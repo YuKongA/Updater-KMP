@@ -220,7 +220,9 @@ fun TextFieldWithDropdown(
 @Composable
 fun MessageCardViews() {
     Card(
-        elevation = CardDefaults.cardElevation(2.dp), modifier = Modifier.fillMaxWidth().padding(
+        colors = CardDefaults.cardColors(
+            contentColor = MaterialTheme.colorScheme.onSurface, containerColor = MaterialTheme.colorScheme.surface
+        ), elevation = CardDefaults.cardElevation(2.dp), modifier = Modifier.fillMaxWidth().padding(
             start = 16.dp, end = 16.dp, top = 16.dp, bottom = 0.dp
         ), shape = RoundedCornerShape(10.dp)
     ) {
@@ -237,7 +239,9 @@ fun MoreCardViews(
     changeLog: String,
 ) {
     Card(
-        elevation = CardDefaults.cardElevation(2.dp), modifier = Modifier.fillMaxWidth().padding(
+        colors = CardDefaults.cardColors(
+            contentColor = MaterialTheme.colorScheme.onSurface, containerColor = MaterialTheme.colorScheme.surface
+        ), elevation = CardDefaults.cardElevation(2.dp), modifier = Modifier.fillMaxWidth().padding(
             start = 16.dp, end = 16.dp, top = 16.dp, bottom = 0.dp
         ), shape = RoundedCornerShape(10.dp)
     ) {
@@ -255,7 +259,9 @@ fun MoreCardViews(
 fun DownloadCardViews(
 ) {
     Card(
-        elevation = CardDefaults.cardElevation(2.dp), modifier = Modifier.fillMaxWidth().padding(16.dp), shape = RoundedCornerShape(10.dp)
+        colors = CardDefaults.cardColors(
+            contentColor = MaterialTheme.colorScheme.onSurface, containerColor = MaterialTheme.colorScheme.surface
+        ), elevation = CardDefaults.cardElevation(2.dp), modifier = Modifier.fillMaxWidth().padding(16.dp), shape = RoundedCornerShape(10.dp)
     ) {
         Text(
             "下载链接", modifier = Modifier.fillMaxWidth().padding(
