@@ -1,5 +1,7 @@
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Login
@@ -21,6 +24,7 @@ import androidx.compose.material.icons.outlined.DeveloperMode
 import androidx.compose.material.icons.outlined.Smartphone
 import androidx.compose.material.icons.outlined.TravelExplore
 import androidx.compose.material.icons.outlined.Update
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -47,12 +51,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -83,13 +93,11 @@ fun App() {
 @Composable
 private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior) {
     CenterAlignedTopAppBar(title = { Text(text = "Updater KMM", style = MaterialTheme.typography.titleLarge) }, navigationIcon = {
-        IconButton(onClick = { /* Handle navigation icon click */ }) {
-            Icon(
-                imageVector = Icons.Outlined.Update, contentDescription = "Navigation Icon", tint = MaterialTheme.colorScheme.onSurface
-            )
-        }
+        AboutDialog()
     }, actions = {
-        IconButton(onClick = { /* Handle action icon click */ }) {
+        IconButton(onClick = {
+            //TODO: Login Dialog
+        }) {
             Icon(
                 imageVector = Icons.AutoMirrored.Outlined.Login, contentDescription = "Action Icon", tint = MaterialTheme.colorScheme.onSurface
             )
@@ -174,8 +182,71 @@ fun EditTextFields() {
             )
         })
     }
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AboutDialog() {
+    var showDialog by remember { mutableStateOf(false) }
+    IconButton(onClick = { showDialog = true }) {
+        Icon(
+            imageVector = Icons.Outlined.Update, contentDescription = "Navigation Icon", tint = MaterialTheme.colorScheme.onSurface
+        )
+    }
 
+    if (showDialog) {
+        BasicAlertDialog(onDismissRequest = { showDialog = false }, content = {
+            Box(
+                modifier = Modifier.fillMaxWidth().size(280.dp, 155.dp).clip(RoundedCornerShape(30.dp)).background(MaterialTheme.colorScheme.surfaceContainer)
+            ) {
+                Row(modifier = Modifier.padding(24.dp)) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.size(48.dp).clip(RoundedCornerShape(50.dp)).background(MaterialTheme.colorScheme.primary)
+                    ) {
+                        Image(
+                            imageVector = Icons.Outlined.Update,
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary),
+                            contentDescription = "Logo",
+                            modifier = Modifier.size(25.dp),
+                        )
+                    }
+                    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        Text(
+                            "Updater KMM", modifier = Modifier, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            "v1.0.0", modifier = Modifier, style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+                Column(modifier = Modifier.padding(horizontal = 24.dp).padding(top = 85.dp)) {
+                    Row {
+                        Text(
+                            "在 ", modifier = Modifier, style = MaterialTheme.typography.bodyMedium
+                        )
+                        GitHubLink()
+                        Text(
+                            " 查看源码", modifier = Modifier, style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    Text(
+                        "版权所有 © 2024 YuKongA, AkaneTan", modifier = Modifier, style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+        })
+    }
+}
+
+@Composable
+fun GitHubLink() {
+    val uriHandler = LocalUriHandler.current
+    ClickableText(
+        text = AnnotatedString("GitHub", SpanStyle(textDecoration = TextDecoration.Underline)), onClick = {
+            uriHandler.openUri("https://github.com/YuKongA/Updater-KMM")
+        }, style = MaterialTheme.typography.bodyMedium
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -259,10 +330,11 @@ fun DownloadCardViews(
         ), elevation = CardDefaults.cardElevation(2.dp), modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp), shape = RoundedCornerShape(10.dp)
     ) {
         Text(
-
-            "下载链接", modifier = Modifier.fillMaxWidth().padding(
-                start = 16.dp, end = 16.dp, top = 16.dp, bottom = 0.dp
-            ), fontSize = MaterialTheme.typography.bodyMedium.fontSize, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace
+            "下载链接",
+            modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 0.dp),
+            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+            fontWeight = FontWeight.Bold,
+            fontFamily = FontFamily.Monospace
         )
         DownloadTextView("Official", "xxx", "xxx")
         DownloadTextView("CDN (cdnorg)", "yyy", "yyy")
@@ -339,14 +411,14 @@ fun DownloadTextView(
             modifier = Modifier, horizontalArrangement = Arrangement.SpaceBetween
         ) {
             TextButton(onClick = {
-                /* Handle copy button click */
+                //TODO: Copy button
             }) {
                 Text(
                     "复制", modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize, fontFamily = FontFamily.Monospace
                 )
             }
             TextButton(onClick = {
-                /* Handle download button click */
+                //TODO: Download button
             }) {
                 Text(
                     "下载", modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize, fontFamily = FontFamily.Monospace
