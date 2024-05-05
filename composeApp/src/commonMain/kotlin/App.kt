@@ -1,7 +1,5 @@
 import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,8 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Login
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.outlined.Analytics
 import androidx.compose.material.icons.outlined.Android
@@ -31,13 +27,18 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -46,46 +47,42 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
 fun App() {
     MaterialTheme {
-        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+        Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = { TopAppBar(scrollBehavior) }) { padding ->
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(padding).padding(horizontal = 24.dp).verticalScroll(
+                    rememberScrollState()
+                ), verticalArrangement = Arrangement.spacedBy(18.dp), horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                TopAppBar()
-                Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-                    LoginCardView()
-                    EditTextFields()
-                    MessageCardViews()
-                    MoreCardViews("xxx", "xxx", "xxx")
-                    DownloadCardViews()
-                }
+                LoginCardView()
+                EditTextFields()
+                MessageCardViews()
+                MoreCardViews("xxx", "xxx", "xxx")
+                DownloadCardViews()
             }
         }
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBar() {
-    CenterAlignedTopAppBar(colors = TopAppBarDefaults.topAppBarColors(
-        containerColor = MaterialTheme.colorScheme.surface,
-        titleContentColor = MaterialTheme.colorScheme.onSurface,
-    ), title = {
-        Row(
-            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(text = "Updater KMM", style = MaterialTheme.typography.titleLarge)
-        }
-    }, navigationIcon = {
+private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior) {
+    CenterAlignedTopAppBar(title = { Text(text = "Updater KMM", style = MaterialTheme.typography.titleLarge) }, navigationIcon = {
         IconButton(onClick = { /* Handle navigation icon click */ }) {
             Icon(
                 imageVector = Icons.Outlined.Update, contentDescription = "Navigation Icon", tint = MaterialTheme.colorScheme.onSurface
@@ -97,7 +94,8 @@ fun TopAppBar() {
                 imageVector = Icons.AutoMirrored.Outlined.Login, contentDescription = "Action Icon", tint = MaterialTheme.colorScheme.onSurface
             )
         }
-    })
+    }, scrollBehavior = scrollBehavior
+    )
 }
 
 @Composable
@@ -105,9 +103,7 @@ fun LoginCardView() {
     Card(
         elevation = CardDefaults.cardElevation(2.dp), shape = RoundedCornerShape(10.dp), colors = CardDefaults.cardColors(
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer, containerColor = MaterialTheme.colorScheme.primaryContainer
-        ), modifier = Modifier.fillMaxWidth().padding(
-            start = 16.dp, end = 16.dp, top = 6.dp, bottom = 0.dp
-        )
+        ), modifier = Modifier.fillMaxWidth()
     ) {
         Row(
             modifier = Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically
@@ -133,87 +129,90 @@ fun EditTextFields() {
     val text4 = remember { mutableStateOf("OS1.0.36.0.UNCCNXM") }
     val text5 = remember { mutableStateOf("14.0") }
 
-    OutlinedTextField(value = text1.value, onValueChange = { text1.value = it }, label = { Text("设备名称") }, modifier = Modifier.fillMaxWidth().padding(
-        start = 16.dp, end = 16.dp, top = 16.dp, bottom = 0.dp
-    ), shape = RoundedCornerShape(10.dp), leadingIcon = {
-        Icon(
-            imageVector = Icons.Outlined.Smartphone,
-            contentDescription = null,
+    @Composable
+    fun _OutlinedTextField(
+        value: String, onValueChange: (String) -> Unit, label: String, leadingIcon: ImageVector
+    ) {
+        OutlinedTextField(value = value,
+            onValueChange = onValueChange,
+            label = { Text(label) },
+            leadingIcon = { Icon(imageVector = leadingIcon, null) },
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.fillMaxWidth()
         )
-    })
-    OutlinedTextField(value = text2.value, onValueChange = { text2.value = it }, label = { Text("设备代号") }, modifier = Modifier.fillMaxWidth().padding(
-        start = 16.dp, end = 16.dp, top = 16.dp, bottom = 0.dp
-    ), shape = RoundedCornerShape(10.dp), leadingIcon = {
-        Icon(
-            imageVector = Icons.Outlined.DeveloperMode,
-            contentDescription = null,
+    }
+
+    Column(
+        modifier = Modifier.background(Color.Unspecified).fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        _OutlinedTextField(
+            value = text1.value, onValueChange = { text1.value = it }, label = "设备名称", leadingIcon = Icons.Outlined.Smartphone
         )
-    })
-    val itemsA = listOf("CN", "GL", "EEA", "RU", "TW", "ID", "TR", "IN", "JP", "KR")
-    TextFieldWithDropdown(text = text3, items = itemsA, label = "区域代号", leadingIcon = {
-        Icon(
-            imageVector = Icons.Outlined.TravelExplore,
-            contentDescription = null,
+        _OutlinedTextField(
+            value = text2.value, onValueChange = { text2.value = it }, label = "设备代号", leadingIcon = Icons.Outlined.DeveloperMode
         )
-    })
-    OutlinedTextField(value = text4.value, onValueChange = { text4.value = it }, label = { Text("系统版本") }, modifier = Modifier.fillMaxWidth().padding(
-        start = 16.dp, end = 16.dp, top = 16.dp, bottom = 0.dp
-    ), shape = RoundedCornerShape(10.dp), leadingIcon = {
-        Icon(
-            imageVector = Icons.Outlined.Analytics,
-            contentDescription = null,
+
+        val itemsA = listOf("CN", "GL", "EEA", "RU", "TW", "ID", "TR", "IN", "JP", "KR")
+        TextFieldWithDropdown(text = text3, items = itemsA, label = "区域代号", leadingIcon = {
+            Icon(
+                imageVector = Icons.Outlined.TravelExplore,
+                contentDescription = null,
+            )
+        })
+        _OutlinedTextField(
+            value = text4.value, onValueChange = { text4.value = it }, label = "系统版本", leadingIcon = Icons.Outlined.Analytics
         )
-    })
-    val itemsB = listOf(
-        "14.0", "13.0", "12.0", "11.0", "10.0", "9.0", "8.1", "8.0", "7.1", "7.0", "6.0", "5.1", "5.0", "4.4"
-    )
-    TextFieldWithDropdown(text = text5, items = itemsB, label = "安卓版本", leadingIcon = {
-        Icon(
-            imageVector = Icons.Outlined.Android,
-            contentDescription = null,
+        val itemsB = listOf(
+            "14.0", "13.0", "12.0", "11.0", "10.0", "9.0", "8.1", "8.0", "7.1", "7.0", "6.0", "5.1", "5.0", "4.4"
         )
-    })
+        TextFieldWithDropdown(text = text5, items = itemsB, label = "安卓版本", leadingIcon = {
+            Icon(
+                imageVector = Icons.Outlined.Android,
+                contentDescription = null,
+            )
+        })
+    }
+
+
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextFieldWithDropdown(
-    text: MutableState<String>,
-    items: List<String>,
-    label: String,
-    modifier: Modifier = Modifier,
-    leadingIcon: @Composable (() -> Unit),
-    onItemSelected: (String) -> Unit = {}
+    text: MutableState<String>, items: List<String>, label: String, leadingIcon: @Composable (() -> Unit)
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf("") }
-    val interactionSource = remember { MutableInteractionSource() }
 
-    Box(modifier = modifier.fillMaxWidth()) {
-        OutlinedTextField(value = text.value, onValueChange = {
-            text.value = it
-        }, label = { Text(label) }, modifier = Modifier.fillMaxWidth().padding(
-            start = 16.dp, end = 16.dp, top = 16.dp, bottom = 0.dp
-        ), interactionSource = interactionSource, shape = RoundedCornerShape(10.dp), leadingIcon = leadingIcon, trailingIcon = {
-            IconButton(onClick = { expanded = !expanded }) {
-                Icon(
-                    imageVector = if (expanded) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown, contentDescription = null
-                )
-            }
-            DropdownMenu(
-                expanded = expanded, onDismissRequest = { expanded = false }, modifier = Modifier.fillMaxHeight(0.4f)
-            ) {
-                items.forEach { item ->
-                    DropdownMenuItem(text = { Text(item) }, onClick = {
-                        item.let {
-                            selectedText = it
-                            text.value = it
-                            expanded = false
-                            onItemSelected(it)
-                        }
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it },
+    ) {
+        OutlinedTextField(value = text.value,
+            onValueChange = {},
+            label = { Text(label) },
+            readOnly = true,
+            modifier = Modifier.menuAnchor().fillMaxWidth(),
+            shape = RoundedCornerShape(10.dp),
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+            leadingIcon = leadingIcon
+        )
+        DropdownMenu(
+            modifier = Modifier.exposedDropdownSize().fillMaxHeight(0.6f),
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            items.forEach { item ->
+                DropdownMenuItem(modifier = Modifier.background(Color.Transparent),
+                    text = { Text(item) },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                    onClick = {
+                        text.value = item
+                        expanded = false
                     })
-                }
             }
-        })
+        }
     }
 }
 
@@ -221,10 +220,8 @@ fun TextFieldWithDropdown(
 fun MessageCardViews() {
     Card(
         colors = CardDefaults.cardColors(
-            contentColor = MaterialTheme.colorScheme.onSurface, containerColor = MaterialTheme.colorScheme.surface
-        ), elevation = CardDefaults.cardElevation(2.dp), modifier = Modifier.fillMaxWidth().padding(
-            start = 16.dp, end = 16.dp, top = 16.dp, bottom = 0.dp
-        ), shape = RoundedCornerShape(10.dp)
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer, containerColor = MaterialTheme.colorScheme.surfaceContainer
+        ), elevation = CardDefaults.cardElevation(2.dp), modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp)
     ) {
         Column {
             MessageCardView("xxx", "xxx", "xxx", "xxx", "xxx")
@@ -240,10 +237,8 @@ fun MoreCardViews(
 ) {
     Card(
         colors = CardDefaults.cardColors(
-            contentColor = MaterialTheme.colorScheme.onSurface, containerColor = MaterialTheme.colorScheme.surface
-        ), elevation = CardDefaults.cardElevation(2.dp), modifier = Modifier.fillMaxWidth().padding(
-            start = 16.dp, end = 16.dp, top = 16.dp, bottom = 0.dp
-        ), shape = RoundedCornerShape(10.dp)
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer, containerColor = MaterialTheme.colorScheme.surfaceContainer
+        ), elevation = CardDefaults.cardElevation(2.dp), modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(10.dp)
@@ -260,17 +255,18 @@ fun DownloadCardViews(
 ) {
     Card(
         colors = CardDefaults.cardColors(
-            contentColor = MaterialTheme.colorScheme.onSurface, containerColor = MaterialTheme.colorScheme.surface
-        ), elevation = CardDefaults.cardElevation(2.dp), modifier = Modifier.fillMaxWidth().padding(16.dp), shape = RoundedCornerShape(10.dp)
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer, containerColor = MaterialTheme.colorScheme.surfaceContainer
+        ), elevation = CardDefaults.cardElevation(2.dp), modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp), shape = RoundedCornerShape(10.dp)
     ) {
         Text(
+
             "下载链接", modifier = Modifier.fillMaxWidth().padding(
                 start = 16.dp, end = 16.dp, top = 16.dp, bottom = 0.dp
-            ), fontSize = MaterialTheme.typography.bodyLarge.fontSize, fontWeight = FontWeight(500)
+            ), fontSize = MaterialTheme.typography.bodyMedium.fontSize, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace
         )
-        DownloadTextView("xxx", "xxx", "xxx")
-        DownloadTextView("yyy", "yyy", "yyy")
-        DownloadTextView("zzz", "zzz", "zzz", 16.dp)
+        DownloadTextView("Official", "xxx", "xxx")
+        DownloadTextView("CDN (cdnorg)", "yyy", "yyy")
+        DownloadTextView("CDN (aliyuncs)", "zzz", "zzz")
     }
 }
 
@@ -295,10 +291,14 @@ fun MessageTextView(
         modifier = Modifier.fillMaxWidth().padding(6.dp), horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            title, modifier = Modifier, fontSize = MaterialTheme.typography.bodyLarge.fontSize, fontWeight = FontWeight(500)
+            title,
+            modifier = Modifier,
+            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+            fontWeight = FontWeight.Bold,
+            fontFamily = FontFamily.Monospace,
         )
         Text(
-            content, modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize
+            content, modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize, fontFamily = FontFamily.Monospace
         )
     }
 }
@@ -311,37 +311,45 @@ fun MoreTextView(
         modifier = Modifier.fillMaxWidth().padding(6.dp)
     ) {
         Text(
-            title, modifier = Modifier, fontSize = MaterialTheme.typography.bodyLarge.fontSize, fontWeight = FontWeight(500)
+            title, modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace
         )
         Text(
-            content, modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize
+            content, modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize, fontFamily = FontFamily.Monospace
         )
     }
 }
 
 @Composable
 fun DownloadTextView(
-    title: String, copy: String, download: String, bottom: Dp = 0.dp
+    title: String, copy: String, download: String
 ) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(
-            start = 16.dp, end = 16.dp, top = 0.dp, bottom = bottom
+            start = 16.dp, end = 16.dp, top = 0.dp, bottom = 0.dp
         ), horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            title, fontSize = MaterialTheme.typography.bodyMedium.fontSize, textAlign = TextAlign.Center, modifier = Modifier.align(Alignment.CenterVertically)
+            title,
+            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+            textAlign = TextAlign.Start,
+            modifier = Modifier.align(Alignment.CenterVertically).fillMaxWidth(0.5f),
+            fontFamily = FontFamily.Monospace,
         )
         Row(
-            modifier = Modifier.fillMaxWidth(0.5f), horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier, horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            TextButton(onClick = { /* Handle copy button click */ }) {
+            TextButton(onClick = {
+                /* Handle copy button click */
+            }) {
                 Text(
-                    copy, modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                    "复制", modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize, fontFamily = FontFamily.Monospace
                 )
             }
-            TextButton(onClick = { /* Handle download button click */ }) {
+            TextButton(onClick = {
+                /* Handle download button click */
+            }) {
                 Text(
-                    download, modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                    "下载", modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize, fontFamily = FontFamily.Monospace
                 )
             }
         }
