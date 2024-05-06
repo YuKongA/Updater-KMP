@@ -1,5 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/java,kotlin,composer,android,androidstudio,visualstudiocode,macos,linux,windows,jetbrains
-# Edit at https://www.toptal.com/developers/gitignore?templates=java,kotlin,composer,android,androidstudio,visualstudiocode,macos,linux,windows,jetbrains
+# Created by https://www.toptal.com/developers/gitignore/api/java,linux,macos,kotlin,android,windows,composer,jetbrains,androidstudio,visualstudiocode,xcode
+# Edit at https://www.toptal.com/developers/gitignore?templates=java,linux,macos,kotlin,android,windows,composer,jetbrains,androidstudio,visualstudiocode,xcode
 
 ### Android ###
 # Gradle files
@@ -294,6 +294,23 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+### Xcode ###
+## User settings
+xcuserdata/
+
+## Xcode 8 and earlier
+*.xcscmblueprint
+*.xccheckout
+
+### Xcode Patch ###
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+!*.xcodeproj/project.xcworkspace/
+!*.xcworkspace/contents.xcworkspacedata
+/*.gcno
+**/xcshareddata/WorkspaceSettings.xcsettings
+
 ### AndroidStudio ###
 # Covers files to be ignored for android development using Android Studio.
 
@@ -402,4 +419,4 @@ obj/
 
 !/gradle/wrapper/gradle-wrapper.jar
 
-# End of https://www.toptal.com/developers/gitignore/api/java,kotlin,composer,android,androidstudio,visualstudiocode,macos,linux,windows,jetbrains
+# End of https://www.toptal.com/developers/gitignore/api/java,linux,macos,kotlin,android,windows,composer,jetbrains,androidstudio,visualstudiocode,xcode
