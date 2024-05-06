@@ -409,7 +409,7 @@ fun DownloadTextView(
             modifier = Modifier, horizontalArrangement = Arrangement.SpaceBetween
         ) {
             TextButton(onClick = {
-                //TODO: Copy button
+                copyToClipboard(copy)
             }) {
                 Text(
                     "复制", modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize
