@@ -59,7 +59,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -70,19 +69,24 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 @Preview
 fun App() {
-    MaterialTheme {
-        val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
-        Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = { TopAppBar(scrollBehavior) }) { padding ->
-            Column(
-                modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(padding).padding(horizontal = 24.dp).verticalScroll(
-                    rememberScrollState()
-                ), verticalArrangement = Arrangement.spacedBy(18.dp), horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                LoginCardView()
-                EditTextFields()
-                MessageCardViews()
-                MoreCardViews("xxx", "xxx", "xxx")
-                DownloadCardViews()
+
+    AppTheme {
+        MaterialTheme {
+            val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+            Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = { TopAppBar(scrollBehavior) }) { padding ->
+                Column(
+                    modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(padding).padding(horizontal = 24.dp)
+                        .verticalScroll(
+                            rememberScrollState()
+                        ), verticalArrangement = Arrangement.spacedBy(18.dp), horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    LoginCardView()
+                    EditTextFields()
+                    MessageCardViews()
+                    MoreCardViews("xxx", "xxx", "xxx")
+                    DownloadCardViews()
+                    Text("当前运行在 ${getPlatform().name}!", modifier = Modifier.padding(bottom = 24.dp))
+                }
             }
         }
     }
@@ -327,14 +331,13 @@ fun DownloadCardViews(
     Card(
         colors = CardDefaults.cardColors(
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer, containerColor = MaterialTheme.colorScheme.surfaceContainer
-        ), elevation = CardDefaults.cardElevation(2.dp), modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp), shape = RoundedCornerShape(10.dp)
+        ), elevation = CardDefaults.cardElevation(2.dp), modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp)
     ) {
         Text(
             "下载链接",
             modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 0.dp),
             fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-            fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace
+            fontWeight = FontWeight.Bold
         )
         DownloadTextView("Official", "xxx", "xxx")
         DownloadTextView("CDN (cdnorg)", "yyy", "yyy")
@@ -363,14 +366,10 @@ fun MessageTextView(
         modifier = Modifier.fillMaxWidth().padding(6.dp), horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            title,
-            modifier = Modifier,
-            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-            fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace,
+            title, modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize, fontWeight = FontWeight.Bold
         )
         Text(
-            content, modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize, fontFamily = FontFamily.Monospace
+            content, modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize
         )
     }
 }
@@ -383,10 +382,10 @@ fun MoreTextView(
         modifier = Modifier.fillMaxWidth().padding(6.dp)
     ) {
         Text(
-            title, modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace
+            title, modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize, fontWeight = FontWeight.Bold
         )
         Text(
-            content, modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize, fontFamily = FontFamily.Monospace
+            content, modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize
         )
     }
 }
@@ -405,7 +404,6 @@ fun DownloadTextView(
             fontSize = MaterialTheme.typography.bodyMedium.fontSize,
             textAlign = TextAlign.Start,
             modifier = Modifier.align(Alignment.CenterVertically).fillMaxWidth(0.5f),
-            fontFamily = FontFamily.Monospace,
         )
         Row(
             modifier = Modifier, horizontalArrangement = Arrangement.SpaceBetween
@@ -414,14 +412,14 @@ fun DownloadTextView(
                 //TODO: Copy button
             }) {
                 Text(
-                    "复制", modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize, fontFamily = FontFamily.Monospace
+                    "复制", modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize
                 )
             }
             TextButton(onClick = {
                 //TODO: Download button
             }) {
                 Text(
-                    "下载", modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize, fontFamily = FontFamily.Monospace
+                    "下载", modifier = Modifier, fontSize = MaterialTheme.typography.bodyMedium.fontSize
                 )
             }
         }
