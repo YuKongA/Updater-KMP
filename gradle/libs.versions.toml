@@ -7,7 +7,7 @@ cryptography = "0.3.0"
 kotlin = "1.9.23"
 kotlinxCoroutinesCore = "1.8.0"
 kotlinxSerializationJson = "1.6.3"
-okio = "3.9.0"
+ktorClient = "3.0.0-beta-2-eap-932"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
@@ -20,7 +20,12 @@ cryptography-core = { module = "dev.whyoleg.cryptography:cryptography-core", ver
 cryptography-provider-jdk = { module = "dev.whyoleg.cryptography:cryptography-provider-jdk", version.ref = "cryptography" }
 cryptography-provider-webcrypto = { module = "dev.whyoleg.cryptography:cryptography-provider-webcrypto", version.ref = "cryptography" }
 cryptography-provider-apple = { module = "dev.whyoleg.cryptography:cryptography-provider-apple", version.ref = "cryptography" }
-okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
+
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClient" }
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClient" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktorClient" }
+ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktorClient" }
+ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktorClient" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

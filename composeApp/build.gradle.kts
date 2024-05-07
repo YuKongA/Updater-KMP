@@ -52,12 +52,6 @@ kotlin {
         val desktopMain by getting
         val wasmJsMain by getting
 
-        androidMain.dependencies {
-            implementation(libs.compose.ui.tooling.preview)
-            implementation(libs.androidx.activity.compose)
-
-            implementation(libs.cryptography.provider.jdk)
-        }
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -66,21 +60,34 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-
+            // Added
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
-
             implementation(libs.cryptography.core)
-            implementation(libs.okio)
-
+            implementation(libs.ktor.client.core)
+        }
+        androidMain.dependencies {
+            implementation(libs.compose.ui.tooling.preview)
+            implementation(libs.androidx.activity.compose)
+            // Added
+            implementation(libs.cryptography.provider.jdk)
+            implementation(libs.ktor.client.android)
+        }
+        iosMain.dependencies {
+            // Added
+            implementation(libs.cryptography.provider.apple)
+            implementation(libs.ktor.client.darwin)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
-
+            // Added
             implementation(libs.cryptography.provider.jdk)
+            implementation(libs.ktor.client.java)
         }
         wasmJsMain.dependencies {
+            // Added
             implementation(libs.cryptography.provider.webcrypto)
+            implementation(libs.ktor.client.js)
         }
     }
 }

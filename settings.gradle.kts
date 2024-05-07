@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 rootProject.name = "UpdaterKMM"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
@@ -23,6 +25,9 @@ dependencyResolutionManagement {
                 includeGroupAndSubgroups("com.android")
                 includeGroupAndSubgroups("com.google")
             }
+        }
+        maven {
+            url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap")
         }
         mavenCentral()
     }

@@ -1,12 +1,12 @@
 import dev.whyoleg.cryptography.CryptographyProvider
 import dev.whyoleg.cryptography.DelicateCryptographyApi
 import dev.whyoleg.cryptography.algorithms.symmetric.AES
-import okio.internal.commonAsUtf8ToByteArray
-import okio.internal.commonToUtf8String
+import io.ktor.utils.io.core.String
+import io.ktor.utils.io.core.toByteArray
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-val iv = "0102030405060708".commonAsUtf8ToByteArray()
+val iv = "0102030405060708".toByteArray()
 
 suspend fun miuiCipher(securityKey: ByteArray): AES.CBC.Cipher {
     val provider = CryptographyProvider.Default
@@ -18,7 +18,7 @@ suspend fun miuiCipher(securityKey: ByteArray): AES.CBC.Cipher {
 @OptIn(DelicateCryptographyApi::class, ExperimentalEncodingApi::class)
 suspend fun miuiEncrypt(jsonRequest: String, securityKey: ByteArray): String {
     val cipher = miuiCipher(securityKey)
-    val encrypted = cipher.encrypt(iv, jsonRequest.commonAsUtf8ToByteArray())
+    val encrypted = cipher.encrypt(iv, jsonRequest.toByteArray())
     return Base64.UrlSafe.encode(encrypted)
 }
 
@@ -27,5 +27,5 @@ suspend fun miuiDecrypt(encryptedText: String, securityKey: ByteArray): String {
     val cipher = miuiCipher(securityKey)
     val encryptedTextBytes = Base64.Mime.decode(encryptedText)
     val decryptedTextBytes = cipher.decrypt(iv, encryptedTextBytes)
-    return decryptedTextBytes.commonToUtf8String()
+    return String(decryptedTextBytes)
 }
