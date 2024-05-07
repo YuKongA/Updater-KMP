@@ -9,6 +9,9 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
 }
 
+version = "1.0.0"
+val pkg = "top.yukonga.updater.kmm"
+
 kotlin {
     @OptIn(ExperimentalWasmDsl::class) wasmJs {
         moduleName = "composeApp"
@@ -48,7 +51,22 @@ kotlin {
         }
     }
 
+    listOf(
+        macosX64(), macosArm64()
+    ).forEach { macosTarget ->
+        macosTarget.binaries.framework {
+            baseName = "ComposeApp"
+            isStatic = true
+        }
+    }
+
     sourceSets {
+        all {
+            languageSettings {
+                optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
+            }
+        }
+
         val desktopMain by getting
         val wasmJsMain by getting
 
@@ -72,6 +90,7 @@ kotlin {
             // Added
             implementation(libs.cryptography.provider.jdk)
             implementation(libs.ktor.client.android)
+            implementation(libs.slf4j.simple) // Only used to complete R8
         }
         iosMain.dependencies {
             // Added
@@ -93,19 +112,16 @@ kotlin {
 }
 
 android {
-    namespace = "top.yukonga.updater.kmm"
+    namespace = pkg
     compileSdk = 34
-
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    sourceSets["main"].res.srcDirs("src/androidMain/res")
-    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
-        applicationId = "top.yukonga.updater.kmm"
+        applicationId = pkg
         minSdk = 26
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0"
+        versionName = version.toString()
     }
     packaging {
         resources {
@@ -132,8 +148,8 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "top.yukonga.updater.kmm"
-            packageVersion = "1.0.0"
+            packageName = pkg
+            packageVersion = version.toString()
         }
     }
 }

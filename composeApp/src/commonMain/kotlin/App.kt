@@ -80,6 +80,8 @@ import kotlinx.coroutines.launch
 import misc.json
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
+const val version = "v1.0.0"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
@@ -444,7 +446,7 @@ fun AboutDialog() {
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "v1.0.0",
+                                text = version,
                                 modifier = Modifier,
                                 style = MaterialTheme.typography.bodyMedium
                             )
