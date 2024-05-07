@@ -19,10 +19,13 @@ kotlin {
                     static = (static ?: mutableListOf()).apply {
                         // Serve sources to debug inside browser
                         add(project.projectDir.path)
+                        add(project.projectDir.path + "/commonMain/")
+                        add(project.projectDir.path + "/wasmJsMain/")
                     }
                 }
             }
         }
+        applyBinaryen()
         binaries.executable()
     }
 
@@ -47,10 +50,13 @@ kotlin {
 
     sourceSets {
         val desktopMain by getting
+        val wasmJsMain by getting
 
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
+
+            implementation(libs.cryptography.provider.jdk)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -60,11 +66,21 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
+
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
+
+            implementation(libs.cryptography.core)
+            implementation(libs.okio)
+
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
+
+            implementation(libs.cryptography.provider.jdk)
+        }
+        wasmJsMain.dependencies {
+            implementation(libs.cryptography.provider.webcrypto)
         }
     }
 }
