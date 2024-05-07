@@ -5,7 +5,7 @@ compose = "1.6.7"
 compose-plugin = "1.6.2"
 cryptography = "0.3.0"
 kotlin = "1.9.23"
-kotlinxCoroutinesCore = "1.8.0"
+kotlinxCoroutines = "1.8.0"
 kotlinxSerializationJson = "1.6.3"
 ktorClient = "3.0.0-beta-2-eap-932"
 
@@ -13,7 +13,7 @@ ktorClient = "3.0.0-beta-2-eap-932"
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 cryptography-core = { module = "dev.whyoleg.cryptography:cryptography-core", version.ref = "cryptography" }

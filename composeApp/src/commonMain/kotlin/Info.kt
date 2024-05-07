@@ -1,9 +1,10 @@
 import data.RequestParamHelper
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.request.post
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.Parameters
-import io.ktor.http.formUrlEncode
+import io.ktor.client.request.url
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import io.ktor.utils.io.InternalAPI
 import io.ktor.utils.io.core.toByteArray
 import kotlinx.serialization.encodeToString
@@ -37,16 +38,14 @@ suspend fun getRecoveryRomInfo(codeNameExt: String, regionCode: String, romVersi
     val jsonData = generateJson(codeNameExt, regionCode, romVersion, androidVersion, userId)
     val encryptedText = miuiEncrypt(jsonData, securityKey)
     val client = HttpClient()
-    val formParameters = Parameters.build {
-        append("q", encryptedText)
-        append("t", serviceToken)
-        append("s", port)
-    }
+    val postData = "q=${encryptedText}&t=${serviceToken}&s=${port}"
     val recoveryUrl = if (accountType == "GL") INTL_RECOVERY_URL else CN_RECOVERY_URL
-    val response = client.post(recoveryUrl) {
-        body = formParameters.formUrlEncode()
+    val response = client.post {
+        url(recoveryUrl)
+        this.body = postData
+        contentType(ContentType.Application.FormUrlEncoded)
     }
+    val requestedEncryptedText = response.body<String>()
     client.close()
-    val requestedEncryptedText = response.bodyAsText()
     return miuiDecrypt(requestedEncryptedText, securityKey)
 }
