@@ -1,6 +1,4 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -13,23 +11,6 @@ version = "1.0.0"
 val pkg = "top.yukonga.updater.kmm"
 
 kotlin {
-    @OptIn(ExperimentalWasmDsl::class) wasmJs {
-        moduleName = "composeApp"
-        browser {
-            commonWebpackConfig {
-                outputFileName = "composeApp.js"
-                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                    static = (static ?: mutableListOf()).apply {
-                        // Serve sources to debug inside browser
-                        add(project.projectDir.path)
-                    }
-                }
-            }
-        }
-        applyBinaryen()
-        binaries.executable()
-    }
-
     androidTarget {
         compilations.all {
             kotlinOptions {
@@ -49,24 +30,8 @@ kotlin {
         }
     }
 
-    listOf(
-        macosX64(), macosArm64()
-    ).forEach { macosTarget ->
-        macosTarget.binaries.framework {
-            baseName = "ComposeApp"
-            isStatic = true
-        }
-    }
-
     sourceSets {
-        all {
-            languageSettings {
-                optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
-            }
-        }
-
         val desktopMain by getting
-        val wasmJsMain by getting
 
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -81,6 +46,7 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.cryptography.core)
             implementation(libs.ktor.client.core)
+            implementation(libs.slf4j.simple)
         }
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)
@@ -88,7 +54,6 @@ kotlin {
             // Added
             implementation(libs.cryptography.provider.jdk)
             implementation(libs.ktor.client.android)
-            implementation(libs.slf4j.simple) // Only used to complete R8
         }
         iosMain.dependencies {
             // Added
@@ -100,11 +65,6 @@ kotlin {
             // Added
             implementation(libs.cryptography.provider.jdk)
             implementation(libs.ktor.client.java)
-        }
-        wasmJsMain.dependencies {
-            // Added
-            implementation(libs.cryptography.provider.webcrypto)
-            implementation(libs.ktor.client.js)
         }
     }
 }
@@ -150,8 +110,4 @@ compose.desktop {
             packageVersion = version.toString()
         }
     }
-}
-
-compose.experimental {
-    web.application {}
 }

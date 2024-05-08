@@ -15,7 +15,13 @@ var accountType = "CN"
 var serviceToken = ""
 var port = "1"
 
-fun generateJson(codeNameExt: String, regionCode: String, romVersion: String, androidVersion: String, userId: String): String {
+fun generateJson(
+    codeNameExt: String,
+    regionCode: String,
+    romVersion: String,
+    androidVersion: String,
+    userId: String
+): String {
     val data = RequestParamHelper(
         id = userId,
         c = androidVersion,
@@ -30,7 +36,7 @@ fun generateJson(codeNameExt: String, regionCode: String, romVersion: String, an
     return Json.encodeToString(data)
 }
 
-suspend fun getRecoveryRomInfoDefault(
+suspend fun getRecoveryRomInfo(
     codeNameExt: String, regionCode: String, romVersion: String, androidVersion: String
 ): String {
     val jsonData = generateJson(codeNameExt, regionCode, romVersion, androidVersion, userId)
@@ -45,5 +51,3 @@ suspend fun getRecoveryRomInfoDefault(
     client.close()
     return miuiDecrypt(requestedEncryptedText, securityKey)
 }
-
-expect suspend fun getRecoveryRomInfo(codeNameExt: String, regionCode: String, romVersion: String, androidVersion: String): String
