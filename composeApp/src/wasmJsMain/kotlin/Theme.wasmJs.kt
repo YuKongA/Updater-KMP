@@ -8,8 +8,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import cn.edu.buct.snc.xware.manage.misc.LoadFontAsync
-import cn.edu.buct.snc.xware.manage.misc.loadFontAsync
+import misc.LoadFontAsync
+import misc.loadFontAsync
 
 @Composable
 actual fun PlatformSpecifiedAppTheme(

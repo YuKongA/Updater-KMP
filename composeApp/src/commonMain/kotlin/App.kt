@@ -220,7 +220,6 @@ private fun FloatActionButton(
                         androidVersion.value
                     )
                 )
-                println(recoveryRomInfo)
                 if (recoveryRomInfo.currentRom?.branch != null) {
                     val log = StringBuilder()
                     recoveryRomInfo.currentRom.changelog!!.forEach {

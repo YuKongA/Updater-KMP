@@ -1,4 +1,4 @@
-package cn.edu.buct.snc.xware.manage.misc
+package misc
 
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
@@ -7,12 +7,9 @@ import androidx.compose.ui.text.platform.Font
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
-import misc.AsyncLazy
-import misc.asyncLazy
 import org.jetbrains.compose.resources.InternalResourceApi
 import org.jetbrains.compose.resources.readResourceBytes
 import kotlin.reflect.KProperty
-
 
 class LoadFontAsync
 @OptIn(DelicateCoroutinesApi::class) constructor(
