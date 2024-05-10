@@ -277,7 +277,6 @@ private fun FloatActionButton(
                     perfSet("androidVersion", androidVersion.value)
 
                     snackbarHostState.currentSnackbarData?.dismiss()
-                    snackbarHostState.showSnackbar(message = "查询成功")
                 } else {
                     device.value = ""
                     version.value = ""
