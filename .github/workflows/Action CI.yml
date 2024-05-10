@@ -1,0 +1,87 @@
+name: Action CI
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+
+jobs:
+  Windows-x64:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Build
+        run: ./gradlew packageReleaseDistributionForCurrentOS
+
+      - name: Upload UpdaterKMM Windows-x64-msi
+        uses: actions/upload-artifact@v4
+        with:
+          name: UpdaterKMM-windows-x64-msi
+          path: composeApp/build/compose/binaries/main-release/
+          compression-level: 9
+
+  macOS-arm64:
+        runs-on: macos-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+      
+            - name: Setup JDK 17
+              uses: actions/setup-java@v4
+              with:
+                java-version: 17
+                distribution: 'temurin'
+                cache: 'gradle'
+      
+            - name: Build
+              run: ./gradlew packageReleaseDistributionForCurrentOS
+
+            - name: Upload UpdaterKMM Darwin-arm64-dmg
+              uses: actions/upload-artifact@v4
+              with:
+                name: UpdaterKMM-darwin-arm64-dmg
+                path: composeApp/build/compose/binaries/main-release/
+                compression-level: 9
+
+  Linux-x64:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Build
+        run: |
+          bash ./gradlew packageReleaseDistributionForCurrentOS
+          bash ./gradlew assembleRelease
+
+      - name: Upload UpdaterKMM Linux-x64-deb
+        uses: actions/upload-artifact@v4
+        with:
+          name: UpdaterKMM-linux-x64-deb
+          path: composeApp/build/compose/binaries/main-release/
+          compression-level: 9
+
+      - name: Upload UpdaterKMM Android-arm64-apk
+        uses: actions/upload-artifact@v4
+        with:
+          name: UpdaterKMM-android-arm64-apk
+          path: composeApp/build/outputs/apk/release
+          compression-level: 9
