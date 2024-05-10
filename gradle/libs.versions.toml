@@ -7,7 +7,7 @@ cryptography = "0.3.0"
 kotlin = "1.9.23"
 kotlinxCoroutines = "1.8.0"
 kotlinxSerializationJson = "1.6.3"
-ktorClient = "2.3.11"
+ktorClient = "3.0.0-wasm2"
 slf4jSimple = "2.0.9"
 
 [libraries]
