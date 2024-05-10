@@ -8,10 +8,13 @@ import androidx.compose.ui.window.rememberWindowState
 
 fun main() = application {
     val state = rememberWindowState(
-        size = DpSize(420.dp, 800.dp), position = WindowPosition.Aligned(Alignment.Center)
+        size = DpSize(420.dp, 820.dp),
+        position = WindowPosition.Aligned(Alignment.Center)
     )
     Window(
-        onCloseRequest = ::exitApplication, title = "Updater KMM", state = state
+        onCloseRequest = ::exitApplication,
+        title = "Updater KMM",
+        state = state
     ) {
         App()
     }

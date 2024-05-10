@@ -10,7 +10,7 @@ import io.ktor.client.request.url
 import io.ktor.client.statement.request
 import io.ktor.http.ContentType
 import io.ktor.http.content.TextContent
-import io.ktor.utils.io.InternalAPI
+import io.ktor.util.InternalAPI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString

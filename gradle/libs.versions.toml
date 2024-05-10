@@ -7,7 +7,7 @@ cryptography = "0.3.0"
 kotlin = "1.9.23"
 kotlinxCoroutines = "1.8.0"
 kotlinxSerializationJson = "1.6.3"
-ktorClient = "3.0.0-wasm2"
+ktorClient = "2.3.11"
 slf4jSimple = "2.0.9"
 
 [libraries]
@@ -19,14 +19,12 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 
 cryptography-core = { module = "dev.whyoleg.cryptography:cryptography-core", version.ref = "cryptography" }
 cryptography-provider-jdk = { module = "dev.whyoleg.cryptography:cryptography-provider-jdk", version.ref = "cryptography" }
-cryptography-provider-webcrypto = { module = "dev.whyoleg.cryptography:cryptography-provider-webcrypto", version.ref = "cryptography" }
 cryptography-provider-apple = { module = "dev.whyoleg.cryptography:cryptography-provider-apple", version.ref = "cryptography" }
 
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClient" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClient" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktorClient" }
 ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktorClient" }
-ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktorClient" }
 
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4jSimple" }
 

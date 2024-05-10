@@ -1,4 +1,6 @@
+import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import java.io.ByteArrayOutputStream
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -78,12 +80,17 @@ android {
         applicationId = pkg
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
+        versionCode = getVersionCode()
         versionName = version.toString()
     }
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "**"
+        }
+        applicationVariants.all {
+            outputs.all {
+                (this as BaseVariantOutputImpl).outputFileName = "Updater_KMM-$versionName($versionCode)-$name.apk"
+            }
         }
     }
     buildTypes {
@@ -106,8 +113,23 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = pkg
-            packageVersion = version.toString()
+            packageName = "Updater_KMM"
+            packageVersion = "1.0.0"
         }
     }
+}
+
+fun getGitCommitCount(): Int {
+    val out = ByteArrayOutputStream()
+    exec {
+        commandLine("git", "rev-list", "--count", "HEAD")
+        standardOutput = out
+    }
+    return out.toString().trim().toInt()
+}
+
+fun getVersionCode(): Int {
+    val commitCount = getGitCommitCount()
+    val major = 5
+    return major + commitCount
 }
