@@ -9,7 +9,7 @@ on:
       - 'LICENSE'
 
 jobs:
-  build:
+  amd64:
     runs-on: ubuntu-latest
 
     steps:

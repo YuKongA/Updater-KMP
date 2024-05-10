@@ -9,7 +9,7 @@ on:
       - 'LICENSE'
 
 jobs:
-  build:
+  x64:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
