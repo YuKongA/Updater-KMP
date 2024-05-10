@@ -1,6 +1,5 @@
 import data.LoginHelper
 import data.RequestParamHelper
-import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.http.ContentType
@@ -57,7 +56,7 @@ suspend fun getRecoveryRomInfo(
     }
     val jsonData = generateJson(codeNameExt, regionCode, romVersion, androidVersion, userId)
     val encryptedText = miuiEncrypt(jsonData, securityKey)
-    val client = HttpClient()
+    val client = httpClientPlatform()
     val parameters = Parameters.build {
         append("q", encryptedText)
         append("t", serviceToken)

@@ -55,7 +55,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             // Added
             implementation(libs.cryptography.provider.jdk)
-            implementation(libs.ktor.client.android)
+            implementation(libs.ktor.client.okhttp)
         }
         iosMain.dependencies {
             // Added
@@ -66,7 +66,7 @@ kotlin {
             implementation(compose.desktop.currentOs)
             // Added
             implementation(libs.cryptography.provider.jdk)
-            implementation(libs.ktor.client.java)
+            implementation(libs.ktor.client.cio)
         }
     }
 }
@@ -115,6 +115,9 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "Updater_KMM"
             packageVersion = "1.0.0"
+            macOS {
+                iconFile = file("src/desktopMain/resources/macOS/Icon.icns")
+            }
         }
     }
 }

@@ -21,6 +21,9 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 private const val loginUrl = "https://account.xiaomi.com/pass/serviceLogin"
 private const val loginAuth2Url = "https://account.xiaomi.com/pass/serviceLoginAuth2"
 
+
+expect suspend fun httpClientPlatform(): HttpClient
+
 @OptIn(ExperimentalEncodingApi::class, InternalAPI::class)
 suspend fun login(
     account: String,
@@ -38,7 +41,7 @@ suspend fun login(
         return false
     }
 
-    val client = HttpClient()
+    val client = httpClientPlatform()
     val response1 = client.get { url(loginUrl) }
 
     val md5Hash = md5Hash(password)

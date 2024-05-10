@@ -91,17 +91,17 @@ import kotlinx.coroutines.launch
 import misc.json
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-const val version = "v1.0.0"
+var version = "v1.0.0"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
 fun App() {
-    val deviceName = remember { mutableStateOf(perfGet("deviceName") ?: "Xiaomi 14") }
-    val codeName = remember { mutableStateOf(perfGet("codeName") ?: "houji") }
-    val deviceRegion = remember { mutableStateOf(perfGet("deviceRegion") ?: "CN") }
-    val systemVersion = remember { mutableStateOf(perfGet("systemVersion") ?: "OS1.0.36.0.UNCCNXM") }
-    val androidVersion = remember { mutableStateOf(perfGet("androidVersion") ?: "14.0") }
+    val deviceName = remember { mutableStateOf(perfGet("deviceName") ?: "") }
+    val codeName = remember { mutableStateOf(perfGet("codeName") ?: "") }
+    val deviceRegion = remember { mutableStateOf(perfGet("deviceRegion") ?: "") }
+    val systemVersion = remember { mutableStateOf(perfGet("systemVersion") ?: "") }
+    val androidVersion = remember { mutableStateOf(perfGet("androidVersion") ?: "") }
 
     val isLogin = remember { mutableStateOf(perfGet("loginInfo") != null) }
 
@@ -129,6 +129,7 @@ fun App() {
                 topBar = { TopAppBar(scrollBehavior, snackbarHostState, isLogin) },
                 floatingActionButton = {
                     FloatActionButton(
+                        deviceName,
                         codeName,
                         deviceRegion,
                         systemVersion,
@@ -192,6 +193,7 @@ private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, snackbarHostState
 
 @Composable
 private fun FloatActionButton(
+    deviceName: MutableState<String>,
     codeName: MutableState<String>,
     deviceRegion: MutableState<String>,
     systemVersion: MutableState<String>,
@@ -268,6 +270,7 @@ private fun FloatActionButton(
                     }
                     changeLog.value = log.toString().trimEnd()
 
+                    perfSet("deviceName", deviceName.value)
                     perfSet("codeName", codeName.value)
                     perfSet("deviceRegion", deviceRegion.value)
                     perfSet("systemVersion", systemVersion.value)

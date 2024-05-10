@@ -1,11 +1,15 @@
-actual fun perfGet(key: String): String? {
-    TODO("Not yet implemented")
-}
+import platform.Foundation.NSUserDefaults
+
+private val preferences = NSUserDefaults.standardUserDefaults()
 
 actual fun perfSet(key: String, value: String) {
-    TODO("Not yet implemented")
+    preferences.setObject(value, key)
+}
+
+actual fun perfGet(key: String): String? {
+    return preferences.stringForKey(key)
 }
 
 actual fun perfRemove(key: String) {
-    TODO("Not yet implemented")
+    preferences.removeObjectForKey(key)
 }

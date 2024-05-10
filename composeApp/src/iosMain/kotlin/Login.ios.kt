@@ -1,3 +1,5 @@
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.darwin.Darwin
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.UByteVar
 import kotlinx.cinterop.addressOf
@@ -34,4 +36,8 @@ actual fun sha1Hash(input: String): ByteArray {
         )
     }
     return digest.readBytes(CC_SHA1_DIGEST_LENGTH)
+}
+
+actual suspend fun httpClientPlatform(): HttpClient {
+    return HttpClient(Darwin)
 }

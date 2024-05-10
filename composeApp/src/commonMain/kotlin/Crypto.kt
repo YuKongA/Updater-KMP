@@ -8,12 +8,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 val iv = "0102030405060708".toByteArray()
 
-suspend fun miuiCipher(securityKey: ByteArray): AES.CBC.Cipher {
-    val provider = CryptographyProvider.Default
-    val aesCBC = provider.get(AES.CBC) // AES CBC
-    val key = aesCBC.keyDecoder().decodeFrom(AES.Key.Format.RAW, securityKey)
-    return key.cipher(true) // PKCS5Padding
-}
+expect suspend fun miuiCipher(securityKey: ByteArray): AES.CBC.Cipher
 
 @OptIn(DelicateCryptographyApi::class, ExperimentalEncodingApi::class)
 suspend fun miuiEncrypt(jsonRequest: String, securityKey: ByteArray): String {
