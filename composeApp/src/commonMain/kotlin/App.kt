@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -81,6 +82,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.PopupProperties
 import data.DeviceInfoHelper
 import data.RomInfoHelper
 import kotlinx.coroutines.CoroutineScope
@@ -377,22 +379,6 @@ fun EditTextFields(
             }
         }
     }
-
-    @Composable
-    fun _OutlinedTextField(
-        value: String, onValueChange: (String) -> Unit, label: String, leadingIcon: ImageVector
-    ) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            label = { Text(label) },
-            leadingIcon = { Icon(imageVector = leadingIcon, null) },
-            shape = RoundedCornerShape(10.dp),
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-    }
-
     Column(
         modifier = Modifier.background(Color.Unspecified).fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -418,11 +404,14 @@ fun EditTextFields(
             items = itemsA, label = "区域代号",
             leadingIcon = Icons.Outlined.TravelExplore
         )
-        _OutlinedTextField(
+        OutlinedTextField(
             value = systemVersion.value,
             onValueChange = { systemVersion.value = it },
-            label = "系统版本",
-            leadingIcon = Icons.Outlined.Analytics
+            label = { Text("系统版本") },
+            leadingIcon = { Icon(imageVector = Icons.Outlined.Analytics, null) },
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
         )
         val itemsB = listOf("14.0", "13.0", "12.0", "11.0", "10.0", "9.0", "8.1", "8.0", "7.1", "7.0", "6.0", "5.1", "5.0", "4.4")
         TextFieldWithDropdown(
@@ -727,7 +716,8 @@ fun TextFieldWithDropdown(
                     onClick = {
                         text.value = item
                         isDropdownExpanded = false
-                    })
+                    }
+                )
             }
         }
     }
@@ -752,7 +742,7 @@ fun AutoCompleteTextField(
             value = text.value,
             onValueChange = {
                 onValueChange.value = it
-                isDropdownExpanded = true
+                isDropdownExpanded = it.isNotEmpty()
             },
             singleLine = true,
             label = { Text(label) },
@@ -760,22 +750,26 @@ fun AutoCompleteTextField(
             modifier = Modifier.menuAnchor().fillMaxWidth(),
             leadingIcon = { Icon(imageVector = leadingIcon, null) },
         )
+        val listForItems = ArrayList(items)
+        val list = listForItems.filter {
+            it.startsWith(text.value, ignoreCase = true) || it.contains(text.value, ignoreCase = true)
+        }.sortedBy {
+            !it.startsWith(text.value, ignoreCase = true)
+        }
         DropdownMenu(
-            modifier = Modifier.exposedDropdownSize().heightIn(max = 250.dp),
-            expanded = isDropdownExpanded,
+            modifier = Modifier.exposedDropdownSize().heightIn(max = 250.dp).imePadding(),
+            expanded = isDropdownExpanded && list.isNotEmpty(),
             onDismissRequest = { isDropdownExpanded = false },
+            properties = PopupProperties(focusable = false)
         ) {
-            val listForItems = ArrayList(items)
-            val list = listForItems.filter { item ->
-                item.contains(text.value, ignoreCase = true) || item.replace(" ", "").contains(text.value, ignoreCase = true)
-            }
             list.forEach { text ->
-                DropdownMenuItem(modifier = Modifier.background(Color.Transparent),
+                DropdownMenuItem(
                     text = { Text(text) },
                     onClick = {
                         onValueChange.value = text
                         isDropdownExpanded = false
-                    })
+                    }
+                )
             }
         }
     }
