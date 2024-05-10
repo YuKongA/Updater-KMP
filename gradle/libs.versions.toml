@@ -8,7 +8,7 @@ kotlin = "1.9.23"
 kotlinxCoroutines = "1.8.0"
 kotlinxSerializationJson = "1.6.3"
 ktorClient = "2.3.11"
-slf4jSimple = "2.0.9"
+slf4jSimple = "2.0.13"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }

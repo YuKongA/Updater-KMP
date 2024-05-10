@@ -1,0 +1,80 @@
+name: macOS CI
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'README.md'
+      - 'README_EN.md'
+      - 'LICENSE'
+
+jobs:
+  build-on-x64:
+        runs-on: macos-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup JDK 17
+              uses: actions/setup-java@v4
+              with:
+                java-version: 17
+                distribution: 'temurin'
+                cache: 'gradle'
+
+            - name: Build
+              run: ./gradlew packageReleaseDistributionForCurrentOS
+      
+            - name: Upload UpdaterKMM
+              uses: actions/upload-artifact@v4
+              with:
+                name: UpdaterKMM-darwin-x64-dmg
+                path: composeApp/build/compose/binaries/main-release/
+                compression-level: 9
+
+  Build-on-arm64:
+      runs-on: macos-latest-large
+      steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+      
+            - name: Setup JDK 17
+              uses: actions/setup-java@v4
+              with:
+                java-version: 17
+                distribution: 'temurin'
+                cache: 'gradle'
+      
+            - name: Build
+              run: ./gradlew packageReleaseDistributionForCurrentOS
+
+            - name: Upload UpdaterKMM
+              uses: actions/upload-artifact@v4
+              with:
+                name: UpdaterKMM-darwin-arm64-dmg
+                path: composeApp/build/compose/binaries/main-release/
+                compression-level: 9
+    
+  Build-on-Windows-x64:
+        runs-on: macos-latest-large
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup JDK 17
+              uses: actions/setup-java@v4
+              with:
+                java-version: 17
+                distribution: 'temurin'
+                cache: 'gradle'
+
+            - name: Build
+              run: |
+                ./gradlew packageReleaseDistributionForCurrentOS
+
+            - name: Upload UpdaterKMM
+              uses: actions/upload-artifact@v4
+              with:
+                name: UpdaterKMM-windows-x64-msi
+                path: composeApp/build/compose/binaries/main-release/
+                compression-level: 9
