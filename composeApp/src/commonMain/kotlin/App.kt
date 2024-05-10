@@ -6,14 +6,15 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -23,8 +24,10 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Login
+import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Analytics
 import androidx.compose.material.icons.outlined.Android
 import androidx.compose.material.icons.outlined.DeveloperMode
@@ -35,6 +38,7 @@ import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,8 +51,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
@@ -76,6 +83,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import data.DeviceInfoHelper
 import data.RomInfoHelper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import misc.json
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -86,11 +95,11 @@ const val version = "v1.0.0"
 @Composable
 @Preview
 fun App() {
-    val deviceName = rememberSaveable { mutableStateOf("Xiaomi 14") }
-    val codeName = rememberSaveable { mutableStateOf("houji") }
-    val deviceRegion = rememberSaveable { mutableStateOf("CN") }
-    val systemVersion = rememberSaveable { mutableStateOf("OS1.0.36.0.UNCCNXM") }
-    val androidVersion = rememberSaveable { mutableStateOf("14.0") }
+    val deviceName = remember { mutableStateOf(perfGet("deviceName") ?: "Xiaomi 14") }
+    val codeName = remember { mutableStateOf(perfGet("codeName") ?: "houji") }
+    val deviceRegion = remember { mutableStateOf(perfGet("deviceRegion") ?: "CN") }
+    val systemVersion = remember { mutableStateOf(perfGet("systemVersion") ?: "OS1.0.36.0.UNCCNXM") }
+    val androidVersion = remember { mutableStateOf(perfGet("androidVersion") ?: "14.0") }
 
     val device = remember { mutableStateOf("") }
     val version = remember { mutableStateOf("") }
@@ -105,12 +114,15 @@ fun App() {
     val cdn2Download = remember { mutableStateOf("") }
     val changeLog = remember { mutableStateOf("") }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
     AppTheme {
         MaterialTheme {
             val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
             Scaffold(
+                snackbarHost = { SnackbarHost(snackbarHostState) },
                 modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-                topBar = { TopAppBar(scrollBehavior) },
+                topBar = { TopAppBar(scrollBehavior, snackbarHostState) },
                 floatingActionButton = {
                     FloatActionButton(
                         codeName,
@@ -128,7 +140,8 @@ fun App() {
                         officialText,
                         cdn1Download,
                         cdn2Download,
-                        changeLog
+                        changeLog,
+                        snackbarHostState,
                     )
                 },
                 floatingActionButtonPosition = FabPosition.End
@@ -144,12 +157,12 @@ fun App() {
                 ) {
                     LoginCardView()
                     EditTextFields(deviceName, codeName, deviceRegion, systemVersion, androidVersion)
-                    MessageCardViews(device, version, codebase, branch, bigVersion)
+                    MessageCardViews(device, version, bigVersion, codebase, branch)
                     MoreCardViews(fileName, fileSize, changeLog)
-                    DownloadCardViews(officialDownload, officialText, cdn1Download, cdn2Download)
+                    DownloadCardViews(officialText, officialDownload, cdn1Download, cdn2Download, fileName)
                     Text(
                         text = "当前运行在 ${getPlatform().name}!",
-                        modifier = Modifier.padding(bottom = 24.dp)
+                        modifier = Modifier.padding(bottom = 45.dp)
                     )
                 }
             }
@@ -159,7 +172,7 @@ fun App() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior) {
+private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, snackbarHostState: SnackbarHostState) {
     CenterAlignedTopAppBar(
         title = {
             Text(
@@ -168,19 +181,7 @@ private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior) {
             )
         },
         navigationIcon = { AboutDialog() },
-        actions = {
-            IconButton(
-                onClick = {
-                    //TODO: Login Dialog
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.Login,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-            }
-        },
+        actions = { LoginDialog(snackbarHostState) },
         scrollBehavior = scrollBehavior
     )
 }
@@ -202,15 +203,20 @@ private fun FloatActionButton(
     officialText: MutableState<String>,
     cdn1Download: MutableState<String>,
     cdn2Download: MutableState<String>,
-    changeLog: MutableState<String>
+    changeLog: MutableState<String>,
+    snackbarHostState: SnackbarHostState
 ) {
     val coroutineScope = rememberCoroutineScope()
+
     ExtendedFloatingActionButton(
         onClick = {
             val regionCode = DeviceInfoHelper.regionCode(deviceRegion.value)
             val regionNameExt = DeviceInfoHelper.regionNameExt(deviceRegion.value)
             val codeNameExt = codeName.value + regionNameExt
             val deviceCode = DeviceInfoHelper.deviceCode(androidVersion.value, codeName.value, regionCode)
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar(message = "正在查询...")
+            }
             coroutineScope.launch {
                 val recoveryRomInfo = json.decodeFromString<RomInfoHelper.RomInfo>(
                     getRecoveryRomInfo(
@@ -257,6 +263,13 @@ private fun FloatActionButton(
                         "https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com/" + recoveryRomInfo.currentRom.version + "/" + recoveryRomInfo.currentRom.filename
                     }
                     changeLog.value = log.toString().trimEnd()
+
+                    perfSet("codeName", codeName.value)
+                    perfSet("deviceRegion", deviceRegion.value)
+                    perfSet("systemVersion", systemVersion.value)
+                    perfSet("androidVersion", androidVersion.value)
+
+                    snackbarHostState.currentSnackbarData?.dismiss()
                 } else {
                     device.value = ""
                     version.value = ""
@@ -270,7 +283,8 @@ private fun FloatActionButton(
                     cdn1Download.value = ""
                     cdn2Download.value = ""
                     changeLog.value = ""
-
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                    snackbarHostState.showSnackbar(message = "未查询到结果")
                 }
             }
         }) {
@@ -289,6 +303,10 @@ private fun FloatActionButton(
 
 @Composable
 fun LoginCardView() {
+    val account = perfGet("loginInfo")?.let { "已登录" } ?: "未登录"
+    val info = perfGet("loginInfo")?.let { "正在使用 v2 接口" } ?: "正在使用 v1 接口"
+    val icon = perfGet("loginInfo")?.let { Icons.Filled.CheckCircle } ?: Icons.Filled.Cancel
+
     Card(
         elevation = CardDefaults.cardElevation(2.dp),
         shape = RoundedCornerShape(10.dp),
@@ -299,22 +317,21 @@ fun LoginCardView() {
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier.padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(16.dp)
         ) {
             Icon(
-                imageVector = Icons.Filled.Cancel,
+                imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(56.dp).padding(12.dp)
+                modifier = Modifier.size(40.dp).padding(end = 10.dp).align(Alignment.CenterVertically)
             )
-            Spacer(modifier = Modifier.width(16.dp))
             Column {
                 Text(
-                    text = "未登录",
+                    text = account,
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Text(
-                    text = "正在使用 v1 接口",
+                    text = info,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -326,11 +343,34 @@ fun LoginCardView() {
 
 fun EditTextFields(
     deviceName: MutableState<String>,
+    codeName: MutableState<String>,
     deviceRegion: MutableState<String>,
-    regionCode: MutableState<String>,
     systemVersion: MutableState<String>,
     androidVersion: MutableState<String>
 ) {
+    val deviceNameFlow = MutableStateFlow(deviceName.value)
+    val codeNameFlow = MutableStateFlow(codeName.value)
+    val coroutineScope = rememberCoroutineScope()
+
+    coroutineScope.launch {
+        deviceNameFlow.collect { newValue ->
+            if (deviceName.value != deviceNameFlow.value) {
+                val text = DeviceInfoHelper.codeName(newValue)
+                if (text != "") codeName.value = text
+                deviceName.value = newValue
+            }
+        }
+    }
+
+    coroutineScope.launch {
+        codeNameFlow.collect { newValue ->
+            if (codeName.value != codeNameFlow.value) {
+                val text = DeviceInfoHelper.deviceName(newValue)
+                if (text != "") deviceName.value = text
+                codeName.value = newValue
+            }
+        }
+    }
 
     @Composable
     fun _OutlinedTextField(
@@ -352,29 +392,26 @@ fun EditTextFields(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        _OutlinedTextField(
-            value = deviceName.value,
-            onValueChange = { deviceName.value = it },
+        AutoCompleteTextField(
+            text = deviceName,
+            items = DeviceInfoHelper.deviceNames,
+            onValueChange = deviceNameFlow,
             label = "设备名称",
             leadingIcon = Icons.Outlined.Smartphone
         )
-        _OutlinedTextField(
-            value = deviceRegion.value,
-            onValueChange = { deviceRegion.value = it },
+        AutoCompleteTextField(
+            text = codeName,
+            items = DeviceInfoHelper.codeNames,
+            onValueChange = codeNameFlow,
             label = "设备代号",
             leadingIcon = Icons.Outlined.DeveloperMode
         )
-
         val itemsA = listOf("CN", "GL", "EEA", "RU", "TW", "ID", "TR", "IN", "JP", "KR")
         TextFieldWithDropdown(
-            text = regionCode,
+            text = deviceRegion,
             items = itemsA, label = "区域代号",
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.TravelExplore,
-                    contentDescription = null,
-                )
-            })
+            leadingIcon = Icons.Outlined.TravelExplore
+        )
         _OutlinedTextField(
             value = systemVersion.value,
             onValueChange = { systemVersion.value = it },
@@ -386,12 +423,7 @@ fun EditTextFields(
             text = androidVersion,
             items = itemsB,
             label = "安卓版本",
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Android,
-                    contentDescription = null,
-                )
-            }
+            leadingIcon = Icons.Outlined.Android
         )
     }
 }
@@ -452,7 +484,7 @@ fun AboutDialog() {
                         }
                     }
                     Column(
-                        modifier = Modifier.padding(horizontal = 24.dp).padding(top = 85.dp)
+                        modifier = Modifier.padding(horizontal = 24.dp).padding(top = 90.dp)
                     ) {
                         Row {
                             Text(
@@ -469,13 +501,172 @@ fun AboutDialog() {
                         }
                         Text(
                             text = "版权所有 © 2024 YuKongA, AkaneTan",
-                            modifier = Modifier,
+                            modifier = Modifier.padding(top = 2.dp),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
                 }
             })
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LoginDialog(
+    snackbarHostState: SnackbarHostState
+) {
+    val account: MutableState<String> = rememberSaveable { mutableStateOf("") }
+    val password: MutableState<String> = rememberSaveable { mutableStateOf("") }
+    val global: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+    val coroutineScope: CoroutineScope = rememberCoroutineScope()
+    val icon = perfGet("loginInfo")?.let { Icons.AutoMirrored.Outlined.Logout } ?: Icons.AutoMirrored.Outlined.Login
+
+    IconButton(
+        onClick = { showDialog = true }) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurface
+        )
+    }
+
+    if (showDialog)
+        if (perfGet("loginInfo") == null) {
+            BasicAlertDialog(
+                onDismissRequest = { showDialog = false },
+                content = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .size(280.dp, 280.dp)
+                            .clip(RoundedCornerShape(30.dp))
+                            .background(MaterialTheme.colorScheme.surfaceContainer)
+                    ) {
+                        Row(modifier = Modifier.padding(24.dp)) {
+                            Text(
+                                modifier = Modifier.align(Alignment.CenterVertically).weight(1f),
+                                text = "登录",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                            )
+                            Checkbox(
+                                modifier = Modifier.height(22.dp).align(Alignment.CenterVertically),
+                                checked = global.value,
+                                onCheckedChange = { global.value = it })
+                            Text(
+                                modifier = Modifier.align(Alignment.CenterVertically),
+                                text = "全球账户",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                        Column(
+                            modifier = Modifier.padding(horizontal = 24.dp).padding(top = 65.dp)
+                        ) {
+                            TextField(
+                                value = account.value,
+                                onValueChange = { account.value = it },
+                                label = { Text("账号") },
+                                modifier = Modifier.fillMaxWidth(),
+                                singleLine = true,
+                                shape = RoundedCornerShape(10.dp)
+                            )
+                            TextField(
+                                value = password.value,
+                                onValueChange = { password.value = it },
+                                label = { Text("密码") },
+                                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                                singleLine = true,
+                                shape = RoundedCornerShape(10.dp)
+                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                TextButton(
+                                    onClick = { showDialog = false },
+                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                ) {
+                                    Text(
+                                        text = "取消",
+                                        modifier = Modifier,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                                TextButton(
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            snackbarHostState.showSnackbar(message = "正在登录...")
+                                        }
+                                        coroutineScope.launch {
+                                            login(account.value, password.value, global.value, coroutineScope, snackbarHostState)
+                                        }
+                                        showDialog = false
+                                    }
+                                ) {
+                                    Text(
+                                        text = "登录",
+                                        modifier = Modifier,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                            }
+                        }
+                    }
+                })
+        } else {
+            BasicAlertDialog(
+                onDismissRequest = { showDialog = false },
+                content = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .size(280.dp, 165.dp)
+                            .clip(RoundedCornerShape(30.dp))
+                            .background(MaterialTheme.colorScheme.surfaceContainer)
+                    ) {
+                        Box(modifier = Modifier.padding(24.dp)) {
+                            Text(
+                                text = "登出",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(top = 80.dp),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                TextButton(
+                                    onClick = { showDialog = false },
+                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                ) {
+                                    Text(
+                                        text = "取消",
+                                        modifier = Modifier,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                                TextButton(
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            snackbarHostState.showSnackbar(message = "正在登出...")
+                                        }
+                                        coroutineScope.launch {
+                                            logout(coroutineScope, snackbarHostState)
+                                        }
+                                        showDialog = false
+                                    }
+                                ) {
+                                    Text(
+                                        text = "登出",
+                                        modifier = Modifier,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                            }
+                        }
+                    }
+                })
+        }
 }
 
 @Composable
@@ -497,13 +688,13 @@ fun TextFieldWithDropdown(
     text: MutableState<String>,
     items: List<String>,
     label: String,
-    leadingIcon: @Composable (() -> Unit)
+    leadingIcon: ImageVector
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var isDropdownExpanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
+        expanded = isDropdownExpanded,
+        onExpandedChange = { isDropdownExpanded = it },
     ) {
         OutlinedTextField(
             value = text.value,
@@ -513,13 +704,13 @@ fun TextFieldWithDropdown(
             singleLine = true,
             modifier = Modifier.menuAnchor().fillMaxWidth(),
             shape = RoundedCornerShape(10.dp),
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            leadingIcon = leadingIcon
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(isDropdownExpanded) },
+            leadingIcon = { Icon(imageVector = leadingIcon, null) },
         )
         DropdownMenu(
-            modifier = Modifier.exposedDropdownSize().fillMaxHeight(0.6f),
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
+            modifier = Modifier.exposedDropdownSize().heightIn(max = 250.dp),
+            expanded = isDropdownExpanded,
+            onDismissRequest = { isDropdownExpanded = false },
         ) {
             items.forEach { item ->
                 DropdownMenuItem(modifier = Modifier.background(Color.Transparent),
@@ -527,7 +718,55 @@ fun TextFieldWithDropdown(
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                     onClick = {
                         text.value = item
-                        expanded = false
+                        isDropdownExpanded = false
+                    })
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AutoCompleteTextField(
+    text: MutableState<String>,
+    items: List<String>,
+    onValueChange: MutableStateFlow<String>,
+    label: String,
+    leadingIcon: ImageVector
+) {
+    var isDropdownExpanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = isDropdownExpanded,
+        onExpandedChange = { isDropdownExpanded = it },
+    ) {
+        OutlinedTextField(
+            value = text.value,
+            onValueChange = {
+                onValueChange.value = it
+                isDropdownExpanded = true
+            },
+            singleLine = true,
+            label = { Text(label) },
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.menuAnchor().fillMaxWidth(),
+            leadingIcon = { Icon(imageVector = leadingIcon, null) },
+        )
+        DropdownMenu(
+            modifier = Modifier.exposedDropdownSize().heightIn(max = 250.dp),
+            expanded = isDropdownExpanded,
+            onDismissRequest = { isDropdownExpanded = false },
+        ) {
+            val listForItems = ArrayList(items)
+            val list = listForItems.filter { item ->
+                item.contains(text.value, ignoreCase = true) || item.replace(" ", "").contains(text.value, ignoreCase = true)
+            }
+            list.forEach { text ->
+                DropdownMenuItem(modifier = Modifier.background(Color.Transparent),
+                    text = { Text(text) },
+                    onClick = {
+                        onValueChange.value = text
+                        isDropdownExpanded = false
                     })
             }
         }
@@ -573,6 +812,28 @@ fun MessageCardViews(
 }
 
 @Composable
+fun MessageCardView(
+    codeName: String,
+    systemVersion: String,
+    xiaomiVersion: String,
+    androidVersion: String,
+    branchVersion: String
+) {
+    val content = remember { mutableStateOf("") }
+    content.value = codeName + systemVersion
+
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)) {
+        Spacer(modifier = Modifier.height(4.dp))
+        MessageTextView("设备代号", codeName)
+        MessageTextView("系统版本", systemVersion)
+        MessageTextView("主要版本", xiaomiVersion)
+        MessageTextView("安卓版本", androidVersion)
+        MessageTextView("分支版本", branchVersion)
+        Spacer(modifier = Modifier.height(4.dp))
+    }
+}
+
+@Composable
 fun MoreCardViews(
     fileName: MutableState<String>,
     fileSize: MutableState<String>,
@@ -596,23 +857,25 @@ fun MoreCardViews(
             shape = RoundedCornerShape(10.dp)
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(10.dp)
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)
             ) {
+                Spacer(modifier = Modifier.height(4.dp))
                 MoreTextView("文件名称", fileName.value)
                 MoreTextView("文件大小", fileSize.value)
-                MoreTextView("更新日志", changeLog.value)
+                MoreTextView("更新日志", changeLog.value, true)
+                Spacer(modifier = Modifier.height(4.dp))
             }
         }
     }
-
 }
 
 @Composable
 fun DownloadCardViews(
-    officialDownload: MutableState<String>,
     officialText: MutableState<String>,
+    officialDownload: MutableState<String>,
     cdn1Download: MutableState<String>,
-    cdn2Download: MutableState<String>
+    cdn2Download: MutableState<String>,
+    fileName: MutableState<String>,
 ) {
     val isVisible = remember { mutableStateOf(false) }
     isVisible.value = officialDownload.value.isNotEmpty()
@@ -633,34 +896,15 @@ fun DownloadCardViews(
         ) {
             Text(
                 "下载链接",
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 16.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 8.dp),
                 fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                 fontWeight = FontWeight.Bold
             )
-            DownloadTextView("Official (${officialText.value})", officialDownload.value, officialDownload.value)
-            DownloadTextView("CDN (cdnorg)", cdn1Download.value, cdn1Download.value)
-            DownloadTextView("CDN (aliyuncs)", cdn2Download.value, cdn2Download.value)
+            DownloadTextView("Official (${officialText.value})", officialDownload.value, officialDownload.value, fileName.value)
+            DownloadTextView("CDN (cdnorg)", cdn1Download.value, cdn1Download.value, fileName.value)
+            DownloadTextView("CDN (aliyuncs)", cdn2Download.value, cdn2Download.value, fileName.value)
+            Spacer(modifier = Modifier.height(4.dp))
         }
-    }
-}
-
-@Composable
-fun MessageCardView(
-    codeName: String,
-    systemVersion: String,
-    xiaomiVersion: String,
-    androidVersion: String,
-    branchVersion: String
-) {
-    val content = remember { mutableStateOf("") }
-    content.value = codeName + systemVersion
-
-    Column(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
-        MessageTextView("设备代号", codeName)
-        MessageTextView("系统版本", systemVersion)
-        MessageTextView("小米版本", xiaomiVersion)
-        MessageTextView("安卓版本", androidVersion)
-        MessageTextView("分支版本", branchVersion)
     }
 }
 
@@ -673,7 +917,7 @@ fun MessageTextView(
     content.value = text
 
     Row(
-        modifier = Modifier.fillMaxWidth().padding(6.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
@@ -699,13 +943,14 @@ fun MessageTextView(
 @Composable
 fun MoreTextView(
     title: String,
-    text: String
+    text: String,
+    copy: Boolean = false
 ) {
     val content = remember { mutableStateOf("") }
     content.value = text
 
     Column(
-        modifier = Modifier.fillMaxWidth().padding(6.dp)
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 4.dp)
     ) {
         Text(
             text = title,
@@ -720,7 +965,7 @@ fun MoreTextView(
             }) { targetContent ->
             Text(
                 text = targetContent,
-                modifier = Modifier,
+                modifier = Modifier.clickable(copy, onClick = { copyToClipboard(targetContent) }),
                 fontSize = MaterialTheme.typography.bodyMedium.fontSize
             )
         }
@@ -731,10 +976,11 @@ fun MoreTextView(
 fun DownloadTextView(
     title: String,
     copy: String,
-    download: String
+    download: String,
+    fileName: String
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(bottom = 6.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
@@ -758,7 +1004,7 @@ fun DownloadTextView(
                     )
                 }
                 TextButton(onClick = {
-                    //TODO: Download button
+                    downloadToLocal(download, fileName)
                 }) {
                     Text(
                         text = "下载",
