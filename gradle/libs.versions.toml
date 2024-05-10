@@ -2,7 +2,7 @@
 agp = "8.2.2"
 androidx-activityCompose = "1.9.0"
 compose = "1.6.7"
-compose-plugin = "1.6.2"
+compose-plugin = "23.10.16.1"
 cryptography = "0.3.0"
 kotlin = "1.9.23"
 kotlinxCoroutines = "1.8.0"
