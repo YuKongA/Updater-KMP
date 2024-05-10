@@ -1,4 +1,5 @@
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.MutableState
 import data.AuthorizeHelper
 import data.LoginHelper
 import io.ktor.client.HttpClient
@@ -21,7 +22,14 @@ private const val loginUrl = "https://account.xiaomi.com/pass/serviceLogin"
 private const val loginAuth2Url = "https://account.xiaomi.com/pass/serviceLoginAuth2"
 
 @OptIn(ExperimentalEncodingApi::class, InternalAPI::class)
-suspend fun login(account: String, password: String, global: Boolean, coroutineScope: CoroutineScope, snackbarHostState: SnackbarHostState): Boolean {
+suspend fun login(
+    account: String,
+    password: String,
+    global: Boolean,
+    coroutineScope: CoroutineScope,
+    snackbarHostState: SnackbarHostState,
+    isLogin: MutableState<Boolean>
+): Boolean {
     if (account.isEmpty() || password.isEmpty()) {
         coroutineScope.launch {
             snackbarHostState.currentSnackbarData?.dismiss()
@@ -85,11 +93,13 @@ suspend fun login(account: String, password: String, global: Boolean, coroutineS
         snackbarHostState.currentSnackbarData?.dismiss()
         snackbarHostState.showSnackbar("登录成功")
     }
+    isLogin.value = true
     return true
 }
 
-fun logout(coroutineScope: CoroutineScope, snackbarHostState: SnackbarHostState) {
+fun logout(coroutineScope: CoroutineScope, snackbarHostState: SnackbarHostState, isLogin: MutableState<Boolean>) {
     perfRemove("loginInfo")
+    isLogin.value = false
     coroutineScope.launch {
         snackbarHostState.currentSnackbarData?.dismiss()
         snackbarHostState.showSnackbar("登出成功")

@@ -101,6 +101,8 @@ fun App() {
     val systemVersion = remember { mutableStateOf(perfGet("systemVersion") ?: "OS1.0.36.0.UNCCNXM") }
     val androidVersion = remember { mutableStateOf(perfGet("androidVersion") ?: "14.0") }
 
+    val isLogin = remember { mutableStateOf(perfGet("loginInfo") != null) }
+
     val device = remember { mutableStateOf("") }
     val version = remember { mutableStateOf("") }
     val codebase = remember { mutableStateOf("") }
@@ -122,7 +124,7 @@ fun App() {
             Scaffold(
                 snackbarHost = { SnackbarHost(snackbarHostState) },
                 modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-                topBar = { TopAppBar(scrollBehavior, snackbarHostState) },
+                topBar = { TopAppBar(scrollBehavior, snackbarHostState, isLogin) },
                 floatingActionButton = {
                     FloatActionButton(
                         codeName,
@@ -155,7 +157,7 @@ fun App() {
                     verticalArrangement = Arrangement.spacedBy(18.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    LoginCardView()
+                    LoginCardView(isLogin)
                     EditTextFields(deviceName, codeName, deviceRegion, systemVersion, androidVersion)
                     MessageCardViews(device, version, bigVersion, codebase, branch)
                     MoreCardViews(fileName, fileSize, changeLog)
@@ -172,7 +174,7 @@ fun App() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, snackbarHostState: SnackbarHostState) {
+private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, snackbarHostState: SnackbarHostState, isLogin: MutableState<Boolean>) {
     CenterAlignedTopAppBar(
         title = {
             Text(
@@ -181,7 +183,7 @@ private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, snackbarHostState
             )
         },
         navigationIcon = { AboutDialog() },
-        actions = { LoginDialog(snackbarHostState) },
+        actions = { LoginDialog(snackbarHostState, isLogin) },
         scrollBehavior = scrollBehavior
     )
 }
@@ -270,6 +272,7 @@ private fun FloatActionButton(
                     perfSet("androidVersion", androidVersion.value)
 
                     snackbarHostState.currentSnackbarData?.dismiss()
+                    snackbarHostState.showSnackbar(message = "查询成功")
                 } else {
                     device.value = ""
                     version.value = ""
@@ -287,7 +290,8 @@ private fun FloatActionButton(
                     snackbarHostState.showSnackbar(message = "未查询到结果")
                 }
             }
-        }) {
+        }
+    ) {
         Icon(
             imageVector = Icons.Filled.Check,
             contentDescription = null,
@@ -302,10 +306,12 @@ private fun FloatActionButton(
 }
 
 @Composable
-fun LoginCardView() {
-    val account = perfGet("loginInfo")?.let { "已登录" } ?: "未登录"
-    val info = perfGet("loginInfo")?.let { "正在使用 v2 接口" } ?: "正在使用 v1 接口"
-    val icon = perfGet("loginInfo")?.let { Icons.Filled.CheckCircle } ?: Icons.Filled.Cancel
+fun LoginCardView(
+    isLogin: MutableState<Boolean>
+) {
+    val account = if (isLogin.value) "已登录" else "未登录"
+    val info = if (isLogin.value) "正在使用 v2 接口" else "正在使用 v1 接口"
+    val icon = if (isLogin.value) Icons.Filled.CheckCircle else Icons.Filled.Cancel
 
     Card(
         elevation = CardDefaults.cardElevation(2.dp),
@@ -513,7 +519,8 @@ fun AboutDialog() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginDialog(
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    isLogin: MutableState<Boolean>
 ) {
     val account: MutableState<String> = rememberSaveable { mutableStateOf("") }
     val password: MutableState<String> = rememberSaveable { mutableStateOf("") }
@@ -531,8 +538,8 @@ fun LoginDialog(
         )
     }
 
-    if (showDialog)
-        if (perfGet("loginInfo") == null) {
+    if (showDialog) {
+        if (!isLogin.value) {
             BasicAlertDialog(
                 onDismissRequest = { showDialog = false },
                 content = {
@@ -599,7 +606,7 @@ fun LoginDialog(
                                             snackbarHostState.showSnackbar(message = "正在登录...")
                                         }
                                         coroutineScope.launch {
-                                            login(account.value, password.value, global.value, coroutineScope, snackbarHostState)
+                                            login(account.value, password.value, global.value, coroutineScope, snackbarHostState, isLogin)
                                         }
                                         showDialog = false
                                     }
@@ -651,7 +658,7 @@ fun LoginDialog(
                                             snackbarHostState.showSnackbar(message = "正在登出...")
                                         }
                                         coroutineScope.launch {
-                                            logout(coroutineScope, snackbarHostState)
+                                            logout(coroutineScope, snackbarHostState, isLogin)
                                         }
                                         showDialog = false
                                     }
@@ -667,6 +674,7 @@ fun LoginDialog(
                     }
                 })
         }
+    }
 }
 
 @Composable
