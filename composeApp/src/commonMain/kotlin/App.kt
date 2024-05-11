@@ -185,7 +185,7 @@ private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, snackbarHostState
     CenterAlignedTopAppBar(
         title = {
             Text(
-                text = "Updater KMM",
+                text = "UpdaterKMM",
                 style = MaterialTheme.typography.titleLarge
             )
         },
