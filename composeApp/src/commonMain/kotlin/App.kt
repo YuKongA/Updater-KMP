@@ -89,13 +89,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import misc.json
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 var version = "v1.0.0"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview
 fun App() {
     val deviceName = remember { mutableStateOf(perfGet("deviceName") ?: "") }
     val codeName = remember { mutableStateOf(perfGet("codeName") ?: "") }

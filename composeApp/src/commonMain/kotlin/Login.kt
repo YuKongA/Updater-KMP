@@ -24,6 +24,10 @@ private const val loginAuth2Url = "https://account.xiaomi.com/pass/serviceLoginA
 
 expect suspend fun httpClientPlatform(): HttpClient
 
+expect fun md5Hash(input: String): String
+
+expect fun sha1Hash(input: String): ByteArray
+
 @OptIn(ExperimentalEncodingApi::class, InternalAPI::class)
 suspend fun login(
     account: String,
@@ -108,7 +112,3 @@ fun logout(coroutineScope: CoroutineScope, snackbarHostState: SnackbarHostState,
         snackbarHostState.showSnackbar("登出成功")
     }
 }
-
-expect fun md5Hash(input: String): String
-
-expect fun sha1Hash(input: String): ByteArray
