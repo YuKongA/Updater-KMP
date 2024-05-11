@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Login
@@ -29,6 +30,8 @@ import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.Analytics
 import androidx.compose.material.icons.outlined.Android
 import androidx.compose.material.icons.outlined.DeveloperMode
@@ -79,6 +82,9 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -565,15 +571,26 @@ fun LoginDialog(
                                 label = { Text("账号") },
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true,
-                                shape = RoundedCornerShape(10.dp)
                             )
+                            var passwordVisibility by remember { mutableStateOf(false) }
                             TextField(
                                 value = password.value,
                                 onValueChange = { password.value = it },
                                 label = { Text("密码") },
                                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                                 singleLine = true,
-                                shape = RoundedCornerShape(10.dp)
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                                visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+                                trailingIcon = {
+                                    IconButton(
+                                        onClick = { passwordVisibility = !passwordVisibility }
+                                    ) {
+                                        Icon(
+                                            imageVector = if (passwordVisibility) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                            contentDescription = null
+                                        )
+                                    }
+                                }
                             )
                             Row(
                                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
