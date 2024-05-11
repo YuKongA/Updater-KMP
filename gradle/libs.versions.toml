@@ -1,9 +1,9 @@
 [versions]
 agp = "8.2.2"
 androidx-activityCompose = "1.9.0"
-compose = "1.6.10-rc01"
+compose-plugin = "1.6.10-rc01"
 cryptography = "0.3.0"
-kotlin = "1.9.23"
+kotlin = "2.0.0-RC3"
 kotlinxCoroutines = "1.8.1"
 kotlinxSerializationJson = "1.6.3"
 ktorClient = "2.3.11"
@@ -28,6 +28,7 @@ slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4jSimple" 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
-jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose" }
+jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

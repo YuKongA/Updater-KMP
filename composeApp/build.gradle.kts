@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinSerialization)
 }
 
@@ -14,13 +15,7 @@ val appName = "UpdaterKMM"
 val pkgName = "top.yukonga.updater.kmm"
 
 kotlin {
-    androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-    }
+    androidTarget()
 
     jvm("desktop")
 
@@ -113,6 +108,9 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlin {
+        jvmToolchain(17)
     }
 }
 
