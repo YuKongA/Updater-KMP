@@ -1,5 +1,6 @@
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -12,10 +13,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -87,6 +92,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import data.DeviceInfoHelper
@@ -122,17 +128,23 @@ fun App() {
     val cdn2Download = remember { mutableStateOf("") }
     val changeLog = remember { mutableStateOf("") }
 
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackBarHostState = remember { SnackbarHostState() }
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    val scrollState = rememberScrollState()
+    val fabOffsetHeight by animateDpAsState(
+        targetValue = if (scrollState.value > 0) 80.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() else 0.dp,
+        animationSpec = tween(durationMillis = 300)
+    )
 
     AppTheme {
         MaterialTheme {
-            val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
             Scaffold(
-                snackbarHost = { SnackbarHost(snackbarHostState) },
+                snackbarHost = { SnackbarHost(snackBarHostState) },
                 modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-                topBar = { TopAppBar(scrollBehavior, snackbarHostState, isLogin) },
+                topBar = { TopAppBar(scrollBehavior, snackBarHostState, isLogin) },
                 floatingActionButton = {
                     FloatActionButton(
+                        fabOffsetHeight,
                         deviceName,
                         codeName,
                         deviceRegion,
@@ -150,7 +162,7 @@ fun App() {
                         cdn1Download,
                         cdn2Download,
                         changeLog,
-                        snackbarHostState,
+                        snackBarHostState,
                     )
                 },
                 floatingActionButtonPosition = FabPosition.End
@@ -158,9 +170,9 @@ fun App() {
                 Column(
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.background)
-                        .padding(padding)
+                        .padding(top = padding.calculateTopPadding())
                         .padding(horizontal = 24.dp)
-                        .verticalScroll(rememberScrollState()),
+                        .verticalScroll(scrollState),
                     verticalArrangement = Arrangement.spacedBy(18.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -171,7 +183,7 @@ fun App() {
                     DownloadCardViews(officialText, officialDownload, cdn1Download, cdn2Download, fileName)
                     Text(
                         text = "当前运行在 ${getPlatform().name}!",
-                        modifier = Modifier.padding(bottom = 45.dp)
+                        modifier = Modifier.padding(bottom = 18.dp + padding.calculateBottomPadding()),
                     )
                 }
             }
@@ -197,6 +209,7 @@ private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, snackbarHostState
 
 @Composable
 private fun FloatActionButton(
+    fabOffsetHeight: Dp,
     deviceName: MutableState<String>,
     codeName: MutableState<String>,
     deviceRegion: MutableState<String>,
@@ -219,6 +232,7 @@ private fun FloatActionButton(
     val coroutineScope = rememberCoroutineScope()
 
     ExtendedFloatingActionButton(
+        modifier = Modifier.offset(y = fabOffsetHeight),
         onClick = {
             val regionCode = DeviceInfoHelper.regionCode(deviceRegion.value)
             val regionNameExt = DeviceInfoHelper.regionNameExt(deviceRegion.value)

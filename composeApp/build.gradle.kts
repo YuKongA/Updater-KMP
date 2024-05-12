@@ -1,5 +1,6 @@
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import java.io.ByteArrayOutputStream
 
 plugins {
@@ -13,24 +14,23 @@ plugins {
 version = "1.0.0"
 val appName = "UpdaterKMM"
 val pkgName = "top.yukonga.updater.kmm"
+val xcf = XCFramework(appName + "Framework")
 
 kotlin {
     androidTarget()
 
     jvm("desktop")
 
-    listOf(
-        iosX64(), iosArm64(), iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
+    listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach {
+        it.binaries.framework {
             baseName = appName + "Framework"
             isStatic = true
+            freeCompilerArgs += "-Xbinary=bundleId=$pkgName.framework"
+            xcf.add(this)
         }
     }
 
-    listOf(
-        macosX64(), macosArm64()
-    ).forEach { macosTarget ->
+    listOf(macosX64(), macosArm64()).forEach { macosTarget ->
         macosTarget.binaries.executable {
             baseName = appName
             entryPoint = "main"
@@ -41,9 +41,10 @@ kotlin {
         val desktopMain by getting
 
         commonMain.dependencies {
+            implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.materialIconsExtended)
             implementation(compose.material3)
+            implementation(compose.materialIconsExtended)
             implementation(compose.ui)
             implementation(compose.components.resources)
             // Added
@@ -81,6 +82,7 @@ kotlin {
 android {
     namespace = pkgName
     compileSdk = 34
+
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
 
     defaultConfig {
