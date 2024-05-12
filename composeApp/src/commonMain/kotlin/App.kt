@@ -89,6 +89,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -97,7 +98,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import data.DeviceInfoHelper
 import data.RomInfoHelper
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import misc.json
@@ -162,7 +162,7 @@ fun App() {
                         cdn1Download,
                         cdn2Download,
                         changeLog,
-                        snackBarHostState,
+                        snackBarHostState
                     )
                 },
                 floatingActionButtonPosition = FabPosition.End
@@ -528,14 +528,14 @@ fun AboutDialog() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginDialog(
-    snackbarHostState: SnackbarHostState,
+    snackBarHostState: SnackbarHostState,
     isLogin: MutableState<Boolean>
 ) {
-    val account: MutableState<String> = rememberSaveable { mutableStateOf("") }
-    val password: MutableState<String> = rememberSaveable { mutableStateOf("") }
-    val global: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) }
+    var account by remember { mutableStateOf(TextFieldValue("")) }
+    var password by remember { mutableStateOf(TextFieldValue("")) }
+    var global by rememberSaveable { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
-    val coroutineScope: CoroutineScope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
     val icon = perfGet("loginInfo")?.let { Icons.AutoMirrored.Outlined.Logout } ?: Icons.AutoMirrored.Outlined.Login
 
     IconButton(
@@ -568,8 +568,8 @@ fun LoginDialog(
                             )
                             Checkbox(
                                 modifier = Modifier.height(22.dp).align(Alignment.CenterVertically),
-                                checked = global.value,
-                                onCheckedChange = { global.value = it })
+                                checked = global,
+                                onCheckedChange = { global = it })
                             Text(
                                 modifier = Modifier.align(Alignment.CenterVertically),
                                 text = "全球账户",
@@ -580,16 +580,16 @@ fun LoginDialog(
                             modifier = Modifier.padding(horizontal = 24.dp).padding(top = 65.dp)
                         ) {
                             TextField(
-                                value = account.value,
-                                onValueChange = { account.value = it },
+                                value = account,
+                                onValueChange = { account = it },
                                 label = { Text("账号") },
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true,
                             )
                             var passwordVisibility by remember { mutableStateOf(false) }
                             TextField(
-                                value = password.value,
-                                onValueChange = { password.value = it },
+                                value = password,
+                                onValueChange = { password = it },
                                 label = { Text("密码") },
                                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                                 singleLine = true,
@@ -623,10 +623,10 @@ fun LoginDialog(
                                 TextButton(
                                     onClick = {
                                         coroutineScope.launch {
-                                            snackbarHostState.showSnackbar(message = "正在登录...")
+                                            snackBarHostState.showSnackbar(message = "正在登录...")
                                         }
                                         coroutineScope.launch {
-                                            login(account.value, password.value, global.value, coroutineScope, snackbarHostState, isLogin)
+                                            login(account.text, password.text, global, coroutineScope, snackBarHostState, isLogin)
                                         }
                                         showDialog = false
                                     }
@@ -675,10 +675,10 @@ fun LoginDialog(
                                 TextButton(
                                     onClick = {
                                         coroutineScope.launch {
-                                            snackbarHostState.showSnackbar(message = "正在登出...")
+                                            snackBarHostState.showSnackbar(message = "正在登出...")
                                         }
                                         coroutineScope.launch {
-                                            logout(coroutineScope, snackbarHostState, isLogin)
+                                            logout(coroutineScope, snackBarHostState, isLogin)
                                         }
                                         showDialog = false
                                     }
@@ -784,6 +784,7 @@ fun AutoCompleteTextField(
         val listForItems = ArrayList(items)
         val list = listForItems.filter {
             it.startsWith(text.value, ignoreCase = true) || it.contains(text.value, ignoreCase = true)
+                    || it.replace(" ", "").contains(text.value, ignoreCase = true)
         }.sortedBy {
             !it.startsWith(text.value, ignoreCase = true)
         }

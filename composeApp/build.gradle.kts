@@ -34,6 +34,10 @@ kotlin {
         macosTarget.binaries.executable {
             baseName = appName
             entryPoint = "main"
+            freeCompilerArgs += listOf(
+                "-linker-option", "-framework", "-linker-option", "Metal"
+            )
+            freeCompilerArgs += "-Xdisable-phases=VerifyBitcode"
         }
     }
 
