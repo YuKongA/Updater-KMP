@@ -32,9 +32,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Login
 import androidx.compose.material.icons.automirrored.outlined.Logout
-import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.Analytics
@@ -333,34 +333,35 @@ fun LoginCardView(
 ) {
     val account = if (isLogin.value) "已登录" else "未登录"
     val info = if (isLogin.value) "正在使用 v2 接口" else "正在使用 v1 接口"
-    val icon = if (isLogin.value) Icons.Filled.CheckCircle else Icons.Filled.Cancel
+    val icon = if (isLogin.value) Icons.Filled.DoneAll else Icons.Filled.Done
 
     Card(
-        elevation = CardDefaults.cardElevation(2.dp),
+        elevation = CardDefaults.cardElevation(1.dp),
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(18.dp)
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(40.dp).padding(end = 10.dp).align(Alignment.CenterVertically)
+                modifier = Modifier.size(32.dp).padding(start = 8.dp)
             )
-            Column {
+            Column(modifier = Modifier.padding(start = 20.dp)) {
                 Text(
                     text = account,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = info,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.titleSmall
                 )
             }
         }
