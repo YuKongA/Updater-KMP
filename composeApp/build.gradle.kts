@@ -128,9 +128,10 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = appName
             packageVersion = version.toString()
-            macOS {
-                iconFile = file("src/desktopMain/resources/macOS/Icon.icns")
-            }
+
+            linux { iconFile = file("src/desktopMain/resources/linux/Icon.png") }
+            macOS { iconFile = file("src/desktopMain/resources/macOS/Icon.icns") }
+            windows { iconFile = file("src/desktopMain/resources/windows/Icon.ico") }
         }
     }
 }

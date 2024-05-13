@@ -1,4 +1,3 @@
-import dev.whyoleg.cryptography.CryptographyProvider
 import dev.whyoleg.cryptography.DelicateCryptographyApi
 import dev.whyoleg.cryptography.algorithms.symmetric.AES
 import io.ktor.utils.io.core.String
