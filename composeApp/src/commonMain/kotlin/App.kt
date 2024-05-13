@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -83,16 +82,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
@@ -101,8 +96,45 @@ import data.RomInfoHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import misc.json
+import org.jetbrains.compose.resources.InternalResourceApi
+import org.jetbrains.compose.resources.stringResource
+import updaterkmm.composeapp.generated.resources.Res
+import updaterkmm.composeapp.generated.resources.account
+import updaterkmm.composeapp.generated.resources.account_or_password_empty
+import updaterkmm.composeapp.generated.resources.android_version
+import updaterkmm.composeapp.generated.resources.app_name
+import updaterkmm.composeapp.generated.resources.big_version
+import updaterkmm.composeapp.generated.resources.branch
+import updaterkmm.composeapp.generated.resources.cancel
+import updaterkmm.composeapp.generated.resources.changelog
+import updaterkmm.composeapp.generated.resources.code_name
+import updaterkmm.composeapp.generated.resources.copy_button
+import updaterkmm.composeapp.generated.resources.device_name
+import updaterkmm.composeapp.generated.resources.download
+import updaterkmm.composeapp.generated.resources.download_button
+import updaterkmm.composeapp.generated.resources.filename
+import updaterkmm.composeapp.generated.resources.filesize
+import updaterkmm.composeapp.generated.resources.global
+import updaterkmm.composeapp.generated.resources.logged_in
+import updaterkmm.composeapp.generated.resources.logging_in
+import updaterkmm.composeapp.generated.resources.login
+import updaterkmm.composeapp.generated.resources.login_desc
+import updaterkmm.composeapp.generated.resources.login_error
+import updaterkmm.composeapp.generated.resources.logout
+import updaterkmm.composeapp.generated.resources.logout_successful
+import updaterkmm.composeapp.generated.resources.no_account
+import updaterkmm.composeapp.generated.resources.opensource_info
+import updaterkmm.composeapp.generated.resources.password
+import updaterkmm.composeapp.generated.resources.regions_code
+import updaterkmm.composeapp.generated.resources.request_sign_failed
+import updaterkmm.composeapp.generated.resources.security_error
+import updaterkmm.composeapp.generated.resources.submit
+import updaterkmm.composeapp.generated.resources.system_version
+import updaterkmm.composeapp.generated.resources.toast_ing
+import updaterkmm.composeapp.generated.resources.toast_no_info
+import updaterkmm.composeapp.generated.resources.using_v2
 
-var version = "v1.0.0"
+const val version = "v1.0.0"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -197,7 +229,7 @@ private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, snackbarHostState
     CenterAlignedTopAppBar(
         title = {
             Text(
-                text = "UpdaterKMM",
+                text = stringResource(Res.string.app_name),
                 style = MaterialTheme.typography.titleLarge
             )
         },
@@ -207,6 +239,7 @@ private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, snackbarHostState
     )
 }
 
+@OptIn(InternalResourceApi::class)
 @Composable
 private fun FloatActionButton(
     fabOffsetHeight: Dp,
@@ -230,6 +263,8 @@ private fun FloatActionButton(
     snackbarHostState: SnackbarHostState
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val messageIng = stringResource(Res.string.toast_ing)
+    val messageNoResult = stringResource(Res.string.toast_no_info)
 
     ExtendedFloatingActionButton(
         modifier = Modifier.offset(y = fabOffsetHeight),
@@ -238,8 +273,9 @@ private fun FloatActionButton(
             val regionNameExt = DeviceInfoHelper.regionNameExt(deviceRegion.value)
             val codeNameExt = codeName.value + regionNameExt
             val deviceCode = DeviceInfoHelper.deviceCode(androidVersion.value, codeName.value, regionCode)
+
             coroutineScope.launch {
-                snackbarHostState.showSnackbar(message = "正在查询...")
+                snackbarHostState.showSnackbar(message = messageIng)
             }
             coroutineScope.launch {
                 val recoveryRomInfo = json.decodeFromString<RomInfoHelper.RomInfo>(
@@ -309,7 +345,7 @@ private fun FloatActionButton(
                     cdn2Download.value = ""
                     changeLog.value = ""
                     snackbarHostState.currentSnackbarData?.dismiss()
-                    snackbarHostState.showSnackbar(message = "未查询到结果")
+                    snackbarHostState.showSnackbar(message = messageNoResult)
                 }
             }
         }
@@ -321,7 +357,7 @@ private fun FloatActionButton(
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = "查询",
+            text = stringResource(Res.string.submit),
             modifier = Modifier.height(20.dp)
         )
     }
@@ -331,8 +367,8 @@ private fun FloatActionButton(
 fun LoginCardView(
     isLogin: MutableState<Boolean>
 ) {
-    val account = if (isLogin.value) "已登录" else "未登录"
-    val info = if (isLogin.value) "正在使用 v2 接口" else "正在使用 v1 接口"
+    val account = if (isLogin.value) stringResource(Res.string.logged_in) else stringResource(Res.string.no_account)
+    val info = if (isLogin.value) stringResource(Res.string.using_v2) else stringResource(Res.string.login_desc)
     val icon = if (isLogin.value) Icons.Filled.DoneAll else Icons.Filled.Done
 
     Card(
@@ -409,26 +445,27 @@ fun EditTextFields(
             text = deviceName,
             items = DeviceInfoHelper.deviceNames,
             onValueChange = deviceNameFlow,
-            label = "设备名称",
+            label = stringResource(Res.string.device_name),
             leadingIcon = Icons.Outlined.Smartphone
         )
         AutoCompleteTextField(
             text = codeName,
             items = DeviceInfoHelper.codeNames,
             onValueChange = codeNameFlow,
-            label = "设备代号",
+            label = stringResource(Res.string.code_name),
             leadingIcon = Icons.Outlined.DeveloperMode
         )
         val itemsA = listOf("CN", "GL", "EEA", "RU", "TW", "ID", "TR", "IN", "JP", "KR")
         TextFieldWithDropdown(
             text = deviceRegion,
-            items = itemsA, label = "区域代号",
+            items = itemsA,
+            label = stringResource(Res.string.regions_code),
             leadingIcon = Icons.Outlined.TravelExplore
         )
         OutlinedTextField(
             value = systemVersion.value,
             onValueChange = { systemVersion.value = it },
-            label = { Text("系统版本") },
+            label = { Text(stringResource(Res.string.system_version)) },
             leadingIcon = { Icon(imageVector = Icons.Outlined.Analytics, null) },
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier.fillMaxWidth(),
@@ -438,7 +475,7 @@ fun EditTextFields(
         TextFieldWithDropdown(
             text = androidVersion,
             items = itemsB,
-            label = "安卓版本",
+            label = stringResource(Res.string.android_version),
             leadingIcon = Icons.Outlined.Android
         )
     }
@@ -464,7 +501,7 @@ fun AboutDialog() {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .size(280.dp, 155.dp)
+                        .size(280.dp, 135.dp)
                         .clip(RoundedCornerShape(30.dp))
                         .background(MaterialTheme.colorScheme.surfaceContainer)
                 ) {
@@ -487,7 +524,7 @@ fun AboutDialog() {
                             modifier = Modifier.padding(horizontal = 16.dp)
                         ) {
                             Text(
-                                text = "Updater KMM",
+                                text = stringResource(Res.string.app_name),
                                 modifier = Modifier,
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold
@@ -502,27 +539,14 @@ fun AboutDialog() {
                     Column(
                         modifier = Modifier.padding(horizontal = 24.dp).padding(top = 90.dp)
                     ) {
-                        Row {
-                            Text(
-                                text = "在 ",
-                                modifier = Modifier,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            GitHubLink()
-                            Text(
-                                text = " 查看源码",
-                                modifier = Modifier,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
                         Text(
-                            text = "版权所有 © 2024 YuKongA, AkaneTan",
-                            modifier = Modifier.padding(top = 2.dp),
+                            text = stringResource(Res.string.opensource_info),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
                 }
-            })
+            }
+        )
     }
 }
 
@@ -563,7 +587,7 @@ fun LoginDialog(
                         Row(modifier = Modifier.padding(24.dp)) {
                             Text(
                                 modifier = Modifier.align(Alignment.CenterVertically).weight(1f),
-                                text = "登录",
+                                text = stringResource(Res.string.login),
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
                             )
@@ -573,7 +597,7 @@ fun LoginDialog(
                                 onCheckedChange = { global = it })
                             Text(
                                 modifier = Modifier.align(Alignment.CenterVertically),
-                                text = "全球账户",
+                                text = stringResource(Res.string.global),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
@@ -583,7 +607,7 @@ fun LoginDialog(
                             TextField(
                                 value = account,
                                 onValueChange = { account = it },
-                                label = { Text("账号") },
+                                label = { Text(stringResource(Res.string.account)) },
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true,
                             )
@@ -591,7 +615,7 @@ fun LoginDialog(
                             TextField(
                                 value = password,
                                 onValueChange = { password = it },
-                                label = { Text("密码") },
+                                label = { Text(stringResource(Res.string.password)) },
                                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                                 singleLine = true,
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -616,24 +640,38 @@ fun LoginDialog(
                                     modifier = Modifier.padding(horizontal = 16.dp)
                                 ) {
                                     Text(
-                                        text = "取消",
+                                        text = stringResource(Res.string.cancel),
                                         modifier = Modifier,
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                 }
+                                val message = stringResource(Res.string.logging_in)
+                                val messageLoginSuccess = stringResource(Res.string.logout_successful)
+                                val messageEmpty = stringResource(Res.string.account_or_password_empty)
+                                val messageSign = stringResource(Res.string.request_sign_failed)
+                                val messageError = stringResource(Res.string.login_error)
+                                val messageSecurityError = stringResource(Res.string.security_error)
                                 TextButton(
                                     onClick = {
                                         coroutineScope.launch {
-                                            snackBarHostState.showSnackbar(message = "正在登录...")
+                                            snackBarHostState.showSnackbar(message = message)
                                         }
                                         coroutineScope.launch {
-                                            login(account.text, password.text, global, coroutineScope, snackBarHostState, isLogin)
+                                            val int = login(account.text, password.text, global, isLogin)
+                                            snackBarHostState.currentSnackbarData?.dismiss()
+                                            when (int) {
+                                                0 -> snackBarHostState.showSnackbar(message = messageLoginSuccess)
+                                                1 -> snackBarHostState.showSnackbar(message = messageEmpty)
+                                                2 -> snackBarHostState.showSnackbar(message = messageSign)
+                                                3 -> snackBarHostState.showSnackbar(message = messageError)
+                                                4 -> snackBarHostState.showSnackbar(message = messageSecurityError)
+                                            }
                                         }
                                         showDialog = false
                                     }
                                 ) {
                                     Text(
-                                        text = "登录",
+                                        text = stringResource(Res.string.login),
                                         modifier = Modifier,
                                         style = MaterialTheme.typography.bodyMedium
                                     )
@@ -655,7 +693,7 @@ fun LoginDialog(
                     ) {
                         Box(modifier = Modifier.padding(24.dp)) {
                             Text(
-                                text = "登出",
+                                text = stringResource(Res.string.logout),
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
                             )
@@ -668,24 +706,23 @@ fun LoginDialog(
                                     modifier = Modifier.padding(horizontal = 16.dp)
                                 ) {
                                     Text(
-                                        text = "取消",
+                                        text = stringResource(Res.string.cancel),
                                         modifier = Modifier,
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                 }
+                                val message = stringResource(Res.string.logout_successful)
                                 TextButton(
                                     onClick = {
                                         coroutineScope.launch {
-                                            snackBarHostState.showSnackbar(message = "正在登出...")
-                                        }
-                                        coroutineScope.launch {
-                                            logout(coroutineScope, snackBarHostState, isLogin)
+                                            val boolean = logout(isLogin)
+                                            if (boolean) snackBarHostState.showSnackbar(message = message)
                                         }
                                         showDialog = false
                                     }
                                 ) {
                                     Text(
-                                        text = "登出",
+                                        text = stringResource(Res.string.logout),
                                         modifier = Modifier,
                                         style = MaterialTheme.typography.bodyMedium
                                     )
@@ -696,19 +733,6 @@ fun LoginDialog(
                 })
         }
     }
-}
-
-@Composable
-fun GitHubLink() {
-    val uriHandler = LocalUriHandler.current
-    ClickableText(
-        text = AnnotatedString(
-            text = "GitHub",
-            spanStyle = SpanStyle(textDecoration = TextDecoration.Underline)
-        ),
-        onClick = { uriHandler.openUri("https://github.com/YuKongA/Updater-KMM") },
-        style = MaterialTheme.typography.bodyMedium + SpanStyle(color = MaterialTheme.colorScheme.primary)
-    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -859,11 +883,11 @@ fun MessageCardView(
 
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)) {
         Spacer(modifier = Modifier.height(4.dp))
-        MessageTextView("设备代号", codeName)
-        MessageTextView("系统版本", systemVersion)
-        MessageTextView("主要版本", xiaomiVersion)
-        MessageTextView("安卓版本", androidVersion)
-        MessageTextView("分支版本", branchVersion)
+        MessageTextView(stringResource(Res.string.code_name), codeName)
+        MessageTextView(stringResource(Res.string.system_version), systemVersion)
+        MessageTextView(stringResource(Res.string.big_version), xiaomiVersion)
+        MessageTextView(stringResource(Res.string.android_version), androidVersion)
+        MessageTextView(stringResource(Res.string.branch), branchVersion)
         Spacer(modifier = Modifier.height(4.dp))
     }
 }
@@ -895,9 +919,9 @@ fun MoreCardViews(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)
             ) {
                 Spacer(modifier = Modifier.height(4.dp))
-                MoreTextView("文件名称", fileName.value)
-                MoreTextView("文件大小", fileSize.value)
-                MoreTextView("更新日志", changeLog.value, true)
+                MoreTextView(stringResource(Res.string.filename), fileName.value)
+                MoreTextView(stringResource(Res.string.filesize), fileSize.value)
+                MoreTextView(stringResource(Res.string.changelog), changeLog.value, true)
                 Spacer(modifier = Modifier.height(4.dp))
             }
         }
@@ -930,7 +954,7 @@ fun DownloadCardViews(
             shape = RoundedCornerShape(10.dp)
         ) {
             Text(
-                "下载链接",
+                stringResource(Res.string.download),
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 8.dp),
                 fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                 fontWeight = FontWeight.Bold
@@ -1033,7 +1057,7 @@ fun DownloadTextView(
                     copyToClipboard(copy)
                 }) {
                     Text(
-                        text = "复制",
+                        text = stringResource(Res.string.copy_button),
                         modifier = Modifier,
                         fontSize = MaterialTheme.typography.bodyMedium.fontSize
                     )
@@ -1042,7 +1066,7 @@ fun DownloadTextView(
                     downloadToLocal(download, fileName)
                 }) {
                     Text(
-                        text = "下载",
+                        text = stringResource(Res.string.download_button),
                         modifier = Modifier,
                         fontSize = MaterialTheme.typography.bodyMedium.fontSize
                     )
