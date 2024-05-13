@@ -6,8 +6,8 @@ import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import org.jetbrains.compose.resources.painterResource
-import updaterkmm.composeapp.generated.resources.Icon
 import updaterkmm.composeapp.generated.resources.Res
+import updaterkmm.composeapp.generated.resources.icon
 
 fun main() = application {
     val state = rememberWindowState(
@@ -18,7 +18,7 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "UpdaterKMM",
         state = state,
-        icon = painterResource(Res.drawable.Icon),
+        icon = painterResource(Res.drawable.icon),
     ) {
         App()
     }

@@ -213,10 +213,7 @@ fun App() {
                     MessageCardViews(device, version, bigVersion, codebase, branch)
                     MoreCardViews(fileName, fileSize, changeLog)
                     DownloadCardViews(officialText, officialDownload, cdn1Download, cdn2Download, fileName)
-                    Text(
-                        text = "当前运行在 ${getPlatform().name}!",
-                        modifier = Modifier.padding(bottom = 18.dp + padding.calculateBottomPadding()),
-                    )
+                    Spacer(modifier = Modifier.height(padding.calculateBottomPadding()))
                 }
             }
         }

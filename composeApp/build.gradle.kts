@@ -86,9 +86,6 @@ kotlin {
 android {
     namespace = pkgName
     compileSdk = 34
-
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-
     defaultConfig {
         applicationId = pkgName
         minSdk = 26
@@ -98,7 +95,13 @@ android {
     }
     packaging {
         resources {
-            excludes += "**"
+            excludes += "/kotlin**"
+            excludes += "/META-INF/**"
+            excludes += "/META-INF/**/**"
+            excludes += "/kotlin/**"
+            excludes += "/okhttp3/**"
+            excludes += "/DebugProbesKt.bin"
+            excludes += "/composeResources/updaterkmm.composeapp.generated.resources/drawable/**"
         }
         applicationVariants.all {
             outputs.all {
