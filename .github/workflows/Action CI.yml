@@ -22,13 +22,13 @@ jobs:
           cache: 'gradle'
 
       - name: Build
-        run: ./gradlew packageReleaseDistributionForCurrentOS
+        run: ./gradlew createReleaseDistributable
 
-      - name: Upload UpdaterKMM Windows-x64-msi
+      - name: Upload UpdaterKMM windows-x64-exe
         uses: actions/upload-artifact@v4
         with:
-          name: UpdaterKMM-windows-x64-msi
-          path: composeApp/build/compose/binaries/main-release/
+          name: UpdaterKMM-windows-x64-exe
+          path: composeApp/build/compose/binaries/main-release/app/UpdaterKMM
           compression-level: 9
 
   macOS-arm64:
@@ -47,11 +47,11 @@ jobs:
       - name: Build
         run: ./gradlew packageReleaseDistributionForCurrentOS
 
-      - name: Upload UpdaterKMM Darwin-arm64-dmg
+      - name: Upload UpdaterKMM darwin-arm64-dmg
         uses: actions/upload-artifact@v4
         with:
           name: UpdaterKMM-darwin-arm64-dmg
-          path: composeApp/build/compose/binaries/main-release/
+          path: composeApp/build/compose/binaries/main-release/dmg
           compression-level: 9
 
   Linux-x64:
@@ -70,16 +70,24 @@ jobs:
       - name: Build
         run: |
           bash ./gradlew packageReleaseDistributionForCurrentOS
+          bash ./gradlew createReleaseDistributable
           bash ./gradlew assembleRelease
 
-      - name: Upload UpdaterKMM Linux-x64-deb
+      - name: Upload UpdaterKMM linux-x64-deb
         uses: actions/upload-artifact@v4
         with:
           name: UpdaterKMM-linux-x64-deb
-          path: composeApp/build/compose/binaries/main-release/
+          path: composeApp/build/compose/binaries/main-release/deb
           compression-level: 9
 
-      - name: Upload UpdaterKMM Android-arm64-apk
+      - name: Upload UpdaterKMM linux-x64-other
+        uses: actions/upload-artifact@v4
+        with:
+          name: UpdaterKMM-linux-x64-other
+          path: composeApp/build/compose/binaries/main-release/app/UpdaterKMM
+          compression-level: 9
+
+      - name: Upload UpdaterKMM android-arm64-apk
         uses: actions/upload-artifact@v4
         with:
           name: UpdaterKMM-android-arm64-apk
