@@ -13,6 +13,10 @@ import platform.CoreCrypto.CC_MD5_DIGEST_LENGTH
 import platform.CoreCrypto.CC_SHA1
 import platform.CoreCrypto.CC_SHA1_DIGEST_LENGTH
 
+actual fun httpClientPlatform(): HttpClient {
+    return HttpClient(Darwin)
+}
+
 @OptIn(ExperimentalForeignApi::class)
 actual fun md5Hash(input: String): String {
     val data = input.encodeToByteArray().toUByteArray()
@@ -36,8 +40,4 @@ actual fun sha1Hash(input: String): ByteArray {
         )
     }
     return digest.readBytes(CC_SHA1_DIGEST_LENGTH)
-}
-
-actual suspend fun httpClientPlatform(): HttpClient {
-    return HttpClient(Darwin)
 }

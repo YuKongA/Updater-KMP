@@ -2,6 +2,10 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import java.security.MessageDigest
 
+actual fun httpClientPlatform(): HttpClient {
+    return HttpClient(CIO)
+}
+
 actual fun md5Hash(input: String): String {
     val md = MessageDigest.getInstance("MD5")
     md.update(input.toByteArray())
@@ -12,8 +16,4 @@ actual fun sha1Hash(input: String): ByteArray {
     val md = MessageDigest.getInstance("SHA-1")
     md.update(input.toByteArray())
     return md.digest()
-}
-
-actual suspend fun httpClientPlatform(): HttpClient {
-    return HttpClient(CIO)
 }

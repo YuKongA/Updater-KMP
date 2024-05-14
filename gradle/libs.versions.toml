@@ -1,7 +1,7 @@
 [versions]
 agp = "8.3.2"
 androidx-activityCompose = "1.9.0"
-compose-plugin = "1.6.10-rc01"
+compose-plugin = "1.6.10-rc02"
 cryptography = "0.3.0"
 kotlin = "2.0.0-RC3"
 kotlinxCoroutines = "1.8.1"
