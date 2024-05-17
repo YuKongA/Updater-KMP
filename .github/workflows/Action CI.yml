@@ -18,16 +18,16 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 17
-          distribution: 'temurin'
+          distribution: 'zulu'
           cache: 'gradle'
 
       - name: Build
         run: ./gradlew createReleaseDistributable
 
-      - name: Upload UpdaterKMM windows-x64-exe
+      - name: Upload UpdaterKMM windows-x86_64-exe
         uses: actions/upload-artifact@v4
         with:
-          name: UpdaterKMM-windows-x64-exe
+          name: UpdaterKMM-windows-x86_64-exe
           path: composeApp/build/compose/binaries/main-release/app/UpdaterKMM
           compression-level: 9
 
@@ -41,17 +41,26 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 17
-          distribution: 'temurin'
+          distribution: 'zulu'
           cache: 'gradle'
 
       - name: Build
-        run: ./gradlew packageReleaseDistributionForCurrentOS
+        run: |
+          ./gradlew packageReleaseDistributionForCurrentOS
+          xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -sdk iphonesimulator -configuration Debug build
 
-      - name: Upload UpdaterKMM darwin-arm64-dmg
+      - name: Upload UpdaterKMM darwin-aarch64-dmg
         uses: actions/upload-artifact@v4
         with:
-          name: UpdaterKMM-darwin-arm64-dmg
+          name: UpdaterKMM-darwin-aarch64-dmg
           path: composeApp/build/compose/binaries/main-release/dmg
+          compression-level: 9
+
+      - name: Upload UpdaterKMM ios-aarch64-app
+        uses: actions/upload-artifact@v4
+        with:
+          name: UpdaterKMM-ios-aarch64-app
+          path: /Users/runner/Library/Developer/Xcode/DerivedData/iosApp-*/Build/Products/Debug-iphonesimulator
           compression-level: 9
 
   Linux-x64:
@@ -64,7 +73,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 17
-          distribution: 'temurin'
+          distribution: 'zulu'
           cache: 'gradle'
 
       - name: Build
@@ -73,23 +82,23 @@ jobs:
           bash ./gradlew createReleaseDistributable
           bash ./gradlew assembleRelease
 
-      - name: Upload UpdaterKMM linux-x64-deb
+      - name: Upload UpdaterKMM linux-x86_64-deb
         uses: actions/upload-artifact@v4
         with:
-          name: UpdaterKMM-linux-x64-deb
+          name: UpdaterKMM-linux-x86_64-deb
           path: composeApp/build/compose/binaries/main-release/deb
           compression-level: 9
 
-      - name: Upload UpdaterKMM linux-x64-other
+      - name: Upload UpdaterKMM linux-x86_64-other
         uses: actions/upload-artifact@v4
         with:
-          name: UpdaterKMM-linux-x64-other
+          name: UpdaterKMM-linux-x86_64-other
           path: composeApp/build/compose/binaries/main-release/app/UpdaterKMM
           compression-level: 9
 
-      - name: Upload UpdaterKMM android-arm64-apk
+      - name: Upload UpdaterKMM android-aarch64-apk
         uses: actions/upload-artifact@v4
         with:
-          name: UpdaterKMM-android-arm64-apk
+          name: UpdaterKMM-android-aarch64-apk
           path: composeApp/build/outputs/apk/release
           compression-level: 9
