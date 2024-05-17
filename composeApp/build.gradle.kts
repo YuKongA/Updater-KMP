@@ -31,17 +31,6 @@ kotlin {
         }
     }
 
-    listOf(macosX64(), macosArm64()).forEach { macosTarget ->
-        macosTarget.binaries.executable {
-            baseName = appName
-            entryPoint = "main"
-            freeCompilerArgs += listOf(
-                "-linker-option", "-framework", "-linker-option", "Metal"
-            )
-            freeCompilerArgs += "-Xdisable-phases=VerifyBitcode"
-        }
-    }
-
     sourceSets {
         val desktopMain by getting
 
