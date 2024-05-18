@@ -19,7 +19,6 @@ jobs:
         with:
           java-version: 17
           distribution: 'zulu'
-          cache: 'gradle'
 
       - name: Build
         run: ./gradlew createReleaseDistributable
@@ -60,7 +59,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: UpdaterKMM-ios-aarch64-app
-          path: /Users/runner/Library/Developer/Xcode/DerivedData/iosApp-*/Build/Products/Debug-iphonesimulator
+          path: /Users/runner/Library/Developer/Xcode/DerivedData/iosApp-*/Build/Products/Debug-iphonesimulator/UpdaterKMM.app
           compression-level: 9
 
   Linux-x64:
@@ -68,6 +67,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup JDK 17
         uses: actions/setup-java@v4
