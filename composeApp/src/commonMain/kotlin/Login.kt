@@ -29,7 +29,7 @@ suspend fun login(
     account: String,
     password: String,
     global: Boolean,
-    isLogin: MutableState<Boolean>
+    isLogin: MutableState<Int>
 ): Int {
     if (account.isEmpty() || password.isEmpty()) return 1
 
@@ -69,12 +69,12 @@ suspend fun login(
 
     val loginInfo = LoginHelper(accountType, authResult, description, ssecurity, serviceToken, userId)
     perfSet("loginInfo", json.encodeToString(loginInfo))
-    isLogin.value = true
+    isLogin.value = 1
     return 0
 }
 
-fun logout(isLogin: MutableState<Boolean>): Boolean {
+fun logout(isLogin: MutableState<Int>): Boolean {
     perfRemove("loginInfo")
-    isLogin.value = false
+    isLogin.value = 0
     return true
 }

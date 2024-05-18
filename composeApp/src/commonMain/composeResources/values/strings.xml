@@ -26,6 +26,8 @@
     <string name="login_desc">Using v1 interface</string>
     <string name="using_v2">Using v2 interface</string>
     <string name="logged_in">Logged in</string>
+    <string name="login_expired">Login expired</string>
+    <string name="login_expired_desc">Recommended to login again</string>
     <string name="copy_button">Copy</string>
     <string name="download_button">Download</string>
     <string name="security_error">Failed to get security key</string>

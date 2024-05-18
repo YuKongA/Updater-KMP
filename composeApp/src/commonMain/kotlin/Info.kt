@@ -46,7 +46,7 @@ suspend fun getRecoveryRomInfo(
     if (perfGet("loginInfo") != null) {
         val cookies = perfGet("loginInfo")?.let { json.decodeFromString<LoginHelper>(it) }
         val authResult = cookies?.authResult
-        if (authResult != "-1") {
+        if (authResult != "3") {
             userId = cookies?.userId.toString()
             accountType = cookies?.accountType.toString().ifEmpty { "CN" }
             securityKey = Base64.Default.decode(cookies?.ssecurity.toString())

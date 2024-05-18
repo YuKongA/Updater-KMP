@@ -92,11 +92,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import data.DeviceInfoHelper
+import data.LoginHelper
 import data.RomInfoHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
 import misc.json
-import org.jetbrains.compose.resources.InternalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import updaterkmm.composeapp.generated.resources.Res
 import updaterkmm.composeapp.generated.resources.account
@@ -120,6 +121,9 @@ import updaterkmm.composeapp.generated.resources.logging_in
 import updaterkmm.composeapp.generated.resources.login
 import updaterkmm.composeapp.generated.resources.login_desc
 import updaterkmm.composeapp.generated.resources.login_error
+import updaterkmm.composeapp.generated.resources.login_expired
+import updaterkmm.composeapp.generated.resources.login_expired_desc
+import updaterkmm.composeapp.generated.resources.login_successful
 import updaterkmm.composeapp.generated.resources.logout
 import updaterkmm.composeapp.generated.resources.logout_successful
 import updaterkmm.composeapp.generated.resources.no_account
@@ -145,7 +149,8 @@ fun App() {
     val systemVersion = remember { mutableStateOf(perfGet("systemVersion") ?: "") }
     val androidVersion = remember { mutableStateOf(perfGet("androidVersion") ?: "") }
 
-    val isLogin = remember { mutableStateOf(perfGet("loginInfo") != null) }
+    val loginInfo = perfGet("loginInfo")?.let { json.decodeFromString<LoginHelper>(it) }
+    val isLogin = remember { mutableStateOf(loginInfo?.authResult?.toInt() ?: 0) }
 
     val device = remember { mutableStateOf("") }
     val version = remember { mutableStateOf("") }
@@ -194,7 +199,8 @@ fun App() {
                         cdn1Download,
                         cdn2Download,
                         changeLog,
-                        snackBarHostState
+                        snackBarHostState,
+                        isLogin
                     )
                 },
                 floatingActionButtonPosition = FabPosition.End
@@ -222,7 +228,7 @@ fun App() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, snackbarHostState: SnackbarHostState, isLogin: MutableState<Boolean>) {
+private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, snackBarHostState: SnackbarHostState, isLogin: MutableState<Int>) {
     CenterAlignedTopAppBar(
         title = {
             Text(
@@ -231,12 +237,11 @@ private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, snackbarHostState
             )
         },
         navigationIcon = { AboutDialog() },
-        actions = { LoginDialog(snackbarHostState, isLogin) },
+        actions = { LoginDialog(snackBarHostState, isLogin) },
         scrollBehavior = scrollBehavior
     )
 }
 
-@OptIn(InternalResourceApi::class)
 @Composable
 private fun FloatActionButton(
     fabOffsetHeight: Dp,
@@ -257,7 +262,8 @@ private fun FloatActionButton(
     cdn1Download: MutableState<String>,
     cdn2Download: MutableState<String>,
     changeLog: MutableState<String>,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    isLogin: MutableState<Int>
 ) {
     val coroutineScope = rememberCoroutineScope()
     val messageIng = stringResource(Res.string.toast_ing)
@@ -283,6 +289,18 @@ private fun FloatActionButton(
                         androidVersion.value
                     )
                 )
+                val loginInfo = perfGet("loginInfo") ?: ""
+                if (loginInfo.isNotEmpty()) {
+                    val cookies = json.decodeFromString<MutableMap<String, String>>(loginInfo)
+                    val description = cookies["description"] ?: ""
+                    val authResult = cookies["authResult"].toString()
+                    if (description.isNotEmpty() && recoveryRomInfo.authResult != 1 && authResult != "3") {
+                        cookies.clear()
+                        cookies["authResult"] = "3"
+                        isLogin.value = 3
+                        perfSet("loginInfo", json.encodeToString(cookies))
+                    }
+                }
                 if (recoveryRomInfo.currentRom?.branch != null) {
                     val log = StringBuilder()
                     recoveryRomInfo.currentRom.changelog!!.forEach {
@@ -362,11 +380,19 @@ private fun FloatActionButton(
 
 @Composable
 fun LoginCardView(
-    isLogin: MutableState<Boolean>
+    isLogin: MutableState<Int>
 ) {
-    val account = if (isLogin.value) stringResource(Res.string.logged_in) else stringResource(Res.string.no_account)
-    val info = if (isLogin.value) stringResource(Res.string.using_v2) else stringResource(Res.string.login_desc)
-    val icon = if (isLogin.value) Icons.Filled.DoneAll else Icons.Filled.Done
+    val account = when (isLogin.value) {
+        1 -> stringResource(Res.string.logged_in)
+        0 -> stringResource(Res.string.no_account)
+        else -> stringResource(Res.string.login_expired)
+    }
+    val info = when (isLogin.value) {
+        1 -> stringResource(Res.string.using_v2)
+        0 -> stringResource(Res.string.login_desc)
+        else -> stringResource(Res.string.login_expired_desc)
+    }
+    val icon = if (isLogin.value == 1) Icons.Filled.DoneAll else Icons.Filled.Done
 
     Card(
         elevation = CardDefaults.cardElevation(1.dp),
@@ -551,14 +577,17 @@ fun AboutDialog() {
 @Composable
 fun LoginDialog(
     snackBarHostState: SnackbarHostState,
-    isLogin: MutableState<Boolean>
+    isLogin: MutableState<Int>
 ) {
     var account by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
     var global by rememberSaveable { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
-    val icon = perfGet("loginInfo")?.let { Icons.AutoMirrored.Outlined.Logout } ?: Icons.AutoMirrored.Outlined.Login
+    val icon = when (isLogin.value) {
+        1 -> Icons.AutoMirrored.Outlined.Logout
+        else -> Icons.AutoMirrored.Outlined.Login
+    }
 
     IconButton(
         onClick = { showDialog = true }) {
@@ -570,7 +599,7 @@ fun LoginDialog(
     }
 
     if (showDialog) {
-        if (!isLogin.value) {
+        if (isLogin.value != 1) {
             BasicAlertDialog(
                 onDismissRequest = { showDialog = false },
                 content = {
@@ -643,7 +672,7 @@ fun LoginDialog(
                                     )
                                 }
                                 val message = stringResource(Res.string.logging_in)
-                                val messageLoginSuccess = stringResource(Res.string.logout_successful)
+                                val messageLoginSuccess = stringResource(Res.string.login_successful)
                                 val messageEmpty = stringResource(Res.string.account_or_password_empty)
                                 val messageSign = stringResource(Res.string.request_sign_failed)
                                 val messageError = stringResource(Res.string.login_error)
