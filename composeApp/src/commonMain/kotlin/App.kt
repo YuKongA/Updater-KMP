@@ -478,10 +478,9 @@ fun EditTextFields(
             label = stringResource(Res.string.code_name),
             leadingIcon = Icons.Outlined.DeveloperMode
         )
-        val itemsA = listOf("CN", "GL", "EEA", "RU", "TW", "ID", "TR", "IN", "JP", "KR")
         TextFieldWithDropdown(
             text = deviceRegion,
-            items = itemsA,
+            items = DeviceInfoHelper.regionNames,
             label = stringResource(Res.string.regions_code),
             leadingIcon = Icons.Outlined.TravelExplore
         )
@@ -494,10 +493,9 @@ fun EditTextFields(
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
-        val itemsB = listOf("14.0", "13.0", "12.0", "11.0", "10.0", "9.0", "8.1", "8.0", "7.1", "7.0", "6.0", "5.1", "5.0", "4.4")
         TextFieldWithDropdown(
             text = androidVersion,
-            items = itemsB,
+            items = DeviceInfoHelper.androidVersions,
             label = stringResource(Res.string.android_version),
             leadingIcon = Icons.Outlined.Android
         )
