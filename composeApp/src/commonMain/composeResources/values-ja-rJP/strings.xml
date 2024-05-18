@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login">ログイン</string>
+    <string name="code_name">コードネーム</string>
+    <string name="device_name">デバイス名</string>
+    <string name="system_version">システムバージョン</string>
+    <string name="android_version">Android バージョン</string>
+    <string name="submit">送信</string>
+    <string name="big_version">メジャーバージョン</string>
+    <string name="filename">ファイル名</string>
+    <string name="filesize">ファイルサイズ</string>
+    <string name="download">ダウンロード URL</string>
+    <string name="changelog">変更履歴</string>
+    <string name="branch">ブランチ</string>
+    <string name="toast_ing">検索中…</string>
+    <string name="toast_no_info">情報がありません！</string>
+    <string name="account">アカウント</string>
+    <string name="password">パスワード</string>
+    <string name="cancel">キャンセル</string>
+    <string name="logging_in">ログイン中</string>
+    <string name="login_successful">ログイン成功</string>
+    <string name="request_sign_failed">_サインのリクエストに失敗しました！</string>
+    <string name="account_or_password_empty">アカウントまたはパスワードが空です！</string>
+    <string name="no_account">アカウントがありません</string>
+    <string name="login_desc">v1 インターフェースを使用</string>
+    <string name="using_v2">v2 インターフェースを使用</string>
+    <string name="logged_in">ログイン済み</string>
+    <string name="login_expired">ログイン期限切れ</string>
+    <string name="login_expired_desc">再ログインをお勧めします</string>
+    <string name="copy_button">コピー</string>
+    <string name="download_button">ダウンロード</string>
+    <string name="security_error">セキュリティキーの取得に失敗しました</string>
+    <string name="logout">ログアウト</string>
+    <string name="confirm">確認</string>
+    <string name="logout_successful">ログアウト成功</string>
+    <string name="login_error">ログイン認証に失敗しました！</string>
+    <string name="regions_code">地域コード</string>
+    <string name="global">グローバルアカウント</string>
+    <string name="opensource_info">著作権 © 2024 YuKongA, AkaneTan</string>
+</resources>
