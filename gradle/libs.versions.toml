@@ -1,5 +1,5 @@
 [versions]
-agp = "8.3.2"
+agp = "8.4.1"
 androidx-activityCompose = "1.9.0"
 compose-plugin = "1.6.10-rc03"
 cryptography = "0.3.0"
