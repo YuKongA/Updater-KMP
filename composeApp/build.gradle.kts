@@ -61,11 +61,6 @@ kotlin {
             implementation(libs.cryptography.provider.apple)
             implementation(libs.ktor.client.darwin)
         }
-        macosMain.dependencies {
-            // Added
-            implementation(libs.cryptography.provider.apple)
-            implementation(libs.ktor.client.darwin)
-        }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             // Added
