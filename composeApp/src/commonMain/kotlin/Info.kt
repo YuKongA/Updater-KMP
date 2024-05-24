@@ -17,15 +17,18 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 const val CN_RECOVERY_URL = "https://update.miui.com/updates/miotaV3.php"
 const val INTL_RECOVERY_URL = "https://update.intl.miui.com/updates/miotaV3.php"
 var securityKey = "miuiotavalided11".toByteArray()
-var userId = ""
 var accountType = "CN"
-var serviceToken = ""
 var port = "1"
+var userId = ""
+var security = ""
+var serviceToken = ""
 
 fun generateJson(
-    codeNameExt: String, regionCode: String, romVersion: String, androidVersion: String, userId: String
+    codeNameExt: String, regionCode: String, romVersion: String, androidVersion: String, userId: String, security: String, token: String
 ): String {
     val data = RequestParamHelper(
+        security = security,
+        token = token,
         id = userId,
         c = androidVersion,
         d = codeNameExt,
@@ -33,7 +36,7 @@ fun generateJson(
         ov = romVersion,
         l = if (!codeNameExt.contains("_global")) "zh_CN" else "en_US",
         r = regionCode,
-        v = "miui-$romVersion",
+        v = "MIUI-$romVersion",
         unlock = "0"
     )
     return Json.encodeToString(data)
@@ -49,12 +52,13 @@ suspend fun getRecoveryRomInfo(
         if (authResult != "3") {
             userId = cookies?.userId.toString()
             accountType = cookies?.accountType.toString().ifEmpty { "CN" }
-            securityKey = Base64.Default.decode(cookies?.ssecurity.toString())
+            security = cookies?.ssecurity.toString()
+            securityKey = Base64.Default.decode(security)
             serviceToken = cookies?.serviceToken.toString()
             port = "2"
         }
     }
-    val jsonData = generateJson(codeNameExt, regionCode, romVersion, androidVersion, userId)
+    val jsonData = generateJson(codeNameExt, regionCode, romVersion, androidVersion, userId, security, serviceToken)
     val encryptedText = miuiEncrypt(jsonData, securityKey)
     val client = httpClientPlatform()
     val parameters = Parameters.build {
