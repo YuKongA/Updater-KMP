@@ -285,7 +285,7 @@ private fun FloatActionButton(
                     getRecoveryRomInfo(
                         codeNameExt,
                         regionCode,
-                        systemVersion.value.replace("OS1", "V816").replace("AUTO", deviceCode),
+                        systemVersion.value.uppercase().replace("OS1", "V816").replace("AUTO", deviceCode),
                         androidVersion.value
                     )
                 )
