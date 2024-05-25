@@ -1,22 +1,27 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop.
+# UpdaterKMM
+**UpdaterKMM** is an application that gets MIUI/HyperOS update information. With the [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) UI framework.
 
-* `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - `commonMain` is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    `iosMain` would be the right folder for such calls.
+**Desktop**/**Android**/**iOS** is now supported.
 
-* `/iosApp` contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform, 
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+Due to browser cross-domain request restrictions, the **Web** platform is unavailable.
 
+## Usage:
+When obtaining the `Pubilc Release Version (F)`, the suffix of the system version can be automatically completed using `AUTO`<br />For example: `OS1.0.26.0.AUTO` / `V14.0.4.0.AUTO`
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
+When obtaining `Beta Development Version (X)`, please enter the complete system version<br />For example: `OS1.0.23.12.19.DEV` / `V14.0.23.5.8.DEV`
 
-**Note:** Compose/Web is Experimental and may be changed at any time. Use it only for evaluation purposes.
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
+## Notes:
+Only supported `MIUI9` and above versions. The most extreme case is: Redmi 1S (armani), MIUI9, Android4.4.
 
-You can open the web application by running the `:composeApp:wasmJsBrowserDevelopmentRun` Gradle task.
+Only devices in the list of [DeviceInfoHelper](https://github.com/YuKongA/UpdaterKMM/blob/main/composeApp/src/commonMain/kotlin/data/DeviceInfoHelper.kt#L62) are supported use `AUTO` to complete automatically, other devices still need to manually enter the full system version.
+
+When you are not logged in with a Xiaomi account, you can use the miotaV3-v1 interface to obtain any detailed information of the `Pubilc Release Version` of any model.
+
+After logging in to your Xiaomi account, you will use the miotaV3-v2 interface to obtain detailed information about the `Beta Release Version` or the `Public Development Version`, corresponding to the internal test permissions you have.
+
+## Credits:
+- [Xiaomi-Update-Info](https://github.com/YuKongA/Xiaomi-Update-Info)
+- [Xiaomi-Community-AutoTask](https://github.com/CMDQ8575/Xiaomi-Community-AutoTask)
+- [XiaoMiToolV2](https://github.com/francescotescari/XiaoMiToolV2) with Apache License Version 2.0
+- [compose-multiplatform](https://github.com/JetBrains/compose-multiplatform) with Apache License Version 2.0
+- [MobileModels-Xiaomi](https://github.com/KHwang9883/MobileModels/blob/master/brands/xiaomi.md) with Attribution-NonCommercial-ShareAlike 4.0 International
