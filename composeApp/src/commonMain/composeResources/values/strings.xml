@@ -29,7 +29,9 @@
     <string name="login_expired">Login expired</string>
     <string name="login_expired_desc">Recommended to login again</string>
     <string name="copy_button">Copy</string>
+    <string name="copy_successful">Copy successful</string>
     <string name="download_button">Download</string>
+    <string name="download_start">Start download</string>
     <string name="security_error">Failed to get security key</string>
     <string name="logout">Logout</string>
     <string name="confirm">Confirm</string>

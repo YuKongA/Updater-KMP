@@ -8,6 +8,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,6 +44,7 @@ import androidx.compose.material.icons.outlined.Smartphone
 import androidx.compose.material.icons.outlined.TravelExplore
 import androidx.compose.material.icons.outlined.Update
 import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -82,6 +84,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -90,6 +93,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
 import data.DeviceInfoHelper
 import data.LoginHelper
@@ -110,9 +114,11 @@ import updaterkmm.composeapp.generated.resources.cancel
 import updaterkmm.composeapp.generated.resources.changelog
 import updaterkmm.composeapp.generated.resources.code_name
 import updaterkmm.composeapp.generated.resources.copy_button
+import updaterkmm.composeapp.generated.resources.copy_successful
 import updaterkmm.composeapp.generated.resources.device_name
 import updaterkmm.composeapp.generated.resources.download
 import updaterkmm.composeapp.generated.resources.download_button
+import updaterkmm.composeapp.generated.resources.download_start
 import updaterkmm.composeapp.generated.resources.filename
 import updaterkmm.composeapp.generated.resources.filesize
 import updaterkmm.composeapp.generated.resources.global
@@ -172,11 +178,20 @@ fun App() {
         targetValue = if (scrollState.value > 0) 80.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() else 0.dp,
         animationSpec = tween(durationMillis = 300)
     )
+    val snackOffsetHeight by animateDpAsState(
+        targetValue = if (scrollState.value > 0) 65.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() else 0.dp,
+        animationSpec = tween(durationMillis = 300)
+    )
 
     AppTheme {
         MaterialTheme {
             Scaffold(
-                snackbarHost = { SnackbarHost(snackBarHostState) },
+                snackbarHost = {
+                    SnackbarHost(
+                        hostState = snackBarHostState,
+                        modifier = Modifier.padding(horizontal = 3.dp).offset(y = snackOffsetHeight),
+                    )
+                },
                 modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                 topBar = { TopAppBar(scrollBehavior, snackBarHostState, isLogin) },
                 floatingActionButton = {
@@ -209,16 +224,16 @@ fun App() {
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.background)
                         .padding(top = padding.calculateTopPadding())
-                        .padding(horizontal = 24.dp)
+                        .padding(horizontal = 20.dp)
                         .verticalScroll(scrollState),
-                    verticalArrangement = Arrangement.spacedBy(18.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     LoginCardView(isLogin)
                     EditTextFields(deviceName, codeName, deviceRegion, systemVersion, androidVersion)
                     MessageCardViews(device, version, bigVersion, codebase, branch)
-                    MoreCardViews(fileName, fileSize, changeLog)
-                    DownloadCardViews(officialText, officialDownload, cdn1Download, cdn2Download, fileName)
+                    MoreCardViews(fileName, fileSize, changeLog, snackBarHostState)
+                    DownloadCardViews(officialText, officialDownload, cdn1Download, cdn2Download, fileName, snackBarHostState)
                     Spacer(modifier = Modifier.height(padding.calculateBottomPadding()))
                 }
             }
@@ -582,10 +597,19 @@ fun LoginDialog(
     var global by rememberSaveable { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+
     val icon = when (isLogin.value) {
         1 -> Icons.AutoMirrored.Outlined.Logout
         else -> Icons.AutoMirrored.Outlined.Login
     }
+
+    val messageLoginIn = stringResource(Res.string.logging_in)
+    val messageLoginSuccess = stringResource(Res.string.login_successful)
+    val messageEmpty = stringResource(Res.string.account_or_password_empty)
+    val messageSign = stringResource(Res.string.request_sign_failed)
+    val messageError = stringResource(Res.string.login_error)
+    val messageSecurityError = stringResource(Res.string.security_error)
+    val messageLogoutSuccessful = stringResource(Res.string.logout_successful)
 
     IconButton(
         onClick = { showDialog = true }) {
@@ -669,16 +693,10 @@ fun LoginDialog(
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                 }
-                                val message = stringResource(Res.string.logging_in)
-                                val messageLoginSuccess = stringResource(Res.string.login_successful)
-                                val messageEmpty = stringResource(Res.string.account_or_password_empty)
-                                val messageSign = stringResource(Res.string.request_sign_failed)
-                                val messageError = stringResource(Res.string.login_error)
-                                val messageSecurityError = stringResource(Res.string.security_error)
                                 TextButton(
                                     onClick = {
                                         coroutineScope.launch {
-                                            snackBarHostState.showSnackbar(message = message)
+                                            snackBarHostState.showSnackbar(message = messageLoginIn)
                                         }
                                         coroutineScope.launch {
                                             val int = login(account.text, password.text, global, isLogin)
@@ -703,7 +721,8 @@ fun LoginDialog(
                             }
                         }
                     }
-                })
+                }
+            )
         } else {
             BasicAlertDialog(
                 onDismissRequest = { showDialog = false },
@@ -735,12 +754,11 @@ fun LoginDialog(
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                 }
-                                val message = stringResource(Res.string.logout_successful)
                                 TextButton(
                                     onClick = {
                                         coroutineScope.launch {
                                             val boolean = logout(isLogin)
-                                            if (boolean) snackBarHostState.showSnackbar(message = message)
+                                            if (boolean) snackBarHostState.showSnackbar(message = messageLogoutSuccessful)
                                         }
                                         showDialog = false
                                     }
@@ -754,7 +772,8 @@ fun LoginDialog(
                             }
                         }
                     }
-                })
+                }
+            )
         }
     }
 }
@@ -902,17 +921,14 @@ fun MessageCardView(
     androidVersion: String,
     branchVersion: String
 ) {
-    val content = remember { mutableStateOf("") }
-    content.value = codeName + systemVersion
-
-    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)) {
-        Spacer(modifier = Modifier.height(4.dp))
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
+    ) {
         MessageTextView(stringResource(Res.string.code_name), codeName)
         MessageTextView(stringResource(Res.string.system_version), systemVersion)
         MessageTextView(stringResource(Res.string.big_version), xiaomiVersion)
         MessageTextView(stringResource(Res.string.android_version), androidVersion)
-        MessageTextView(stringResource(Res.string.branch), branchVersion)
-        Spacer(modifier = Modifier.height(4.dp))
+        MessageTextView(stringResource(Res.string.branch), branchVersion, 0.dp)
     }
 }
 
@@ -921,6 +937,7 @@ fun MoreCardViews(
     fileName: MutableState<String>,
     fileSize: MutableState<String>,
     changeLog: MutableState<String>,
+    snackBarHostState: SnackbarHostState
 ) {
     val isVisible = remember { mutableStateOf(false) }
     isVisible.value = fileName.value.isNotEmpty()
@@ -940,13 +957,11 @@ fun MoreCardViews(
             shape = RoundedCornerShape(10.dp)
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp)
             ) {
-                Spacer(modifier = Modifier.height(4.dp))
-                MoreTextView(stringResource(Res.string.filename), fileName.value)
-                MoreTextView(stringResource(Res.string.filesize), fileSize.value)
-                MoreTextView(stringResource(Res.string.changelog), changeLog.value, true)
-                Spacer(modifier = Modifier.height(4.dp))
+                MoreTextView(stringResource(Res.string.filename), fileName.value, snackBarHostState)
+                MoreTextView(stringResource(Res.string.filesize), fileSize.value, snackBarHostState)
+                MoreTextView(stringResource(Res.string.changelog), changeLog.value, snackBarHostState, true, 0.dp)
             }
         }
     }
@@ -959,6 +974,7 @@ fun DownloadCardViews(
     cdn1Download: MutableState<String>,
     cdn2Download: MutableState<String>,
     fileName: MutableState<String>,
+    snackBarHostState: SnackbarHostState
 ) {
     val isVisible = remember { mutableStateOf(false) }
     isVisible.value = officialDownload.value.isNotEmpty()
@@ -977,16 +993,19 @@ fun DownloadCardViews(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(10.dp)
         ) {
-            Text(
-                stringResource(Res.string.download),
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 8.dp),
-                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                fontWeight = FontWeight.Bold
-            )
-            DownloadTextView("Official (${officialText.value})", officialDownload.value, officialDownload.value, fileName.value)
-            DownloadTextView("CDN (cdnorg)", cdn1Download.value, cdn1Download.value, fileName.value)
-            DownloadTextView("CDN (aliyuncs)", cdn2Download.value, cdn2Download.value, fileName.value)
-            Spacer(modifier = Modifier.height(4.dp))
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp)
+            ) {
+                Text(
+                    text = stringResource(Res.string.download),
+                    modifier = Modifier.fillMaxWidth(),
+                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                    fontWeight = FontWeight.SemiBold
+                )
+                DownloadTextView("Official (${officialText.value})", officialDownload.value, officialDownload.value, fileName.value, snackBarHostState)
+                DownloadTextView("CDN (cdnorg)", cdn1Download.value, cdn1Download.value, fileName.value, snackBarHostState)
+                DownloadTextView("CDN (aliyuncs)", cdn2Download.value, cdn2Download.value, fileName.value, snackBarHostState, 0.dp)
+            }
         }
     }
 }
@@ -994,30 +1013,35 @@ fun DownloadCardViews(
 @Composable
 fun MessageTextView(
     title: String,
-    text: String
+    text: String,
+    bottomPadding: Dp = 8.dp
 ) {
+    val scrollState = rememberScrollState()
     val content = remember { mutableStateOf("") }
     content.value = text
 
     Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        modifier = Modifier.fillMaxWidth().padding(bottom = bottomPadding),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = title,
-            modifier = Modifier,
             fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.SemiBold
         )
         AnimatedContent(
             targetState = content.value,
             transitionSpec = {
                 fadeIn(animationSpec = tween(1500)) togetherWith fadeOut(animationSpec = tween(300))
-            }) { targetContent ->
+            }
+        ) {
             Text(
-                text = targetContent,
-                modifier = Modifier,
-                fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                text = it,
+                modifier = Modifier.horizontalScroll(scrollState),
+                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                fontFamily = FontFamily.Monospace,
+                maxLines = 1
             )
         }
     }
@@ -1027,31 +1051,42 @@ fun MessageTextView(
 fun MoreTextView(
     title: String,
     text: String,
-    copy: Boolean = false
+    snackBarHostState: SnackbarHostState,
+    copy: Boolean = false,
+    bottomPadding: Dp = 8.dp
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
     val content = remember { mutableStateOf("") }
     content.value = text
 
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 4.dp)
+    val messageCopySuccessful = stringResource(Res.string.copy_successful)
+
+    Text(
+        text = title,
+        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontWeight = FontWeight.SemiBold
+    )
+    AnimatedContent(
+        targetState = content.value,
+        transitionSpec = {
+            fadeIn(animationSpec = tween(1500)) togetherWith fadeOut(animationSpec = tween(300))
+        }
     ) {
         Text(
-            text = title,
-            modifier = Modifier,
+            text = it,
+            modifier = Modifier
+                .padding(bottom = bottomPadding)
+                .clickable(
+                    enabled = copy,
+                    onClick = {
+                        copyToClipboard(it)
+                        coroutineScope.launch { snackBarHostState.showSnackbar(message = messageCopySuccessful) }
+                    }
+                ),
             fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-            fontWeight = FontWeight.Bold
+            fontFamily = FontFamily.Monospace
         )
-        AnimatedContent(
-            targetState = content.value,
-            transitionSpec = {
-                fadeIn(animationSpec = tween(1500)) togetherWith fadeOut(animationSpec = tween(300))
-            }) { targetContent ->
-            Text(
-                text = targetContent,
-                modifier = Modifier.clickable(copy, onClick = { copyToClipboard(targetContent) }),
-                fontSize = MaterialTheme.typography.bodyMedium.fontSize
-            )
-        }
     }
 }
 
@@ -1060,41 +1095,58 @@ fun DownloadTextView(
     title: String,
     copy: String,
     download: String,
-    fileName: String
+    fileName: String,
+    snackBarHostState: SnackbarHostState,
+    bottomPadding: Dp = 8.dp,
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
+    val messageCopySuccessful = stringResource(Res.string.copy_successful)
+    val messageDownloadStart = stringResource(Res.string.download_start)
+
     Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        modifier = Modifier.fillMaxWidth().padding(bottom = bottomPadding),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = title,
             fontSize = MaterialTheme.typography.bodyMedium.fontSize,
             textAlign = TextAlign.Start,
-            modifier = Modifier.align(Alignment.CenterVertically).fillMaxWidth(0.5f),
+            modifier = Modifier.fillMaxWidth(0.5f),
         )
         Row(
-            modifier = Modifier,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             if (copy.isNotEmpty()) {
-                TextButton(onClick = {
-                    copyToClipboard(copy)
-                }) {
-                    Text(
-                        text = stringResource(Res.string.copy_button),
-                        modifier = Modifier,
-                        fontSize = MaterialTheme.typography.bodyMedium.fontSize
-                    )
-                }
-                TextButton(onClick = {
-                    downloadToLocal(download, fileName)
-                }) {
-                    Text(
-                        text = stringResource(Res.string.download_button),
-                        modifier = Modifier,
-                        fontSize = MaterialTheme.typography.bodyMedium.fontSize
-                    )
-                }
+                Text(
+                    modifier = Modifier
+                        .padding(end = 10.dp)
+                        .clickable(
+                            enabled = true,
+                            onClick = {
+                                copyToClipboard(copy)
+                                coroutineScope.launch { snackBarHostState.showSnackbar(message = messageCopySuccessful) }
+                            }
+                        ),
+                    text = stringResource(Res.string.copy_button),
+                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                    color = ButtonDefaults.textButtonColors().contentColor
+                )
+                Text(
+                    modifier = Modifier
+                        .clickable(
+                            enabled = true,
+                            onClick = {
+                                downloadToLocal(download, fileName)
+                                coroutineScope.launch { snackBarHostState.showSnackbar(message = messageDownloadStart) }
+                            }
+                        ),
+                    text = stringResource(Res.string.download_button),
+                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                    color = ButtonDefaults.textButtonColors().contentColor
+                )
             }
         }
     }
