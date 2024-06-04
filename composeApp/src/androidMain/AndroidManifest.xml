@@ -11,7 +11,7 @@
         android:localeConfig="@xml/locales_config"
         android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
-        android:theme="@android:style/Theme.Material.Light.NoActionBar"
+        android:theme="@style/Theme.UpdaterKMM"
         tools:ignore="UnusedAttribute">
         <activity
             android:name=".MainActivity"
