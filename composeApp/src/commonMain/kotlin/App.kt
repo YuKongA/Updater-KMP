@@ -66,6 +66,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
@@ -250,6 +251,13 @@ private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, snackBarHostState
                 style = MaterialTheme.typography.titleLarge
             )
         },
+        colors = TopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            actionIconContentColor = MaterialTheme.colorScheme.onBackground,
+            navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+            titleContentColor = MaterialTheme.colorScheme.onBackground,
+            scrolledContainerColor = MaterialTheme.colorScheme.background,
+        ),
         navigationIcon = { AboutDialog() },
         actions = { LoginDialog(snackBarHostState, isLogin) },
         scrollBehavior = scrollBehavior
