@@ -14,7 +14,7 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
 }
 
-version = "1.0.0"
+version = "1.1.0"
 val appName = "UpdaterKMM"
 val pkgName = "top.yukonga.updater.kmm"
 val xcf = XCFramework(appName + "Framework")

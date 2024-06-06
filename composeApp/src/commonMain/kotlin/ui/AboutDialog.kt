@@ -33,7 +33,7 @@ import updaterkmm.composeapp.generated.resources.Res
 import updaterkmm.composeapp.generated.resources.app_name
 import updaterkmm.composeapp.generated.resources.opensource_info
 
-const val version = "v1.0.0"
+const val version = "v1.1.0"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
