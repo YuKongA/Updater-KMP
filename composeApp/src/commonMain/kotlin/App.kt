@@ -142,6 +142,7 @@ import updaterkmm.composeapp.generated.resources.submit
 import updaterkmm.composeapp.generated.resources.system_version
 import updaterkmm.composeapp.generated.resources.toast_ing
 import updaterkmm.composeapp.generated.resources.toast_no_info
+import updaterkmm.composeapp.generated.resources.toast_wrong_info
 import updaterkmm.composeapp.generated.resources.using_v2
 
 const val version = "v1.0.0"
@@ -290,6 +291,7 @@ private fun FloatActionButton(
     val coroutineScope = rememberCoroutineScope()
     val messageIng = stringResource(Res.string.toast_ing)
     val messageNoResult = stringResource(Res.string.toast_no_info)
+    val messageWrongResult = stringResource(Res.string.toast_wrong_info)
 
     ExtendedFloatingActionButton(
         modifier = Modifier.offset(y = fabOffsetHeight),
@@ -323,7 +325,7 @@ private fun FloatActionButton(
                         perfSet("loginInfo", json.encodeToString(cookies))
                     }
                 }
-                if (recoveryRomInfo.currentRom?.branch != null) {
+                if (recoveryRomInfo.currentRom?.bigversion != null) {
                     val log = StringBuilder()
                     recoveryRomInfo.currentRom.changelog!!.forEach {
                         log.append(it.key).append("\n- ").append(it.value.txt.joinToString("\n- ")).append("\n\n")
@@ -344,11 +346,8 @@ private fun FloatActionButton(
                     } else {
                         "https://bigota.d.miui.com/" + recoveryRomInfo.currentRom.version + "/" + recoveryRomInfo.currentRom.filename
                     }
-                    officialText.value = if (recoveryRomInfo.currentRom.md5 == recoveryRomInfo.latestRom?.md5) {
-                        "ultimateota"
-                    } else {
-                        "bigota"
-                    }
+                    officialText.value = if (recoveryRomInfo.currentRom.md5 == recoveryRomInfo.latestRom?.md5) "ultimateota" else "bigota"
+
                     cdn1Download.value = if (recoveryRomInfo.currentRom.md5 == recoveryRomInfo.latestRom?.md5) {
                         "https://cdnorg.d.miui.com/" + recoveryRomInfo.currentRom.version + "/" + recoveryRomInfo.latestRom?.filename
                     } else {
@@ -368,6 +367,54 @@ private fun FloatActionButton(
                     perfSet("androidVersion", androidVersion.value)
 
                     snackbarHostState.currentSnackbarData?.dismiss()
+                } else if (recoveryRomInfo.incrementRom?.bigversion != null) {
+                    val log = StringBuilder()
+                    recoveryRomInfo.incrementRom.changelog!!.forEach {
+                        log.append(it.key).append("\n- ").append(it.value.txt.joinToString("\n- ")).append("\n\n")
+                    }
+                    device.value = recoveryRomInfo.incrementRom.device.toString()
+                    version.value = recoveryRomInfo.incrementRom.version.toString()
+                    codebase.value = recoveryRomInfo.incrementRom.codebase.toString()
+                    branch.value = recoveryRomInfo.incrementRom.branch.toString()
+                    fileName.value = recoveryRomInfo.incrementRom.filename.toString().substringBefore(".zip") + ".zip"
+                    fileSize.value = recoveryRomInfo.incrementRom.filesize.toString()
+                    bigVersion.value = if (recoveryRomInfo.incrementRom.bigversion?.contains("816") == true) {
+                        recoveryRomInfo.incrementRom.bigversion.replace("816", "HyperOS 1.0")
+                    } else {
+                        "MIUI ${recoveryRomInfo.incrementRom.bigversion}"
+                    }
+                    officialDownload.value = "https://ultimateota.d.miui.com/" + recoveryRomInfo.incrementRom.version + "/" + recoveryRomInfo.incrementRom.filename
+                    officialText.value = "ultimateota"
+                    cdn1Download.value = "https://cdnorg.d.miui.com/" + recoveryRomInfo.incrementRom.version + "/" + recoveryRomInfo.incrementRom.filename
+                    cdn2Download.value =
+                        "https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com/" + recoveryRomInfo.incrementRom.version + "/" + recoveryRomInfo.incrementRom.filename
+                    changeLog.value = log.toString().trimEnd()
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                    snackbarHostState.showSnackbar(message = messageWrongResult)
+                } else if (recoveryRomInfo.crossRom?.bigversion != null) {
+                    val log = StringBuilder()
+                    recoveryRomInfo.crossRom.changelog!!.forEach {
+                        log.append(it.key).append("\n- ").append(it.value.txt.joinToString("\n- ")).append("\n\n")
+                    }
+                    device.value = recoveryRomInfo.crossRom.device.toString()
+                    version.value = recoveryRomInfo.crossRom.version.toString()
+                    codebase.value = recoveryRomInfo.crossRom.codebase.toString()
+                    branch.value = recoveryRomInfo.crossRom.branch.toString()
+                    fileName.value = recoveryRomInfo.crossRom.filename.toString().substringBefore(".zip") + ".zip"
+                    fileSize.value = recoveryRomInfo.crossRom.filesize.toString()
+                    bigVersion.value = if (recoveryRomInfo.crossRom.bigversion?.contains("816") == true) {
+                        recoveryRomInfo.crossRom.bigversion.replace("816", "HyperOS 1.0")
+                    } else {
+                        "MIUI ${recoveryRomInfo.crossRom.bigversion}"
+                    }
+                    officialDownload.value = "https://ultimateota.d.miui.com/" + recoveryRomInfo.crossRom.version + "/" + recoveryRomInfo.crossRom.filename
+                    officialText.value = "ultimateota"
+                    cdn1Download.value = "https://cdnorg.d.miui.com/" + recoveryRomInfo.crossRom.version + "/" + recoveryRomInfo.crossRom.filename
+                    cdn2Download.value =
+                        "https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com/" + recoveryRomInfo.crossRom.version + "/" + recoveryRomInfo.crossRom.filename
+                    changeLog.value = log.toString().trimEnd()
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                    snackbarHostState.showSnackbar(message = messageWrongResult)
                 } else {
                     device.value = ""
                     version.value = ""

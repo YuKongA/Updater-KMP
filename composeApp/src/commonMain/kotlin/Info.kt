@@ -27,17 +27,20 @@ fun generateJson(
     codeNameExt: String, regionCode: String, romVersion: String, androidVersion: String, userId: String, security: String, token: String
 ): String {
     val data = RequestParamHelper(
-        security = security,
-        token = token,
-        id = userId,
+        b = "F",
         c = androidVersion,
         d = codeNameExt,
         f = "1",
-        ov = romVersion,
+        id = userId,
         l = if (!codeNameExt.contains("_global")) "zh_CN" else "en_US",
+        ov = romVersion,
+        p = codeNameExt,
+        pn = codeNameExt,
         r = regionCode,
-        v = "MIUI-$romVersion",
-        unlock = "0"
+        security = security,
+        token = token,
+        unlock = "0",
+        v = "MIUI-$romVersion"
     )
     return Json.encodeToString(data)
 }
@@ -72,5 +75,6 @@ suspend fun getRecoveryRomInfo(
     }
     val requestedEncryptedText = response.body<String>()
     client.close()
+    println(miuiDecrypt(requestedEncryptedText, securityKey))
     return miuiDecrypt(requestedEncryptedText, securityKey)
 }
