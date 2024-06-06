@@ -1,0 +1,4 @@
+package ui
+
+class FloatActionButton {
+}

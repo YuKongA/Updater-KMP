@@ -24,10 +24,10 @@ var security = ""
 var serviceToken = ""
 
 fun generateJson(
-    codeNameExt: String, regionCode: String, romVersion: String, androidVersion: String, userId: String, security: String, token: String
+    branch: String = "", codeNameExt: String, regionCode: String, romVersion: String, androidVersion: String, userId: String, security: String, token: String
 ): String {
     val data = RequestParamHelper(
-        b = "F",
+        b = branch,
         c = androidVersion,
         d = codeNameExt,
         f = "1",
@@ -47,7 +47,7 @@ fun generateJson(
 
 @OptIn(ExperimentalEncodingApi::class, InternalAPI::class)
 suspend fun getRecoveryRomInfo(
-    codeNameExt: String, regionCode: String, romVersion: String, androidVersion: String
+    branch: String, codeNameExt: String, regionCode: String, romVersion: String, androidVersion: String
 ): String {
     if (perfGet("loginInfo") != null) {
         val cookies = perfGet("loginInfo")?.let { json.decodeFromString<LoginHelper>(it) }
@@ -61,7 +61,7 @@ suspend fun getRecoveryRomInfo(
             port = "2"
         }
     }
-    val jsonData = generateJson(codeNameExt, regionCode, romVersion, androidVersion, userId, security, serviceToken)
+    val jsonData = generateJson(branch, codeNameExt, regionCode, romVersion, androidVersion, userId, security, serviceToken)
     val encryptedText = miuiEncrypt(jsonData, securityKey)
     val client = httpClientPlatform()
     val parameters = Parameters.build {
@@ -75,6 +75,5 @@ suspend fun getRecoveryRomInfo(
     }
     val requestedEncryptedText = response.body<String>()
     client.close()
-    println(miuiDecrypt(requestedEncryptedText, securityKey))
     return miuiDecrypt(requestedEncryptedText, securityKey)
 }
