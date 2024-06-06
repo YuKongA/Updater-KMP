@@ -287,7 +287,7 @@ private fun FloatActionButton(
             }
             if (recoveryRomInfo.currentRom?.bigversion != null) {
 
-                if (recoveryRomInfo.currentRom.md5 != recoveryRomInfo.latestRom?.md5) {
+                officialDownload.value = if (recoveryRomInfo.currentRom.md5 != recoveryRomInfo.latestRom?.md5) {
                     val recoveryRomInfoCurrent = json.decodeFromString<RomInfoHelper.RomInfo>(
                         getRecoveryRomInfo(
                             "",
@@ -297,9 +297,8 @@ private fun FloatActionButton(
                             androidVersion.value
                         )
                     )
-                    officialDownload.value =
-                        "https://ultimateota.d.miui.com/" + recoveryRomInfoCurrent.currentRom?.version + "/" + recoveryRomInfoCurrent.latestRom?.filename
-                }
+                   "https://ultimateota.d.miui.com/" + recoveryRomInfoCurrent.currentRom?.version + "/" + recoveryRomInfoCurrent.latestRom?.filename
+                } else "https://ultimateota.d.miui.com/" + recoveryRomInfo.currentRom.version + "/" + recoveryRomInfo.latestRom?.filename
 
                 handleRomInfo(
                     recoveryRomInfo.currentRom,
