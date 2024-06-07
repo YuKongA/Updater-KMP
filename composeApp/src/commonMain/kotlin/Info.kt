@@ -24,7 +24,7 @@ var security = ""
 var serviceToken = ""
 
 fun generateJson(
-    branch: String = "", codeNameExt: String, regionCode: String, romVersion: String, androidVersion: String, userId: String, security: String, token: String
+    branch: String, codeNameExt: String, regionCode: String, romVersion: String, androidVersion: String, userId: String, security: String, token: String
 ): String {
     val data = RequestParamHelper(
         b = branch,

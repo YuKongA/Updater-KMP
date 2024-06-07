@@ -264,13 +264,15 @@ private fun FloatActionButton(
         val codeNameExt = codeName.value + regionNameExt
         val deviceCode = DeviceInfoHelper.deviceCode(androidVersion.value, codeName.value, regionCode)
 
+        val branchExt = if (systemVersion.value.contains(".DEV")) "X" else "F"
+
         coroutineScope.launch {
             snackBarHostState.showSnackbar(message = messageIng)
         }
         coroutineScope.launch {
             val recoveryRomInfo = json.decodeFromString<RomInfoHelper.RomInfo>(
                 getRecoveryRomInfo(
-                    "F", codeNameExt, regionCode, systemVersion.value.uppercase().replace("OS1", "V816").replace("AUTO", deviceCode), androidVersion.value
+                    branchExt, codeNameExt, regionCode, systemVersion.value.uppercase().replace("OS1", "V816").replace("AUTO", deviceCode), androidVersion.value
                 )
             )
             val loginInfo = perfGet("loginInfo") ?: ""
