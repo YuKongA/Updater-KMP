@@ -46,20 +46,12 @@ jobs:
       - name: Build
         run: |
           ./gradlew packageReleaseDistributionForCurrentOS
-          xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -sdk iphonesimulator -configuration Debug build
 
       - name: Upload UpdaterKMM darwin-aarch64-dmg
         uses: actions/upload-artifact@v4
         with:
           name: UpdaterKMM-darwin-aarch64-dmg
           path: composeApp/build/compose/binaries/main-release/dmg
-          compression-level: 9
-
-      - name: Upload UpdaterKMM ios-aarch64-app
-        uses: actions/upload-artifact@v4
-        with:
-          name: UpdaterKMM-ios-aarch64-app
-          path: /Users/runner/Library/Developer/Xcode/DerivedData/iosApp-*/Build/Products/Debug-iphonesimulator/UpdaterKMM.app
           compression-level: 9
 
   Linux-x64:
