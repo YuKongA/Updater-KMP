@@ -46,7 +46,6 @@ fun LoginCardView(
     val icon = if (isLogin.value == 1) Icons.Filled.DoneAll else Icons.Filled.Done
 
     Card(
-        elevation = CardDefaults.cardElevation(1.dp),
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
