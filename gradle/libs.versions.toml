@@ -5,7 +5,7 @@ compose-plugin = "1.6.11"
 cryptography = "0.3.1"
 kotlin = "2.0.0"
 kotlinxCoroutines = "1.8.1"
-kotlinxSerializationJson = "1.6.3"
+kotlinxSerializationJson = "1.7.0"
 ktorClient = "2.3.11"
 slf4jSimple = "2.0.13"
 
