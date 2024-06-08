@@ -242,7 +242,8 @@ private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, isLogin: MutableS
         title = {
             Text(
                 text = stringResource(Res.string.app_name),
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleLarge,
+                maxLines = 1,
             )
         },
         colors = TopAppBarColors(
