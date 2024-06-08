@@ -8,43 +8,27 @@ val json = Json { ignoreUnknownKeys = true }
 
 fun handleRomInfo(
     romInfo: RomInfoHelper.Rom?,
-    type: MutableState<String>,
-    device: MutableState<String>,
-    version: MutableState<String>,
-    codebase: MutableState<String>,
-    branch: MutableState<String>,
-    fileName: MutableState<String>,
-    fileSize: MutableState<String>,
-    bigVersion: MutableState<String>,
-    cdn1Download: MutableState<String>,
-    cdn2Download: MutableState<String>,
-    changeLog: MutableState<String>
+    curRomInfo: List<MutableState<String>>
 ) {
     if (romInfo?.bigversion != null) {
         val log = StringBuilder()
         romInfo.changelog!!.forEach { log.append(it.key).append("\n- ").append(it.value.txt.joinToString("\n- ")).append("\n\n") }
-        type.value = romInfo.type.toString()
-        device.value = romInfo.device.toString()
-        version.value = romInfo.version.toString()
-        codebase.value = romInfo.codebase.toString()
-        branch.value = romInfo.branch.toString()
-        fileName.value = romInfo.filename.toString().substringBefore(".zip") + ".zip"
-        fileSize.value = romInfo.filesize.toString()
-        bigVersion.value = if (romInfo.bigversion.contains("816")) romInfo.bigversion.replace("816", "HyperOS 1.0") else "MIUI ${romInfo.bigversion}"
-        cdn1Download.value = "https://cdnorg.d.miui.com/" + romInfo.version + "/" + romInfo.filename
-        cdn2Download.value = "https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com/" + romInfo.version + "/" + romInfo.filename
-        changeLog.value = log.toString().trimEnd()
+        curRomInfo[0].value = romInfo.type.toString()
+        curRomInfo[1].value = romInfo.device.toString()
+        curRomInfo[2].value = romInfo.version.toString()
+        curRomInfo[3].value = romInfo.codebase.toString()
+        curRomInfo[4].value = romInfo.branch.toString()
+        curRomInfo[5].value = romInfo.filename.toString().substringBefore(".zip") + ".zip"
+        curRomInfo[6].value = romInfo.filesize.toString()
+        curRomInfo[7].value = if (romInfo.bigversion.contains("816")) romInfo.bigversion.replace("816", "HyperOS 1.0") else "MIUI ${romInfo.bigversion}"
+        curRomInfo[9].value = "https://cdnorg.d.miui.com/" + romInfo.version + "/" + romInfo.filename
+        curRomInfo[10].value = "https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com/" + romInfo.version + "/" + romInfo.filename
+        curRomInfo[11].value = log.toString().trimEnd()
     } else {
-        type.value = ""
-        device.value = ""
-        version.value = ""
-        codebase.value = ""
-        branch.value = ""
-        fileName.value = ""
-        fileSize.value = ""
-        bigVersion.value = ""
-        cdn1Download.value = ""
-        cdn2Download.value = ""
-        changeLog.value = ""
+        clearRomInfo(curRomInfo)
     }
+}
+
+fun clearRomInfo(romInfo: List<MutableState<String>>) {
+    romInfo.forEach { it.value = "" }
 }
