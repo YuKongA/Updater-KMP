@@ -22,7 +22,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -46,6 +45,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import login
 import logout
+import misc.SnackbarUtil.Companion.hideSnackbar
+import misc.SnackbarUtil.Companion.showSnackbar
 import org.jetbrains.compose.resources.stringResource
 import updaterkmm.composeapp.generated.resources.Res
 import updaterkmm.composeapp.generated.resources.account
@@ -65,7 +66,6 @@ import updaterkmm.composeapp.generated.resources.security_error
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginDialog(
-    snackBarHostState: SnackbarHostState,
     isLogin: MutableState<Int>
 ) {
     var account by remember { mutableStateOf(TextFieldValue("")) }
@@ -171,18 +171,16 @@ fun LoginDialog(
                                 }
                                 TextButton(
                                     onClick = {
-                                        coroutineScope.launch {
-                                            snackBarHostState.showSnackbar(message = messageLoginIn)
-                                        }
+                                        showSnackbar(message = messageLoginIn)
                                         coroutineScope.launch {
                                             val int = login(account.text, password.text, global, isLogin)
-                                            snackBarHostState.currentSnackbarData?.dismiss()
+                                            hideSnackbar()
                                             when (int) {
-                                                0 -> snackBarHostState.showSnackbar(message = messageLoginSuccess)
-                                                1 -> snackBarHostState.showSnackbar(message = messageEmpty)
-                                                2 -> snackBarHostState.showSnackbar(message = messageSign)
-                                                3 -> snackBarHostState.showSnackbar(message = messageError)
-                                                4 -> snackBarHostState.showSnackbar(message = messageSecurityError)
+                                                0 -> showSnackbar(message = messageLoginSuccess)
+                                                1 -> showSnackbar(message = messageEmpty)
+                                                2 -> showSnackbar(message = messageSign)
+                                                3 -> showSnackbar(message = messageError)
+                                                4 -> showSnackbar(message = messageSecurityError)
                                             }
                                         }
                                         showDialog = false
@@ -234,7 +232,7 @@ fun LoginDialog(
                                     onClick = {
                                         coroutineScope.launch {
                                             val boolean = logout(isLogin)
-                                            if (boolean) snackBarHostState.showSnackbar(message = messageLogoutSuccessful)
+                                            if (boolean) showSnackbar(message = messageLogoutSuccessful)
                                         }
                                         showDialog = false
                                     }

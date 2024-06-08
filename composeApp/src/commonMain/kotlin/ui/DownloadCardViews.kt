@@ -15,13 +15,11 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -30,7 +28,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import copyToClipboard
 import downloadToLocal
-import kotlinx.coroutines.launch
+import misc.SnackbarUtil.Companion.showSnackbar
 import org.jetbrains.compose.resources.stringResource
 import updaterkmm.composeapp.generated.resources.Res
 import updaterkmm.composeapp.generated.resources.copy_button
@@ -44,8 +42,7 @@ fun DownloadCardViews(
     officialDownload: MutableState<String>,
     cdn1Download: MutableState<String>,
     cdn2Download: MutableState<String>,
-    fileName: MutableState<String>,
-    snackBarHostState: SnackbarHostState
+    fileName: MutableState<String>
 ) {
     val isVisible = remember { mutableStateOf(false) }
     isVisible.value = officialDownload.value.isNotEmpty()
@@ -73,9 +70,9 @@ fun DownloadCardViews(
                     fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                     fontWeight = FontWeight.SemiBold
                 )
-                DownloadTextView("Official (ultimateota)", officialDownload.value, officialDownload.value, fileName.value, snackBarHostState)
-                DownloadTextView("CDN (cdnorg)", cdn1Download.value, cdn1Download.value, fileName.value, snackBarHostState)
-                DownloadTextView("CDN (aliyuncs)", cdn2Download.value, cdn2Download.value, fileName.value, snackBarHostState, 0.dp)
+                DownloadTextView("Official (ultimateota)", officialDownload.value, officialDownload.value, fileName.value)
+                DownloadTextView("CDN (cdnorg)", cdn1Download.value, cdn1Download.value, fileName.value)
+                DownloadTextView("CDN (aliyuncs)", cdn2Download.value, cdn2Download.value, fileName.value, 0.dp)
             }
         }
     }
@@ -87,11 +84,8 @@ fun DownloadTextView(
     copy: String,
     download: String,
     fileName: String,
-    snackBarHostState: SnackbarHostState,
     bottomPadding: Dp = 8.dp,
 ) {
-    val coroutineScope = rememberCoroutineScope()
-
     val messageCopySuccessful = stringResource(Res.string.copy_successful)
     val messageDownloadStart = stringResource(Res.string.download_start)
 
@@ -118,7 +112,7 @@ fun DownloadTextView(
                             enabled = true,
                             onClick = {
                                 copyToClipboard(copy)
-                                coroutineScope.launch { snackBarHostState.showSnackbar(message = messageCopySuccessful) }
+                                showSnackbar(messageCopySuccessful)
                             }
                         ),
                     text = stringResource(Res.string.copy_button),
@@ -131,7 +125,7 @@ fun DownloadTextView(
                             enabled = true,
                             onClick = {
                                 downloadToLocal(download, fileName)
-                                coroutineScope.launch { snackBarHostState.showSnackbar(message = messageDownloadStart) }
+                                showSnackbar(messageDownloadStart)
                             }
                         ),
                     text = stringResource(Res.string.download_button),

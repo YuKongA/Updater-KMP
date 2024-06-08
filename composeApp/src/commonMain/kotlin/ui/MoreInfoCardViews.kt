@@ -14,20 +14,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import copyToClipboard
-import kotlinx.coroutines.launch
+import misc.SnackbarUtil.Companion.showSnackbar
 import org.jetbrains.compose.resources.stringResource
 import updaterkmm.composeapp.generated.resources.Res
 import updaterkmm.composeapp.generated.resources.changelog
@@ -39,8 +37,7 @@ import updaterkmm.composeapp.generated.resources.filesize
 fun MoreInfoCardViews(
     fileName: MutableState<String>,
     fileSize: MutableState<String>,
-    changeLog: MutableState<String>,
-    snackBarHostState: SnackbarHostState
+    changeLog: MutableState<String>
 ) {
     val isVisible = remember { mutableStateOf(false) }
     isVisible.value = fileName.value.isNotEmpty()
@@ -62,9 +59,9 @@ fun MoreInfoCardViews(
             Column(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp)
             ) {
-                MoreTextView(stringResource(Res.string.filename), fileName.value, snackBarHostState)
-                MoreTextView(stringResource(Res.string.filesize), fileSize.value, snackBarHostState)
-                MoreTextView(stringResource(Res.string.changelog), changeLog.value, snackBarHostState, true, 0.dp)
+                MoreTextView(stringResource(Res.string.filename), fileName.value)
+                MoreTextView(stringResource(Res.string.filesize), fileSize.value)
+                MoreTextView(stringResource(Res.string.changelog), changeLog.value, true, 0.dp)
             }
         }
     }
@@ -74,12 +71,9 @@ fun MoreInfoCardViews(
 fun MoreTextView(
     title: String,
     text: String,
-    snackBarHostState: SnackbarHostState,
     copy: Boolean = false,
     bottomPadding: Dp = 8.dp
 ) {
-    val coroutineScope = rememberCoroutineScope()
-
     val content = remember { mutableStateOf("") }
     content.value = text
 
@@ -104,7 +98,7 @@ fun MoreTextView(
                     enabled = copy,
                     onClick = {
                         copyToClipboard(it)
-                        coroutineScope.launch { snackBarHostState.showSnackbar(message = messageCopySuccessful) }
+                        showSnackbar(messageCopySuccessful)
                     }
                 ),
             fontSize = MaterialTheme.typography.bodyMedium.fontSize,

@@ -23,8 +23,6 @@ import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
@@ -45,6 +43,11 @@ import data.LoginHelper
 import data.RomInfoHelper
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
+import misc.SnackbarUtil.Companion.Snackbar
+import misc.SnackbarUtil.Companion.getSnackbarMessage
+import misc.SnackbarUtil.Companion.hideSnackbar
+import misc.SnackbarUtil.Companion.isSnackbarVisible
+import misc.SnackbarUtil.Companion.showSnackbar
 import misc.handleRomInfo
 import misc.json
 import org.jetbrains.compose.resources.stringResource
@@ -100,30 +103,33 @@ fun App() {
     val cdn2DownloadIncrementRom = remember { mutableStateOf("") }
     val changeLogIncrementRom = remember { mutableStateOf("") }
 
-    val snackBarHostState = remember { SnackbarHostState() }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     val fabOffsetHeight by animateDpAsState(
-        targetValue = if (scrollBehavior.state.contentOffset < -10) 80.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() else 0.dp,
+        targetValue = if (scrollBehavior.state.contentOffset < -35) 80.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() else 0.dp,
         animationSpec = tween(durationMillis = 300)
     )
     val snackOffsetHeight by animateDpAsState(
-        targetValue = if (scrollBehavior.state.contentOffset <= -10) 65.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() else 0.dp,
+        targetValue = if (scrollBehavior.state.contentOffset <= -35) 65.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() else 0.dp,
         animationSpec = tween(durationMillis = 300)
     )
 
     AppTheme {
         MaterialTheme {
             Scaffold(
-                snackbarHost = {
-                    SnackbarHost(
-                        hostState = snackBarHostState,
-                        modifier = Modifier.padding(horizontal = 3.dp).offset(y = snackOffsetHeight),
-                    )
-                },
                 modifier = Modifier
                     .nestedScroll(scrollBehavior.nestedScrollConnection)
-                    .background(MaterialTheme.colorScheme.background),
-                topBar = { TopAppBar(scrollBehavior, snackBarHostState, isLogin) },
+                    .background(MaterialTheme.colorScheme.background)
+                    .displayCutoutPadding(),
+                topBar = {
+                    TopAppBar(scrollBehavior, isLogin)
+                },
+                snackbarHost = {
+                    Snackbar(
+                        getSnackbarMessage(),
+                        isSnackbarVisible(),
+                        snackOffsetHeight
+                    )
+                },
                 floatingActionButton = {
                     FloatActionButton(
                         fabOffsetHeight,
@@ -156,7 +162,6 @@ fun App() {
                         cdn1DownloadIncrementRom,
                         cdn2DownloadIncrementRom,
                         changeLogIncrementRom,
-                        snackBarHostState,
                         isLogin
                     )
                 },
@@ -174,8 +179,8 @@ fun App() {
                                     LoginCardView(isLogin)
                                     TextFieldViews(deviceName, codeName, deviceRegion, systemVersion, androidVersion)
                                     MessageCardViews(type, device, version, bigVersion, codebase, branch)
-                                    MoreInfoCardViews(fileName, fileSize, changeLog, snackBarHostState)
-                                    DownloadCardViews(officialDownload, cdn1Download, cdn2Download, fileName, snackBarHostState)
+                                    MoreInfoCardViews(fileName, fileSize, changeLog)
+                                    DownloadCardViews(officialDownload, cdn1Download, cdn2Download, fileName)
                                     MessageCardViews(
                                         typeIncrementRom,
                                         deviceIncrementRom,
@@ -184,18 +189,12 @@ fun App() {
                                         codebaseIncrementRom,
                                         branchIncrementRom
                                     )
-                                    MoreInfoCardViews(fileNameIncrementRom, fileSizeIncrementRom, changeLogIncrementRom, snackBarHostState)
-                                    DownloadCardViews(
-                                        officialDownloadIncrementRom,
-                                        cdn1DownloadIncrementRom,
-                                        cdn2DownloadIncrementRom,
-                                        fileNameIncrementRom,
-                                        snackBarHostState
-                                    )
+                                    MoreInfoCardViews(fileNameIncrementRom, fileSizeIncrementRom, changeLogIncrementRom)
+                                    DownloadCardViews(officialDownloadIncrementRom, cdn1DownloadIncrementRom, cdn2DownloadIncrementRom, fileNameIncrementRom)
                                     Spacer(Modifier.height(padding.calculateBottomPadding()))
                                 }
                             } else {
-                                Column(modifier = Modifier.displayCutoutPadding()) {
+                                Column {
                                     Row {
                                         Column(modifier = Modifier.weight(0.8f).padding(end = 20.dp)) {
                                             LoginCardView(isLogin)
@@ -203,8 +202,8 @@ fun App() {
                                         }
                                         Column(modifier = Modifier.weight(1.0f)) {
                                             MessageCardViews(type, device, version, bigVersion, codebase, branch)
-                                            MoreInfoCardViews(fileName, fileSize, changeLog, snackBarHostState)
-                                            DownloadCardViews(officialDownload, cdn1Download, cdn2Download, fileName, snackBarHostState)
+                                            MoreInfoCardViews(fileName, fileSize, changeLog)
+                                            DownloadCardViews(officialDownload, cdn1Download, cdn2Download, fileName)
                                             MessageCardViews(
                                                 typeIncrementRom,
                                                 deviceIncrementRom,
@@ -213,13 +212,12 @@ fun App() {
                                                 codebaseIncrementRom,
                                                 branchIncrementRom
                                             )
-                                            MoreInfoCardViews(fileNameIncrementRom, fileSizeIncrementRom, changeLogIncrementRom, snackBarHostState)
+                                            MoreInfoCardViews(fileNameIncrementRom, fileSizeIncrementRom, changeLogIncrementRom)
                                             DownloadCardViews(
                                                 officialDownloadIncrementRom,
                                                 cdn1DownloadIncrementRom,
                                                 cdn2DownloadIncrementRom,
-                                                fileNameIncrementRom,
-                                                snackBarHostState
+                                                fileNameIncrementRom
                                             )
                                         }
                                     }
@@ -238,7 +236,7 @@ fun App() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, snackBarHostState: SnackbarHostState, isLogin: MutableState<Int>) {
+private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, isLogin: MutableState<Int>) {
     CenterAlignedTopAppBar(
         modifier = Modifier.displayCutoutPadding(),
         title = {
@@ -258,7 +256,7 @@ private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, snackBarHostState
             AboutDialog()
         },
         actions = {
-            LoginDialog(snackBarHostState, isLogin)
+            LoginDialog(isLogin)
         },
         scrollBehavior = scrollBehavior
     )
@@ -296,7 +294,6 @@ private fun FloatActionButton(
     cdn1DownloadIncrementRom: MutableState<String>,
     cdn2DownloadIncrementRom: MutableState<String>,
     changeLogIncrementRom: MutableState<String>,
-    snackBarHostState: SnackbarHostState,
     isLogin: MutableState<Int>
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -306,8 +303,7 @@ private fun FloatActionButton(
 
     ExtendedFloatingActionButton(
         modifier = Modifier
-            .offset(y = fabOffsetHeight)
-            .displayCutoutPadding(),
+            .offset(y = fabOffsetHeight),
         onClick = {
             val regionCode = DeviceInfoHelper.regionCode(deviceRegion.value)
             val regionNameExt = DeviceInfoHelper.regionNameExt(deviceRegion.value)
@@ -316,9 +312,8 @@ private fun FloatActionButton(
 
             val branchExt = if (systemVersion.value.contains(".DEV")) "X" else "F"
 
-            coroutineScope.launch {
-                snackBarHostState.showSnackbar(message = messageIng)
-            }
+            showSnackbar(message = messageIng)
+
             coroutineScope.launch {
                 val recoveryRomInfo = json.decodeFromString<RomInfoHelper.RomInfo>(
                     getRecoveryRomInfo(
@@ -410,7 +405,7 @@ private fun FloatActionButton(
                         changeLogIncrementRom.value = ""
                     }
 
-                    snackBarHostState.currentSnackbarData?.dismiss()
+                    hideSnackbar()
 
                 } else if (recoveryRomInfo.incrementRom?.bigversion != null) {
 
@@ -445,12 +440,13 @@ private fun FloatActionButton(
                     cdn2DownloadIncrementRom.value = ""
                     changeLogIncrementRom.value = ""
 
-                    snackBarHostState.currentSnackbarData?.dismiss()
-                    snackBarHostState.showSnackbar(messageWrongResult)
+                    hideSnackbar()
+                    showSnackbar(messageWrongResult)
 
                 } else if (recoveryRomInfo.crossRom?.bigversion != null) {
 
-                    officialDownload.value = "https://ultimateota.d.miui.com/" + recoveryRomInfo.crossRom.version + "/" + recoveryRomInfo.crossRom.filename
+                    officialDownload.value =
+                        "https://ultimateota.d.miui.com/" + recoveryRomInfo.crossRom.version + "/" + recoveryRomInfo.crossRom.filename
 
                     handleRomInfo(
                         recoveryRomInfo.crossRom,
@@ -480,8 +476,8 @@ private fun FloatActionButton(
                     cdn2DownloadIncrementRom.value = ""
                     changeLogIncrementRom.value = ""
 
-                    snackBarHostState.currentSnackbarData?.dismiss()
-                    snackBarHostState.showSnackbar(messageWrongResult)
+                    hideSnackbar()
+                    showSnackbar(messageWrongResult)
 
                 } else {
                     type.value = ""
@@ -509,8 +505,8 @@ private fun FloatActionButton(
                     cdn2DownloadIncrementRom.value = ""
                     changeLogIncrementRom.value = ""
 
-                    snackBarHostState.currentSnackbarData?.dismiss()
-                    snackBarHostState.showSnackbar(messageNoResult)
+                    hideSnackbar()
+                    showSnackbar(messageNoResult)
                 }
             }
         }) {
