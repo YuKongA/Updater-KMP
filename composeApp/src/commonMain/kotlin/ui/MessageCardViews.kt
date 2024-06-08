@@ -29,12 +29,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import updaterkmm.composeapp.generated.resources.Res
-import updaterkmm.composeapp.generated.resources.android_version
-import updaterkmm.composeapp.generated.resources.big_version
-import updaterkmm.composeapp.generated.resources.branch
-import updaterkmm.composeapp.generated.resources.code_name
-import updaterkmm.composeapp.generated.resources.system_version
+import updaterkmp.composeapp.generated.resources.Res
+import updaterkmp.composeapp.generated.resources.android_version
+import updaterkmp.composeapp.generated.resources.big_version
+import updaterkmp.composeapp.generated.resources.branch
+import updaterkmp.composeapp.generated.resources.code_name
+import updaterkmp.composeapp.generated.resources.system_version
 
 @Composable
 fun MessageCardViews(

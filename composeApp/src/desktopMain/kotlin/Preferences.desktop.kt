@@ -1,6 +1,6 @@
 import java.util.prefs.Preferences
 
-private val preferences = Preferences.userRoot().node("UpdaterKMM")
+private val preferences = Preferences.userRoot().node("UpdaterKMP")
 
 actual fun perfSet(key: String, value: String) {
     preferences.put(key, value)

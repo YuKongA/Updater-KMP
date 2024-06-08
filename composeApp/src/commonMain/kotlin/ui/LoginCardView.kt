@@ -21,13 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import updaterkmm.composeapp.generated.resources.Res
-import updaterkmm.composeapp.generated.resources.logged_in
-import updaterkmm.composeapp.generated.resources.login_desc
-import updaterkmm.composeapp.generated.resources.login_expired
-import updaterkmm.composeapp.generated.resources.login_expired_desc
-import updaterkmm.composeapp.generated.resources.no_account
-import updaterkmm.composeapp.generated.resources.using_v2
+import updaterkmp.composeapp.generated.resources.Res
+import updaterkmp.composeapp.generated.resources.logged_in
+import updaterkmp.composeapp.generated.resources.login_desc
+import updaterkmp.composeapp.generated.resources.login_expired
+import updaterkmp.composeapp.generated.resources.login_expired_desc
+import updaterkmp.composeapp.generated.resources.no_account
+import updaterkmp.composeapp.generated.resources.using_v2
 
 @Composable
 fun LoginCardView(

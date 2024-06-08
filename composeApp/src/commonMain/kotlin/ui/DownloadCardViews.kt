@@ -30,12 +30,12 @@ import copyToClipboard
 import downloadToLocal
 import misc.SnackbarUtil.Companion.showSnackbar
 import org.jetbrains.compose.resources.stringResource
-import updaterkmm.composeapp.generated.resources.Res
-import updaterkmm.composeapp.generated.resources.copy_button
-import updaterkmm.composeapp.generated.resources.copy_successful
-import updaterkmm.composeapp.generated.resources.download
-import updaterkmm.composeapp.generated.resources.download_button
-import updaterkmm.composeapp.generated.resources.download_start
+import updaterkmp.composeapp.generated.resources.Res
+import updaterkmp.composeapp.generated.resources.copy_button
+import updaterkmp.composeapp.generated.resources.copy_successful
+import updaterkmp.composeapp.generated.resources.download
+import updaterkmp.composeapp.generated.resources.download_button
+import updaterkmp.composeapp.generated.resources.download_start
 
 @Composable
 fun DownloadCardViews(

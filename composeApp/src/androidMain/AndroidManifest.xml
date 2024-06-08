@@ -7,11 +7,11 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:label="UpdaterKMM"
+        android:label="Updater"
         android:localeConfig="@xml/locales_config"
         android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
-        android:theme="@style/Theme.UpdaterKMM"
+        android:theme="@style/Theme.Updater"
         tools:ignore="UnusedAttribute">
         <activity
             android:name=".MainActivity"

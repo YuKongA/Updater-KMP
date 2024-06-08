@@ -48,20 +48,20 @@ import login
 import logout
 import misc.SnackbarUtil.Companion.showSnackbar
 import org.jetbrains.compose.resources.stringResource
-import updaterkmm.composeapp.generated.resources.Res
-import updaterkmm.composeapp.generated.resources.account
-import updaterkmm.composeapp.generated.resources.account_or_password_empty
-import updaterkmm.composeapp.generated.resources.cancel
-import updaterkmm.composeapp.generated.resources.global
-import updaterkmm.composeapp.generated.resources.logging_in
-import updaterkmm.composeapp.generated.resources.login
-import updaterkmm.composeapp.generated.resources.login_error
-import updaterkmm.composeapp.generated.resources.login_successful
-import updaterkmm.composeapp.generated.resources.logout
-import updaterkmm.composeapp.generated.resources.logout_successful
-import updaterkmm.composeapp.generated.resources.password
-import updaterkmm.composeapp.generated.resources.request_sign_failed
-import updaterkmm.composeapp.generated.resources.security_error
+import updaterkmp.composeapp.generated.resources.Res
+import updaterkmp.composeapp.generated.resources.account
+import updaterkmp.composeapp.generated.resources.account_or_password_empty
+import updaterkmp.composeapp.generated.resources.cancel
+import updaterkmp.composeapp.generated.resources.global
+import updaterkmp.composeapp.generated.resources.logging_in
+import updaterkmp.composeapp.generated.resources.login
+import updaterkmp.composeapp.generated.resources.login_error
+import updaterkmp.composeapp.generated.resources.login_successful
+import updaterkmp.composeapp.generated.resources.logout
+import updaterkmp.composeapp.generated.resources.logout_successful
+import updaterkmp.composeapp.generated.resources.password
+import updaterkmp.composeapp.generated.resources.request_sign_failed
+import updaterkmp.composeapp.generated.resources.security_error
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

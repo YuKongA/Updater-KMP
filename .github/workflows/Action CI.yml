@@ -20,14 +20,14 @@ jobs:
           java-version: 17
           distribution: 'zulu'
 
-      - name: Build
+      - name: Build Windows platform
         run: ./gradlew createReleaseDistributable
 
-      - name: Upload UpdaterKMM windows-x86_64-exe
+      - name: Upload UpdaterKMP windows-x86_64-exe
         uses: actions/upload-artifact@v4
         with:
-          name: UpdaterKMM-windows-x86_64-exe
-          path: composeApp/build/compose/binaries/main-release/app/UpdaterKMM
+          name: UpdaterKMP-windows-x86_64-exe
+          path: composeApp/build/compose/binaries/main-release/app/Updater
           compression-level: 9
 
   macOS-arm64:
@@ -43,14 +43,13 @@ jobs:
           distribution: 'zulu'
           cache: 'gradle'
 
-      - name: Build
-        run: |
-          ./gradlew packageReleaseDistributionForCurrentOS
+      - name: Build Darwin platform
+        run: ./gradlew packageReleaseDistributionForCurrentOS
 
-      - name: Upload UpdaterKMM darwin-aarch64-dmg
+      - name: Upload UpdaterKMP darwin-aarch64-dmg
         uses: actions/upload-artifact@v4
         with:
-          name: UpdaterKMM-darwin-aarch64-dmg
+          name: UpdaterKMP-darwin-aarch64-dmg
           path: composeApp/build/compose/binaries/main-release/dmg
           compression-level: 9
 
@@ -69,35 +68,40 @@ jobs:
           distribution: 'zulu'
           cache: 'gradle'
 
-      - name: Build
+
+      - name: Build Android platform
         run: |
           echo ${{ secrets.SIGNING_KEY }} | base64 -d > keystore.jks
           bash ./gradlew assembleRelease
-          bash ./gradlew packageReleaseDistributionForCurrentOS
-          bash ./gradlew createReleaseDistributable
         env:
           KEYSTORE_PATH: "../keystore.jks"
           KEYSTORE_PASS: ${{ secrets.KEY_STORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
-      - name: Upload UpdaterKMM linux-x86_64-deb
+      - name: Upload UpdaterKMP android-aarch64-apk
         uses: actions/upload-artifact@v4
         with:
-          name: UpdaterKMM-linux-x86_64-deb
+          name: UpdaterKMP-android-aarch64-apk
+          path: composeApp/build/outputs/apk/release
+          compression-level: 9
+
+      - name: Build Linux platform
+        run: |
+          bash ./gradlew packageReleaseDistributionForCurrentOS
+          bash ./gradlew createReleaseDistributable
+
+      - name: Upload UpdaterKMP linux-x86_64-deb
+        uses: actions/upload-artifact@v4
+        with:
+          name: UpdaterKMP-linux-x86_64-deb
           path: composeApp/build/compose/binaries/main-release/deb
           compression-level: 9
 
-      - name: Upload UpdaterKMM linux-x86_64-other
+      - name: Upload UpdaterKMP linux-x86_64-other
         uses: actions/upload-artifact@v4
         with:
-          name: UpdaterKMM-linux-x86_64-other
-          path: composeApp/build/compose/binaries/main-release/app/UpdaterKMM
+          name: UpdaterKMP-linux-x86_64-other
+          path: composeApp/build/compose/binaries/main-release/app/Updater
           compression-level: 9
 
-      - name: Upload UpdaterKMM android-aarch64-apk
-        uses: actions/upload-artifact@v4
-        with:
-          name: UpdaterKMM-android-aarch64-apk
-          path: composeApp/build/outputs/apk/release
-          compression-level: 9

@@ -30,9 +30,9 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import updaterkmm.composeapp.generated.resources.Res
-import updaterkmm.composeapp.generated.resources.app_name
-import updaterkmm.composeapp.generated.resources.opensource_info
+import updaterkmp.composeapp.generated.resources.Res
+import updaterkmp.composeapp.generated.resources.app_name
+import updaterkmp.composeapp.generated.resources.opensource_info
 
 const val version = "v1.1.0"
 

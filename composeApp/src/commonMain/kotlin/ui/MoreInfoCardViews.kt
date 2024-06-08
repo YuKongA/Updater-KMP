@@ -27,11 +27,11 @@ import androidx.compose.ui.unit.dp
 import copyToClipboard
 import misc.SnackbarUtil.Companion.showSnackbar
 import org.jetbrains.compose.resources.stringResource
-import updaterkmm.composeapp.generated.resources.Res
-import updaterkmm.composeapp.generated.resources.changelog
-import updaterkmm.composeapp.generated.resources.copy_successful
-import updaterkmm.composeapp.generated.resources.filename
-import updaterkmm.composeapp.generated.resources.filesize
+import updaterkmp.composeapp.generated.resources.Res
+import updaterkmp.composeapp.generated.resources.changelog
+import updaterkmp.composeapp.generated.resources.copy_successful
+import updaterkmp.composeapp.generated.resources.filename
+import updaterkmp.composeapp.generated.resources.filesize
 
 @Composable
 fun MoreInfoCardViews(

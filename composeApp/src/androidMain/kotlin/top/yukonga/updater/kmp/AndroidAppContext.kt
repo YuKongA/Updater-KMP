@@ -1,4 +1,4 @@
-package top.yukonga.updater.kmm
+package top.yukonga.updater.kmp
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -8,7 +8,7 @@ object AndroidAppContext {
     private var context: Context? = null
 
     fun init(context: Context) {
-        this.context = context.applicationContext
+        AndroidAppContext.context = context.applicationContext
     }
 
     fun getApplicationContext(): Context? {

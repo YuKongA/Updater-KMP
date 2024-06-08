@@ -1,7 +1,7 @@
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import top.yukonga.updater.kmm.AndroidAppContext
+import top.yukonga.updater.kmp.AndroidAppContext
 
 actual fun copyToClipboard(text: String) {
     val context = AndroidAppContext.getApplicationContext()

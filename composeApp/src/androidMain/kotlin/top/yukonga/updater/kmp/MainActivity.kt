@@ -1,4 +1,4 @@
-package top.yukonga.updater.kmm
+package top.yukonga.updater.kmp
 
 import App
 import android.os.Build

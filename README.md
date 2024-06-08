@@ -1,9 +1,5 @@
-# UpdaterKMM
-**UpdaterKMM** is an application that gets MIUI/HyperOS update information. With the [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) UI framework.
-
-**Desktop**/**Android**/**iOS** is now supported.
-
-Due to browser cross-domain request restrictions, the **Web** platform is unavailable.
+# Updater-KMP
+This is an application that gets MIUI/HyperOS update information. With the [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) UI framework. **Desktop** / **Android** / **iOS** is now supported.
 
 ## Usage:
 When obtaining the `Pubilc Release Version (F)`, the suffix of the system version can be automatically completed using `AUTO`<br />For example: `OS1.0.26.0.AUTO` / `V14.0.4.0.AUTO`
@@ -13,7 +9,7 @@ When obtaining `Beta Development Version (X)`, please enter the complete system 
 ## Notes:
 Only supported `MIUI9` and above versions. The most extreme case is: Redmi 1S (armani), MIUI9, Android4.4.
 
-Only devices in the list of [DeviceInfoHelper](https://github.com/YuKongA/UpdaterKMM/blob/main/composeApp/src/commonMain/kotlin/data/DeviceInfoHelper.kt#L62) are supported use `AUTO` to complete automatically, other devices still need to manually enter the full system version.
+Only devices in the list of [DeviceInfoHelper](https://github.com/YuKongA/Updater-KMP/blob/main/composeApp/src/commonMain/kotlin/data/DeviceInfoHelper.kt#L62) are supported use `AUTO` to complete automatically, other devices still need to manually enter the full system version.
 
 When you are not logged in with a Xiaomi account, you can use the miotaV3-v1 interface to obtain any detailed information of the `Pubilc Release Version` of any model.
 

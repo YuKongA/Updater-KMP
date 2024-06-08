@@ -6,18 +6,20 @@ import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import org.jetbrains.compose.resources.painterResource
-import updaterkmm.composeapp.generated.resources.Res
-import updaterkmm.composeapp.generated.resources.icon
+import org.jetbrains.compose.resources.stringResource
+import updaterkmp.composeapp.generated.resources.Res
+import updaterkmp.composeapp.generated.resources.app_name
+import updaterkmp.composeapp.generated.resources.icon
 
 fun main() = application {
     val state = rememberWindowState(
-        size = DpSize(420.dp, 820.dp),
+        size = DpSize(420.dp, 840.dp),
         position = WindowPosition.Aligned(Alignment.Center)
     )
     Window(
-        onCloseRequest = ::exitApplication,
-        title = "UpdaterKMM",
         state = state,
+        onCloseRequest = ::exitApplication,
+        title = stringResource(Res.string.app_name),
         icon = painterResource(Res.drawable.icon),
     ) {
         App()

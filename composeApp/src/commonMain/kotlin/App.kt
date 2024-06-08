@@ -56,14 +56,14 @@ import ui.LoginDialog
 import ui.MessageCardViews
 import ui.MoreInfoCardViews
 import ui.TextFieldViews
-import updaterkmm.composeapp.generated.resources.Res
-import updaterkmm.composeapp.generated.resources.app_name
-import updaterkmm.composeapp.generated.resources.submit
-import updaterkmm.composeapp.generated.resources.toast_crash_info
-import updaterkmm.composeapp.generated.resources.toast_ing
-import updaterkmm.composeapp.generated.resources.toast_no_info
-import updaterkmm.composeapp.generated.resources.toast_success_info
-import updaterkmm.composeapp.generated.resources.toast_wrong_info
+import updaterkmp.composeapp.generated.resources.Res
+import updaterkmp.composeapp.generated.resources.app_name
+import updaterkmp.composeapp.generated.resources.submit
+import updaterkmp.composeapp.generated.resources.toast_crash_info
+import updaterkmp.composeapp.generated.resources.toast_ing
+import updaterkmp.composeapp.generated.resources.toast_no_info
+import updaterkmp.composeapp.generated.resources.toast_success_info
+import updaterkmp.composeapp.generated.resources.toast_wrong_info
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

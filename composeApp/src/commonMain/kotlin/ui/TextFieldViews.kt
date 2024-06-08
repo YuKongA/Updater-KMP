@@ -28,12 +28,12 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import ui.components.AutoCompleteTextField
 import ui.components.TextFieldWithDropdown
-import updaterkmm.composeapp.generated.resources.Res
-import updaterkmm.composeapp.generated.resources.android_version
-import updaterkmm.composeapp.generated.resources.code_name
-import updaterkmm.composeapp.generated.resources.device_name
-import updaterkmm.composeapp.generated.resources.regions_code
-import updaterkmm.composeapp.generated.resources.system_version
+import updaterkmp.composeapp.generated.resources.Res
+import updaterkmp.composeapp.generated.resources.android_version
+import updaterkmp.composeapp.generated.resources.code_name
+import updaterkmp.composeapp.generated.resources.device_name
+import updaterkmp.composeapp.generated.resources.regions_code
+import updaterkmp.composeapp.generated.resources.system_version
 
 @Composable
 fun TextFieldViews(

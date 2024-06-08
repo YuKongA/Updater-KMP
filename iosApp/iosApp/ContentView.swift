@@ -1,6 +1,6 @@
 import UIKit
 import SwiftUI
-import UpdaterKMMFramework
+import UpdaterFramework
 
 struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {

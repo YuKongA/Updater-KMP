@@ -15,8 +15,8 @@ plugins {
 }
 
 version = "1.1.0"
-val appName = "UpdaterKMM"
-val pkgName = "top.yukonga.updater.kmm"
+val appName = "Updater"
+val pkgName = "top.yukonga.updater.kmp"
 val xcf = XCFramework(appName + "Framework")
 
 kotlin {
@@ -107,7 +107,7 @@ android {
             excludes += "/kotlin/**"
             excludes += "/okhttp3/**"
             excludes += "/DebugProbesKt.bin"
-            excludes += "/composeResources/updaterkmm.composeapp.generated.resources/drawable/**"
+            excludes += "/composeResources/updaterkmp.composeapp.generated.resources/drawable/**"
         }
         applicationVariants.all {
             outputs.all {
