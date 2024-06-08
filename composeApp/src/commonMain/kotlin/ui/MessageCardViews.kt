@@ -62,7 +62,7 @@ fun MessageCardViews(
             ) {
                 Text(
                     text = it,
-                    modifier = Modifier.padding(start = 15.dp, bottom = 10.dp),
+                    modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
                     fontSize = MaterialTheme.typography.titleSmall.fontSize
                 )
             }
