@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -14,31 +15,29 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class SnackbarUtil {
 
     companion object {
         private val snackbarMessage = mutableStateOf("")
+        private var snackbarDuration = mutableStateOf(1000L)
         private var isSnackbarVisible = mutableStateOf(false)
+        private var snackbarCoroutineJob: Job? = null
+        private var snackbarKey = mutableStateOf(0)
 
-        fun showSnackbar(message: String) {
+        fun showSnackbar(message: String, duration: Long = 1000L) {
+            snackbarCoroutineJob?.cancel()
             snackbarMessage.value = message
+            snackbarDuration.value = duration
             isSnackbarVisible.value = true
+            snackbarKey.value++
         }
-
-        fun getSnackbarMessage() = snackbarMessage.value
-
-        fun hideSnackbar() {
-            isSnackbarVisible.value = false
-        }
-
-        fun isSnackbarVisible() = isSnackbarVisible.value
 
         @Composable
         fun Snackbar(
-            message: String,
-            isVisible: Boolean,
             offsetY: Dp
         ) {
             val snackbarHostState = remember { SnackbarHostState() }
@@ -59,17 +58,15 @@ class SnackbarUtil {
                     )
                 }
             }
-
-            if (isVisible) {
-                LaunchedEffect(isVisible) {
-                    snackCoroutineScope.launch {
-                        snackbarHostState.showSnackbar(message)
+            if (snackbarMessage.value.isNotEmpty()) {
+                LaunchedEffect(snackbarKey.value) {
+                    snackbarCoroutineJob = snackCoroutineScope.launch {
+                        snackbarHostState.showSnackbar(message = snackbarMessage.value, duration = SnackbarDuration.Indefinite)
                         isSnackbarVisible.value = false
                     }
+                    delay(snackbarDuration.value)
+                    snackbarHostState.currentSnackbarData?.dismiss()
                 }
-            } else {
-                isSnackbarVisible.value = false
-                snackbarHostState.currentSnackbarData?.dismiss()
             }
         }
     }

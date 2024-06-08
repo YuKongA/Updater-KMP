@@ -15,6 +15,8 @@
     <string name="toast_ing">検索中…</string>
     <string name="toast_no_info">情報がありません！</string>
     <string name="toast_wrong_info">要求されたバージョンは存在しません！</string>
+    <string name="toast_success_info">リクエストが成功しました! </string>
+    <string name="toast_crash_info">ネットワーク接続がありません!</string>
     <string name="account">アカウント</string>
     <string name="password">パスワード</string>
     <string name="cancel">キャンセル</string>

@@ -16,6 +16,8 @@
     <string name="toast_ing">Searching…</string>
     <string name="toast_no_info">No information!</string>
     <string name="toast_wrong_info">Requested version does not exist!</string>
+    <string name="toast_success_info">Request successful!</string>
+    <string name="toast_crash_info">No network connection!</string>
     <string name="account">Account</string>
     <string name="password">Password</string>
     <string name="cancel">Cancel</string>

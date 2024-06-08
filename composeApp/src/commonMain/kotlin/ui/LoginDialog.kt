@@ -46,7 +46,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import login
 import logout
-import misc.SnackbarUtil.Companion.hideSnackbar
 import misc.SnackbarUtil.Companion.showSnackbar
 import org.jetbrains.compose.resources.stringResource
 import updaterkmm.composeapp.generated.resources.Res
@@ -176,7 +175,6 @@ fun LoginDialog(
                                         showSnackbar(message = messageLoginIn)
                                         coroutineScope.launch {
                                             val int = login(account.text, password.text, global, isLogin)
-                                            hideSnackbar()
                                             when (int) {
                                                 0 -> showSnackbar(message = messageLoginSuccess)
                                                 1 -> showSnackbar(message = messageEmpty)

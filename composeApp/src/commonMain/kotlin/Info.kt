@@ -70,10 +70,15 @@ suspend fun getRecoveryRomInfo(
         append("s", port)
     }.formUrlEncode()
     val recoveryUrl = if (accountType == "GL") INTL_RECOVERY_URL else CN_RECOVERY_URL
-    val response = client.post(recoveryUrl) {
-        body = TextContent(parameters, ContentType.Application.FormUrlEncoded)
+    try {
+        val response = client.post(recoveryUrl) {
+            body = TextContent(parameters, ContentType.Application.FormUrlEncoded)
+        }
+        val requestedEncryptedText = response.body<String>()
+        client.close()
+        return miuiDecrypt(requestedEncryptedText, securityKey)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return ""
     }
-    val requestedEncryptedText = response.body<String>()
-    client.close()
-    return miuiDecrypt(requestedEncryptedText, securityKey)
 }

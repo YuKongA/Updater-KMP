@@ -44,9 +44,6 @@ import data.RomInfoHelper
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import misc.SnackbarUtil.Companion.Snackbar
-import misc.SnackbarUtil.Companion.getSnackbarMessage
-import misc.SnackbarUtil.Companion.hideSnackbar
-import misc.SnackbarUtil.Companion.isSnackbarVisible
 import misc.SnackbarUtil.Companion.showSnackbar
 import misc.handleRomInfo
 import misc.json
@@ -61,8 +58,10 @@ import ui.TextFieldViews
 import updaterkmm.composeapp.generated.resources.Res
 import updaterkmm.composeapp.generated.resources.app_name
 import updaterkmm.composeapp.generated.resources.submit
+import updaterkmm.composeapp.generated.resources.toast_crash_info
 import updaterkmm.composeapp.generated.resources.toast_ing
 import updaterkmm.composeapp.generated.resources.toast_no_info
+import updaterkmm.composeapp.generated.resources.toast_success_info
 import updaterkmm.composeapp.generated.resources.toast_wrong_info
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -125,9 +124,7 @@ fun App() {
                 },
                 snackbarHost = {
                     Snackbar(
-                        getSnackbarMessage(),
-                        isSnackbarVisible(),
-                        snackOffsetHeight
+                        offsetY = snackOffsetHeight
                     )
                 },
                 floatingActionButton = {
@@ -300,7 +297,9 @@ private fun FloatActionButton(
     val coroutineScope = rememberCoroutineScope()
     val messageIng = stringResource(Res.string.toast_ing)
     val messageNoResult = stringResource(Res.string.toast_no_info)
+    val messageSuccessResult = stringResource(Res.string.toast_success_info)
     val messageWrongResult = stringResource(Res.string.toast_wrong_info)
+    val messageCrashResult = stringResource(Res.string.toast_crash_info)
 
     ExtendedFloatingActionButton(
         modifier = Modifier
@@ -316,82 +315,117 @@ private fun FloatActionButton(
             showSnackbar(message = messageIng)
 
             coroutineScope.launch {
-                val recoveryRomInfo = json.decodeFromString<RomInfoHelper.RomInfo>(
-                    getRecoveryRomInfo(
-                        branchExt,
-                        codeNameExt,
-                        regionCode,
-                        systemVersion.value.uppercase().replace("OS1", "V816").replace("AUTO", deviceCode),
-                        androidVersion.value
-                    )
-                )
-                val loginInfo = perfGet("loginInfo") ?: ""
-                if (loginInfo.isNotEmpty()) {
-                    val cookies = json.decodeFromString<MutableMap<String, String>>(loginInfo)
-                    val description = cookies["description"] ?: ""
-                    val authResult = cookies["authResult"].toString()
-                    if (description.isNotEmpty() && recoveryRomInfo.authResult != 1 && authResult != "3") {
-                        cookies.clear()
-                        cookies["authResult"] = "3"
-                        isLogin.value = 3
-                        perfSet("loginInfo", json.encodeToString(cookies))
-                    }
-                }
-                if (recoveryRomInfo.currentRom?.bigversion != null) {
 
-                    officialDownload.value = if (recoveryRomInfo.currentRom.md5 != recoveryRomInfo.latestRom?.md5) {
-                        val recoveryRomInfoCurrent = json.decodeFromString<RomInfoHelper.RomInfo>(
-                            getRecoveryRomInfo(
-                                "",
-                                codeNameExt,
-                                regionCode,
+                val romInfo = getRecoveryRomInfo(
+                    branchExt, codeNameExt, regionCode,
+                    systemVersion.value.uppercase().replace("OS1", "V816").replace("AUTO", deviceCode),
+                    androidVersion.value
+                )
+
+                if (romInfo.isNotEmpty()) {
+
+                    val recoveryRomInfo = json.decodeFromString<RomInfoHelper.RomInfo>(romInfo)
+
+                    val loginInfo = perfGet("loginInfo") ?: ""
+                    if (loginInfo.isNotEmpty()) {
+                        val cookies = json.decodeFromString<MutableMap<String, String>>(loginInfo)
+                        val description = cookies["description"] ?: ""
+                        val authResult = cookies["authResult"].toString()
+                        if (description.isNotEmpty() && recoveryRomInfo.authResult != 1 && authResult != "3") {
+                            cookies.clear()
+                            cookies["authResult"] = "3"
+                            isLogin.value = 3
+                            perfSet("loginInfo", json.encodeToString(cookies))
+                        }
+                    }
+                    if (recoveryRomInfo.currentRom?.bigversion != null) {
+
+                        officialDownload.value = if (recoveryRomInfo.currentRom.md5 != recoveryRomInfo.latestRom?.md5) {
+                            val romInfoCurrent = getRecoveryRomInfo(
+                                "", codeNameExt, regionCode,
                                 systemVersion.value.uppercase().replace("OS1", "V816").replace("AUTO", deviceCode),
                                 androidVersion.value
                             )
+                            val recoveryRomInfoCurrent = json.decodeFromString<RomInfoHelper.RomInfo>(romInfoCurrent)
+                            "https://ultimateota.d.miui.com/" + recoveryRomInfoCurrent.currentRom?.version + "/" + recoveryRomInfoCurrent.latestRom?.filename
+                        } else "https://ultimateota.d.miui.com/" + recoveryRomInfo.currentRom.version + "/" + recoveryRomInfo.latestRom?.filename
+
+                        handleRomInfo(
+                            recoveryRomInfo.currentRom,
+                            type,
+                            device,
+                            version,
+                            codebase,
+                            branch,
+                            fileName,
+                            fileSize,
+                            bigVersion,
+                            cdn1Download,
+                            cdn2Download,
+                            changeLog
                         )
-                        "https://ultimateota.d.miui.com/" + recoveryRomInfoCurrent.currentRom?.version + "/" + recoveryRomInfoCurrent.latestRom?.filename
-                    } else "https://ultimateota.d.miui.com/" + recoveryRomInfo.currentRom.version + "/" + recoveryRomInfo.latestRom?.filename
 
-                    handleRomInfo(
-                        recoveryRomInfo.currentRom,
-                        type,
-                        device,
-                        version,
-                        codebase,
-                        branch,
-                        fileName,
-                        fileSize,
-                        bigVersion,
-                        cdn1Download,
-                        cdn2Download,
-                        changeLog
-                    )
+                        perfSet("deviceName", deviceName.value)
+                        perfSet("codeName", codeName.value)
+                        perfSet("deviceRegion", deviceRegion.value)
+                        perfSet("systemVersion", systemVersion.value)
+                        perfSet("androidVersion", androidVersion.value)
 
-                    perfSet("deviceName", deviceName.value)
-                    perfSet("codeName", codeName.value)
-                    perfSet("deviceRegion", deviceRegion.value)
-                    perfSet("systemVersion", systemVersion.value)
-                    perfSet("androidVersion", androidVersion.value)
+                        if (recoveryRomInfo.incrementRom?.bigversion != null) {
+                            officialDownloadIncrementRom.value =
+                                "https://ultimateota.d.miui.com/" + recoveryRomInfo.incrementRom.version + "/" + recoveryRomInfo.incrementRom.filename
 
-                    if (recoveryRomInfo.incrementRom?.bigversion != null) {
-                        officialDownloadIncrementRom.value =
+                            handleRomInfo(
+                                recoveryRomInfo.incrementRom,
+                                typeIncrementRom,
+                                deviceIncrementRom,
+                                versionIncrementRom,
+                                codebaseIncrementRom,
+                                branchIncrementRom,
+                                fileNameIncrementRom,
+                                fileSizeIncrementRom,
+                                bigVersionIncrementRom,
+                                cdn1DownloadIncrementRom,
+                                cdn2DownloadIncrementRom,
+                                changeLogIncrementRom
+                            )
+                        } else {
+                            typeIncrementRom.value = ""
+                            deviceIncrementRom.value = ""
+                            versionIncrementRom.value = ""
+                            codebaseIncrementRom.value = ""
+                            branchIncrementRom.value = ""
+                            fileNameIncrementRom.value = ""
+                            fileSizeIncrementRom.value = ""
+                            bigVersionIncrementRom.value = ""
+                            officialDownloadIncrementRom.value = ""
+                            cdn1DownloadIncrementRom.value = ""
+                            cdn2DownloadIncrementRom.value = ""
+                            changeLogIncrementRom.value = ""
+                        }
+
+                        showSnackbar(messageSuccessResult, 1000L)
+
+                    } else if (recoveryRomInfo.incrementRom?.bigversion != null) {
+
+                        officialDownload.value =
                             "https://ultimateota.d.miui.com/" + recoveryRomInfo.incrementRom.version + "/" + recoveryRomInfo.incrementRom.filename
 
                         handleRomInfo(
                             recoveryRomInfo.incrementRom,
-                            typeIncrementRom,
-                            deviceIncrementRom,
-                            versionIncrementRom,
-                            codebaseIncrementRom,
-                            branchIncrementRom,
-                            fileNameIncrementRom,
-                            fileSizeIncrementRom,
-                            bigVersionIncrementRom,
-                            cdn1DownloadIncrementRom,
-                            cdn2DownloadIncrementRom,
-                            changeLogIncrementRom
+                            type,
+                            device,
+                            version,
+                            codebase,
+                            branch,
+                            fileName,
+                            fileSize,
+                            bigVersion,
+                            cdn1Download,
+                            cdn2Download,
+                            changeLog
                         )
-                    } else {
+
                         typeIncrementRom.value = ""
                         deviceIncrementRom.value = ""
                         versionIncrementRom.value = ""
@@ -404,110 +438,74 @@ private fun FloatActionButton(
                         cdn1DownloadIncrementRom.value = ""
                         cdn2DownloadIncrementRom.value = ""
                         changeLogIncrementRom.value = ""
+
+                        showSnackbar(messageWrongResult)
+
+                    } else if (recoveryRomInfo.crossRom?.bigversion != null) {
+
+                        officialDownload.value =
+                            "https://ultimateota.d.miui.com/" + recoveryRomInfo.crossRom.version + "/" + recoveryRomInfo.crossRom.filename
+
+                        handleRomInfo(
+                            recoveryRomInfo.crossRom,
+                            type,
+                            device,
+                            version,
+                            codebase,
+                            branch,
+                            fileName,
+                            fileSize,
+                            bigVersion,
+                            cdn1Download,
+                            cdn2Download,
+                            changeLog
+                        )
+
+                        typeIncrementRom.value = ""
+                        deviceIncrementRom.value = ""
+                        versionIncrementRom.value = ""
+                        codebaseIncrementRom.value = ""
+                        branchIncrementRom.value = ""
+                        fileNameIncrementRom.value = ""
+                        fileSizeIncrementRom.value = ""
+                        bigVersionIncrementRom.value = ""
+                        officialDownloadIncrementRom.value = ""
+                        cdn1DownloadIncrementRom.value = ""
+                        cdn2DownloadIncrementRom.value = ""
+                        changeLogIncrementRom.value = ""
+
+                        showSnackbar(messageWrongResult)
+
+                    } else {
+                        type.value = ""
+                        device.value = ""
+                        version.value = ""
+                        codebase.value = ""
+                        branch.value = ""
+                        fileName.value = ""
+                        fileSize.value = ""
+                        bigVersion.value = ""
+                        officialDownload.value = ""
+                        cdn1Download.value = ""
+                        cdn2Download.value = ""
+                        changeLog.value = ""
+                        typeIncrementRom.value = ""
+                        deviceIncrementRom.value = ""
+                        versionIncrementRom.value = ""
+                        codebaseIncrementRom.value = ""
+                        branchIncrementRom.value = ""
+                        fileNameIncrementRom.value = ""
+                        fileSizeIncrementRom.value = ""
+                        bigVersionIncrementRom.value = ""
+                        officialDownloadIncrementRom.value = ""
+                        cdn1DownloadIncrementRom.value = ""
+                        cdn2DownloadIncrementRom.value = ""
+                        changeLogIncrementRom.value = ""
+
+                        showSnackbar(messageNoResult)
                     }
-
-                    hideSnackbar()
-
-                } else if (recoveryRomInfo.incrementRom?.bigversion != null) {
-
-                    officialDownload.value =
-                        "https://ultimateota.d.miui.com/" + recoveryRomInfo.incrementRom.version + "/" + recoveryRomInfo.incrementRom.filename
-
-                    handleRomInfo(
-                        recoveryRomInfo.incrementRom,
-                        type,
-                        device,
-                        version,
-                        codebase,
-                        branch,
-                        fileName,
-                        fileSize,
-                        bigVersion,
-                        cdn1Download,
-                        cdn2Download,
-                        changeLog
-                    )
-
-                    typeIncrementRom.value = ""
-                    deviceIncrementRom.value = ""
-                    versionIncrementRom.value = ""
-                    codebaseIncrementRom.value = ""
-                    branchIncrementRom.value = ""
-                    fileNameIncrementRom.value = ""
-                    fileSizeIncrementRom.value = ""
-                    bigVersionIncrementRom.value = ""
-                    officialDownloadIncrementRom.value = ""
-                    cdn1DownloadIncrementRom.value = ""
-                    cdn2DownloadIncrementRom.value = ""
-                    changeLogIncrementRom.value = ""
-
-                    hideSnackbar()
-                    showSnackbar(messageWrongResult)
-
-                } else if (recoveryRomInfo.crossRom?.bigversion != null) {
-
-                    officialDownload.value =
-                        "https://ultimateota.d.miui.com/" + recoveryRomInfo.crossRom.version + "/" + recoveryRomInfo.crossRom.filename
-
-                    handleRomInfo(
-                        recoveryRomInfo.crossRom,
-                        type,
-                        device,
-                        version,
-                        codebase,
-                        branch,
-                        fileName,
-                        fileSize,
-                        bigVersion,
-                        cdn1Download,
-                        cdn2Download,
-                        changeLog
-                    )
-
-                    typeIncrementRom.value = ""
-                    deviceIncrementRom.value = ""
-                    versionIncrementRom.value = ""
-                    codebaseIncrementRom.value = ""
-                    branchIncrementRom.value = ""
-                    fileNameIncrementRom.value = ""
-                    fileSizeIncrementRom.value = ""
-                    bigVersionIncrementRom.value = ""
-                    officialDownloadIncrementRom.value = ""
-                    cdn1DownloadIncrementRom.value = ""
-                    cdn2DownloadIncrementRom.value = ""
-                    changeLogIncrementRom.value = ""
-
-                    hideSnackbar()
-                    showSnackbar(messageWrongResult)
-
                 } else {
-                    type.value = ""
-                    device.value = ""
-                    version.value = ""
-                    codebase.value = ""
-                    branch.value = ""
-                    fileName.value = ""
-                    fileSize.value = ""
-                    bigVersion.value = ""
-                    officialDownload.value = ""
-                    cdn1Download.value = ""
-                    cdn2Download.value = ""
-                    changeLog.value = ""
-                    typeIncrementRom.value = ""
-                    deviceIncrementRom.value = ""
-                    versionIncrementRom.value = ""
-                    codebaseIncrementRom.value = ""
-                    branchIncrementRom.value = ""
-                    fileNameIncrementRom.value = ""
-                    fileSizeIncrementRom.value = ""
-                    bigVersionIncrementRom.value = ""
-                    officialDownloadIncrementRom.value = ""
-                    cdn1DownloadIncrementRom.value = ""
-                    cdn2DownloadIncrementRom.value = ""
-                    changeLogIncrementRom.value = ""
-
-                    hideSnackbar()
-                    showSnackbar(messageNoResult)
+                    showSnackbar(messageCrashResult, 5000L)
                 }
             }
         }) {
