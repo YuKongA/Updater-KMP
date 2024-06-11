@@ -17,6 +17,3 @@ struct ContentView: View {
                 .edgesIgnoringSafeArea(.all) // edge to edge
     }
 }
-
-
-
