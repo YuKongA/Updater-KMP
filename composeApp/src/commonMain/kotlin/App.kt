@@ -56,6 +56,7 @@ import ui.LoginDialog
 import ui.MessageCardViews
 import ui.MoreInfoCardViews
 import ui.TextFieldViews
+import ui.theme.AppTheme
 import updaterkmp.composeapp.generated.resources.Res
 import updaterkmp.composeapp.generated.resources.app_name
 import updaterkmp.composeapp.generated.resources.submit
@@ -124,66 +125,64 @@ fun App() {
     )
 
     AppTheme {
-        MaterialTheme {
-            Scaffold(
+        Scaffold(
+            modifier = Modifier
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .background(MaterialTheme.colorScheme.background)
+                .displayCutoutPadding(),
+            topBar = {
+                TopAppBar(scrollBehavior, isLogin)
+            },
+            snackbarHost = {
+                Snackbar(
+                    offsetY = snackOffsetHeight
+                )
+            },
+            floatingActionButton = {
+                FloatActionButton(fabOffsetHeight, deviceName, codeName, deviceRegion, systemVersion, androidVersion, curRomInfo, incRomInfo, isLogin)
+            },
+            floatingActionButtonPosition = FabPosition.End
+        ) { padding ->
+            LazyColumn(
                 modifier = Modifier
-                    .nestedScroll(scrollBehavior.nestedScrollConnection)
-                    .background(MaterialTheme.colorScheme.background)
-                    .displayCutoutPadding(),
-                topBar = {
-                    TopAppBar(scrollBehavior, isLogin)
-                },
-                snackbarHost = {
-                    Snackbar(
-                        offsetY = snackOffsetHeight
-                    )
-                },
-                floatingActionButton = {
-                    FloatActionButton(fabOffsetHeight, deviceName, codeName, deviceRegion, systemVersion, androidVersion, curRomInfo, incRomInfo, isLogin)
-                },
-                floatingActionButtonPosition = FabPosition.End
-            ) { padding ->
-                LazyColumn(
-                    modifier = Modifier
-                        .padding(top = padding.calculateTopPadding())
-                        .padding(horizontal = 20.dp)
-                ) {
-                    item {
-                        BoxWithConstraints {
-                            if (maxWidth < 768.dp) {
-                                Column {
-                                    LoginCardView(isLogin)
-                                    TextFieldViews(deviceName, codeName, deviceRegion, systemVersion, androidVersion)
-                                    MessageCardViews(typeCurRom, deviceCurRom, versionCurRom, bigVersionCurRom, codebaseCurRom, branchCurRom)
-                                    MoreInfoCardViews(fileNameCurRom, fileSizeCurRom, changeLogCurRom)
-                                    DownloadCardViews(officialDownloadCurRom, cdn1DownloadCurRom, cdn2DownloadCurRom, fileNameCurRom)
-                                    MessageCardViews(typeIncRom, deviceIncRom, versionIncRom, bigVersionIncRom, codebaseIncRom, branchIncRom)
-                                    MoreInfoCardViews(fileNameIncRom, fileSizeIncRom, changeLogIncRom)
-                                    DownloadCardViews(officialDownloadIncRom, cdn1DownloadIncRom, cdn2DownloadIncRom, fileNameIncRom)
-                                    Spacer(Modifier.height(padding.calculateBottomPadding()))
-                                }
-                            } else {
-                                Column {
-                                    Row {
-                                        Column(modifier = Modifier.weight(0.8f).padding(end = 20.dp)) {
-                                            LoginCardView(isLogin)
-                                            TextFieldViews(deviceName, codeName, deviceRegion, systemVersion, androidVersion)
-                                        }
-                                        Column(modifier = Modifier.weight(1.0f)) {
-                                            MessageCardViews(typeCurRom, deviceCurRom, versionCurRom, bigVersionCurRom, codebaseCurRom, branchCurRom)
-                                            MoreInfoCardViews(fileNameCurRom, fileSizeCurRom, changeLogCurRom)
-                                            DownloadCardViews(officialDownloadCurRom, cdn1DownloadCurRom, cdn2DownloadCurRom, fileNameCurRom)
-                                            MessageCardViews(typeIncRom, deviceIncRom, versionIncRom, bigVersionIncRom, codebaseIncRom, branchIncRom)
-                                            MoreInfoCardViews(fileNameIncRom, fileSizeIncRom, changeLogIncRom)
-                                            DownloadCardViews(officialDownloadIncRom, cdn1DownloadIncRom, cdn2DownloadIncRom, fileNameIncRom)
-                                        }
+                    .padding(top = padding.calculateTopPadding())
+                    .padding(horizontal = 20.dp)
+            ) {
+                item {
+                    BoxWithConstraints {
+                        if (maxWidth < 768.dp) {
+                            Column {
+                                LoginCardView(isLogin)
+                                TextFieldViews(deviceName, codeName, deviceRegion, systemVersion, androidVersion)
+                                MessageCardViews(typeCurRom, deviceCurRom, versionCurRom, bigVersionCurRom, codebaseCurRom, branchCurRom)
+                                MoreInfoCardViews(fileNameCurRom, fileSizeCurRom, changeLogCurRom)
+                                DownloadCardViews(officialDownloadCurRom, cdn1DownloadCurRom, cdn2DownloadCurRom, fileNameCurRom)
+                                MessageCardViews(typeIncRom, deviceIncRom, versionIncRom, bigVersionIncRom, codebaseIncRom, branchIncRom)
+                                MoreInfoCardViews(fileNameIncRom, fileSizeIncRom, changeLogIncRom)
+                                DownloadCardViews(officialDownloadIncRom, cdn1DownloadIncRom, cdn2DownloadIncRom, fileNameIncRom)
+                                Spacer(Modifier.height(padding.calculateBottomPadding()))
+                            }
+                        } else {
+                            Column {
+                                Row {
+                                    Column(modifier = Modifier.weight(0.8f).padding(end = 20.dp)) {
+                                        LoginCardView(isLogin)
+                                        TextFieldViews(deviceName, codeName, deviceRegion, systemVersion, androidVersion)
                                     }
-                                    Spacer(Modifier.height(padding.calculateBottomPadding()))
+                                    Column(modifier = Modifier.weight(1.0f)) {
+                                        MessageCardViews(typeCurRom, deviceCurRom, versionCurRom, bigVersionCurRom, codebaseCurRom, branchCurRom)
+                                        MoreInfoCardViews(fileNameCurRom, fileSizeCurRom, changeLogCurRom)
+                                        DownloadCardViews(officialDownloadCurRom, cdn1DownloadCurRom, cdn2DownloadCurRom, fileNameCurRom)
+                                        MessageCardViews(typeIncRom, deviceIncRom, versionIncRom, bigVersionIncRom, codebaseIncRom, branchIncRom)
+                                        MoreInfoCardViews(fileNameIncRom, fileSizeIncRom, changeLogIncRom)
+                                        DownloadCardViews(officialDownloadIncRom, cdn1DownloadIncRom, cdn2DownloadIncRom, fileNameIncRom)
+                                    }
                                 }
+                                Spacer(Modifier.height(padding.calculateBottomPadding()))
                             }
                         }
-
                     }
+
                 }
             }
         }
