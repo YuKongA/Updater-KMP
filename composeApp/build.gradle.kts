@@ -119,6 +119,7 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            vcsInfo.include = false
             proguardFiles("proguard-rules.pro")
             if (keystorePath != null) signingConfig = signingConfigs.getByName("release")
         }
