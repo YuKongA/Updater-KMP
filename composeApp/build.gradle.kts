@@ -65,7 +65,7 @@ kotlin {
             implementation(compose.desktop.currentOs)
             // Added
             implementation(libs.cryptography.provider.jdk)
-            implementation(libs.ktor.client.cio)
+            implementation(libs.ktor.client.okhttp)
         }
     }
 }
