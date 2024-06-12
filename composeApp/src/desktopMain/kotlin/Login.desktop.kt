@@ -1,9 +1,9 @@
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.engine.cio.CIO
 import java.security.MessageDigest
 
 actual fun httpClientPlatform(): HttpClient {
-    return HttpClient(OkHttp)
+    return HttpClient(CIO)
 }
 
 actual fun md5Hash(input: String): String {
