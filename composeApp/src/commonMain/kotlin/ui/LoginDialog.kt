@@ -37,6 +37,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -72,7 +74,9 @@ fun LoginDialog(
     var password by remember { mutableStateOf(TextFieldValue("")) }
     var global by rememberSaveable { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
+
     val coroutineScope = rememberCoroutineScope()
+    val hapticFeedback = LocalHapticFeedback.current
 
     val icon = when (isLogin.value) {
         1 -> Icons.AutoMirrored.Outlined.Logout
@@ -89,7 +93,10 @@ fun LoginDialog(
 
     IconButton(
         modifier = Modifier.widthIn(max = 48.dp),
-        onClick = { showDialog = true }) {
+        onClick = {
+            showDialog = true
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+        }) {
         Icon(
             imageVector = icon,
             contentDescription = null,
@@ -105,7 +112,7 @@ fun LoginDialog(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .size(280.dp, 280.dp)
+                            .size(280.dp, 270.dp)
                             .clip(RoundedCornerShape(30.dp))
                             .background(MaterialTheme.colorScheme.surfaceContainer)
                     ) {
@@ -119,7 +126,10 @@ fun LoginDialog(
                             Checkbox(
                                 modifier = Modifier.height(22.dp).align(Alignment.CenterVertically),
                                 checked = global,
-                                onCheckedChange = { global = it })
+                                onCheckedChange = {
+                                    global = it
+                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                })
                             Text(
                                 modifier = Modifier.align(Alignment.CenterVertically),
                                 text = stringResource(Res.string.global),
@@ -161,7 +171,10 @@ fun LoginDialog(
                                 horizontalArrangement = Arrangement.End
                             ) {
                                 TextButton(
-                                    onClick = { showDialog = false },
+                                    onClick = {
+                                        showDialog = false
+                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    },
                                     modifier = Modifier.padding(horizontal = 16.dp)
                                 ) {
                                     Text(
@@ -173,6 +186,7 @@ fun LoginDialog(
                                 TextButton(
                                     onClick = {
                                         showSnackbar(message = messageLoginIn)
+                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                         coroutineScope.launch {
                                             val int = login(account.text, password.text, global, isLogin)
                                             when (int) {
@@ -219,7 +233,10 @@ fun LoginDialog(
                                 horizontalArrangement = Arrangement.End
                             ) {
                                 TextButton(
-                                    onClick = { showDialog = false },
+                                    onClick = {
+                                        showDialog = false
+                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    },
                                     modifier = Modifier.padding(horizontal = 16.dp)
                                 ) {
                                     Text(
@@ -235,6 +252,7 @@ fun LoginDialog(
                                             if (boolean) showSnackbar(message = messageLogoutSuccessful)
                                         }
                                         showDialog = false
+                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                     }
                                 ) {
                                     Text(

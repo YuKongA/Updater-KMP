@@ -21,6 +21,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,9 +35,14 @@ fun TextFieldWithDropdown(
 ) {
     var isDropdownExpanded by remember { mutableStateOf(false) }
 
+    val hapticFeedback = LocalHapticFeedback.current
+
     ExposedDropdownMenuBox(
         expanded = isDropdownExpanded,
-        onExpandedChange = { isDropdownExpanded = it },
+        onExpandedChange = {
+            isDropdownExpanded = it
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+        },
     ) {
         OutlinedTextField(
             value = text.value,
@@ -60,6 +67,7 @@ fun TextFieldWithDropdown(
                     onClick = {
                         text.value = item
                         isDropdownExpanded = false
+                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                     }
                 )
             }

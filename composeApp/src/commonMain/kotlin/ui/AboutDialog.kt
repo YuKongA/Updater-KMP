@@ -29,6 +29,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -49,9 +51,14 @@ const val version = "v1.1.0"
 fun AboutDialog() {
     var showDialog by remember { mutableStateOf(false) }
 
+    val hapticFeedback = LocalHapticFeedback.current
+
     IconButton(
         modifier = Modifier.widthIn(max = 48.dp),
-        onClick = { showDialog = true }) {
+        onClick = {
+            showDialog = true
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+        }) {
         Icon(
             imageVector = Icons.Outlined.Update,
             contentDescription = null,
@@ -65,7 +72,7 @@ fun AboutDialog() {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .size(280.dp, 185.dp)
+                        .size(280.dp, 180.dp)
                         .clip(RoundedCornerShape(30.dp))
                         .background(MaterialTheme.colorScheme.surfaceContainer)
                 ) {
@@ -116,7 +123,10 @@ fun AboutDialog() {
                                     text = "GitHub",
                                     spanStyle = SpanStyle(textDecoration = TextDecoration.Underline)
                                 ),
-                                onClick = { uriHandler.openUri("https://github.com/YuKongA/Updater-KMP") },
+                                onClick = {
+                                    uriHandler.openUri("https://github.com/YuKongA/Updater-KMP")
+                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                },
                                 style = MaterialTheme.typography.bodyMedium + SpanStyle(color = MaterialTheme.colorScheme.primary)
                             )
                         }
@@ -130,7 +140,10 @@ fun AboutDialog() {
                                     text = "Telegram",
                                     spanStyle = SpanStyle(textDecoration = TextDecoration.Underline)
                                 ),
-                                onClick = { uriHandler.openUri("https://t.me/YuKongA13579") },
+                                onClick = {
+                                    uriHandler.openUri("https://t.me/YuKongA13579")
+                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                },
                                 style = MaterialTheme.typography.bodyMedium + SpanStyle(color = MaterialTheme.colorScheme.primary)
                             )
                         }

@@ -35,7 +35,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import data.DeviceInfoHelper
@@ -238,9 +240,13 @@ private fun FloatActionButton(
     val messageWrongResult = stringResource(Res.string.toast_wrong_info)
     val messageCrashResult = stringResource(Res.string.toast_crash_info)
 
+    val hapticFeedback = LocalHapticFeedback.current
+
     ExtendedFloatingActionButton(
         modifier = Modifier.offset(y = fabOffsetHeight),
         onClick = {
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+
             val regionCode = DeviceInfoHelper.regionCode(deviceRegion.value)
             val regionNameExt = DeviceInfoHelper.regionNameExt(deviceRegion.value)
             val codeNameExt = codeName.value + regionNameExt

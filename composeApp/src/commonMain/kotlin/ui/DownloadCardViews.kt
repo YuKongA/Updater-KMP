@@ -22,6 +22,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -86,6 +88,8 @@ fun DownloadTextView(
     fileName: String,
     bottomPadding: Dp = 8.dp,
 ) {
+    val hapticFeedback = LocalHapticFeedback.current
+
     val messageCopySuccessful = stringResource(Res.string.copy_successful)
     val messageDownloadStart = stringResource(Res.string.download_start)
 
@@ -113,6 +117,7 @@ fun DownloadTextView(
                             onClick = {
                                 copyToClipboard(copy)
                                 showSnackbar(messageCopySuccessful)
+                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                             }
                         ),
                     text = stringResource(Res.string.copy_button),
@@ -126,6 +131,7 @@ fun DownloadTextView(
                             onClick = {
                                 downloadToLocal(download, fileName)
                                 showSnackbar(messageDownloadStart)
+                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                             }
                         ),
                     text = stringResource(Res.string.download_button),
