@@ -4,8 +4,8 @@ import data.LoginHelper
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
-import io.ktor.client.request.url
 import io.ktor.client.statement.request
 import io.ktor.http.ContentType
 import io.ktor.http.content.TextContent
@@ -34,7 +34,7 @@ suspend fun login(
     if (account.isEmpty() || password.isEmpty()) return 1
 
     val client = httpClientPlatform()
-    val response1 = client.get { url(loginUrl) }
+    val response1 = client.get(loginUrl)
 
     val md5Hash = md5Hash(password)
     val sign = response1.request.url.parameters["_sign"]?.replace("2&V1_passport&", "") ?: return 2
@@ -60,10 +60,13 @@ suspend fun login(
     if (nonce == null || ssecurity == null || location == null || userId.isEmpty()) return 4
 
     val sha1Hash = sha1Hash("nonce=$nonce&$ssecurity")
-    val clientSign = Base64.Default.encode(sha1Hash)
+    val clientSign = Base64.UrlSafe.encode(sha1Hash)
 
-    val newUrl = "$location&_userIdNeedEncrypt=true&clientSign=$clientSign"
-    val response3 = client.get(newUrl)
+    val response3 = client.get(location) {
+        parameter("_userIdNeedEncrypt", true)
+        parameter("clientSign", clientSign)
+    }
+
     val cookies = response3.headers["Set-Cookie"].toString().split("; ")[0].split("; ")[0]
     val serviceToken = cookies.split("serviceToken=")[1].split(";")[0]
 

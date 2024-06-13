@@ -56,7 +56,7 @@ suspend fun getRecoveryRomInfo(
             userId = cookies?.userId.toString()
             accountType = cookies?.accountType.toString().ifEmpty { "CN" }
             security = cookies?.ssecurity.toString()
-            securityKey = Base64.Default.decode(security)
+            securityKey = Base64.Mime.decode(security)
             serviceToken = cookies?.serviceToken.toString()
             port = "2"
         }
