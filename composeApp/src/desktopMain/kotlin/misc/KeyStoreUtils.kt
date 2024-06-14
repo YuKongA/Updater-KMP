@@ -14,7 +14,7 @@ object KeyStoreUtils {
     private const val KEY_ALIAS = "updater_key_alias"
     private const val AES_MODE = "AES/GCM/NoPadding"
     private const val JVM_KEY_STORE = "JvmKeyStore"
-    private const val KEY_STORE_FILE = "keystore.jks"
+    private val KEY_STORE_FILE = File(System.getProperty("user.home"), "keystore.jks").absolutePath
 
     fun generateKey() {
         val keyGenerator = KeyGenerator.getInstance("AES")
