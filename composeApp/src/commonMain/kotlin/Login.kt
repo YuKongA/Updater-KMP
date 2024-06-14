@@ -12,8 +12,6 @@ import io.ktor.http.content.TextContent
 import io.ktor.util.InternalAPI
 import kotlinx.serialization.encodeToString
 import misc.json
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
 
 private const val loginUrl = "https://account.xiaomi.com/pass/serviceLogin"
 private const val loginAuth2Url = "https://account.xiaomi.com/pass/serviceLoginAuth2"
@@ -22,9 +20,7 @@ expect fun httpClientPlatform(): HttpClient
 
 expect fun md5Hash(input: String): String
 
-expect fun sha1Hash(input: String): ByteArray
-
-@OptIn(ExperimentalEncodingApi::class, InternalAPI::class)
+@OptIn(InternalAPI::class)
 suspend fun login(
     account: String,
     password: String,
@@ -51,7 +47,6 @@ suspend fun login(
     val authStr = response2.body<String>().replace("&&&START&&&", "")
     val authJson = json.decodeFromString<AuthorizeHelper>(authStr)
     val description = authJson.description
-    val nonce = authJson.nonce
     val ssecurity = authJson.ssecurity
     val location = authJson.location
     val userId = authJson.userId.toString()
@@ -63,19 +58,11 @@ suspend fun login(
             perfSet("savePassword", "1")
             savePassword(account, password)
         }
-    } else {
-        return 3
-    }
+    } else return 3
 
-    if (nonce == null || ssecurity == null || location == null || userId.isEmpty()) return 4
+    if (ssecurity == null || location == null || userId.isEmpty()) return 4
 
-    val sha1Hash = sha1Hash("nonce=$nonce&$ssecurity")
-    val clientSign = Base64.UrlSafe.encode(sha1Hash)
-
-    val response3 = client.get(location) {
-        parameter("_userIdNeedEncrypt", true)
-        parameter("clientSign", clientSign)
-    }
+    val response3 = client.get(location) { parameter("_userIdNeedEncrypt", true) }
 
     val cookies = response3.headers["Set-Cookie"].toString().split("; ")[0].split("; ")[0]
     val serviceToken = cookies.split("serviceToken=")[1].split(";")[0]

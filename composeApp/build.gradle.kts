@@ -59,7 +59,7 @@ kotlin {
         iosMain.dependencies {
             // Added
             implementation(libs.cryptography.provider.apple)
-            implementation(libs.ktor.client.darwin)
+            implementation(libs.ktor.client.ios)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
