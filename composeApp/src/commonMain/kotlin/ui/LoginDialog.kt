@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,11 +46,14 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import getPassword
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import login
 import logout
 import misc.SnackbarUtil.Companion.showSnackbar
 import org.jetbrains.compose.resources.stringResource
+import perfGet
 import updaterkmp.composeapp.generated.resources.Res
 import updaterkmp.composeapp.generated.resources.account
 import updaterkmp.composeapp.generated.resources.account_or_password_empty
@@ -63,6 +67,7 @@ import updaterkmp.composeapp.generated.resources.logout
 import updaterkmp.composeapp.generated.resources.logout_successful
 import updaterkmp.composeapp.generated.resources.password
 import updaterkmp.composeapp.generated.resources.request_sign_failed
+import updaterkmp.composeapp.generated.resources.save_password
 import updaterkmp.composeapp.generated.resources.security_error
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,12 +75,14 @@ import updaterkmp.composeapp.generated.resources.security_error
 fun LoginDialog(
     isLogin: MutableState<Int>
 ) {
-    var account by remember { mutableStateOf(TextFieldValue("")) }
-    var password by remember { mutableStateOf(TextFieldValue("")) }
+    val coroutineScope = rememberCoroutineScope()
+    var account by remember { mutableStateOf(TextFieldValue(getPassword().first)) }
+    var password by remember { mutableStateOf(TextFieldValue(getPassword().second)) }
+
     var global by rememberSaveable { mutableStateOf(false) }
+    var savePassword by rememberSaveable { mutableStateOf(perfGet("savePassword") ?: "0") }
     var showDialog by remember { mutableStateOf(false) }
 
-    val coroutineScope = rememberCoroutineScope()
     val hapticFeedback = LocalHapticFeedback.current
 
     val icon = when (isLogin.value) {
@@ -112,26 +119,28 @@ fun LoginDialog(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .size(280.dp, 270.dp)
+                            .size(280.dp, 275.dp)
                             .clip(RoundedCornerShape(30.dp))
                             .background(MaterialTheme.colorScheme.surfaceContainer)
                     ) {
-                        Row(modifier = Modifier.padding(24.dp)) {
+                        Row(
+                            modifier = Modifier.padding(24.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Text(
-                                modifier = Modifier.align(Alignment.CenterVertically).weight(1f),
+                                modifier = Modifier.weight(1f),
                                 text = stringResource(Res.string.login),
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
                             )
                             Checkbox(
-                                modifier = Modifier.height(22.dp).align(Alignment.CenterVertically),
+                                modifier = Modifier.height(22.dp).padding(start = 0.dp, end = 10.dp).size(22.dp),
                                 checked = global,
                                 onCheckedChange = {
                                     global = it
                                     hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                 })
                             Text(
-                                modifier = Modifier.align(Alignment.CenterVertically),
                                 text = stringResource(Res.string.global),
                                 style = MaterialTheme.typography.bodyMedium
                             )
@@ -168,43 +177,58 @@ fun LoginDialog(
                             )
                             Row(
                                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                                horizontalArrangement = Arrangement.End
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                TextButton(
-                                    onClick = {
-                                        showDialog = false
-                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    },
-                                    modifier = Modifier.padding(horizontal = 16.dp)
-                                ) {
+                                Row {
+                                    Checkbox(
+                                        modifier = Modifier.height(22.dp).padding(start = 0.dp, end = 10.dp).size(22.dp),
+                                        checked = savePassword == "1",
+                                        onCheckedChange = {
+                                            savePassword = if (it) "1" else "0"
+                                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        }
+                                    )
                                     Text(
-                                        text = stringResource(Res.string.cancel),
-                                        modifier = Modifier,
+                                        text = stringResource(Res.string.save_password),
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                 }
-                                TextButton(
-                                    onClick = {
-                                        showSnackbar(message = messageLoginIn)
-                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                        coroutineScope.launch {
-                                            val int = login(account.text, password.text, global, isLogin)
-                                            when (int) {
-                                                0 -> showSnackbar(message = messageLoginSuccess)
-                                                1 -> showSnackbar(message = messageEmpty)
-                                                2 -> showSnackbar(message = messageSign)
-                                                3 -> showSnackbar(message = messageError)
-                                                4 -> showSnackbar(message = messageSecurityError)
-                                            }
-                                        }
-                                        showDialog = false
+                                Row {
+                                    TextButton(
+                                        onClick = {
+                                            showDialog = false
+                                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        },
+                                        modifier = Modifier.padding(end = 16.dp)
+                                    ) {
+                                        Text(
+                                            text = stringResource(Res.string.cancel),
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
                                     }
-                                ) {
-                                    Text(
-                                        text = stringResource(Res.string.login),
-                                        modifier = Modifier,
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
+                                    TextButton(
+                                        onClick = {
+                                            showSnackbar(message = messageLoginIn)
+                                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            coroutineScope.launch {
+                                                val int = login(account.text, password.text, global, savePassword, isLogin)
+                                                when (int) {
+                                                    0 -> showSnackbar(message = messageLoginSuccess)
+                                                    1 -> showSnackbar(message = messageEmpty)
+                                                    2 -> showSnackbar(message = messageSign)
+                                                    3 -> showSnackbar(message = messageError)
+                                                    4 -> showSnackbar(message = messageSecurityError)
+                                                }
+                                            }
+                                            showDialog = false
+                                        }
+                                    ) {
+                                        Text(
+                                            text = stringResource(Res.string.login),
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                    }
                                 }
                             }
                         }

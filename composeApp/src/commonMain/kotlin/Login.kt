@@ -29,9 +29,12 @@ suspend fun login(
     account: String,
     password: String,
     global: Boolean,
+    savePassword: String,
     isLogin: MutableState<Int>
 ): Int {
     if (account.isEmpty() || password.isEmpty()) return 1
+
+    if (savePassword != "1") deletePassword()
 
     val client = httpClientPlatform()
     val response1 = client.get(loginUrl)
@@ -55,7 +58,14 @@ suspend fun login(
     val accountType = if (global) "GL" else "CN"
     val authResult = if (authJson.result == "ok") "1" else "0"
 
-    if (description != "成功") return 3
+    if (description == "成功") {
+        if (savePassword == "1") {
+            perfSet("savePassword", "1")
+            savePassword(account, password)
+        }
+    } else {
+        return 3
+    }
 
     if (nonce == null || ssecurity == null || location == null || userId.isEmpty()) return 4
 
@@ -80,4 +90,33 @@ fun logout(isLogin: MutableState<Int>): Boolean {
     perfRemove("loginInfo")
     isLogin.value = 0
     return true
+}
+
+fun savePassword(account: String, password: String) {
+    generateKey()
+    val encryptedAccount = ownEncrypt(account)
+    val encryptedPassword = ownEncrypt(password)
+    perfSet("account", encryptedAccount.first)
+    perfSet("accountIv", encryptedAccount.second)
+    perfSet("password", encryptedPassword.first)
+    perfSet("passwordIv", encryptedPassword.second)
+}
+
+fun deletePassword() {
+    perfRemove("account")
+    perfRemove("accountIv")
+    perfRemove("password")
+    perfRemove("passwordIv")
+}
+
+fun getPassword(): Pair<String, String> {
+    if (perfGet("account") != null && perfGet("password") != null && perfGet("accountIv") != null && perfGet("passwordIv") != null) {
+        val encryptedAccount = perfGet("account").toString()
+        val encodedAccountKey = perfGet("accountIv").toString()
+        val encryptedPassword = perfGet("password").toString()
+        val encodedPasswordKey = perfGet("passwordIv").toString()
+        val account = ownDecrypt(encryptedAccount, encodedAccountKey)
+        val password = ownDecrypt(encryptedPassword, encodedPasswordKey)
+        return Pair(account, password)
+    } else return Pair("", "")
 }

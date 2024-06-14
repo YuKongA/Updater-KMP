@@ -22,6 +22,7 @@
     <string name="toast_crash_info">No network connection!</string>
     <string name="account">Account</string>
     <string name="password">Password</string>
+    <string name="save_password">Save password</string>
     <string name="cancel">Cancel</string>
     <string name="logging_in">Logging in</string>
     <string name="login_successful">Login successful</string>

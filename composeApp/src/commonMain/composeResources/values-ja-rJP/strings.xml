@@ -21,6 +21,7 @@
     <string name="toast_crash_info">ネットワーク接続がありません！</string>
     <string name="account">アカウント</string>
     <string name="password">パスワード</string>
+    <string name="save_password">パスワードを保存</string>
     <string name="cancel">キャンセル</string>
     <string name="logging_in">ログイン中</string>
     <string name="login_successful">ログイン成功</string>

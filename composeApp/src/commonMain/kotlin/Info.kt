@@ -7,7 +7,6 @@ import io.ktor.http.Parameters
 import io.ktor.http.content.TextContent
 import io.ktor.http.formUrlEncode
 import io.ktor.util.InternalAPI
-import io.ktor.utils.io.core.toByteArray
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import misc.json
@@ -16,7 +15,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 const val CN_RECOVERY_URL = "https://update.miui.com/updates/miotaV3.php"
 const val INTL_RECOVERY_URL = "https://update.intl.miui.com/updates/miotaV3.php"
-var securityKey = "miuiotavalided11".toByteArray()
+var securityKey = "miuiotavalided11".encodeToByteArray()
 var accountType = "CN"
 var port = "1"
 var userId = ""
