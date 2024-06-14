@@ -69,6 +69,7 @@ import updaterkmp.composeapp.generated.resources.password
 import updaterkmp.composeapp.generated.resources.request_sign_failed
 import updaterkmp.composeapp.generated.resources.save_password
 import updaterkmp.composeapp.generated.resources.security_error
+import updaterkmp.composeapp.generated.resources.toast_crash_info
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,6 +98,7 @@ fun LoginDialog(
     val messageError = stringResource(Res.string.login_error)
     val messageSecurityError = stringResource(Res.string.security_error)
     val messageLogoutSuccessful = stringResource(Res.string.logout_successful)
+    val messageCrashInfo = stringResource(Res.string.toast_crash_info)
 
     IconButton(
         modifier = Modifier.widthIn(max = 48.dp),
@@ -219,6 +221,7 @@ fun LoginDialog(
                                                     2 -> showSnackbar(message = messageSign)
                                                     3 -> showSnackbar(message = messageError)
                                                     4 -> showSnackbar(message = messageSecurityError)
+                                                    5 -> showSnackbar(message = messageCrashInfo)
                                                 }
                                             }
                                             showDialog = false

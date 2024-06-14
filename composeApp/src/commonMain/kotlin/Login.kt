@@ -13,6 +13,7 @@ import io.ktor.util.InternalAPI
 import kotlinx.serialization.encodeToString
 import misc.json
 
+private const val testUrl = "https://hyperos.mi.com/"
 private const val loginUrl = "https://account.xiaomi.com/pass/serviceLogin"
 private const val loginAuth2Url = "https://account.xiaomi.com/pass/serviceLoginAuth2"
 
@@ -33,6 +34,13 @@ suspend fun login(
     if (savePassword != "1") deletePassword()
 
     val client = httpClientPlatform()
+
+    try {
+        client.get(testUrl)
+    } catch (e: Exception) {
+        return 5
+    }
+
     val response1 = client.get(loginUrl)
 
     val md5Hash = md5Hash(password)
