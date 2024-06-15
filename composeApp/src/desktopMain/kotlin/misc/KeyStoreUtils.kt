@@ -14,7 +14,8 @@ object KeyStoreUtils {
     private const val KEY_ALIAS = "updater_key_alias"
     private const val AES_MODE = "AES/GCM/NoPadding"
     private const val JVM_KEY_STORE = "JvmKeyStore"
-    private val KEY_STORE_FILE = File(System.getProperty("user.home"), "keystore.jks").absolutePath
+    private val UPDATER_DIR = File(System.getProperty("user.home"), ".updater-kmp")
+    private val KEY_STORE_FILE = File(UPDATER_DIR, "keystore.jks").absolutePath
 
     fun generateKey() {
         val keyGenerator = KeyGenerator.getInstance("AES")
@@ -26,6 +27,7 @@ object KeyStoreUtils {
         val password = KeyStore.PasswordProtection(JVM_KEY_STORE.toCharArray())
         keyStore.setEntry(KEY_ALIAS, secretKeyEntry, password)
 
+        UPDATER_DIR.mkdirs()
         FileOutputStream(KEY_STORE_FILE).use { keyStore.store(it, JVM_KEY_STORE.toCharArray()) }
     }
 
