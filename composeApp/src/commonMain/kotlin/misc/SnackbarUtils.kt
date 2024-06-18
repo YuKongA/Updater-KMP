@@ -19,7 +19,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class SnackbarUtil {
+class SnackbarUtils {
 
     companion object {
         private val snackbarMessage = mutableStateOf("")

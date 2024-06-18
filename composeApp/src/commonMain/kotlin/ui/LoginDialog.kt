@@ -27,7 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,11 +46,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import getPassword
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import login
 import logout
-import misc.SnackbarUtil.Companion.showSnackbar
+import misc.SnackbarUtils.Companion.showSnackbar
 import org.jetbrains.compose.resources.stringResource
 import perfGet
 import updaterkmp.composeapp.generated.resources.Res

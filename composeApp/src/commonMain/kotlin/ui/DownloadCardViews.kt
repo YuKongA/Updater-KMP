@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import copyToClipboard
 import downloadToLocal
-import misc.SnackbarUtil.Companion.showSnackbar
+import misc.SnackbarUtils.Companion.showSnackbar
 import org.jetbrains.compose.resources.stringResource
 import updaterkmp.composeapp.generated.resources.Res
 import updaterkmp.composeapp.generated.resources.copy_button

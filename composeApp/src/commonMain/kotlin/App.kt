@@ -45,8 +45,8 @@ import data.LoginHelper
 import data.RomInfoHelper
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
-import misc.SnackbarUtil.Companion.Snackbar
-import misc.SnackbarUtil.Companion.showSnackbar
+import misc.SnackbarUtils.Companion.Snackbar
+import misc.SnackbarUtils.Companion.showSnackbar
 import misc.clearRomInfo
 import misc.handleRomInfo
 import misc.json

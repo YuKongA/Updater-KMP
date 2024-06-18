@@ -25,7 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import copyToClipboard
-import misc.SnackbarUtil.Companion.showSnackbar
+import misc.SnackbarUtils.Companion.showSnackbar
 import org.jetbrains.compose.resources.stringResource
 import updaterkmp.composeapp.generated.resources.Res
 import updaterkmp.composeapp.generated.resources.changelog
