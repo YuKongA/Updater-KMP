@@ -72,11 +72,11 @@ kotlin {
 
 android {
     namespace = pkgName
-    compileSdk = 34
+    compileSdk = 35
     defaultConfig {
         applicationId = pkgName
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = getVersionCode()
         versionName = version.toString()
     }
