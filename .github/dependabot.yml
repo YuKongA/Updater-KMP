@@ -9,24 +9,16 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-    registries:
-      - maven-google
-      - gralde-plugin
+    groups:
+      maven-dependencies:
+        patterns:
+          - "*"
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
-
-  - package-ecosystem: "gitsubmodule"
-    directory: "/"
-    schedule:
-      interval: "daily"
-
-registries:
-  maven-google:
-    type: maven-repository
-    url: "https://dl.google.com/dl/android/maven2/"
-  gralde-plugin:
-    type: maven-repository
-    url: "https://plugins.gradle.org/m2/"
+    groups:
+      action-dependencies:
+        patterns:
+          - "*"
