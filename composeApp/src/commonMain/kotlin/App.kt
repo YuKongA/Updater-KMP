@@ -247,21 +247,17 @@ private fun FloatActionButton(
             hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
 
             val regionCode = DeviceInfoHelper.regionCode(deviceRegion.value)
+            val deviceCode = DeviceInfoHelper.deviceCode(androidVersion.value, codeName.value, regionCode)
             val regionNameExt = DeviceInfoHelper.regionNameExt(deviceRegion.value)
             val codeNameExt = codeName.value + regionNameExt
-            val deviceCode = DeviceInfoHelper.deviceCode(androidVersion.value, codeName.value, regionCode)
-
-            val branchExt = if (systemVersion.value.contains(".DEV")) "X" else "F"
+            val systemVersionExt = systemVersion.value.uppercase().replace("^OS1".toRegex(), "V816").replace("AUTO$".toRegex(), deviceCode)
+            val branchExt = if (systemVersion.value.uppercase().endsWith(".DEV")) "X" else "F"
 
             showSnackbar(message = messageIng)
 
             coroutineScope.launch {
 
-                val romInfo = getRecoveryRomInfo(
-                    branchExt, codeNameExt, regionCode,
-                    systemVersion.value.uppercase().replace("OS1", "V816").replace("AUTO", deviceCode),
-                    androidVersion.value
-                )
+                val romInfo = getRecoveryRomInfo(branchExt, codeNameExt, regionCode, systemVersionExt, androidVersion.value)
 
                 if (romInfo.isNotEmpty()) {
 
@@ -282,11 +278,7 @@ private fun FloatActionButton(
                     if (recoveryRomInfo.currentRom?.bigversion != null) {
 
                         curRomInfo[8].value = if (recoveryRomInfo.currentRom.md5 != recoveryRomInfo.latestRom?.md5) {
-                            val romInfoCurrent = getRecoveryRomInfo(
-                                "", codeNameExt, regionCode,
-                                systemVersion.value.uppercase().replace("OS1", "V816").replace("AUTO", deviceCode),
-                                androidVersion.value
-                            )
+                            val romInfoCurrent = getRecoveryRomInfo("", codeNameExt, regionCode, systemVersionExt, androidVersion.value)
                             val recoveryRomInfoCurrent = json.decodeFromString<RomInfoHelper.RomInfo>(romInfoCurrent)
                             "https://ultimateota.d.miui.com/" + recoveryRomInfoCurrent.currentRom?.version + "/" + recoveryRomInfoCurrent.latestRom?.filename
                         } else "https://ultimateota.d.miui.com/" + recoveryRomInfo.currentRom.version + "/" + recoveryRomInfo.latestRom?.filename
@@ -307,7 +299,19 @@ private fun FloatActionButton(
                             handleRomInfo(recoveryRomInfo.incrementRom, incRomInfo)
 
                         } else {
-                            clearRomInfo(incRomInfo)
+
+                            val romInfoCross = getRecoveryRomInfo("", codeNameExt, regionCode, systemVersionExt, androidVersion.value)
+                            val recoveryRomInfoCross = json.decodeFromString<RomInfoHelper.RomInfo>(romInfoCross)
+                            if (recoveryRomInfoCross.crossRom?.bigversion != null) {
+
+                                incRomInfo[8].value =
+                                    "https://ultimateota.d.miui.com/" + recoveryRomInfoCross.crossRom.version + "/" + recoveryRomInfoCross.crossRom.filename
+
+                                handleRomInfo(recoveryRomInfoCross.crossRom, incRomInfo)
+
+                            } else {
+                                clearRomInfo(incRomInfo)
+                            }
                         }
 
                         showSnackbar(messageSuccessResult, 1000L)
