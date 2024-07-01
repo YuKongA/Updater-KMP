@@ -68,6 +68,10 @@ kotlin {
             implementation(libs.ktor.client.cio)
         }
     }
+
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
 android {
@@ -103,7 +107,6 @@ android {
         resources {
             excludes += "/kotlin**"
             excludes += "/META-INF/**"
-            excludes += "/META-INF/**/**"
             excludes += "/kotlin/**"
             excludes += "/okhttp3/**"
             excludes += "/DebugProbesKt.bin"
@@ -128,19 +131,6 @@ android {
             applicationIdSuffix = ".debug"
         }
     }
-    java {
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(17)
-        }
-    }
-    kotlin {
-        jvmToolchain(17)
-        sourceSets.all {
-            languageSettings {
-                languageVersion = "2.0"
-            }
-        }
-    }
 }
 
 compose.desktop {
@@ -149,12 +139,21 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+
             packageName = appName
             packageVersion = version.toString()
+            description = "Get HyperOS/MIUI recovery ROM update info"
+            copyright = "Copyright © 2024 YuKongA, AkaneTan"
 
-            linux { iconFile = file("src/desktopMain/resources/linux/Icon.png") }
-            macOS { iconFile = file("src/desktopMain/resources/macOS/Icon.icns") }
-            windows { iconFile = file("src/desktopMain/resources/windows/Icon.ico") }
+            linux {
+                iconFile = file("src/desktopMain/resources/linux/Icon.png")
+            }
+            macOS {
+                iconFile = file("src/desktopMain/resources/macos/Icon.icns")
+            }
+            windows {
+                iconFile = file("src/desktopMain/resources/windows/Icon.ico")
+            }
         }
     }
 }
