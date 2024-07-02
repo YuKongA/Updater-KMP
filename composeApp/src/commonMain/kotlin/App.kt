@@ -41,6 +41,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import data.DeviceInfoHelper
+import data.IconInfo
 import data.LoginHelper
 import data.RomInfoHelper
 import kotlinx.coroutines.launch
@@ -90,11 +91,11 @@ fun App() {
     val officialDownloadCurRom = remember { mutableStateOf("") }
     val cdn1DownloadCurRom = remember { mutableStateOf("") }
     val cdn2DownloadCurRom = remember { mutableStateOf("") }
-    val changeLogCurRom = remember { mutableStateOf("") }
+    val changelogCurRom = remember { mutableStateOf("") }
 
     val curRomInfo = listOf(
         typeCurRom, deviceCurRom, versionCurRom, codebaseCurRom, branchCurRom, fileNameCurRom, fileSizeCurRom,
-        bigVersionCurRom, officialDownloadCurRom, cdn1DownloadCurRom, cdn2DownloadCurRom, changeLogCurRom
+        bigVersionCurRom, officialDownloadCurRom, cdn1DownloadCurRom, cdn2DownloadCurRom, changelogCurRom
     )
 
     val typeIncRom = remember { mutableStateOf("") }
@@ -108,12 +109,14 @@ fun App() {
     val officialDownloadIncRom = remember { mutableStateOf("") }
     val cdn1DownloadIncRom = remember { mutableStateOf("") }
     val cdn2DownloadIncRom = remember { mutableStateOf("") }
-    val changeLogIncRom = remember { mutableStateOf("") }
+    val changelogIncRom = remember { mutableStateOf("") }
 
     val incRomInfo = listOf(
         typeIncRom, deviceIncRom, versionIncRom, codebaseIncRom, branchIncRom, fileNameIncRom, fileSizeIncRom,
-        bigVersionIncRom, officialDownloadIncRom, cdn1DownloadIncRom, cdn2DownloadIncRom, changeLogIncRom
+        bigVersionIncRom, officialDownloadIncRom, cdn1DownloadIncRom, cdn2DownloadIncRom, changelogIncRom
     )
+
+    val iconInfo: MutableState<List<IconInfo>> = remember { mutableStateOf(listOf()) }
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     val fabOffsetHeight by animateDpAsState(
@@ -140,7 +143,7 @@ fun App() {
                 )
             },
             floatingActionButton = {
-                FloatActionButton(fabOffsetHeight, deviceName, codeName, deviceRegion, systemVersion, androidVersion, curRomInfo, incRomInfo, isLogin)
+                FloatActionButton(fabOffsetHeight, deviceName, codeName, deviceRegion, systemVersion, androidVersion, curRomInfo, incRomInfo, isLogin, iconInfo)
             },
             floatingActionButtonPosition = FabPosition.End
         ) { padding ->
@@ -156,10 +159,10 @@ fun App() {
                                 LoginCardView(isLogin)
                                 TextFieldViews(deviceName, codeName, deviceRegion, systemVersion, androidVersion)
                                 MessageCardViews(typeCurRom, deviceCurRom, versionCurRom, bigVersionCurRom, codebaseCurRom, branchCurRom)
-                                MoreInfoCardViews(fileNameCurRom, fileSizeCurRom, changeLogCurRom)
+                                MoreInfoCardViews(fileNameCurRom, fileSizeCurRom, changelogCurRom, iconInfo)
                                 DownloadCardViews(officialDownloadCurRom, cdn1DownloadCurRom, cdn2DownloadCurRom, fileNameCurRom)
                                 MessageCardViews(typeIncRom, deviceIncRom, versionIncRom, bigVersionIncRom, codebaseIncRom, branchIncRom)
-                                MoreInfoCardViews(fileNameIncRom, fileSizeIncRom, changeLogIncRom)
+                                MoreInfoCardViews(fileNameIncRom, fileSizeIncRom, changelogIncRom, iconInfo)
                                 DownloadCardViews(officialDownloadIncRom, cdn1DownloadIncRom, cdn2DownloadIncRom, fileNameIncRom)
                                 Spacer(Modifier.height(padding.calculateBottomPadding()))
                             }
@@ -172,10 +175,10 @@ fun App() {
                                     }
                                     Column(modifier = Modifier.weight(1.0f)) {
                                         MessageCardViews(typeCurRom, deviceCurRom, versionCurRom, bigVersionCurRom, codebaseCurRom, branchCurRom)
-                                        MoreInfoCardViews(fileNameCurRom, fileSizeCurRom, changeLogCurRom)
+                                        MoreInfoCardViews(fileNameCurRom, fileSizeCurRom, changelogCurRom, iconInfo)
                                         DownloadCardViews(officialDownloadCurRom, cdn1DownloadCurRom, cdn2DownloadCurRom, fileNameCurRom)
                                         MessageCardViews(typeIncRom, deviceIncRom, versionIncRom, bigVersionIncRom, codebaseIncRom, branchIncRom)
-                                        MoreInfoCardViews(fileNameIncRom, fileSizeIncRom, changeLogIncRom)
+                                        MoreInfoCardViews(fileNameIncRom, fileSizeIncRom, changelogIncRom, iconInfo)
                                         DownloadCardViews(officialDownloadIncRom, cdn1DownloadIncRom, cdn2DownloadIncRom, fileNameIncRom)
                                     }
                                 }
@@ -230,7 +233,8 @@ private fun FloatActionButton(
     androidVersion: MutableState<String>,
     curRomInfo: List<MutableState<String>>,
     incRomInfo: List<MutableState<String>>,
-    isLogin: MutableState<Int>
+    isLogin: MutableState<Int>,
+    iconInfo: MutableState<List<IconInfo>>
 ) {
     val coroutineScope = rememberCoroutineScope()
     val messageIng = stringResource(Res.string.toast_ing)
@@ -283,7 +287,7 @@ private fun FloatActionButton(
                             "https://ultimateota.d.miui.com/" + recoveryRomInfoCurrent.currentRom?.version + "/" + recoveryRomInfoCurrent.latestRom?.filename
                         } else "https://ultimateota.d.miui.com/" + recoveryRomInfo.currentRom.version + "/" + recoveryRomInfo.latestRom?.filename
 
-                        handleRomInfo(recoveryRomInfo.currentRom, curRomInfo)
+                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.currentRom, curRomInfo, iconInfo)
 
                         perfSet("deviceName", deviceName.value)
                         perfSet("codeName", codeName.value)
@@ -296,7 +300,7 @@ private fun FloatActionButton(
                             incRomInfo[8].value =
                                 "https://ultimateota.d.miui.com/" + recoveryRomInfo.incrementRom.version + "/" + recoveryRomInfo.incrementRom.filename
 
-                            handleRomInfo(recoveryRomInfo.incrementRom, incRomInfo)
+                            handleRomInfo(recoveryRomInfo, recoveryRomInfo.incrementRom, incRomInfo, iconInfo)
 
                         } else {
 
@@ -307,7 +311,7 @@ private fun FloatActionButton(
                                 incRomInfo[8].value =
                                     "https://ultimateota.d.miui.com/" + recoveryRomInfoCross.crossRom.version + "/" + recoveryRomInfoCross.crossRom.filename
 
-                                handleRomInfo(recoveryRomInfoCross.crossRom, incRomInfo)
+                                handleRomInfo(recoveryRomInfoCross, recoveryRomInfoCross.crossRom, incRomInfo, iconInfo)
 
                             } else {
                                 clearRomInfo(incRomInfo)
@@ -321,7 +325,7 @@ private fun FloatActionButton(
                         curRomInfo[8].value =
                             "https://ultimateota.d.miui.com/" + recoveryRomInfo.incrementRom.version + "/" + recoveryRomInfo.incrementRom.filename
 
-                        handleRomInfo(recoveryRomInfo.incrementRom, curRomInfo)
+                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.incrementRom, curRomInfo, iconInfo)
                         clearRomInfo(incRomInfo)
 
                         showSnackbar(messageWrongResult)
@@ -330,7 +334,7 @@ private fun FloatActionButton(
 
                         curRomInfo[8].value = "https://ultimateota.d.miui.com/" + recoveryRomInfo.crossRom.version + "/" + recoveryRomInfo.crossRom.filename
 
-                        handleRomInfo(recoveryRomInfo.crossRom, curRomInfo)
+                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.crossRom, curRomInfo, iconInfo)
                         clearRomInfo(incRomInfo)
 
                         showSnackbar(messageWrongResult)

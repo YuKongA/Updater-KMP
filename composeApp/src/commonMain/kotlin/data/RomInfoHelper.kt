@@ -12,6 +12,8 @@ object RomInfoHelper {
         @SerialName("LatestRom") val latestRom: Rom? = null,
         @SerialName("IncrementRom") val incrementRom: Rom? = null,
         @SerialName("CrossRom") val crossRom: Rom? = null,
+        @SerialName("Icon") val icon: Map<String, String>? = null,
+        @SerialName("FileMirror") val fileMirror: FileMirror? = null,
     )
 
     @Serializable
@@ -32,5 +34,13 @@ object RomInfoHelper {
     @Serializable
     data class Changelog(
         val txt: List<String>
+    )
+
+    @Serializable
+    data class FileMirror(
+        val icon: String,
+        val image: String,
+        val video: String,
+        val headimage: String
     )
 }

@@ -125,15 +125,13 @@ fun DownloadTextView(
                     color = ButtonDefaults.textButtonColors().contentColor
                 )
                 Text(
-                    modifier = Modifier
-                        .clickable(
-                            enabled = true,
-                            onClick = {
-                                downloadToLocal(download, fileName)
-                                showSnackbar(messageDownloadStart)
-                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                            }
-                        ),
+                    modifier = Modifier.clickable(
+                        onClick = {
+                            downloadToLocal(download, fileName)
+                            showSnackbar(messageDownloadStart)
+                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                        }
+                    ),
                     text = stringResource(Res.string.download_button),
                     fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                     color = ButtonDefaults.textButtonColors().contentColor

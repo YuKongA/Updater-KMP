@@ -48,6 +48,7 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.cryptography.core)
             implementation(libs.ktor.client.core)
+            implementation(libs.image.loader)
             implementation(libs.slf4j.simple)
         }
         androidMain.dependencies {

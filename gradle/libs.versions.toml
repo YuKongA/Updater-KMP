@@ -3,6 +3,7 @@ agp = "8.5.0"
 androidx-activityCompose = "1.9.0"
 compose-plugin = "1.6.11"
 cryptography = "0.3.1"
+imageLoader = "1.8.1"
 kotlin = "2.0.0"
 kotlinxCoroutines = "1.8.1"
 kotlinxSerializationJson = "1.7.1"
@@ -11,6 +12,7 @@ slf4jSimple = "2.0.13"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+image-loader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageLoader" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
