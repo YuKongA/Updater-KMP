@@ -49,7 +49,6 @@ kotlin {
             implementation(libs.cryptography.core)
             implementation(libs.ktor.client.core)
             implementation(libs.image.loader)
-            implementation(libs.slf4j.simple)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)

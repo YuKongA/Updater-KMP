@@ -23,7 +23,6 @@ After logging in to your Xiaomi account, you will use the miotaV3-v2 interface t
 - [kotlinx.coroutines](https://github.com/Kotlin/kotlinx.coroutines) with Apache-2.0 license
 - [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) with Apache-2.0 license
 - [MobileModels](https://github.com/KHwang9883/MobileModels) with Attribution-NonCommercial-ShareAlike 4.0 International
-- [slf4j](https://github.com/qos-ch/slf4j) with MIT License
 - [XiaoMiToolV2](https://github.com/francescotescari/XiaoMiToolV2) with Apache-2.0 license
 - [Xiaomi-Community-AutoTask](https://github.com/CMDQ8575/Xiaomi-Community-AutoTask)
 - [Xiaomi-Update-Info](https://github.com/YuKongA/Xiaomi-Update-Info)

@@ -8,7 +8,6 @@ kotlin = "2.0.0"
 kotlinxCoroutines = "1.8.1"
 kotlinxSerializationJson = "1.7.1"
 ktorClient = "2.3.12"
-slf4jSimple = "2.0.13"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
@@ -23,8 +22,6 @@ cryptography-provider-apple = { module = "dev.whyoleg.cryptography:cryptography-
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClient" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktorClient" }
 ktor-client-ios = { module = "io.ktor:ktor-client-ios", version.ref = "ktorClient" }
-
-slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4jSimple" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
