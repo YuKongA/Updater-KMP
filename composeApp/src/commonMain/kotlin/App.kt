@@ -98,6 +98,8 @@ fun App() {
         bigVersionCurRom, officialDownloadCurRom, cdn1DownloadCurRom, cdn2DownloadCurRom, changelogCurRom
     )
 
+    val curIconInfo: MutableState<List<IconInfo>> = remember { mutableStateOf(listOf()) }
+
     val typeIncRom = remember { mutableStateOf("") }
     val deviceIncRom = remember { mutableStateOf("") }
     val versionIncRom = remember { mutableStateOf("") }
@@ -116,7 +118,7 @@ fun App() {
         bigVersionIncRom, officialDownloadIncRom, cdn1DownloadIncRom, cdn2DownloadIncRom, changelogIncRom
     )
 
-    val iconInfo: MutableState<List<IconInfo>> = remember { mutableStateOf(listOf()) }
+    val incIconInfo: MutableState<List<IconInfo>> = remember { mutableStateOf(listOf()) }
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     val fabOffsetHeight by animateDpAsState(
@@ -143,7 +145,10 @@ fun App() {
                 )
             },
             floatingActionButton = {
-                FloatActionButton(fabOffsetHeight, deviceName, codeName, deviceRegion, systemVersion, androidVersion, curRomInfo, incRomInfo, isLogin, iconInfo)
+                FloatActionButton(
+                    fabOffsetHeight, deviceName, codeName, deviceRegion, systemVersion,
+                    androidVersion, curRomInfo, incRomInfo, curIconInfo, incIconInfo, isLogin
+                )
             },
             floatingActionButtonPosition = FabPosition.End
         ) { padding ->
@@ -159,10 +164,10 @@ fun App() {
                                 LoginCardView(isLogin)
                                 TextFieldViews(deviceName, codeName, deviceRegion, systemVersion, androidVersion)
                                 MessageCardViews(typeCurRom, deviceCurRom, versionCurRom, bigVersionCurRom, codebaseCurRom, branchCurRom)
-                                MoreInfoCardViews(fileNameCurRom, fileSizeCurRom, changelogCurRom, iconInfo)
+                                MoreInfoCardViews(fileNameCurRom, fileSizeCurRom, changelogCurRom, curIconInfo)
                                 DownloadCardViews(officialDownloadCurRom, cdn1DownloadCurRom, cdn2DownloadCurRom, fileNameCurRom)
                                 MessageCardViews(typeIncRom, deviceIncRom, versionIncRom, bigVersionIncRom, codebaseIncRom, branchIncRom)
-                                MoreInfoCardViews(fileNameIncRom, fileSizeIncRom, changelogIncRom, iconInfo)
+                                MoreInfoCardViews(fileNameIncRom, fileSizeIncRom, changelogIncRom, incIconInfo)
                                 DownloadCardViews(officialDownloadIncRom, cdn1DownloadIncRom, cdn2DownloadIncRom, fileNameIncRom)
                                 Spacer(Modifier.height(padding.calculateBottomPadding()))
                             }
@@ -175,10 +180,10 @@ fun App() {
                                     }
                                     Column(modifier = Modifier.weight(1.0f)) {
                                         MessageCardViews(typeCurRom, deviceCurRom, versionCurRom, bigVersionCurRom, codebaseCurRom, branchCurRom)
-                                        MoreInfoCardViews(fileNameCurRom, fileSizeCurRom, changelogCurRom, iconInfo)
+                                        MoreInfoCardViews(fileNameCurRom, fileSizeCurRom, changelogCurRom, curIconInfo)
                                         DownloadCardViews(officialDownloadCurRom, cdn1DownloadCurRom, cdn2DownloadCurRom, fileNameCurRom)
                                         MessageCardViews(typeIncRom, deviceIncRom, versionIncRom, bigVersionIncRom, codebaseIncRom, branchIncRom)
-                                        MoreInfoCardViews(fileNameIncRom, fileSizeIncRom, changelogIncRom, iconInfo)
+                                        MoreInfoCardViews(fileNameIncRom, fileSizeIncRom, changelogIncRom, incIconInfo)
                                         DownloadCardViews(officialDownloadIncRom, cdn1DownloadIncRom, cdn2DownloadIncRom, fileNameIncRom)
                                     }
                                 }
@@ -233,8 +238,10 @@ private fun FloatActionButton(
     androidVersion: MutableState<String>,
     curRomInfo: List<MutableState<String>>,
     incRomInfo: List<MutableState<String>>,
-    isLogin: MutableState<Int>,
-    iconInfo: MutableState<List<IconInfo>>
+    curIconInfo: MutableState<List<IconInfo>>,
+    incIconInfo: MutableState<List<IconInfo>>,
+    isLogin: MutableState<Int>
+
 ) {
     val coroutineScope = rememberCoroutineScope()
     val messageIng = stringResource(Res.string.toast_ing)
@@ -287,7 +294,7 @@ private fun FloatActionButton(
                             "https://ultimateota.d.miui.com/" + recoveryRomInfoCurrent.currentRom?.version + "/" + recoveryRomInfoCurrent.latestRom?.filename
                         } else "https://ultimateota.d.miui.com/" + recoveryRomInfo.currentRom.version + "/" + recoveryRomInfo.latestRom?.filename
 
-                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.currentRom, curRomInfo, iconInfo)
+                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.currentRom, curRomInfo, curIconInfo)
 
                         perfSet("deviceName", deviceName.value)
                         perfSet("codeName", codeName.value)
@@ -300,7 +307,7 @@ private fun FloatActionButton(
                             incRomInfo[8].value =
                                 "https://ultimateota.d.miui.com/" + recoveryRomInfo.incrementRom.version + "/" + recoveryRomInfo.incrementRom.filename
 
-                            handleRomInfo(recoveryRomInfo, recoveryRomInfo.incrementRom, incRomInfo, iconInfo)
+                            handleRomInfo(recoveryRomInfo, recoveryRomInfo.incrementRom, incRomInfo, incIconInfo)
 
                         } else {
 
@@ -311,7 +318,7 @@ private fun FloatActionButton(
                                 incRomInfo[8].value =
                                     "https://ultimateota.d.miui.com/" + recoveryRomInfoCross.crossRom.version + "/" + recoveryRomInfoCross.crossRom.filename
 
-                                handleRomInfo(recoveryRomInfoCross, recoveryRomInfoCross.crossRom, incRomInfo, iconInfo)
+                                handleRomInfo(recoveryRomInfoCross, recoveryRomInfoCross.crossRom, incRomInfo, incIconInfo)
 
                             } else {
                                 clearRomInfo(incRomInfo)
@@ -325,7 +332,7 @@ private fun FloatActionButton(
                         curRomInfo[8].value =
                             "https://ultimateota.d.miui.com/" + recoveryRomInfo.incrementRom.version + "/" + recoveryRomInfo.incrementRom.filename
 
-                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.incrementRom, curRomInfo, iconInfo)
+                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.incrementRom, curRomInfo, curIconInfo)
                         clearRomInfo(incRomInfo)
 
                         showSnackbar(messageWrongResult)
@@ -334,7 +341,7 @@ private fun FloatActionButton(
 
                         curRomInfo[8].value = "https://ultimateota.d.miui.com/" + recoveryRomInfo.crossRom.version + "/" + recoveryRomInfo.crossRom.filename
 
-                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.crossRom, curRomInfo, iconInfo)
+                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.crossRom, curRomInfo, curIconInfo)
                         clearRomInfo(incRomInfo)
 
                         showSnackbar(messageWrongResult)
