@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import copyToClipboard
+import data.RomInfoStateHelper
 import downloadToLocal
 import misc.SnackbarUtils.Companion.showSnackbar
 import org.jetbrains.compose.resources.stringResource
@@ -41,13 +42,10 @@ import updaterkmp.composeapp.generated.resources.download_start
 
 @Composable
 fun DownloadCardViews(
-    officialDownload: MutableState<String>,
-    cdn1Download: MutableState<String>,
-    cdn2Download: MutableState<String>,
-    fileName: MutableState<String>
+    romInfoState: MutableState<RomInfoStateHelper>
 ) {
     val isVisible = remember { mutableStateOf(false) }
-    isVisible.value = officialDownload.value.isNotEmpty()
+    isVisible.value = romInfoState.value.officialDownload.isNotEmpty()
 
     AnimatedVisibility(
         visible = isVisible.value,
@@ -72,9 +70,9 @@ fun DownloadCardViews(
                     fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                     fontWeight = FontWeight.SemiBold
                 )
-                DownloadTextView("Official (ultimateota)", officialDownload.value, officialDownload.value, fileName.value)
-                DownloadTextView("CDN (cdnorg)", cdn1Download.value, cdn1Download.value, fileName.value)
-                DownloadTextView("CDN (aliyuncs)", cdn2Download.value, cdn2Download.value, fileName.value, 0.dp)
+                DownloadTextView("Official (ultimateota)", romInfoState.value.officialDownload, romInfoState.value.officialDownload, romInfoState.value.fileName)
+                DownloadTextView("CDN (cdnorg)", romInfoState.value.cdn1Download, romInfoState.value.cdn1Download, romInfoState.value.fileName)
+                DownloadTextView("CDN (aliyuncs)", romInfoState.value.cdn2Download, romInfoState.value.cdn2Download, romInfoState.value.fileName, 0.dp)
             }
         }
     }

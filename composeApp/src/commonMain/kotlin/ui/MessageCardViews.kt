@@ -19,6 +19,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,6 +29,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import data.RomInfoStateHelper
 import org.jetbrains.compose.resources.stringResource
 import updaterkmp.composeapp.generated.resources.Res
 import updaterkmp.composeapp.generated.resources.android_version
@@ -38,15 +40,10 @@ import updaterkmp.composeapp.generated.resources.system_version
 
 @Composable
 fun MessageCardViews(
-    type: MutableState<String>,
-    codeName: MutableState<String>,
-    systemVersion: MutableState<String>,
-    xiaomiVersion: MutableState<String>,
-    androidVersion: MutableState<String>,
-    branchVersion: MutableState<String>
+    romInfoState: MutableState<RomInfoStateHelper>
 ) {
     val isVisible = remember { mutableStateOf(false) }
-    isVisible.value = codeName.value.isNotEmpty()
+    isVisible.value = romInfoState.value.type.isNotEmpty()
 
     AnimatedVisibility(
         visible = isVisible.value,
@@ -55,7 +52,7 @@ fun MessageCardViews(
     ) {
         Column {
             AnimatedContent(
-                targetState = type.value.uppercase(),
+                targetState = romInfoState.value.type.uppercase(),
                 transitionSpec = {
                     fadeIn(animationSpec = tween(1500)) togetherWith fadeOut(animationSpec = tween(300))
                 }
@@ -76,11 +73,11 @@ fun MessageCardViews(
                 shape = RoundedCornerShape(10.dp)
             ) {
                 MessageCardView(
-                    codeName.value,
-                    systemVersion.value,
-                    xiaomiVersion.value,
-                    androidVersion.value,
-                    branchVersion.value
+                    romInfoState.value.device,
+                    romInfoState.value.version,
+                    romInfoState.value.bigVersion,
+                    romInfoState.value.codebase,
+                    romInfoState.value.branch
                 )
             }
         }
@@ -89,20 +86,20 @@ fun MessageCardViews(
 
 @Composable
 fun MessageCardView(
-    codeName: String,
-    systemVersion: String,
-    xiaomiVersion: String,
-    androidVersion: String,
-    branchVersion: String
+    device: String,
+    version: String,
+    bigVersion: String,
+    codebase: String,
+    branch: String
 ) {
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
     ) {
-        MessageTextView(stringResource(Res.string.code_name), codeName)
-        MessageTextView(stringResource(Res.string.system_version), systemVersion)
-        MessageTextView(stringResource(Res.string.big_version), xiaomiVersion)
-        MessageTextView(stringResource(Res.string.android_version), androidVersion)
-        MessageTextView(stringResource(Res.string.branch), branchVersion, 0.dp)
+        MessageTextView(stringResource(Res.string.code_name), device)
+        MessageTextView(stringResource(Res.string.system_version), version)
+        MessageTextView(stringResource(Res.string.big_version), bigVersion)
+        MessageTextView(stringResource(Res.string.android_version), codebase)
+        MessageTextView(stringResource(Res.string.branch), branch, 0.dp)
     }
 }
 

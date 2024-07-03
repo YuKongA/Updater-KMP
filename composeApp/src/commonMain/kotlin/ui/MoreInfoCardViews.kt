@@ -29,7 +29,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import copyToClipboard
-import data.IconInfo
+import data.IconInfoHelper
+import data.RomInfoStateHelper
 import misc.SnackbarUtils.Companion.showSnackbar
 import org.jetbrains.compose.resources.stringResource
 import ui.components.TextWithIcon
@@ -42,13 +43,11 @@ import updaterkmp.composeapp.generated.resources.filesize
 
 @Composable
 fun MoreInfoCardViews(
-    fileName: MutableState<String>,
-    fileSize: MutableState<String>,
-    changelog: MutableState<String>,
-    iconInfo: MutableState<List<IconInfo>>
+    romInfoState: MutableState<RomInfoStateHelper>,
+    iconInfo: MutableState<List<IconInfoHelper>>
 ) {
     val isVisible = remember { mutableStateOf(false) }
-    isVisible.value = fileName.value.isNotEmpty()
+    isVisible.value = romInfoState.value.fileName.isNotEmpty()
 
     AnimatedVisibility(
         visible = isVisible.value,
@@ -67,9 +66,9 @@ fun MoreInfoCardViews(
             Column(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp)
             ) {
-                MoreTextView(stringResource(Res.string.filename), fileName.value)
-                MoreTextView(stringResource(Res.string.filesize), fileSize.value)
-                ChangelogView(iconInfo, changelog)
+                MoreTextView(stringResource(Res.string.filename), romInfoState.value.fileName)
+                MoreTextView(stringResource(Res.string.filesize), romInfoState.value.fileSize)
+                ChangelogView(iconInfo, romInfoState.value.changelog)
             }
         }
     }
@@ -106,8 +105,8 @@ fun MoreTextView(
 
 @Composable
 fun ChangelogView(
-    iconInfo: MutableState<List<IconInfo>>,
-    changelog: MutableState<String>
+    iconInfo: MutableState<List<IconInfoHelper>>,
+    changelog: String
 ) {
     val hapticFeedback = LocalHapticFeedback.current
 
@@ -126,7 +125,7 @@ fun ChangelogView(
             Text(
                 modifier = Modifier.clickable(
                     onClick = {
-                        copyToClipboard(changelog.value)
+                        copyToClipboard(changelog)
                         showSnackbar(messageCopySuccessful)
                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                     }

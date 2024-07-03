@@ -11,6 +11,5 @@ fun iconLink(link: String, iconNameLink: Map<String, String>, iconName: List<Str
             }
         }
     }
-    println(iconMap)
     return iconMap
 }

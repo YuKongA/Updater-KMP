@@ -41,9 +41,10 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import data.DeviceInfoHelper
-import data.IconInfo
+import data.IconInfoHelper
 import data.LoginHelper
 import data.RomInfoHelper
+import data.RomInfoStateHelper
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import misc.SnackbarUtils.Companion.Snackbar
@@ -80,45 +81,11 @@ fun App() {
     val loginInfo = perfGet("loginInfo")?.let { json.decodeFromString<LoginHelper>(it) }
     val isLogin = remember { mutableStateOf(loginInfo?.authResult?.toInt() ?: 0) }
 
-    val typeCurRom = remember { mutableStateOf("") }
-    val deviceCurRom = remember { mutableStateOf("") }
-    val versionCurRom = remember { mutableStateOf("") }
-    val codebaseCurRom = remember { mutableStateOf("") }
-    val branchCurRom = remember { mutableStateOf("") }
-    val fileNameCurRom = remember { mutableStateOf("") }
-    val fileSizeCurRom = remember { mutableStateOf("") }
-    val bigVersionCurRom = remember { mutableStateOf("") }
-    val officialDownloadCurRom = remember { mutableStateOf("") }
-    val cdn1DownloadCurRom = remember { mutableStateOf("") }
-    val cdn2DownloadCurRom = remember { mutableStateOf("") }
-    val changelogCurRom = remember { mutableStateOf("") }
+    val curRomInfo = remember { mutableStateOf(RomInfoStateHelper()) }
+    val incRomInfo = remember { mutableStateOf(RomInfoStateHelper()) }
 
-    val curRomInfo = listOf(
-        typeCurRom, deviceCurRom, versionCurRom, codebaseCurRom, branchCurRom, fileNameCurRom, fileSizeCurRom,
-        bigVersionCurRom, officialDownloadCurRom, cdn1DownloadCurRom, cdn2DownloadCurRom, changelogCurRom
-    )
-
-    val curIconInfo: MutableState<List<IconInfo>> = remember { mutableStateOf(listOf()) }
-
-    val typeIncRom = remember { mutableStateOf("") }
-    val deviceIncRom = remember { mutableStateOf("") }
-    val versionIncRom = remember { mutableStateOf("") }
-    val codebaseIncRom = remember { mutableStateOf("") }
-    val branchIncRom = remember { mutableStateOf("") }
-    val fileNameIncRom = remember { mutableStateOf("") }
-    val fileSizeIncRom = remember { mutableStateOf("") }
-    val bigVersionIncRom = remember { mutableStateOf("") }
-    val officialDownloadIncRom = remember { mutableStateOf("") }
-    val cdn1DownloadIncRom = remember { mutableStateOf("") }
-    val cdn2DownloadIncRom = remember { mutableStateOf("") }
-    val changelogIncRom = remember { mutableStateOf("") }
-
-    val incRomInfo = listOf(
-        typeIncRom, deviceIncRom, versionIncRom, codebaseIncRom, branchIncRom, fileNameIncRom, fileSizeIncRom,
-        bigVersionIncRom, officialDownloadIncRom, cdn1DownloadIncRom, cdn2DownloadIncRom, changelogIncRom
-    )
-
-    val incIconInfo: MutableState<List<IconInfo>> = remember { mutableStateOf(listOf()) }
+    val curIconInfo: MutableState<List<IconInfoHelper>> = remember { mutableStateOf(listOf()) }
+    val incIconInfo: MutableState<List<IconInfoHelper>> = remember { mutableStateOf(listOf()) }
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     val fabOffsetHeight by animateDpAsState(
@@ -163,12 +130,12 @@ fun App() {
                             Column {
                                 LoginCardView(isLogin)
                                 TextFieldViews(deviceName, codeName, deviceRegion, systemVersion, androidVersion)
-                                MessageCardViews(typeCurRom, deviceCurRom, versionCurRom, bigVersionCurRom, codebaseCurRom, branchCurRom)
-                                MoreInfoCardViews(fileNameCurRom, fileSizeCurRom, changelogCurRom, curIconInfo)
-                                DownloadCardViews(officialDownloadCurRom, cdn1DownloadCurRom, cdn2DownloadCurRom, fileNameCurRom)
-                                MessageCardViews(typeIncRom, deviceIncRom, versionIncRom, bigVersionIncRom, codebaseIncRom, branchIncRom)
-                                MoreInfoCardViews(fileNameIncRom, fileSizeIncRom, changelogIncRom, incIconInfo)
-                                DownloadCardViews(officialDownloadIncRom, cdn1DownloadIncRom, cdn2DownloadIncRom, fileNameIncRom)
+                                MessageCardViews(curRomInfo)
+                                MoreInfoCardViews(curRomInfo, curIconInfo)
+                                DownloadCardViews(curRomInfo)
+                                MessageCardViews(incRomInfo)
+                                MoreInfoCardViews(incRomInfo, incIconInfo)
+                                DownloadCardViews(incRomInfo)
                                 Spacer(Modifier.height(padding.calculateBottomPadding()))
                             }
                         } else {
@@ -179,12 +146,12 @@ fun App() {
                                         TextFieldViews(deviceName, codeName, deviceRegion, systemVersion, androidVersion)
                                     }
                                     Column(modifier = Modifier.weight(1.0f)) {
-                                        MessageCardViews(typeCurRom, deviceCurRom, versionCurRom, bigVersionCurRom, codebaseCurRom, branchCurRom)
-                                        MoreInfoCardViews(fileNameCurRom, fileSizeCurRom, changelogCurRom, curIconInfo)
-                                        DownloadCardViews(officialDownloadCurRom, cdn1DownloadCurRom, cdn2DownloadCurRom, fileNameCurRom)
-                                        MessageCardViews(typeIncRom, deviceIncRom, versionIncRom, bigVersionIncRom, codebaseIncRom, branchIncRom)
-                                        MoreInfoCardViews(fileNameIncRom, fileSizeIncRom, changelogIncRom, incIconInfo)
-                                        DownloadCardViews(officialDownloadIncRom, cdn1DownloadIncRom, cdn2DownloadIncRom, fileNameIncRom)
+                                        MessageCardViews(curRomInfo)
+                                        MoreInfoCardViews(curRomInfo, curIconInfo)
+                                        DownloadCardViews(curRomInfo)
+                                        MessageCardViews(incRomInfo)
+                                        MoreInfoCardViews(incRomInfo, incIconInfo)
+                                        DownloadCardViews(incRomInfo)
                                     }
                                 }
                                 Spacer(Modifier.height(padding.calculateBottomPadding()))
@@ -197,7 +164,6 @@ fun App() {
         }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -236,12 +202,11 @@ private fun FloatActionButton(
     deviceRegion: MutableState<String>,
     systemVersion: MutableState<String>,
     androidVersion: MutableState<String>,
-    curRomInfo: List<MutableState<String>>,
-    incRomInfo: List<MutableState<String>>,
-    curIconInfo: MutableState<List<IconInfo>>,
-    incIconInfo: MutableState<List<IconInfo>>,
+    curRomInfo: MutableState<RomInfoStateHelper>,
+    incRomInfo: MutableState<RomInfoStateHelper>,
+    curIconInfo: MutableState<List<IconInfoHelper>>,
+    incIconInfo: MutableState<List<IconInfoHelper>>,
     isLogin: MutableState<Int>
-
 ) {
     val coroutineScope = rememberCoroutineScope()
     val messageIng = stringResource(Res.string.toast_ing)
@@ -288,13 +253,13 @@ private fun FloatActionButton(
                     }
                     if (recoveryRomInfo.currentRom?.bigversion != null) {
 
-                        curRomInfo[8].value = if (recoveryRomInfo.currentRom.md5 != recoveryRomInfo.latestRom?.md5) {
+                        val currentRomDownload = if (recoveryRomInfo.currentRom.md5 != recoveryRomInfo.latestRom?.md5) {
                             val romInfoCurrent = getRecoveryRomInfo("", codeNameExt, regionCode, systemVersionExt, androidVersion.value)
                             val recoveryRomInfoCurrent = json.decodeFromString<RomInfoHelper.RomInfo>(romInfoCurrent)
                             "https://ultimateota.d.miui.com/" + recoveryRomInfoCurrent.currentRom?.version + "/" + recoveryRomInfoCurrent.latestRom?.filename
                         } else "https://ultimateota.d.miui.com/" + recoveryRomInfo.currentRom.version + "/" + recoveryRomInfo.latestRom?.filename
 
-                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.currentRom, curRomInfo, curIconInfo)
+                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.currentRom, curRomInfo, curIconInfo, currentRomDownload)
 
                         perfSet("deviceName", deviceName.value)
                         perfSet("codeName", codeName.value)
@@ -304,10 +269,10 @@ private fun FloatActionButton(
 
                         if (recoveryRomInfo.incrementRom?.bigversion != null) {
 
-                            incRomInfo[8].value =
+                            val incrementRomDownload =
                                 "https://ultimateota.d.miui.com/" + recoveryRomInfo.incrementRom.version + "/" + recoveryRomInfo.incrementRom.filename
 
-                            handleRomInfo(recoveryRomInfo, recoveryRomInfo.incrementRom, incRomInfo, incIconInfo)
+                            handleRomInfo(recoveryRomInfo, recoveryRomInfo.incrementRom, incRomInfo, incIconInfo, incrementRomDownload)
 
                         } else {
 
@@ -315,10 +280,10 @@ private fun FloatActionButton(
                             val recoveryRomInfoCross = json.decodeFromString<RomInfoHelper.RomInfo>(romInfoCross)
                             if (recoveryRomInfoCross.crossRom?.bigversion != null) {
 
-                                incRomInfo[8].value =
+                                val crossRomDownload =
                                     "https://ultimateota.d.miui.com/" + recoveryRomInfoCross.crossRom.version + "/" + recoveryRomInfoCross.crossRom.filename
 
-                                handleRomInfo(recoveryRomInfoCross, recoveryRomInfoCross.crossRom, incRomInfo, incIconInfo)
+                                handleRomInfo(recoveryRomInfoCross, recoveryRomInfoCross.crossRom, incRomInfo, incIconInfo, crossRomDownload)
 
                             } else {
                                 clearRomInfo(incRomInfo)
@@ -329,19 +294,20 @@ private fun FloatActionButton(
 
                     } else if (recoveryRomInfo.incrementRom?.bigversion != null) {
 
-                        curRomInfo[8].value =
+                        val incrementRomDownload =
                             "https://ultimateota.d.miui.com/" + recoveryRomInfo.incrementRom.version + "/" + recoveryRomInfo.incrementRom.filename
 
-                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.incrementRom, curRomInfo, curIconInfo)
+                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.incrementRom, curRomInfo, curIconInfo, incrementRomDownload)
                         clearRomInfo(incRomInfo)
 
                         showSnackbar(messageWrongResult)
 
                     } else if (recoveryRomInfo.crossRom?.bigversion != null) {
 
-                        curRomInfo[8].value = "https://ultimateota.d.miui.com/" + recoveryRomInfo.crossRom.version + "/" + recoveryRomInfo.crossRom.filename
+                        val crossRomDownload =
+                            "https://ultimateota.d.miui.com/" + recoveryRomInfo.crossRom.version + "/" + recoveryRomInfo.crossRom.filename
 
-                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.crossRom, curRomInfo, curIconInfo)
+                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.crossRom, curRomInfo, curIconInfo, crossRomDownload)
                         clearRomInfo(incRomInfo)
 
                         showSnackbar(messageWrongResult)
