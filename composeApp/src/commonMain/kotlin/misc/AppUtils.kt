@@ -39,7 +39,11 @@ fun handleRomInfo(
             version = romInfo.version.toString(),
             codebase = romInfo.codebase.toString(),
             branch = romInfo.branch.toString(),
-            bigVersion = if (romInfo.bigversion.contains("816")) romInfo.bigversion.replace("816", "HyperOS 1.0") else "MIUI ${romInfo.bigversion}",
+            bigVersion = when {
+                romInfo.osbigversion != "0.0" -> "HyperOS " + romInfo.osbigversion
+                romInfo.bigversion.contains("816") -> romInfo.bigversion.replace("816", "HyperOS 1.0")
+                else -> "MIUI ${romInfo.bigversion}"
+            },
             fileName = romInfo.filename.toString().substringBefore(".zip") + ".zip",
             fileSize = romInfo.filesize.toString(),
             officialDownload = officialDownload,
