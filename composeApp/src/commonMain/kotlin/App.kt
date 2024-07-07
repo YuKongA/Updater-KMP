@@ -274,7 +274,7 @@ private fun FloatActionButton(
 
                             handleRomInfo(recoveryRomInfo, recoveryRomInfo.incrementRom, incRomInfo, incIconInfo, incrementRomDownload)
 
-                        } else {
+                        } else if (recoveryRomInfo.crossRom?.bigversion != null) {
 
                             val romInfoCross = getRecoveryRomInfo("", codeNameExt, regionCode, systemVersionExt, androidVersion.value)
                             val recoveryRomInfoCross = json.decodeFromString<RomInfoHelper.RomInfo>(romInfoCross)
