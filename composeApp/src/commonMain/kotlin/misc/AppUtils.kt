@@ -1,12 +1,15 @@
 package misc
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.unit.sp
 import data.DataHelper
 import data.RomInfoHelper
 import iconLink
 import kotlinx.serialization.json.Json
 
 val json = Json { ignoreUnknownKeys = true }
+
+val bodyFontSize = 14.5.sp
 
 fun handleRomInfo(
     recoveryRomInfo: RomInfoHelper.RomInfo,
@@ -40,15 +43,16 @@ fun handleRomInfo(
             codebase = romInfo.codebase.toString(),
             branch = romInfo.branch.toString(),
             bigVersion = when {
-                romInfo.osbigversion != "0.0" -> "HyperOS " + romInfo.osbigversion
+                romInfo.osbigversion != ".0" && romInfo.osbigversion != "0.0"  -> "HyperOS " + romInfo.osbigversion
                 romInfo.bigversion.contains("816") -> romInfo.bigversion.replace("816", "HyperOS 1.0")
                 else -> "MIUI ${romInfo.bigversion}"
             },
             fileName = romInfo.filename.toString().substringBefore(".zip") + ".zip",
             fileSize = romInfo.filesize.toString(),
-            officialDownload = officialDownload ?: generateDownloadUrl(romInfo.version!!, romInfo.filename!!),
-            cdn1Download = "https://cdnorg.d.miui.com/" + romInfo.version + "/" + romInfo.filename,
-            cdn2Download = "https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com/" + romInfo.version + "/" + romInfo.filename,
+            official1Download = "https://ultimateota.d.miui.com" + (officialDownload ?: downloadUrl(romInfo.version, romInfo.filename)),
+            official2Download = "https://superota.d.miui.com" + (officialDownload ?: downloadUrl(romInfo.version, romInfo.filename)),
+            cdn1Download = "https://cdnorg.d.miui.com" + downloadUrl(romInfo.version, romInfo.filename),
+            cdn2Download = "https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com" + downloadUrl(romInfo.version, romInfo.filename),
             changelog = log.toString().trimEnd()
         )
     }
@@ -58,6 +62,6 @@ fun clearRomInfo(romInfoState: MutableState<DataHelper.RomInfoData>) {
     romInfoState.value = DataHelper.RomInfoData()
 }
 
-fun generateDownloadUrl(romVersion: String, romFilename: String): String {
-    return "https://ultimateota.d.miui.com/$romVersion/$romFilename"
+fun downloadUrl(romVersion: String?, romFilename: String?): String {
+    return "/$romVersion/$romFilename"
 }

@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import copyToClipboard
 import data.DataHelper
 import misc.SnackbarUtils.Companion.showSnackbar
+import misc.bodyFontSize
 import org.jetbrains.compose.resources.stringResource
 import ui.components.TextWithIcon
 import updaterkmp.composeapp.generated.resources.Res
@@ -63,7 +64,7 @@ fun MoreInfoCardViews(
             shape = RoundedCornerShape(10.dp)
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp)
+                modifier = Modifier.fillMaxWidth().padding(16.dp)
             ) {
                 MoreTextView(stringResource(Res.string.filename), romInfoState.value.fileName)
                 MoreTextView(stringResource(Res.string.filesize), romInfoState.value.fileSize)
@@ -83,7 +84,7 @@ fun MoreTextView(
 
     Text(
         text = title,
-        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontSize = bodyFontSize,
         fontWeight = FontWeight.SemiBold
     )
     AnimatedContent(
@@ -95,8 +96,7 @@ fun MoreTextView(
         Text(
             text = it,
             modifier = Modifier.padding(bottom = 8.dp),
-            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-            fontFamily = FontFamily.Monospace
+            fontSize = bodyFontSize
         )
     }
 }
@@ -118,7 +118,7 @@ fun ChangelogView(
         ) {
             Text(
                 text = stringResource(Res.string.changelog),
-                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                fontSize = bodyFontSize,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
@@ -130,7 +130,8 @@ fun ChangelogView(
                     }
                 ),
                 text = stringResource(Res.string.copy_button),
-                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                fontSize = bodyFontSize,
+                fontWeight = FontWeight.SemiBold,
                 color = ButtonDefaults.textButtonColors().contentColor
             )
         }

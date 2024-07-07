@@ -32,6 +32,7 @@ import copyToClipboard
 import data.DataHelper
 import downloadToLocal
 import misc.SnackbarUtils.Companion.showSnackbar
+import misc.bodyFontSize
 import org.jetbrains.compose.resources.stringResource
 import updaterkmp.composeapp.generated.resources.Res
 import updaterkmp.composeapp.generated.resources.copy_button
@@ -45,7 +46,7 @@ fun DownloadCardViews(
     romInfoState: MutableState<DataHelper.RomInfoData>
 ) {
     val isVisible = remember { mutableStateOf(false) }
-    isVisible.value = romInfoState.value.officialDownload.isNotEmpty()
+    isVisible.value = romInfoState.value.official1Download.isNotEmpty()
 
     AnimatedVisibility(
         visible = isVisible.value,
@@ -62,15 +63,16 @@ fun DownloadCardViews(
             shape = RoundedCornerShape(10.dp)
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp)
+                modifier = Modifier.fillMaxWidth().padding(16.dp)
             ) {
                 Text(
                     text = stringResource(Res.string.download),
-                    modifier = Modifier.fillMaxWidth(),
-                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                    fontSize = bodyFontSize,
                     fontWeight = FontWeight.SemiBold
                 )
-                DownloadTextView("Official (ultimateota)", romInfoState.value.officialDownload, romInfoState.value.officialDownload, romInfoState.value.fileName)
+                DownloadTextView("Official (ultimateota)", romInfoState.value.official1Download, romInfoState.value.official1Download, romInfoState.value.fileName)
+                DownloadTextView("Official (superota)", romInfoState.value.official2Download, romInfoState.value.official2Download, romInfoState.value.fileName)
                 DownloadTextView("CDN (cdnorg)", romInfoState.value.cdn1Download, romInfoState.value.cdn1Download, romInfoState.value.fileName)
                 DownloadTextView("CDN (aliyuncs)", romInfoState.value.cdn2Download, romInfoState.value.cdn2Download, romInfoState.value.fileName, 0.dp)
             }
@@ -97,10 +99,11 @@ fun DownloadTextView(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = title,
-            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-            textAlign = TextAlign.Start,
             modifier = Modifier.fillMaxWidth(0.5f),
+            text = title,
+            fontSize = bodyFontSize,
+            fontWeight = FontWeight.Medium,
+            textAlign = TextAlign.Start
         )
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -109,7 +112,7 @@ fun DownloadTextView(
             if (copy.isNotEmpty()) {
                 Text(
                     modifier = Modifier
-                        .padding(end = 10.dp)
+                        .padding(end = 16.dp)
                         .clickable(
                             enabled = true,
                             onClick = {
@@ -119,7 +122,8 @@ fun DownloadTextView(
                             }
                         ),
                     text = stringResource(Res.string.copy_button),
-                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                    fontSize = bodyFontSize,
+                    fontWeight = FontWeight.SemiBold,
                     color = ButtonDefaults.textButtonColors().contentColor
                 )
                 Text(
@@ -131,7 +135,8 @@ fun DownloadTextView(
                         }
                     ),
                     text = stringResource(Res.string.download_button),
-                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                    fontSize = bodyFontSize,
+                    fontWeight = FontWeight.SemiBold,
                     color = ButtonDefaults.textButtonColors().contentColor
                 )
             }

@@ -131,7 +131,7 @@ fun LoginDialog(
                                 modifier = Modifier.weight(1f),
                                 text = stringResource(Res.string.login),
                                 style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.SemiBold,
                             )
                             Checkbox(
                                 modifier = Modifier.height(22.dp).padding(start = 0.dp, end = 10.dp).size(22.dp),
@@ -251,7 +251,7 @@ fun LoginDialog(
                             Text(
                                 text = stringResource(Res.string.logout),
                                 style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.SemiBold,
                             )
                             Row(
                                 modifier = Modifier.fillMaxWidth().padding(top = 80.dp),

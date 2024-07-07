@@ -28,7 +28,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import data.DataHelper
+import misc.bodyFontSize
 import org.jetbrains.compose.resources.stringResource
 import updaterkmp.composeapp.generated.resources.Res
 import updaterkmp.composeapp.generated.resources.android_version
@@ -92,7 +94,7 @@ fun MessageCardView(
     branch: String
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
     ) {
         MessageTextView(stringResource(Res.string.code_name), device)
         MessageTextView(stringResource(Res.string.system_version), version)
@@ -119,7 +121,7 @@ fun MessageTextView(
     ) {
         Text(
             text = title,
-            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+            fontSize = bodyFontSize,
             fontWeight = FontWeight.SemiBold
         )
         AnimatedContent(
@@ -131,7 +133,7 @@ fun MessageTextView(
             Text(
                 text = it,
                 modifier = Modifier.horizontalScroll(scrollState),
-                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                fontSize = bodyFontSize,
                 fontFamily = FontFamily.Monospace,
                 maxLines = 1
             )

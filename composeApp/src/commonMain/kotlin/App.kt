@@ -48,7 +48,7 @@ import kotlinx.serialization.encodeToString
 import misc.SnackbarUtils.Companion.Snackbar
 import misc.SnackbarUtils.Companion.showSnackbar
 import misc.clearRomInfo
-import misc.generateDownloadUrl
+import misc.downloadUrl
 import misc.handleRomInfo
 import misc.json
 import org.jetbrains.compose.resources.stringResource
@@ -256,8 +256,8 @@ private fun FloatActionButton(
                         val curRomDownload = if (recoveryRomInfo.currentRom.md5 != recoveryRomInfo.latestRom?.md5) {
                             val romInfoCurrent = getRecoveryRomInfo("", codeNameExt, regionCode, systemVersionExt, androidVersion.value)
                             val recoveryRomInfoCurrent = json.decodeFromString<RomInfoHelper.RomInfo>(romInfoCurrent)
-                            generateDownloadUrl(recoveryRomInfoCurrent.currentRom?.version!!, recoveryRomInfoCurrent.latestRom?.filename!!)
-                        } else generateDownloadUrl(recoveryRomInfo.currentRom.version!!, recoveryRomInfo.latestRom?.filename!!)
+                            downloadUrl(recoveryRomInfoCurrent.currentRom?.version!!, recoveryRomInfoCurrent.latestRom?.filename!!)
+                        } else downloadUrl(recoveryRomInfo.currentRom.version!!, recoveryRomInfo.latestRom?.filename!!)
 
                         handleRomInfo(recoveryRomInfo, recoveryRomInfo.currentRom, curRomInfo, curIconInfo, curRomDownload)
 
@@ -272,17 +272,12 @@ private fun FloatActionButton(
                             handleRomInfo(recoveryRomInfo, recoveryRomInfo.incrementRom, incRomInfo, incIconInfo)
 
                         } else if (recoveryRomInfo.crossRom?.bigversion != null) {
-                            val romInfoCross = getRecoveryRomInfo("", codeNameExt, regionCode, systemVersionExt, androidVersion.value)
-                            val recoveryRomInfoCross = json.decodeFromString<RomInfoHelper.RomInfo>(romInfoCross)
-                            if (recoveryRomInfoCross.crossRom?.bigversion != null) {
 
-                                handleRomInfo(recoveryRomInfoCross, recoveryRomInfoCross.crossRom, incRomInfo, incIconInfo)
+                            handleRomInfo(recoveryRomInfo, recoveryRomInfo.crossRom, incRomInfo, incIconInfo)
 
-                            } else {
+                        } else {
 
-                                clearRomInfo(incRomInfo)
-
-                            }
+                            clearRomInfo(incRomInfo)
                         }
 
                         showSnackbar(messageSuccessResult, 1000L)

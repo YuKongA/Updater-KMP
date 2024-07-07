@@ -98,7 +98,7 @@ fun AboutDialog() {
                                 text = stringResource(Res.string.app_name),
                                 modifier = Modifier,
                                 style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.SemiBold
                             )
                             Text(
                                 text = version,

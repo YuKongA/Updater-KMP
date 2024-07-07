@@ -66,7 +66,7 @@ fun LoginCardView(
                 Text(
                     text = account,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.SemiBold
                 )
                 Text(
                     text = info,

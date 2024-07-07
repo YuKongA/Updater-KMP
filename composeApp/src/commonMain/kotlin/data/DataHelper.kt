@@ -59,7 +59,8 @@ object DataHelper {
         var bigVersion: String = "",
         var fileName: String = "",
         var fileSize: String = "",
-        var officialDownload: String = "",
+        var official1Download: String = "",
+        var official2Download: String = "",
         var cdn1Download: String = "",
         var cdn2Download: String = "",
         var changelog: String = ""
