@@ -19,7 +19,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,7 +28,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import data.RomInfoStateHelper
+import data.DataHelper
 import org.jetbrains.compose.resources.stringResource
 import updaterkmp.composeapp.generated.resources.Res
 import updaterkmp.composeapp.generated.resources.android_version
@@ -40,7 +39,7 @@ import updaterkmp.composeapp.generated.resources.system_version
 
 @Composable
 fun MessageCardViews(
-    romInfoState: MutableState<RomInfoStateHelper>
+    romInfoState: MutableState<DataHelper.RomInfoData>
 ) {
     val isVisible = remember { mutableStateOf(false) }
     isVisible.value = romInfoState.value.type.isNotEmpty()

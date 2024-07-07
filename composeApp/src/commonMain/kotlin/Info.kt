@@ -1,5 +1,4 @@
-import data.LoginHelper
-import data.RequestParamHelper
+import data.DataHelper
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.http.ContentType
@@ -25,7 +24,7 @@ var serviceToken = ""
 fun generateJson(
     branch: String, codeNameExt: String, regionCode: String, romVersion: String, androidVersion: String, userId: String, security: String, token: String
 ): String {
-    val data = RequestParamHelper(
+    val data = DataHelper.RequestData(
         b = branch,
         c = androidVersion,
         d = codeNameExt,
@@ -49,7 +48,7 @@ suspend fun getRecoveryRomInfo(
     branch: String, codeNameExt: String, regionCode: String, romVersion: String, androidVersion: String
 ): String {
     if (perfGet("loginInfo") != null) {
-        val cookies = perfGet("loginInfo")?.let { json.decodeFromString<LoginHelper>(it) }
+        val cookies = perfGet("loginInfo")?.let { json.decodeFromString<DataHelper.LoginData>(it) }
         val authResult = cookies?.authResult
         if (authResult != "3") {
             userId = cookies?.userId.toString()

@@ -29,8 +29,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import copyToClipboard
-import data.IconInfoHelper
-import data.RomInfoStateHelper
+import data.DataHelper
 import misc.SnackbarUtils.Companion.showSnackbar
 import org.jetbrains.compose.resources.stringResource
 import ui.components.TextWithIcon
@@ -43,8 +42,8 @@ import updaterkmp.composeapp.generated.resources.filesize
 
 @Composable
 fun MoreInfoCardViews(
-    romInfoState: MutableState<RomInfoStateHelper>,
-    iconInfo: MutableState<List<IconInfoHelper>>
+    romInfoState: MutableState<DataHelper.RomInfoData>,
+    iconInfo: MutableState<List<DataHelper.IconInfoData>>
 ) {
     val isVisible = remember { mutableStateOf(false) }
     isVisible.value = romInfoState.value.fileName.isNotEmpty()
@@ -105,7 +104,7 @@ fun MoreTextView(
 
 @Composable
 fun ChangelogView(
-    iconInfo: MutableState<List<IconInfoHelper>>,
+    iconInfo: MutableState<List<DataHelper.IconInfoData>>,
     changelog: String
 ) {
     val hapticFeedback = LocalHapticFeedback.current

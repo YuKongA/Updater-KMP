@@ -19,7 +19,6 @@ object RomInfoHelper {
     @Serializable
     data class Rom(
         val bigversion: String? = null,
-        val osbigversion: String? = null,
         val branch: String? = null,
         val changelog: HashMap<String, Changelog>? = null,
         val codebase: String? = null,
@@ -28,6 +27,7 @@ object RomInfoHelper {
         val filesize: String? = null,
         val md5: String? = null,
         val name: String? = null,
+        val osbigversion: String? = null,
         val type: String? = null,
         val version: String? = null,
     )

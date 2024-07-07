@@ -44,7 +44,7 @@ import updaterkmp.composeapp.generated.resources.join_group
 import updaterkmp.composeapp.generated.resources.opensource_info
 import updaterkmp.composeapp.generated.resources.view_source
 
-const val version = "v1.2.0"
+const val version = "v1.3.0"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

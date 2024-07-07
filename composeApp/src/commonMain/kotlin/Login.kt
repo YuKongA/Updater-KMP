@@ -1,6 +1,5 @@
 import androidx.compose.runtime.MutableState
-import data.AuthorizeHelper
-import data.LoginHelper
+import data.DataHelper
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -53,7 +52,7 @@ suspend fun login(
     }
 
     val authStr = response2.body<String>().replace("&&&START&&&", "")
-    val authJson = json.decodeFromString<AuthorizeHelper>(authStr)
+    val authJson = json.decodeFromString<DataHelper.AuthorizeData>(authStr)
     val description = authJson.description
     val ssecurity = authJson.ssecurity
     val location = authJson.location
@@ -75,7 +74,7 @@ suspend fun login(
     val cookies = response3.headers["Set-Cookie"].toString().split("; ")[0].split("; ")[0]
     val serviceToken = cookies.split("serviceToken=")[1].split(";")[0]
 
-    val loginInfo = LoginHelper(accountType, authResult, description, ssecurity, serviceToken, userId)
+    val loginInfo = DataHelper.LoginData(accountType, authResult, description, ssecurity, serviceToken, userId)
     perfSet("loginInfo", json.encodeToString(loginInfo))
     isLogin.value = 1
     return 0

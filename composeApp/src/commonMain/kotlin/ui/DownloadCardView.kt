@@ -29,7 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import copyToClipboard
-import data.RomInfoStateHelper
+import data.DataHelper
 import downloadToLocal
 import misc.SnackbarUtils.Companion.showSnackbar
 import org.jetbrains.compose.resources.stringResource
@@ -42,7 +42,7 @@ import updaterkmp.composeapp.generated.resources.download_start
 
 @Composable
 fun DownloadCardViews(
-    romInfoState: MutableState<RomInfoStateHelper>
+    romInfoState: MutableState<DataHelper.RomInfoData>
 ) {
     val isVisible = remember { mutableStateOf(false) }
     isVisible.value = romInfoState.value.officialDownload.isNotEmpty()
