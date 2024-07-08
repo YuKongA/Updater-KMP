@@ -103,33 +103,28 @@ android {
             }
         }
     }
-    packaging {
-        resources {
-            excludes += "/kotlin**"
-            excludes += "/META-INF/**"
-            excludes += "/kotlin/**"
-            excludes += "/okhttp3/**"
-            excludes += "/DebugProbesKt.bin"
-            excludes += "/composeResources/updaterkmp.composeapp.generated.resources/drawable/**"
-        }
-        applicationVariants.all {
-            outputs.all {
-                (this as BaseVariantOutputImpl).outputFileName = "$appName-$versionName($versionCode)-$name.apk"
-            }
-        }
-    }
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
             vcsInfo.include = false
             proguardFiles("proguard-rules.pro")
+            androidResources.ignoreAssetsPattern = "icon.png"
             if (keystorePath != null) signingConfig = signingConfigs.getByName("release")
         }
         debug {
             if (keystorePath != null) signingConfig = signingConfigs.getByName("release")
             applicationIdSuffix = ".debug"
         }
+    }
+    dependenciesInfo.includeInApk = false
+    packaging {
+        applicationVariants.all {
+            outputs.all {
+                (this as BaseVariantOutputImpl).outputFileName = "$appName-$versionName($versionCode)-$name.apk"
+            }
+        }
+        resources.excludes += "**"
     }
 }
 
