@@ -4,11 +4,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MenuAnchorType.Companion.PrimaryEditable
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,8 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.PopupProperties
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,23 +36,25 @@ fun AutoCompleteTextField(
     leadingIcon: ImageVector
 ) {
     var isDropdownExpanded by remember { mutableStateOf(false) }
+    val selectionRange = remember { mutableStateOf(TextRange(text.value.length)) }
 
     val hapticFeedback = LocalHapticFeedback.current
 
     ExposedDropdownMenuBox(
         expanded = isDropdownExpanded,
-        onExpandedChange = { isDropdownExpanded = it },
+        onExpandedChange = { isDropdownExpanded = text.value.isNotEmpty() }
     ) {
         OutlinedTextField(
-            value = text.value,
+            value = TextFieldValue(text.value, selectionRange.value),
             onValueChange = {
-                onValueChange.value = it
-                isDropdownExpanded = it.isNotEmpty()
+                onValueChange.value = it.text
+                selectionRange.value = it.selection
+                isDropdownExpanded = it.text.isNotEmpty()
             },
             singleLine = true,
             label = { Text(label) },
             shape = RoundedCornerShape(10.dp),
-            modifier = Modifier.menuAnchor().fillMaxWidth(),
+            modifier = Modifier.menuAnchor(type = PrimaryEditable, enabled = true).fillMaxWidth(),
             leadingIcon = { Icon(imageVector = leadingIcon, null) },
         )
         val listForItems = ArrayList(items)
@@ -61,17 +64,18 @@ fun AutoCompleteTextField(
         }.sortedBy {
             !it.startsWith(text.value, ignoreCase = true)
         }
-        DropdownMenu(
+        ExposedDropdownMenu(
             modifier = Modifier.exposedDropdownSize().heightIn(max = 250.dp).imePadding(),
+            shape = RoundedCornerShape(10.dp),
             expanded = isDropdownExpanded && list.isNotEmpty(),
-            onDismissRequest = { isDropdownExpanded = false },
-            properties = PopupProperties(focusable = false)
+            onDismissRequest = { isDropdownExpanded = false }
         ) {
             list.forEach { text ->
                 DropdownMenuItem(
                     text = { Text(text) },
                     onClick = {
                         onValueChange.value = text
+                        selectionRange.value = TextRange(text.length)
                         isDropdownExpanded = false
                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                     }
