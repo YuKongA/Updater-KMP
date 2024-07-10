@@ -2,6 +2,7 @@ package ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Update
 import androidx.compose.material3.BasicAlertDialog
@@ -72,7 +72,7 @@ fun AboutDialog() {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .size(280.dp, 180.dp)
+                        .size(280.dp, 190.dp)
                         .clip(RoundedCornerShape(30.dp))
                         .background(MaterialTheme.colorScheme.surfaceContainer)
                 ) {
@@ -97,13 +97,13 @@ fun AboutDialog() {
                             Text(
                                 text = stringResource(Res.string.app_name),
                                 modifier = Modifier,
-                                style = MaterialTheme.typography.titleLarge,
+                                fontSize = MaterialTheme.typography.titleLarge.fontSize,
                                 fontWeight = FontWeight.SemiBold
                             )
                             Text(
                                 text = version,
                                 modifier = Modifier,
-                                style = MaterialTheme.typography.bodyMedium
+                                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                             )
                         }
                     }
@@ -116,41 +116,45 @@ fun AboutDialog() {
                         Row {
                             Text(
                                 text = stringResource(Res.string.view_source) + " ",
-                                style = MaterialTheme.typography.bodyMedium
+                                fontSize = MaterialTheme.typography.bodyMedium.fontSize
                             )
-                            ClickableText(
+                            Text(
                                 text = AnnotatedString(
                                     text = "GitHub",
-                                    spanStyle = SpanStyle(textDecoration = TextDecoration.Underline)
+                                    spanStyle = SpanStyle(textDecoration = TextDecoration.Underline, color = MaterialTheme.colorScheme.primary)
                                 ),
-                                onClick = {
-                                    uriHandler.openUri("https://github.com/YuKongA/Updater-KMP")
-                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                },
-                                style = MaterialTheme.typography.bodyMedium + SpanStyle(color = MaterialTheme.colorScheme.primary)
+                                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                                modifier = Modifier.clickable(
+                                    onClick = {
+                                        uriHandler.openUri("https://github.com/YuKongA/Updater-KMP")
+                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    }
+                                )
                             )
                         }
                         Row {
                             Text(
                                 text = stringResource(Res.string.join_group) + " ",
-                                style = MaterialTheme.typography.bodyMedium
+                                fontSize = MaterialTheme.typography.bodyMedium.fontSize
                             )
-                            ClickableText(
+                            Text(
                                 text = AnnotatedString(
                                     text = "Telegram",
-                                    spanStyle = SpanStyle(textDecoration = TextDecoration.Underline)
+                                    spanStyle = SpanStyle(textDecoration = TextDecoration.Underline, color = MaterialTheme.colorScheme.primary)
                                 ),
-                                onClick = {
-                                    uriHandler.openUri("https://t.me/YuKongA13579")
-                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                },
-                                style = MaterialTheme.typography.bodyMedium + SpanStyle(color = MaterialTheme.colorScheme.primary)
+                                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                                modifier = Modifier.clickable(
+                                    onClick = {
+                                        uriHandler.openUri("https://t.me/YuKongA13579")
+                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    },
+                                )
                             )
                         }
                         Spacer(modifier = Modifier.padding(top = 12.dp))
                         Text(
                             text = stringResource(Res.string.opensource_info),
-                            style = MaterialTheme.typography.bodyMedium
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize
                         )
                     }
                 }

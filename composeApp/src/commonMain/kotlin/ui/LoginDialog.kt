@@ -130,8 +130,8 @@ fun LoginDialog(
                             Text(
                                 modifier = Modifier.weight(1f),
                                 text = stringResource(Res.string.login),
-                                style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.SemiBold,
+                                fontSize = MaterialTheme.typography.titleLarge.fontSize
                             )
                             Checkbox(
                                 modifier = Modifier.height(22.dp).padding(start = 0.dp, end = 10.dp).size(22.dp),
@@ -142,7 +142,7 @@ fun LoginDialog(
                                 })
                             Text(
                                 text = stringResource(Res.string.global),
-                                style = MaterialTheme.typography.bodyMedium
+                                fontSize = MaterialTheme.typography.titleMedium.fontSize
                             )
                         }
                         Column(
@@ -191,7 +191,7 @@ fun LoginDialog(
                                     )
                                     Text(
                                         text = stringResource(Res.string.save_password),
-                                        style = MaterialTheme.typography.bodyMedium
+                                        fontSize = MaterialTheme.typography.bodyMedium.fontSize
                                     )
                                 }
                                 Row {
@@ -204,7 +204,7 @@ fun LoginDialog(
                                     ) {
                                         Text(
                                             text = stringResource(Res.string.cancel),
-                                            style = MaterialTheme.typography.bodyMedium
+                                            fontSize = MaterialTheme.typography.titleMedium.fontSize
                                         )
                                     }
                                     TextButton(
@@ -227,7 +227,7 @@ fun LoginDialog(
                                     ) {
                                         Text(
                                             text = stringResource(Res.string.login),
-                                            style = MaterialTheme.typography.bodyMedium
+                                            fontSize = MaterialTheme.typography.titleMedium.fontSize
                                         )
                                     }
                                 }
@@ -250,8 +250,8 @@ fun LoginDialog(
                         Box(modifier = Modifier.padding(24.dp)) {
                             Text(
                                 text = stringResource(Res.string.logout),
-                                style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.SemiBold,
+                                fontSize = MaterialTheme.typography.titleLarge.fontSize
                             )
                             Row(
                                 modifier = Modifier.fillMaxWidth().padding(top = 80.dp),
@@ -267,7 +267,7 @@ fun LoginDialog(
                                     Text(
                                         text = stringResource(Res.string.cancel),
                                         modifier = Modifier,
-                                        style = MaterialTheme.typography.bodyMedium
+                                        fontSize = MaterialTheme.typography.bodyMedium.fontSize
                                     )
                                 }
                                 TextButton(
@@ -283,7 +283,7 @@ fun LoginDialog(
                                     Text(
                                         text = stringResource(Res.string.logout),
                                         modifier = Modifier,
-                                        style = MaterialTheme.typography.bodyMedium
+                                        fontSize = MaterialTheme.typography.bodyMedium.fontSize
                                     )
                                 }
                             }

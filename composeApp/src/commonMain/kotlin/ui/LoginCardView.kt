@@ -65,12 +65,12 @@ fun LoginCardView(
             Column(modifier = Modifier.padding(start = 20.dp)) {
                 Text(
                     text = account,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = MaterialTheme.typography.titleMedium.fontSize
                 )
                 Text(
                     text = info,
-                    style = MaterialTheme.typography.titleSmall
+                    fontSize = MaterialTheme.typography.titleMedium.fontSize
                 )
             }
         }
