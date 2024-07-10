@@ -55,7 +55,7 @@ fun DownloadCardViews(
     ) {
         Card(
             colors = CardDefaults.cardColors(
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onBackground,
                 containerColor = MaterialTheme.colorScheme.surfaceContainer
             ),
             elevation = CardDefaults.cardElevation(2.dp),
