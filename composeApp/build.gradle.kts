@@ -148,9 +148,12 @@ compose.desktop {
                 iconFile = file("src/desktopMain/resources/linux/Icon.png")
             }
             macOS {
+                bundleID = pkgName
                 iconFile = file("src/desktopMain/resources/macos/Icon.icns")
             }
             windows {
+                dirChooser = true
+                perUserInstall = true
                 iconFile = file("src/desktopMain/resources/windows/Icon.ico")
             }
         }
