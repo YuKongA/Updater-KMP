@@ -8,10 +8,10 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import data.DataHelper
+import misc.SnackbarUtils.Companion.Snackbar
 import misc.json
 import org.jetbrains.compose.resources.stringResource
 import ui.AboutDialog
@@ -42,7 +43,6 @@ import ui.MessageCardViews
 import ui.MoreInfoCardViews
 import ui.TextFieldViews
 import ui.components.FloatActionButton
-import misc.SnackbarUtils.Companion.Snackbar
 import updaterkmp.composeapp.generated.resources.Res
 import updaterkmp.composeapp.generated.resources.app_name
 
@@ -94,7 +94,7 @@ fun App() {
                     BoxWithConstraints {
                         if (maxWidth < 768.dp) {
                             Column(
-                                modifier = Modifier.systemBarsPadding()
+                                modifier = Modifier.navigationBarsPadding()
                             ) {
                                 LoginCardView(isLogin)
                                 TextFieldViews(deviceName, codeName, deviceRegion, systemVersion, androidVersion)
@@ -107,7 +107,7 @@ fun App() {
                             }
                         } else {
                             Column(
-                                modifier = Modifier.systemBarsPadding()
+                                modifier = Modifier.navigationBarsPadding()
                             ) {
                                 Row {
                                     Column(modifier = Modifier.weight(0.8f).padding(end = 20.dp)) {
