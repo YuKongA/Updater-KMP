@@ -32,7 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import data.DataHelper
-import misc.SnackbarUtils.Companion.Snackbar
+import misc.MessageUtils.Companion.Snackbar
 import misc.json
 import org.jetbrains.compose.resources.stringResource
 import ui.AboutDialog
@@ -65,13 +65,10 @@ fun App() {
     val incIconInfo: MutableState<List<DataHelper.IconInfoData>> = remember { mutableStateOf(listOf()) }
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
-    val fabOffsetHeight by animateDpAsState(
-        targetValue = if (scrollBehavior.state.contentOffset < -35) 74.dp + WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() else 0.dp,
-        animationSpec = tween(durationMillis = 300)
-    )
-    val snackOffsetHeight by animateDpAsState(
-        targetValue = if (scrollBehavior.state.contentOffset <= -35) 48.dp + WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() else 0.dp,
-        animationSpec = tween(durationMillis = 300)
+
+    val offsetHeight by animateDpAsState(
+        targetValue = if (scrollBehavior.state.contentOffset < -50) 74.dp + WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() else 0.dp,
+        animationSpec = tween(durationMillis = 450) // 74.dp = FAB + FAB Padding
     )
 
     AppTheme {
@@ -129,12 +126,10 @@ fun App() {
                 }
             }
             FloatActionButton(
-                fabOffsetHeight, deviceName, codeName, deviceRegion, systemVersion,
+                offsetHeight, deviceName, codeName, deviceRegion, systemVersion,
                 androidVersion, curRomInfo, incRomInfo, curIconInfo, incIconInfo, isLogin
             )
-            Snackbar(
-                offsetY = snackOffsetHeight
-            )
+            Snackbar(offsetY = offsetHeight)
         }
     }
 }

@@ -35,7 +35,7 @@ import misc.json
 import org.jetbrains.compose.resources.stringResource
 import perfGet
 import perfSet
-import misc.SnackbarUtils.Companion.showSnackbar
+import misc.MessageUtils.Companion.showMessage
 import updaterkmp.composeapp.generated.resources.Res
 import updaterkmp.composeapp.generated.resources.submit
 import updaterkmp.composeapp.generated.resources.toast_crash_info
@@ -87,7 +87,7 @@ fun FloatActionButton(
                 val systemVersionExt = systemVersion.value.uppercase().replace("^OS1".toRegex(), "V816").replace("AUTO$".toRegex(), deviceCode)
                 val branchExt = if (systemVersion.value.uppercase().endsWith(".DEV")) "X" else "F"
 
-                showSnackbar(message = messageIng)
+                showMessage(message = messageIng)
 
                 coroutineScope.launch {
 
@@ -139,32 +139,32 @@ fun FloatActionButton(
                                 clearRomInfo(incRomInfo)
                             }
 
-                            showSnackbar(messageSuccessResult, 1000L)
+                            showMessage(messageSuccessResult, 1000L)
 
                         } else if (recoveryRomInfo.incrementRom?.bigversion != null) {
 
                             handleRomInfo(recoveryRomInfo, recoveryRomInfo.incrementRom, curRomInfo, curIconInfo)
                             clearRomInfo(incRomInfo)
-                            showSnackbar(messageWrongResult)
+                            showMessage(messageWrongResult)
 
                         } else if (recoveryRomInfo.crossRom?.bigversion != null) {
 
                             handleRomInfo(recoveryRomInfo, recoveryRomInfo.crossRom, curRomInfo, curIconInfo)
                             clearRomInfo(incRomInfo)
-                            showSnackbar(messageWrongResult)
+                            showMessage(messageWrongResult)
 
                         } else {
 
                             clearRomInfo(curRomInfo)
                             clearRomInfo(incRomInfo)
-                            showSnackbar(messageNoResult)
+                            showMessage(messageNoResult)
 
                         }
                     } else {
 
                         clearRomInfo(curRomInfo)
                         clearRomInfo(incRomInfo)
-                        showSnackbar(messageCrashResult, 5000L)
+                        showMessage(messageCrashResult, 5000L)
 
                     }
                 }

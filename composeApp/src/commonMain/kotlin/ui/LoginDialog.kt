@@ -49,7 +49,7 @@ import getPassword
 import kotlinx.coroutines.launch
 import login
 import logout
-import misc.SnackbarUtils.Companion.showSnackbar
+import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
 import perfGet
 import updaterkmp.composeapp.generated.resources.Res
@@ -211,17 +211,17 @@ fun LoginDialog(
                                     }
                                     TextButton(
                                         onClick = {
-                                            showSnackbar(message = messageLoginIn)
+                                            showMessage(message = messageLoginIn)
                                             hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                             coroutineScope.launch {
                                                 val int = login(account.text, password.text, global, savePassword, isLogin)
                                                 when (int) {
-                                                    0 -> showSnackbar(message = messageLoginSuccess)
-                                                    1 -> showSnackbar(message = messageEmpty)
-                                                    2 -> showSnackbar(message = messageSign)
-                                                    3 -> showSnackbar(message = messageError)
-                                                    4 -> showSnackbar(message = messageSecurityError)
-                                                    5 -> showSnackbar(message = messageCrashInfo)
+                                                    0 -> showMessage(message = messageLoginSuccess)
+                                                    1 -> showMessage(message = messageEmpty)
+                                                    2 -> showMessage(message = messageSign)
+                                                    3 -> showMessage(message = messageError)
+                                                    4 -> showMessage(message = messageSecurityError)
+                                                    5 -> showMessage(message = messageCrashInfo)
                                                 }
                                             }
                                             showDialog = false
@@ -275,7 +275,7 @@ fun LoginDialog(
                                     onClick = {
                                         coroutineScope.launch {
                                             val boolean = logout(isLogin)
-                                            if (boolean) showSnackbar(message = messageLogoutSuccessful)
+                                            if (boolean) showMessage(message = messageLogoutSuccessful)
                                         }
                                         showDialog = false
                                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)

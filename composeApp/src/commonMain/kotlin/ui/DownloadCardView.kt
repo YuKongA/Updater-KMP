@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import copyToClipboard
 import data.DataHelper
 import downloadToLocal
-import misc.SnackbarUtils.Companion.showSnackbar
+import misc.MessageUtils.Companion.showMessage
 import misc.bodyFontSize
 import org.jetbrains.compose.resources.stringResource
 import updaterkmp.composeapp.generated.resources.Res
@@ -117,7 +117,7 @@ fun DownloadTextView(
                             enabled = true,
                             onClick = {
                                 copyToClipboard(copy)
-                                showSnackbar(messageCopySuccessful)
+                                showMessage(messageCopySuccessful)
                                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                             }
                         ),
@@ -130,7 +130,7 @@ fun DownloadTextView(
                     modifier = Modifier.clickable(
                         onClick = {
                             downloadToLocal(download, fileName)
-                            showSnackbar(messageDownloadStart)
+                            showMessage(messageDownloadStart)
                             hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                         }
                     ),

@@ -29,7 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import copyToClipboard
 import data.DataHelper
-import misc.SnackbarUtils.Companion.showSnackbar
+import misc.MessageUtils.Companion.showMessage
 import misc.bodyFontSize
 import org.jetbrains.compose.resources.stringResource
 import ui.components.TextWithIcon
@@ -124,7 +124,7 @@ fun ChangelogView(
                 modifier = Modifier.clickable(
                     onClick = {
                         copyToClipboard(changelog)
-                        showSnackbar(messageCopySuccessful)
+                        showMessage(messageCopySuccessful)
                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                     }
                 ),

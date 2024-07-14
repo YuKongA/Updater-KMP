@@ -21,8 +21,10 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import showToast
+import useToast
 
-class SnackbarUtils {
+class MessageUtils {
 
     companion object {
         private val snackbarMessage = mutableStateOf("")
@@ -31,12 +33,16 @@ class SnackbarUtils {
         private var snackbarCoroutineJob: Job? = null
         private var snackbarKey = mutableStateOf(0)
 
-        fun showSnackbar(message: String, duration: Long = 1000L) {
-            snackbarCoroutineJob?.cancel()
-            snackbarMessage.value = message
-            snackbarDuration.value = duration
-            isSnackbarVisible.value = true
-            snackbarKey.value++
+        fun showMessage(message: String, duration: Long = 1000L) {
+            if (useToast()) {
+                showToast(message, duration.toInt())
+            } else {
+                snackbarCoroutineJob?.cancel()
+                snackbarMessage.value = message
+                snackbarDuration.value = duration
+                isSnackbarVisible.value = true
+                snackbarKey.value++
+            }
         }
 
         @Composable
