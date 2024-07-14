@@ -1,6 +1,6 @@
 import dev.whyoleg.cryptography.CryptographyProvider
 import dev.whyoleg.cryptography.providers.jdk.JDK
-import misc.yukonga.updater.kmp.misc.KeyStoreUtils
+import top.yukonga.updater.kmp.misc.KeyStoreUtils
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 

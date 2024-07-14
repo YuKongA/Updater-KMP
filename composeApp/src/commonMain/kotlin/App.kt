@@ -78,10 +78,10 @@ fun App() {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 val delta = available.y
                 scrollDistance += delta
-                if (scrollDistance < -150f) {
+                if (scrollDistance < -50f) {
                     if (fabVisible) fabVisible = false
                     scrollDistance = 0f
-                } else if (scrollDistance > 150f) {
+                } else if (scrollDistance > 50f) {
                     if (!fabVisible) fabVisible = true
                     scrollDistance = 0f
                 }

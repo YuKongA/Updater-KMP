@@ -1,4 +1,4 @@
-package misc.yukonga.updater.kmp.misc
+package top.yukonga.updater.kmp.misc
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
