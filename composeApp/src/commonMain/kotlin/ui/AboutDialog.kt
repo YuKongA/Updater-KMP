@@ -3,11 +3,11 @@ package ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -69,14 +69,17 @@ fun AboutDialog() {
         BasicAlertDialog(
             onDismissRequest = { showDialog = false },
             content = {
-                Box(
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .size(280.dp, 190.dp)
                         .clip(RoundedCornerShape(30.dp))
                         .background(MaterialTheme.colorScheme.surfaceContainer)
                 ) {
-                    Row(modifier = Modifier.padding(24.dp)) {
+                    Row(
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp)
+                            .padding(top = 24.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
                         Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier
@@ -91,18 +94,14 @@ fun AboutDialog() {
                                 modifier = Modifier.size(25.dp),
                             )
                         }
-                        Column(
-                            modifier = Modifier.padding(horizontal = 16.dp)
-                        ) {
+                        Column {
                             Text(
                                 text = stringResource(Res.string.app_name),
-                                modifier = Modifier,
                                 fontSize = MaterialTheme.typography.titleLarge.fontSize,
                                 fontWeight = FontWeight.SemiBold
                             )
                             Text(
                                 text = version,
-                                modifier = Modifier,
                                 fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                             )
                         }
@@ -110,7 +109,7 @@ fun AboutDialog() {
                     Column(
                         modifier = Modifier
                             .padding(horizontal = 24.dp)
-                            .padding(top = 88.dp)
+                            .padding(top = 12.dp, bottom = 24.dp)
                     ) {
                         val uriHandler = LocalUriHandler.current
                         Row {

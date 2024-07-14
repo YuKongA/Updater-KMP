@@ -116,15 +116,16 @@ fun LoginDialog(
             BasicAlertDialog(
                 onDismissRequest = { showDialog = false },
                 content = {
-                    Box(
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .size(280.dp, 275.dp)
                             .clip(RoundedCornerShape(30.dp))
                             .background(MaterialTheme.colorScheme.surfaceContainer)
                     ) {
                         Row(
-                            modifier = Modifier.padding(24.dp),
+                            modifier = Modifier
+                                .padding(horizontal = 24.dp)
+                                .padding(top = 24.dp, bottom = 12.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
@@ -146,7 +147,7 @@ fun LoginDialog(
                             )
                         }
                         Column(
-                            modifier = Modifier.padding(horizontal = 24.dp).padding(top = 65.dp)
+                            modifier = Modifier.padding(horizontal = 24.dp)
                         ) {
                             TextField(
                                 value = account,
@@ -176,7 +177,7 @@ fun LoginDialog(
                                 }
                             )
                             Row(
-                                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
@@ -240,14 +241,12 @@ fun LoginDialog(
             BasicAlertDialog(
                 onDismissRequest = { showDialog = false },
                 content = {
-                    Box(
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .size(280.dp, 165.dp)
                             .clip(RoundedCornerShape(30.dp))
                             .background(MaterialTheme.colorScheme.surfaceContainer)
                     ) {
-                        Box(modifier = Modifier.padding(24.dp)) {
+                        Box(modifier = Modifier.padding(horizontal = 24.dp).padding(top = 24.dp, bottom = 12.dp)) {
                             Text(
                                 text = stringResource(Res.string.logout),
                                 fontWeight = FontWeight.SemiBold,
