@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -71,19 +72,26 @@ fun App() {
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
+    val listState = rememberLazyListState()
     var fabVisible by remember { mutableStateOf(true) }
     var scrollDistance by remember { mutableStateOf(0f) }
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                val isScrolledToEnd =
+                    (listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index == listState.layoutInfo.totalItemsCount - 1 && (listState.layoutInfo.visibleItemsInfo.lastOrNull()?.size
+                        ?: 0) < listState.layoutInfo.viewportEndOffset)
+
                 val delta = available.y
-                scrollDistance += delta
-                if (scrollDistance < -50f) {
-                    if (fabVisible) fabVisible = false
-                    scrollDistance = 0f
-                } else if (scrollDistance > 50f) {
-                    if (!fabVisible) fabVisible = true
-                    scrollDistance = 0f
+                if (!isScrolledToEnd) {
+                    scrollDistance += delta
+                    if (scrollDistance < -50f) {
+                        if (fabVisible) fabVisible = false
+                        scrollDistance = 0f
+                    } else if (scrollDistance > 50f) {
+                        if (!fabVisible) fabVisible = true
+                        scrollDistance = 0f
+                    }
                 }
                 return Offset.Zero
             }
@@ -96,20 +104,21 @@ fun App() {
     )
 
     AppTheme {
-        Box(
-            modifier = Modifier.nestedScroll(nestedScrollConnection)
-        ) {
-            Scaffold(
-                modifier = Modifier.fillMaxSize()
-                    .nestedScroll(scrollBehavior.nestedScrollConnection)
-                    .background(MaterialTheme.colorScheme.background)
-                    .windowInsetsPadding(WindowInsets.statusBars)
-                    .displayCutoutPadding(),
-                topBar = {
-                    TopAppBar(scrollBehavior, isLogin)
-                }
-            ) { padding ->
+        Scaffold(
+            modifier = Modifier.fillMaxSize()
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .background(MaterialTheme.colorScheme.background)
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .displayCutoutPadding(),
+            topBar = {
+                TopAppBar(scrollBehavior, isLogin)
+            }
+        ) { padding ->
+            Box(
+                modifier = Modifier.nestedScroll(nestedScrollConnection)
+            ) {
                 LazyColumn(
+                    state = listState,
                     modifier = Modifier
                         .padding(top = padding.calculateTopPadding())
                         .padding(horizontal = 20.dp)
