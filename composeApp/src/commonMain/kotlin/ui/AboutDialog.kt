@@ -71,6 +71,7 @@ fun AboutDialog() {
             content = {
                 Column(
                     modifier = Modifier
+                        .widthIn(min = 350.dp, max = 380.dp)
                         .clip(RoundedCornerShape(30.dp))
                         .background(MaterialTheme.colorScheme.surfaceContainer)
                 ) {
@@ -109,7 +110,7 @@ fun AboutDialog() {
                     Column(
                         modifier = Modifier
                             .padding(horizontal = 24.dp)
-                            .padding(top = 12.dp, bottom = 24.dp)
+                            .padding(top = 12.dp, bottom = 18.dp)
                     ) {
                         val uriHandler = LocalUriHandler.current
                         Row {

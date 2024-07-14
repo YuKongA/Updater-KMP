@@ -118,6 +118,7 @@ fun LoginDialog(
                 content = {
                     Column(
                         modifier = Modifier
+                            .widthIn(min = 350.dp, max = 380.dp)
                             .clip(RoundedCornerShape(30.dp))
                             .background(MaterialTheme.colorScheme.surfaceContainer)
                     ) {
@@ -243,6 +244,7 @@ fun LoginDialog(
                 content = {
                     Column(
                         modifier = Modifier
+                            .widthIn(min = 350.dp, max = 380.dp)
                             .clip(RoundedCornerShape(30.dp))
                             .background(MaterialTheme.colorScheme.surfaceContainer)
                     ) {

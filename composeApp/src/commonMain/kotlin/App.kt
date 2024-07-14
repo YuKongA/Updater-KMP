@@ -4,24 +4,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.FabPosition
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -34,23 +28,10 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import data.DataHelper
-import data.DeviceInfoHelper
-import data.RomInfoHelper
-import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
-import misc.SnackbarUtils.Companion.Snackbar
-import misc.SnackbarUtils.Companion.showSnackbar
-import misc.clearRomInfo
-import misc.downloadUrl
-import misc.handleRomInfo
 import misc.json
 import org.jetbrains.compose.resources.stringResource
 import ui.AboutDialog
@@ -60,14 +41,10 @@ import ui.LoginDialog
 import ui.MessageCardViews
 import ui.MoreInfoCardViews
 import ui.TextFieldViews
+import ui.components.FloatActionButton
+import misc.SnackbarUtils.Companion.Snackbar
 import updaterkmp.composeapp.generated.resources.Res
 import updaterkmp.composeapp.generated.resources.app_name
-import updaterkmp.composeapp.generated.resources.submit
-import updaterkmp.composeapp.generated.resources.toast_crash_info
-import updaterkmp.composeapp.generated.resources.toast_ing
-import updaterkmp.composeapp.generated.resources.toast_no_info
-import updaterkmp.composeapp.generated.resources.toast_success_info
-import updaterkmp.composeapp.generated.resources.toast_wrong_info
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,11 +66,11 @@ fun App() {
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     val fabOffsetHeight by animateDpAsState(
-        targetValue = if (scrollBehavior.state.contentOffset < -35) 80.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() else 0.dp,
+        targetValue = if (scrollBehavior.state.contentOffset < -35) 74.dp + WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() else 0.dp,
         animationSpec = tween(durationMillis = 300)
     )
     val snackOffsetHeight by animateDpAsState(
-        targetValue = if (scrollBehavior.state.contentOffset <= -35) 65.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() else 0.dp,
+        targetValue = if (scrollBehavior.state.contentOffset <= -35) 48.dp + WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() else 0.dp,
         animationSpec = tween(durationMillis = 300)
     )
 
@@ -102,22 +79,11 @@ fun App() {
             modifier = Modifier.fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .background(MaterialTheme.colorScheme.background)
+                .windowInsetsPadding(WindowInsets.statusBars)
                 .displayCutoutPadding(),
             topBar = {
                 TopAppBar(scrollBehavior, isLogin)
-            },
-            snackbarHost = {
-                Snackbar(
-                    offsetY = snackOffsetHeight
-                )
-            },
-            floatingActionButton = {
-                FloatActionButton(
-                    fabOffsetHeight, deviceName, codeName, deviceRegion, systemVersion,
-                    androidVersion, curRomInfo, incRomInfo, curIconInfo, incIconInfo, isLogin
-                )
-            },
-            floatingActionButtonPosition = FabPosition.End
+            }
         ) { padding ->
             LazyColumn(
                 modifier = Modifier
@@ -127,7 +93,9 @@ fun App() {
                 item {
                     BoxWithConstraints {
                         if (maxWidth < 768.dp) {
-                            Column {
+                            Column(
+                                modifier = Modifier.systemBarsPadding()
+                            ) {
                                 LoginCardView(isLogin)
                                 TextFieldViews(deviceName, codeName, deviceRegion, systemVersion, androidVersion)
                                 MessageCardViews(curRomInfo)
@@ -136,10 +104,11 @@ fun App() {
                                 MessageCardViews(incRomInfo)
                                 MoreInfoCardViews(incRomInfo, incIconInfo)
                                 DownloadCardViews(incRomInfo)
-                                Spacer(Modifier.height(padding.calculateBottomPadding()))
                             }
                         } else {
-                            Column {
+                            Column(
+                                modifier = Modifier.systemBarsPadding()
+                            ) {
                                 Row {
                                     Column(modifier = Modifier.weight(0.8f).padding(end = 20.dp)) {
                                         LoginCardView(isLogin)
@@ -154,13 +123,18 @@ fun App() {
                                         DownloadCardViews(incRomInfo)
                                     }
                                 }
-                                Spacer(Modifier.height(padding.calculateBottomPadding()))
                             }
                         }
                     }
-
                 }
             }
+            FloatActionButton(
+                fabOffsetHeight, deviceName, codeName, deviceRegion, systemVersion,
+                androidVersion, curRomInfo, incRomInfo, curIconInfo, incIconInfo, isLogin
+            )
+            Snackbar(
+                offsetY = snackOffsetHeight
+            )
         }
     }
 }
@@ -169,7 +143,6 @@ fun App() {
 @Composable
 private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, isLogin: MutableState<Int>) {
     CenterAlignedTopAppBar(
-        modifier = Modifier.displayCutoutPadding(),
         title = {
             Text(
                 text = stringResource(Res.string.app_name),
@@ -192,136 +165,4 @@ private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, isLogin: MutableS
         },
         scrollBehavior = scrollBehavior
     )
-}
-
-@Composable
-private fun FloatActionButton(
-    fabOffsetHeight: Dp,
-    deviceName: MutableState<String>,
-    codeName: MutableState<String>,
-    deviceRegion: MutableState<String>,
-    systemVersion: MutableState<String>,
-    androidVersion: MutableState<String>,
-    curRomInfo: MutableState<DataHelper.RomInfoData>,
-    incRomInfo: MutableState<DataHelper.RomInfoData>,
-    curIconInfo: MutableState<List<DataHelper.IconInfoData>>,
-    incIconInfo: MutableState<List<DataHelper.IconInfoData>>,
-    isLogin: MutableState<Int>
-) {
-    val coroutineScope = rememberCoroutineScope()
-    val messageIng = stringResource(Res.string.toast_ing)
-    val messageNoResult = stringResource(Res.string.toast_no_info)
-    val messageSuccessResult = stringResource(Res.string.toast_success_info)
-    val messageWrongResult = stringResource(Res.string.toast_wrong_info)
-    val messageCrashResult = stringResource(Res.string.toast_crash_info)
-
-    val hapticFeedback = LocalHapticFeedback.current
-
-    ExtendedFloatingActionButton(
-        modifier = Modifier.offset(y = fabOffsetHeight),
-        onClick = {
-            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-
-            val regionCode = DeviceInfoHelper.regionCode(deviceRegion.value)
-            val deviceCode = DeviceInfoHelper.deviceCode(androidVersion.value, codeName.value, regionCode)
-            val regionNameExt = DeviceInfoHelper.regionNameExt(deviceRegion.value)
-            val codeNameExt = codeName.value + regionNameExt
-            val systemVersionExt = systemVersion.value.uppercase().replace("^OS1".toRegex(), "V816").replace("AUTO$".toRegex(), deviceCode)
-            val branchExt = if (systemVersion.value.uppercase().endsWith(".DEV")) "X" else "F"
-
-            showSnackbar(message = messageIng)
-
-            coroutineScope.launch {
-
-                val romInfo = getRecoveryRomInfo(branchExt, codeNameExt, regionCode, systemVersionExt, androidVersion.value)
-
-                if (romInfo.isNotEmpty()) {
-
-                    val recoveryRomInfo = json.decodeFromString<RomInfoHelper.RomInfo>(romInfo)
-
-                    val loginInfo = perfGet("loginInfo") ?: ""
-                    if (loginInfo.isNotEmpty()) {
-                        val cookies = json.decodeFromString<MutableMap<String, String>>(loginInfo)
-                        val description = cookies["description"] ?: ""
-                        val authResult = cookies["authResult"].toString()
-                        if (description.isNotEmpty() && recoveryRomInfo.authResult != 1 && authResult != "3") {
-                            cookies.clear()
-                            cookies["authResult"] = "3"
-                            isLogin.value = 3
-                            perfSet("loginInfo", json.encodeToString(cookies))
-                        }
-                    }
-
-                    if (recoveryRomInfo.currentRom?.bigversion != null) {
-
-                        val curRomDownload = if (recoveryRomInfo.currentRom.md5 != recoveryRomInfo.latestRom?.md5) {
-                            val romInfoCurrent = getRecoveryRomInfo("", codeNameExt, regionCode, systemVersionExt, androidVersion.value)
-                            val recoveryRomInfoCurrent = json.decodeFromString<RomInfoHelper.RomInfo>(romInfoCurrent)
-                            downloadUrl(recoveryRomInfoCurrent.currentRom?.version!!, recoveryRomInfoCurrent.latestRom?.filename!!)
-                        } else downloadUrl(recoveryRomInfo.currentRom.version!!, recoveryRomInfo.latestRom?.filename!!)
-
-                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.currentRom, curRomInfo, curIconInfo, curRomDownload)
-
-                        perfSet("deviceName", deviceName.value)
-                        perfSet("codeName", codeName.value)
-                        perfSet("deviceRegion", deviceRegion.value)
-                        perfSet("systemVersion", systemVersion.value)
-                        perfSet("androidVersion", androidVersion.value)
-
-                        if (recoveryRomInfo.incrementRom?.bigversion != null) {
-
-                            handleRomInfo(recoveryRomInfo, recoveryRomInfo.incrementRom, incRomInfo, incIconInfo)
-
-                        } else if (recoveryRomInfo.crossRom?.bigversion != null) {
-
-                            handleRomInfo(recoveryRomInfo, recoveryRomInfo.crossRom, incRomInfo, incIconInfo)
-
-                        } else {
-
-                            clearRomInfo(incRomInfo)
-                        }
-
-                        showSnackbar(messageSuccessResult, 1000L)
-
-                    } else if (recoveryRomInfo.incrementRom?.bigversion != null) {
-
-                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.incrementRom, curRomInfo, curIconInfo)
-                        clearRomInfo(incRomInfo)
-                        showSnackbar(messageWrongResult)
-
-                    } else if (recoveryRomInfo.crossRom?.bigversion != null) {
-
-                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.crossRom, curRomInfo, curIconInfo)
-                        clearRomInfo(incRomInfo)
-                        showSnackbar(messageWrongResult)
-
-                    } else {
-
-                        clearRomInfo(curRomInfo)
-                        clearRomInfo(incRomInfo)
-                        showSnackbar(messageNoResult)
-
-                    }
-                } else {
-
-                    clearRomInfo(curRomInfo)
-                    clearRomInfo(incRomInfo)
-                    showSnackbar(messageCrashResult, 5000L)
-
-                }
-            }
-        }) {
-        Icon(
-            imageVector = Icons.Filled.Check,
-            contentDescription = null,
-            modifier = Modifier.height(20.dp)
-        )
-        Spacer(
-            modifier = Modifier.width(8.dp)
-        )
-        Text(
-            text = stringResource(Res.string.submit),
-            modifier = Modifier.height(20.dp)
-        )
-    }
 }

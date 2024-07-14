@@ -12,6 +12,7 @@
         android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.Updater"
+        android:windowSoftInputMode="adjustResize"
         tools:ignore="UnusedAttribute">
         <activity
             android:name=".MainActivity"

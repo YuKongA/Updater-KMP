@@ -1,8 +1,10 @@
 package misc
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -15,6 +17,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -45,12 +48,13 @@ class SnackbarUtils {
 
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .offset(y = offsetY),
+                    .fillMaxSize()
+                    .padding(bottom = 56.dp + 18.dp) // FAB + FAB Padding
+                    .offset(y = offsetY)
+                    .systemBarsPadding(),
                 contentAlignment = Alignment.BottomCenter
             ) {
                 SnackbarHost(
-                    modifier = Modifier,
                     hostState = snackbarHostState
                 ) {
                     Snackbar(
