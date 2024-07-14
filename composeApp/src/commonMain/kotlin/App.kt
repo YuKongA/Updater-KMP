@@ -1,6 +1,7 @@
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,7 +29,11 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import data.DataHelper
@@ -66,70 +71,93 @@ fun App() {
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
+    var fabVisible by remember { mutableStateOf(true) }
+    var scrollDistance by remember { mutableStateOf(0f) }
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                val delta = available.y
+                scrollDistance += delta
+                if (scrollDistance < -150f) {
+                    if (fabVisible) fabVisible = false
+                    scrollDistance = 0f
+                } else if (scrollDistance > 150f) {
+                    if (!fabVisible) fabVisible = true
+                    scrollDistance = 0f
+                }
+                return Offset.Zero
+            }
+        }
+    }
+
     val offsetHeight by animateDpAsState(
-        targetValue = if (scrollBehavior.state.contentOffset < -50) 74.dp + WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() else 0.dp,
-        animationSpec = tween(durationMillis = 450) // 74.dp = FAB + FAB Padding
+        targetValue = if (fabVisible) 0.dp else 74.dp + WindowInsets.systemBars.asPaddingValues().calculateBottomPadding(), // 74.dp = FAB + FAB Padding
+        animationSpec = tween(durationMillis = 350)
     )
 
     AppTheme {
-        Scaffold(
-            modifier = Modifier.fillMaxSize()
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .background(MaterialTheme.colorScheme.background)
-                .windowInsetsPadding(WindowInsets.statusBars)
-                .displayCutoutPadding(),
-            topBar = {
-                TopAppBar(scrollBehavior, isLogin)
-            }
-        ) { padding ->
-            LazyColumn(
-                modifier = Modifier
-                    .padding(top = padding.calculateTopPadding())
-                    .padding(horizontal = 20.dp)
-            ) {
-                item {
-                    BoxWithConstraints {
-                        if (maxWidth < 768.dp) {
-                            Column(
-                                modifier = Modifier.navigationBarsPadding()
-                            ) {
-                                LoginCardView(isLogin)
-                                TextFieldViews(deviceName, codeName, deviceRegion, systemVersion, androidVersion)
-                                MessageCardViews(curRomInfo)
-                                MoreInfoCardViews(curRomInfo, curIconInfo)
-                                DownloadCardViews(curRomInfo)
-                                MessageCardViews(incRomInfo)
-                                MoreInfoCardViews(incRomInfo, incIconInfo)
-                                DownloadCardViews(incRomInfo)
-                            }
-                        } else {
-                            Column(
-                                modifier = Modifier.navigationBarsPadding()
-                            ) {
-                                Row {
-                                    Column(modifier = Modifier.weight(0.8f).padding(end = 20.dp)) {
-                                        LoginCardView(isLogin)
-                                        TextFieldViews(deviceName, codeName, deviceRegion, systemVersion, androidVersion)
-                                    }
-                                    Column(modifier = Modifier.weight(1.0f)) {
-                                        MessageCardViews(curRomInfo)
-                                        MoreInfoCardViews(curRomInfo, curIconInfo)
-                                        DownloadCardViews(curRomInfo)
-                                        MessageCardViews(incRomInfo)
-                                        MoreInfoCardViews(incRomInfo, incIconInfo)
-                                        DownloadCardViews(incRomInfo)
+        Box(
+            modifier = Modifier.nestedScroll(nestedScrollConnection)
+        ) {
+            Scaffold(
+                modifier = Modifier.fillMaxSize()
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+                    .background(MaterialTheme.colorScheme.background)
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .displayCutoutPadding(),
+                topBar = {
+                    TopAppBar(scrollBehavior, isLogin)
+                }
+            ) { padding ->
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(top = padding.calculateTopPadding())
+                        .padding(horizontal = 20.dp)
+                ) {
+                    item {
+                        BoxWithConstraints {
+                            if (maxWidth < 768.dp) {
+                                Column(
+                                    modifier = Modifier.navigationBarsPadding()
+                                ) {
+                                    LoginCardView(isLogin)
+                                    TextFieldViews(deviceName, codeName, deviceRegion, systemVersion, androidVersion)
+                                    MessageCardViews(curRomInfo)
+                                    MoreInfoCardViews(curRomInfo, curIconInfo)
+                                    DownloadCardViews(curRomInfo)
+                                    MessageCardViews(incRomInfo)
+                                    MoreInfoCardViews(incRomInfo, incIconInfo)
+                                    DownloadCardViews(incRomInfo)
+                                }
+                            } else {
+                                Column(
+                                    modifier = Modifier.navigationBarsPadding()
+                                ) {
+                                    Row {
+                                        Column(modifier = Modifier.weight(0.8f).padding(end = 20.dp)) {
+                                            LoginCardView(isLogin)
+                                            TextFieldViews(deviceName, codeName, deviceRegion, systemVersion, androidVersion)
+                                        }
+                                        Column(modifier = Modifier.weight(1.0f)) {
+                                            MessageCardViews(curRomInfo)
+                                            MoreInfoCardViews(curRomInfo, curIconInfo)
+                                            DownloadCardViews(curRomInfo)
+                                            MessageCardViews(incRomInfo)
+                                            MoreInfoCardViews(incRomInfo, incIconInfo)
+                                            DownloadCardViews(incRomInfo)
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
+                FloatActionButton(
+                    offsetHeight, deviceName, codeName, deviceRegion, systemVersion,
+                    androidVersion, curRomInfo, incRomInfo, curIconInfo, incIconInfo, isLogin
+                )
+                Snackbar(offsetY = offsetHeight)
             }
-            FloatActionButton(
-                offsetHeight, deviceName, codeName, deviceRegion, systemVersion,
-                androidVersion, curRomInfo, incRomInfo, curIconInfo, incIconInfo, isLogin
-            )
-            Snackbar(offsetY = offsetHeight)
         }
     }
 }
