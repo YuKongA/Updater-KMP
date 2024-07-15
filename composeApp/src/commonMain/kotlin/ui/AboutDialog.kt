@@ -19,6 +19,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,7 +38,10 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import isSupportMiuiStringToast
 import org.jetbrains.compose.resources.stringResource
+import perfGet
+import perfSet
 import updaterkmp.composeapp.generated.resources.Res
 import updaterkmp.composeapp.generated.resources.app_name
 import updaterkmp.composeapp.generated.resources.join_group
@@ -50,6 +54,7 @@ const val version = "v1.3.0"
 @Composable
 fun AboutDialog() {
     var showDialog by remember { mutableStateOf(false) }
+    var showExtDialog by remember { mutableStateOf(false) }
 
     val hapticFeedback = LocalHapticFeedback.current
 
@@ -87,6 +92,12 @@ fun AboutDialog() {
                                 .size(48.dp)
                                 .clip(RoundedCornerShape(50.dp))
                                 .background(MaterialTheme.colorScheme.primary)
+                                .clickable {
+                                    if (isSupportMiuiStringToast()) {
+                                        showExtDialog = true
+                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    }
+                                }
                         ) {
                             Image(
                                 imageVector = Icons.Outlined.Update,
@@ -161,4 +172,44 @@ fun AboutDialog() {
             }
         )
     }
+    if (showExtDialog) {
+        showDialog = false
+        var isUseMiuiStringToast by remember { mutableStateOf(perfGet("isUseMiuiStringToast") == "true") }
+        BasicAlertDialog(
+            onDismissRequest = { showExtDialog = false },
+            content = {
+                Column(
+                    modifier = Modifier
+                        .widthIn(min = 350.dp, max = 380.dp)
+                        .clip(RoundedCornerShape(30.dp))
+                        .background(MaterialTheme.colorScheme.surfaceContainer)
+                ) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 24.dp).padding(top = 24.dp),
+                        text = "Extension Settings",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = MaterialTheme.typography.titleLarge.fontSize
+                    )
+                    Row(
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = "Use MiuiStringToast",
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                        )
+                        Switch(
+                            checked = isUseMiuiStringToast,
+                            onCheckedChange = {
+                                isUseMiuiStringToast = it
+                                perfSet("isUseMiuiStringToast", it.toString())
+                            }
+                        )
+                    }
+                }
+            }
+        )
+    }
 }
+

@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import perfGet
+import showExtToast
 import showToast
 import useToast
 
@@ -35,7 +37,11 @@ class MessageUtils {
 
         fun showMessage(message: String, duration: Long = 1000L) {
             if (useToast()) {
-                showToast(message, duration)
+                if (perfGet("isUseMiuiStringToast") == "true") {
+                    showExtToast(message, duration)
+                } else {
+                    showToast(message, duration)
+                }
             } else {
                 snackbarCoroutineJob?.cancel()
                 snackbarMessage.value = message
