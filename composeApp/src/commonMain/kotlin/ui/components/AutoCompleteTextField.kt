@@ -62,7 +62,10 @@ fun AutoCompleteTextField(
             modifier = Modifier.menuAnchor(type = PrimaryEditable, enabled = true).fillMaxWidth(),
             leadingIcon = { Icon(imageVector = leadingIcon, null) },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { isDropdownExpanded = false; focusManager.clearFocus() })
+            keyboardActions = KeyboardActions(onDone = {
+                isDropdownExpanded = false
+                focusManager.clearFocus()
+            })
         )
         val listForItems = ArrayList(items)
         val list = listForItems.filter {

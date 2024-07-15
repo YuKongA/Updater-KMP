@@ -1,3 +1,4 @@
+import androidx.compose.runtime.MutableState
 import data.DataHelper
 import io.ktor.client.call.body
 import io.ktor.client.request.post
@@ -14,15 +15,36 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 const val CN_RECOVERY_URL = "https://update.miui.com/updates/miotaV3.php"
 const val INTL_RECOVERY_URL = "https://update.intl.miui.com/updates/miotaV3.php"
-var securityKey = "miuiotavalided11".encodeToByteArray()
 var accountType = "CN"
 var port = "1"
-var userId = ""
 var security = ""
+var securityKey = "miuiotavalided11".encodeToByteArray()
 var serviceToken = ""
+var userId = ""
 
+/**
+ * Generate JSON data for recovery ROM info request.
+ *
+ * @param branch: Branch name
+ * @param codeNameExt: CodeName with region extension
+ * @param regionCode: Region code
+ * @param romVersion: ROM version
+ * @param androidVersion: Android version
+ * @param userId: Xiaomi ID
+ * @param security: Security key
+ * @param token: Service token
+ *
+ * @return JSON data
+ */
 fun generateJson(
-    branch: String, codeNameExt: String, regionCode: String, romVersion: String, androidVersion: String, userId: String, security: String, token: String
+    branch: String,
+    codeNameExt: String,
+    regionCode: String,
+    romVersion: String,
+    androidVersion: String,
+    userId: String,
+    security: String,
+    token: String
 ): String {
     val data = DataHelper.RequestData(
         b = branch,
@@ -43,22 +65,40 @@ fun generateJson(
     return Json.encodeToString(data)
 }
 
+/**
+ * Get recovery ROM info form xiaomi server.
+ *
+ * @param branch: Branch name
+ * @param codeNameExt: CodeName with region extension
+ * @param regionCode: Region code
+ * @param romVersion: ROM version
+ * @param androidVersion: Android version
+ * @param isLogin: Xiaomi account login status
+ *
+ * @return Recovery ROM info
+ */
 @OptIn(ExperimentalEncodingApi::class, InternalAPI::class)
 suspend fun getRecoveryRomInfo(
-    branch: String, codeNameExt: String, regionCode: String, romVersion: String, androidVersion: String
+    branch: String,
+    codeNameExt: String,
+    regionCode: String,
+    romVersion: String,
+    androidVersion: String,
+    isLogin: MutableState<Int>
 ): String {
-    if (perfGet("loginInfo") != null) {
-        val cookies = perfGet("loginInfo")?.let { json.decodeFromString<DataHelper.LoginData>(it) }
-        val authResult = cookies?.authResult
+    if (perfGet("loginInfo") != null && isLogin.value == 1) {
+        val loginInfo = perfGet("loginInfo")?.let { json.decodeFromString<DataHelper.LoginData>(it) }
+        val authResult = loginInfo?.authResult
         if (authResult != "3") {
-            userId = cookies?.userId.toString()
-            accountType = cookies?.accountType.toString().ifEmpty { "CN" }
-            security = cookies?.ssecurity.toString()
-            securityKey = Base64.Mime.decode(security)
-            serviceToken = cookies?.serviceToken.toString()
+            accountType = loginInfo?.accountType.toString().ifEmpty { "CN" }
             port = "2"
-        }
-    }
+            security = loginInfo?.ssecurity.toString()
+            securityKey = Base64.Mime.decode(security)
+            serviceToken = loginInfo?.serviceToken.toString()
+            userId = loginInfo?.userId.toString()
+        } else setDefaultRequestInfo()
+    } else setDefaultRequestInfo()
+
     val jsonData = generateJson(branch, codeNameExt, regionCode, romVersion, androidVersion, userId, security, serviceToken)
     val encryptedText = miuiEncrypt(jsonData, securityKey)
     val client = httpClientPlatform()
@@ -79,4 +119,16 @@ suspend fun getRecoveryRomInfo(
         e.printStackTrace()
         return ""
     }
+}
+
+/**
+ * Set default request info.
+ */
+fun setDefaultRequestInfo() {
+    accountType = "CN"
+    port = "1"
+    security = ""
+    securityKey = "miuiotavalided11".encodeToByteArray()
+    serviceToken = ""
+    userId = ""
 }

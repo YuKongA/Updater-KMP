@@ -24,7 +24,7 @@ object DataHelper {
     @Serializable
     data class LoginData(
         val accountType: String? = null,
-        val authResult: String? = null,
+        var authResult: String? = null,
         val description: String? = null,
         val ssecurity: String? = null,
         val serviceToken: String? = null,

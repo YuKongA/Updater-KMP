@@ -103,7 +103,8 @@ fun LoginDialog(
         onClick = {
             showDialog = true
             hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-        }) {
+        }
+    ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
@@ -136,7 +137,10 @@ fun LoginDialog(
                                 fontSize = MaterialTheme.typography.titleLarge.fontSize
                             )
                             Checkbox(
-                                modifier = Modifier.height(22.dp).padding(start = 0.dp, end = 10.dp).size(22.dp),
+                                modifier = Modifier
+                                    .height(22.dp)
+                                    .padding(start = 0.dp, end = 10.dp)
+                                    .size(22.dp),
                                 checked = global,
                                 onCheckedChange = {
                                     global = it
@@ -175,8 +179,7 @@ fun LoginDialog(
                                             contentDescription = null
                                         )
                                     }
-                                }
-                            )
+                                })
                             Row(
                                 modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -184,13 +187,15 @@ fun LoginDialog(
                             ) {
                                 Row {
                                     Checkbox(
-                                        modifier = Modifier.height(22.dp).padding(start = 0.dp, end = 10.dp).size(22.dp),
+                                        modifier = Modifier
+                                            .height(22.dp)
+                                            .padding(start = 0.dp, end = 10.dp)
+                                            .size(22.dp),
                                         checked = savePassword == "1",
                                         onCheckedChange = {
                                             savePassword = if (it) "1" else "0"
                                             hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                        }
-                                    )
+                                        })
                                     Text(
                                         text = stringResource(Res.string.save_password),
                                         fontSize = MaterialTheme.typography.bodyMedium.fontSize
@@ -225,8 +230,7 @@ fun LoginDialog(
                                                 }
                                             }
                                             showDialog = false
-                                        }
-                                    ) {
+                                        }) {
                                         Text(
                                             text = stringResource(Res.string.login),
                                             fontSize = MaterialTheme.typography.titleMedium.fontSize
@@ -236,11 +240,12 @@ fun LoginDialog(
                             }
                         }
                     }
-                }
-            )
+                })
         } else {
             BasicAlertDialog(
-                onDismissRequest = { showDialog = false },
+                onDismissRequest = {
+                    showDialog = false
+                },
                 content = {
                     Column(
                         modifier = Modifier
@@ -248,7 +253,11 @@ fun LoginDialog(
                             .clip(RoundedCornerShape(30.dp))
                             .background(MaterialTheme.colorScheme.surfaceContainer)
                     ) {
-                        Box(modifier = Modifier.padding(horizontal = 24.dp).padding(top = 24.dp, bottom = 12.dp)) {
+                        Box(
+                            modifier = Modifier
+                                .padding(horizontal = 24.dp)
+                                .padding(top = 24.dp, bottom = 12.dp)
+                        ) {
                             Text(
                                 text = stringResource(Res.string.logout),
                                 fontWeight = FontWeight.SemiBold,
@@ -279,8 +288,7 @@ fun LoginDialog(
                                         }
                                         showDialog = false
                                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    }
-                                ) {
+                                    }) {
                                     Text(
                                         text = stringResource(Res.string.logout),
                                         modifier = Modifier,

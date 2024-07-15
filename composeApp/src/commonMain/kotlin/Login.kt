@@ -20,6 +20,17 @@ expect fun httpClientPlatform(): HttpClient
 
 expect fun md5Hash(input: String): String
 
+/**
+ * Login Xiaomi account.
+ *
+ * @param account: Xiaomi account
+ * @param password: Password
+ * @param global: Global or China account
+ * @param savePassword: Save password or not
+ * @param isLogin: Login status
+ *
+ * @return Login status
+ */
 @OptIn(InternalAPI::class)
 suspend fun login(
     account: String,
@@ -80,12 +91,25 @@ suspend fun login(
     return 0
 }
 
+/**
+ * Logout Xiaomi account.
+ *
+ * @param isLogin: Login status
+ *
+ * @return Logout status
+ */
 fun logout(isLogin: MutableState<Int>): Boolean {
     perfRemove("loginInfo")
     isLogin.value = 0
     return true
 }
 
+/**
+ * Save Xiaomi's account & password.
+ *
+ * @param account: Xiaomi account
+ * @param password: Password
+ */
 fun savePassword(account: String, password: String) {
     generateKey()
     val encryptedAccount = ownEncrypt(account)
@@ -96,6 +120,9 @@ fun savePassword(account: String, password: String) {
     perfSet("passwordIv", encryptedPassword.second)
 }
 
+/**
+ * Delete Xiaomi's account & password.
+ */
 fun deletePassword() {
     perfRemove("account")
     perfRemove("accountIv")
@@ -103,6 +130,11 @@ fun deletePassword() {
     perfRemove("passwordIv")
 }
 
+/**
+ * Get Xiaomi's account & password.
+ *
+ * @return Pair of Xiaomi's account & password
+ */
 fun getPassword(): Pair<String, String> {
     if (perfGet("account") != null && perfGet("password") != null && perfGet("accountIv") != null && perfGet("passwordIv") != null) {
         val encryptedAccount = perfGet("account").toString()

@@ -10,6 +10,9 @@ expect suspend fun provider(): CryptographyProvider
 
 expect fun generateKey()
 
+/**
+ * Generate a Cipher to be used by the xiaomi server.
+ */
 suspend fun miuiCipher(securityKey: ByteArray): AES.CBC.Cipher {
     val provider = provider()
     val aesCBC = provider.get(AES.CBC) // AES CBC
@@ -17,6 +20,14 @@ suspend fun miuiCipher(securityKey: ByteArray): AES.CBC.Cipher {
     return key.cipher(true) // PKCS5Padding
 }
 
+/**
+ * Encrypt the JSON used for the request using AES.
+ *
+ * @param jsonRequest: JSON used for the request
+ * @param securityKey: Security key
+ *
+ * @return Encrypted JSON text
+ */
 @OptIn(DelicateCryptographyApi::class, ExperimentalEncodingApi::class)
 suspend fun miuiEncrypt(jsonRequest: String, securityKey: ByteArray): String {
     val cipher = miuiCipher(securityKey)
@@ -24,6 +35,14 @@ suspend fun miuiEncrypt(jsonRequest: String, securityKey: ByteArray): String {
     return Base64.UrlSafe.encode(encrypted)
 }
 
+/**
+ * Decrypt the returned content using AES.
+ *
+ * @param encryptedText: Returned content
+ * @param securityKey: Security key
+ *
+ * @return Decrypted return content text
+ */
 @OptIn(DelicateCryptographyApi::class, ExperimentalEncodingApi::class)
 suspend fun miuiDecrypt(encryptedText: String, securityKey: ByteArray): String {
     val cipher = miuiCipher(securityKey)

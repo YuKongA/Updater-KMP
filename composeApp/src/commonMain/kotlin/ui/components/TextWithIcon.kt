@@ -23,7 +23,11 @@ import com.seiko.imageloader.rememberImagePainter
 import misc.bodyFontSize
 
 @Composable
-fun TextWithIcon(changelog: String, iconName: String, iconLink: String) {
+fun TextWithIcon(
+    changelog: String,
+    iconName: String,
+    iconLink: String
+) {
     val painter = rememberImagePainter(iconLink)
     val content = remember { mutableStateOf("") }
     content.value = changelog

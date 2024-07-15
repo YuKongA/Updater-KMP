@@ -2,63 +2,29 @@ package data
 
 object DeviceInfoHelper {
 
-    data class Android(val androidNumericCode: String, val androidLetterCode: String)
+    data class Android(
+        val androidNumericCode: String,
+        val androidLetterCode: String
+    )
 
     data class Region(
-        val regionNameExt: String, val regionCode: String, val regionName: String = regionCode
+        val regionNameExt: String,
+        val regionCode: String,
+        val regionName: String = regionCode
     )
 
-    data class Device(val deviceName: String, val codeName: String, val deviceCode: String)
-
-    private const val XIAOMI = "XM"
-
-    private val androidV = Android("15.0", "V")
-    private val androidU = Android("14.0", "U")
-    private val androidT = Android("13.0", "T")
-    private val androidS = Android("12.0", "S")
-    private val androidR = Android("11.0", "R")
-    private val androidQ = Android("10.0", "Q")
-    private val androidP = Android("9.0", "P")
-    private val androidOMr1 = Android("8.1", "O")
-    private val androidO = Android("8.0", "O")
-    private val androidNMr1 = Android("7.1", "N")
-    private val androidN = Android("7.0", "N")
-    private val androidM = Android("6.0", "M")
-    private val androidLMr1 = Android("5.1", "L")
-    private val androidL = Android("5.0", "L")
-    private val androidK = Android("4.4", "K")
-
-    private val androidList = listOf(
-        androidV,
-        androidU,
-        androidT,
-        androidS,
-        androidR,
-        androidQ,
-        androidP,
-        androidOMr1,
-        androidO,
-        androidNMr1,
-        androidN,
-        androidM,
-        androidLMr1,
-        androidL,
-        androidK
+    data class Device(
+        val deviceName: String,
+        val codeName: String,
+        val deviceCode: String
     )
 
-    private val CN = Region("", "CN")
-    private val GL = Region("_global", "MI", "GL")
-    private val EEA = Region("_eea_global", "EU", "EEA")
-    private val RU = Region("_ru_global", "RU")
-    private val TW = Region("_tw_global", "TW")
-    private val ID = Region("_id_global", "ID")
-    private val TR = Region("_tr_global", "TR")
-    private val IN = Region("_in_global", "IN")
-    private val JP = Region("_jp_global", "JP")
-    private val KR = Region("_kr_global", "KR")
-
-    private val regionList = listOf(CN, GL, EEA, RU, TW, ID, TR, IN, JP, KR)
-
+    /**
+     * List of Xiaomi devices.
+     *
+     * For auto-completion of device designators and system version suffixes.
+     *
+     */
     private val deviceList = listOf(
         Device("Redmi K30 4G", "phoenix", "GH"),
         Device("POCO X2", "phoenixin", "GH"),
@@ -203,6 +169,55 @@ object DeviceInfoHelper {
         Device("Redmi Pad Pro 5G", "ruan", "FS"),
         Device("Redmi Note 13R / POCO M6 Plus", "breeze", "NU")
     )
+
+    private const val XIAOMI = "XM"
+
+    private val androidV = Android("15.0", "V")
+    private val androidU = Android("14.0", "U")
+    private val androidT = Android("13.0", "T")
+    private val androidS = Android("12.0", "S")
+    private val androidR = Android("11.0", "R")
+    private val androidQ = Android("10.0", "Q")
+    private val androidP = Android("9.0", "P")
+    private val androidOMr1 = Android("8.1", "O")
+    private val androidO = Android("8.0", "O")
+    private val androidNMr1 = Android("7.1", "N")
+    private val androidN = Android("7.0", "N")
+    private val androidM = Android("6.0", "M")
+    private val androidLMr1 = Android("5.1", "L")
+    private val androidL = Android("5.0", "L")
+    private val androidK = Android("4.4", "K")
+
+    private val androidList = listOf(
+        androidV,
+        androidU,
+        androidT,
+        androidS,
+        androidR,
+        androidQ,
+        androidP,
+        androidOMr1,
+        androidO,
+        androidNMr1,
+        androidN,
+        androidM,
+        androidLMr1,
+        androidL,
+        androidK
+    )
+
+    private val CN = Region("", "CN")
+    private val GL = Region("_global", "MI", "GL")
+    private val EEA = Region("_eea_global", "EU", "EEA")
+    private val RU = Region("_ru_global", "RU")
+    private val TW = Region("_tw_global", "TW")
+    private val ID = Region("_id_global", "ID")
+    private val TR = Region("_tr_global", "TR")
+    private val IN = Region("_in_global", "IN")
+    private val JP = Region("_jp_global", "JP")
+    private val KR = Region("_kr_global", "KR")
+
+    private val regionList = listOf(CN, GL, EEA, RU, TW, ID, TR, IN, JP, KR)
 
     val deviceNames = deviceList.map { it.deviceName }
 

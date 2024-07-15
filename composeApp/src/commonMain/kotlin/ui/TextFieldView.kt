@@ -44,11 +44,13 @@ fun TextFieldViews(
     deviceName: MutableState<String>,
     codeName: MutableState<String>,
     deviceRegion: MutableState<String>,
+    androidVersion: MutableState<String>,
     systemVersion: MutableState<String>,
-    androidVersion: MutableState<String>
+    updateRomInfo: MutableState<Int>
 ) {
     val deviceNameFlow = MutableStateFlow(deviceName.value)
     val codeNameFlow = MutableStateFlow(codeName.value)
+
     val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
 
@@ -97,6 +99,12 @@ fun TextFieldViews(
             label = stringResource(Res.string.regions_code),
             leadingIcon = Icons.Outlined.TravelExplore
         )
+        TextFieldWithDropdown(
+            text = androidVersion,
+            items = DeviceInfoHelper.androidVersions,
+            label = stringResource(Res.string.android_version),
+            leadingIcon = Icons.Outlined.Android
+        )
         OutlinedTextField(
             value = systemVersion.value,
             onValueChange = { systemVersion.value = it },
@@ -105,14 +113,11 @@ fun TextFieldViews(
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
-        )
-        TextFieldWithDropdown(
-            text = androidVersion,
-            items = DeviceInfoHelper.androidVersions,
-            label = stringResource(Res.string.android_version),
-            leadingIcon = Icons.Outlined.Android
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            keyboardActions = KeyboardActions(onSearch = {
+                focusManager.clearFocus()
+                updateRomInfo.value++
+            })
         )
     }
 }

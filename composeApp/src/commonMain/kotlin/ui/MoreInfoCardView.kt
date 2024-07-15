@@ -100,7 +100,6 @@ fun MoreTextView(
     }
 }
 
-
 @Composable
 fun ChangelogView(
     iconInfo: MutableState<List<DataHelper.IconInfoData>>,

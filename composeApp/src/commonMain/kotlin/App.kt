@@ -5,19 +5,28 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -31,15 +40,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import data.DataHelper
 import misc.MessageUtils.Companion.Snackbar
 import misc.json
+import misc.updateRomInfo
 import org.jetbrains.compose.resources.stringResource
 import ui.AboutDialog
 import ui.DownloadCardViews
@@ -48,9 +62,9 @@ import ui.LoginDialog
 import ui.MessageCardViews
 import ui.MoreInfoCardViews
 import ui.TextFieldViews
-import ui.components.FloatActionButton
 import updaterkmp.composeapp.generated.resources.Res
 import updaterkmp.composeapp.generated.resources.app_name
+import updaterkmp.composeapp.generated.resources.submit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,17 +72,19 @@ fun App() {
     val deviceName = remember { mutableStateOf(perfGet("deviceName") ?: "") }
     val codeName = remember { mutableStateOf(perfGet("codeName") ?: "") }
     val deviceRegion = remember { mutableStateOf(perfGet("deviceRegion") ?: "") }
-    val systemVersion = remember { mutableStateOf(perfGet("systemVersion") ?: "") }
     val androidVersion = remember { mutableStateOf(perfGet("androidVersion") ?: "") }
+    val systemVersion = remember { mutableStateOf(perfGet("systemVersion") ?: "") }
 
-    val loginInfo = perfGet("loginInfo")?.let { json.decodeFromString<DataHelper.LoginData>(it) }
-    val isLogin = remember { mutableStateOf(loginInfo?.authResult?.toInt() ?: 0) }
+    val loginData = perfGet("loginInfo")?.let { json.decodeFromString<DataHelper.LoginData>(it) }
+    val isLogin = remember { mutableStateOf(loginData?.authResult?.toInt() ?: 0) }
 
     val curRomInfo = remember { mutableStateOf(DataHelper.RomInfoData()) }
     val incRomInfo = remember { mutableStateOf(DataHelper.RomInfoData()) }
 
     val curIconInfo: MutableState<List<DataHelper.IconInfoData>> = remember { mutableStateOf(listOf()) }
     val incIconInfo: MutableState<List<DataHelper.IconInfoData>> = remember { mutableStateOf(listOf()) }
+
+    val updateRomInfo = remember { mutableStateOf(0) }
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
@@ -130,7 +146,7 @@ fun App() {
                                     modifier = Modifier.navigationBarsPadding()
                                 ) {
                                     LoginCardView(isLogin)
-                                    TextFieldViews(deviceName, codeName, deviceRegion, systemVersion, androidVersion)
+                                    TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
                                     MessageCardViews(curRomInfo)
                                     MoreInfoCardViews(curRomInfo, curIconInfo)
                                     DownloadCardViews(curRomInfo)
@@ -145,7 +161,7 @@ fun App() {
                                     Row {
                                         Column(modifier = Modifier.weight(0.8f).padding(end = 20.dp)) {
                                             LoginCardView(isLogin)
-                                            TextFieldViews(deviceName, codeName, deviceRegion, systemVersion, androidVersion)
+                                            TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
                                         }
                                         Column(modifier = Modifier.weight(1.0f)) {
                                             MessageCardViews(curRomInfo)
@@ -161,11 +177,12 @@ fun App() {
                         }
                     }
                 }
-                FloatActionButton(
-                    offsetHeight, deviceName, codeName, deviceRegion, systemVersion,
-                    androidVersion, curRomInfo, incRomInfo, curIconInfo, incIconInfo, isLogin
+                FloatActionButton(offsetHeight, updateRomInfo)
+                Snackbar(offsetHeight)
+                updateRomInfo(
+                    deviceName, codeName, deviceRegion, androidVersion, systemVersion, loginData,
+                    isLogin, curRomInfo, incRomInfo, curIconInfo, incIconInfo, updateRomInfo
                 )
-                Snackbar(offsetY = offsetHeight)
             }
         }
     }
@@ -183,18 +200,45 @@ private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, isLogin: MutableS
             )
         },
         colors = TopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            actionIconContentColor = MaterialTheme.colorScheme.onBackground,
-            navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
-            titleContentColor = MaterialTheme.colorScheme.onBackground,
-            scrolledContainerColor = MaterialTheme.colorScheme.background,
+            containerColor = TopAppBarDefaults.topAppBarColors().containerColor,
+            scrolledContainerColor = TopAppBarDefaults.topAppBarColors().containerColor,
+            actionIconContentColor = TopAppBarDefaults.topAppBarColors().actionIconContentColor,
+            navigationIconContentColor = TopAppBarDefaults.topAppBarColors().navigationIconContentColor,
+            titleContentColor = TopAppBarDefaults.topAppBarColors().titleContentColor
         ),
-        navigationIcon = {
-            AboutDialog()
-        },
-        actions = {
-            LoginDialog(isLogin)
-        },
+        navigationIcon = { AboutDialog() },
+        actions = { LoginDialog(isLogin) },
         scrollBehavior = scrollBehavior
     )
+}
+
+@Composable
+fun FloatActionButton(fabOffsetHeight: Dp, updateRomInfo: MutableState<Int>) {
+    val hapticFeedback = LocalHapticFeedback.current
+
+    Box(
+        modifier = Modifier.fillMaxSize().systemBarsPadding().padding(18.dp),
+        contentAlignment = Alignment.BottomEnd
+    ) {
+        ExtendedFloatingActionButton(
+            modifier = Modifier.offset(y = fabOffsetHeight),
+            onClick = {
+                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                updateRomInfo.value++
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Check,
+                contentDescription = null,
+                modifier = Modifier.height(20.dp)
+            )
+            Spacer(
+                modifier = Modifier.width(8.dp)
+            )
+            Text(
+                text = stringResource(Res.string.submit),
+                modifier = Modifier.height(20.dp)
+            )
+        }
+    }
 }
