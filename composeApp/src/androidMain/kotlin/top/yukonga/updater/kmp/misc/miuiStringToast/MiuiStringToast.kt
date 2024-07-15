@@ -16,7 +16,7 @@ import top.yukonga.updater.kmp.misc.miuiStringToast.data.TextParams
 object MiuiStringToast {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @SuppressLint("WrongConstant")
-    fun showStringToast(context: Context, text: String) {
+    fun showStringToast(context: Context, text: String, duration: Long) {
         val textParams = TextParams(text, Color.parseColor("#FFFFFFFF"))
         val left = Left(textParams = textParams)
         val iconParams = IconParams(Category.DRAWABLE, FileType.SVG, "ic_app_icon", 1)
@@ -26,6 +26,7 @@ object MiuiStringToast {
         val bundle = StringToastBundle.Builder()
             .setPackageName("top.yukonga.updater.kmp")
             .setStrongToastCategory(StrongToastCategory.TEXT_BITMAP)
+            .setDuration(duration)
             .setParam(jsonStr)
             .onCreate()
         val service = context.getSystemService(Context.STATUS_BAR_SERVICE)

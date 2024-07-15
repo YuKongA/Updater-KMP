@@ -1,2 +1,2 @@
 expect fun useToast(): Boolean
-expect fun showToast(message: String, duration: Int)
+expect fun showToast(message: String, duration: Long)

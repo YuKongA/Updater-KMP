@@ -1,2 +1,2 @@
 actual fun useToast(): Boolean = false
-actual fun showToast(message: String, duration: Int) {}
+actual fun showToast(message: String, duration: Long) {}

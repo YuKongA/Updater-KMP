@@ -35,7 +35,7 @@ class MessageUtils {
 
         fun showMessage(message: String, duration: Long = 1000L) {
             if (useToast()) {
-                showToast(message, duration.toInt())
+                showToast(message, duration)
             } else {
                 snackbarCoroutineJob?.cancel()
                 snackbarMessage.value = message
