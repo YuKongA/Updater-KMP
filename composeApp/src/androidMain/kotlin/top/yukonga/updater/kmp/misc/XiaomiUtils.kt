@@ -10,7 +10,7 @@ object XiaomiUtils {
     fun isXiaomiFamily(): Boolean = isDeviceType("Xiaomi", "Redmi", "POCO")
 
     fun isRunningMiui(): Boolean {
-        val list = listOf("persist.miui.density_v2", "ro.miui.ui.version.code", "ro.miui.ui.version.name")
+        val list = listOf("ro.miui.ui.version.code", "ro.miui.ui.version.name")
         return isXiaomiFamily() && PropUtils.getProps(list).all { it.value.isNotEmpty() }
     }
 
