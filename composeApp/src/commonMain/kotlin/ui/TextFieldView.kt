@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Analytics
 import androidx.compose.material.icons.outlined.Android
@@ -21,6 +23,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import data.DeviceInfoHelper
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,6 +50,7 @@ fun TextFieldViews(
     val deviceNameFlow = MutableStateFlow(deviceName.value)
     val codeNameFlow = MutableStateFlow(codeName.value)
     val coroutineScope = rememberCoroutineScope()
+    val focusManager = LocalFocusManager.current
 
     coroutineScope.launch {
         deviceNameFlow.collect { newValue ->
@@ -99,7 +104,9 @@ fun TextFieldViews(
             leadingIcon = { Icon(imageVector = Icons.Outlined.Analytics, null) },
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
         )
         TextFieldWithDropdown(
             text = androidVersion,

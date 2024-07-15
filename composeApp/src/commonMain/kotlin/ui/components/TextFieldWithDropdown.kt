@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 
@@ -36,6 +37,7 @@ fun TextFieldWithDropdown(
     var isDropdownExpanded by remember { mutableStateOf(false) }
 
     val hapticFeedback = LocalHapticFeedback.current
+    val focusManager = LocalFocusManager.current
 
     ExposedDropdownMenuBox(
         expanded = isDropdownExpanded,
@@ -53,7 +55,7 @@ fun TextFieldWithDropdown(
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier.menuAnchor(type = PrimaryNotEditable, enabled = true).fillMaxWidth(),
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(isDropdownExpanded) },
-            leadingIcon = { Icon(imageVector = leadingIcon, null) },
+            leadingIcon = { Icon(imageVector = leadingIcon, null) }
         )
         ExposedDropdownMenu(
             modifier = Modifier.exposedDropdownSize().heightIn(max = 250.dp),
@@ -69,6 +71,7 @@ fun TextFieldWithDropdown(
                         text.value = item
                         isDropdownExpanded = false
                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                        focusManager.clearFocus()
                     }
                 )
             }
