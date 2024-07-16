@@ -14,9 +14,10 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-version = "1.3.0"
 val appName = "Updater"
 val pkgName = "top.yukonga.updater.kmp"
+val verName = "1.3.0"
+val verCode = getVersionCode()
 val xcf = XCFramework(appName + "Framework")
 
 kotlin {
@@ -82,8 +83,8 @@ android {
         applicationId = pkgName
         minSdk = 26
         targetSdk = 35
-        versionCode = getVersionCode()
-        versionName = version.toString()
+        versionCode = verCode
+        versionName = verName
     }
     val properties = Properties()
     runCatching { properties.load(project.rootProject.file("local.properties").inputStream()) }
@@ -122,7 +123,7 @@ android {
     packaging {
         applicationVariants.all {
             outputs.all {
-                (this as BaseVariantOutputImpl).outputFileName = "$appName-$versionName($versionCode)-$name.apk"
+                (this as BaseVariantOutputImpl).outputFileName = "$appName-v$versionName($versionCode)-$name.apk"
             }
         }
         resources.excludes += "**"
@@ -141,7 +142,7 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
 
             packageName = appName
-            packageVersion = version.toString()
+            packageVersion = verName
             description = "Get HyperOS/MIUI recovery ROM update info"
             copyright = "Copyright © 2024 YuKongA, AkaneTan"
 
@@ -174,4 +175,24 @@ fun getVersionCode(): Int {
     val commitCount = getGitCommitCount()
     val major = 5
     return major + commitCount
+}
+
+val generateVersionInfo by tasks.registering {
+    doLast {
+        val file = file("src/commonMain/kotlin/misc/VersionInfo.kt")
+        file.writeText(
+            """
+            package misc
+            
+            object VersionInfo {
+                const val VERSION_NAME = "$verName"
+                const val VERSION_CODE = $verCode
+            }
+        """.trimIndent()
+        )
+    }
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    dependsOn(generateVersionInfo)
 }

@@ -39,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import isSupportMiuiStringToast
+import misc.VersionInfo
 import org.jetbrains.compose.resources.stringResource
 import perfGet
 import perfSet
@@ -47,8 +48,6 @@ import updaterkmp.composeapp.generated.resources.app_name
 import updaterkmp.composeapp.generated.resources.join_group
 import updaterkmp.composeapp.generated.resources.opensource_info
 import updaterkmp.composeapp.generated.resources.view_source
-
-const val version = "v1.3.0"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -113,7 +112,7 @@ fun AboutDialog() {
                                 fontWeight = FontWeight.SemiBold
                             )
                             Text(
-                                text = version,
+                                text = VersionInfo.VERSION_NAME + " (" + VersionInfo.VERSION_CODE + ")",
                                 fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                             )
                         }
