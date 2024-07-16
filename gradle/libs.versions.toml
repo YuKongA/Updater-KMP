@@ -1,7 +1,7 @@
 [versions]
 androidGradlePlugin = "8.5.1"
 androidx-activity-compose = "1.9.0"
-compose-plugin = "1.7.0-alpha01"
+compose-plugin = "1.7.0-dev1730"
 cryptography = "0.3.1"
 hiddenapibypass = "4.3"
 image-loader = "1.8.1"
