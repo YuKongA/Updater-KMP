@@ -16,6 +16,7 @@ When you are not logged in with a Xiaomi account, you can use the miotaV3-v1 int
 After logging in to your Xiaomi account, you will use the miotaV3-v2 interface to obtain detailed information about the `Beta Release Version` or the `Public Development Version`, corresponding to the internal test permissions you have.
 
 ## Credits:
+- [AndroidHiddenApiBypass](https://github.com/LSPosed/AndroidHiddenApiBypass) with Apache-2.0 license
 - [compose-imageloader](https://github.com/qdsfdhvh/compose-imageloader) with MIT License
 - [compose-multiplatform](https://github.com/JetBrains/compose-multiplatform) with Apache-2.0 license
 - [cryptography-kotlin](https://github.com/whyoleg/cryptography-kotlin) with Apache-2.0 license
