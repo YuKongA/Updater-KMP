@@ -1,9 +1,9 @@
-package top.yukonga.updater.kmp.misc.miuiStringToast.data
+package top.yukonga.updater.kmp.misc.miuiStrongToast.data
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class StringToastBean(
+data class StrongToastBean(
     var left: Left? = null,
     var right: Right? = null
 )

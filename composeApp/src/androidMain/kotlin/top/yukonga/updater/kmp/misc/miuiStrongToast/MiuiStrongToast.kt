@@ -1,4 +1,4 @@
-package top.yukonga.updater.kmp.misc.miuiStringToast
+package top.yukonga.updater.kmp.misc.miuiStrongToast
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -7,23 +7,23 @@ import android.os.Build
 import android.os.Bundle
 import androidx.annotation.RequiresApi
 import kotlinx.serialization.json.Json
-import top.yukonga.updater.kmp.misc.miuiStringToast.data.IconParams
-import top.yukonga.updater.kmp.misc.miuiStringToast.data.Left
-import top.yukonga.updater.kmp.misc.miuiStringToast.data.Right
-import top.yukonga.updater.kmp.misc.miuiStringToast.data.StringToastBean
-import top.yukonga.updater.kmp.misc.miuiStringToast.data.TextParams
+import top.yukonga.updater.kmp.misc.miuiStrongToast.data.IconParams
+import top.yukonga.updater.kmp.misc.miuiStrongToast.data.Left
+import top.yukonga.updater.kmp.misc.miuiStrongToast.data.Right
+import top.yukonga.updater.kmp.misc.miuiStrongToast.data.StrongToastBean
+import top.yukonga.updater.kmp.misc.miuiStrongToast.data.TextParams
 
-object MiuiStringToast {
+object MiuiStrongToast {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @SuppressLint("WrongConstant")
-    fun showStringToast(context: Context, text: String, duration: Long) {
+    fun showStrongToast(context: Context, text: String, duration: Long) {
         val textParams = TextParams(text, Color.parseColor("#FFFFFFFF"))
         val left = Left(textParams = textParams)
         val iconParams = IconParams(Category.DRAWABLE, FileType.SVG, "ic_app_icon", 1)
         val right = Right(iconParams = iconParams)
-        val stringToastBean = StringToastBean(left, right)
-        val jsonStr = Json.encodeToString(StringToastBean.serializer(), stringToastBean)
-        val bundle = StringToastBundle.Builder()
+        val strongToastBean = StrongToastBean(left, right)
+        val jsonStr = Json.encodeToString(StrongToastBean.serializer(), strongToastBean)
+        val bundle = StrongToastBundle.Builder()
             .setPackageName("top.yukonga.updater.kmp")
             .setStrongToastCategory(StrongToastCategory.TEXT_BITMAP)
             .setDuration(duration)

@@ -37,7 +37,7 @@ class MessageUtils {
 
         fun showMessage(message: String, duration: Long = 1000L) {
             if (useToast()) {
-                if (perfGet("isUseMiuiStringToast") == "true") {
+                if (perfGet("isUseMiuiStrongToast") == "true") {
                     showExtToast(message, duration)
                 } else {
                     showToast(message, duration)

@@ -36,7 +36,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import isSupportMiuiStringToast
+import isSupportMiuiStrongToast
 import perfGet
 import perfSet
 
@@ -94,23 +94,23 @@ fun TuneDialog(
 
 @Composable
 fun miuiStrongToast() {
-    if (isSupportMiuiStringToast()) {
-        var isUseMiuiStringToast by remember { mutableStateOf(perfGet("isUseMiuiStringToast") == "true") }
+    if (isSupportMiuiStrongToast()) {
+        var isUseMiuiStrongToast by remember { mutableStateOf(perfGet("isUseMiuiStrongToast") == "true") }
         Row(
             modifier = Modifier.padding(bottom = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = "MiuiStringToast",
+                text = "MiuiStrongToast",
                 fontWeight = FontWeight.SemiBold,
                 fontSize = MaterialTheme.typography.bodyMedium.fontSize
             )
             Switch(
-                checked = isUseMiuiStringToast,
+                checked = isUseMiuiStrongToast,
                 onCheckedChange = {
-                    isUseMiuiStringToast = it
-                    perfSet("isUseMiuiStringToast", it.toString())
+                    isUseMiuiStrongToast = it
+                    perfSet("isUseMiuiStrongToast", it.toString())
                 }
             )
         }
