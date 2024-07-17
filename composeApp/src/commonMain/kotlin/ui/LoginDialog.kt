@@ -81,7 +81,7 @@ fun LoginDialog(
     var global by rememberSaveable { mutableStateOf(false) }
     var savePassword by rememberSaveable { mutableStateOf(perfGet("savePassword") ?: "0") }
     var showDialog by remember { mutableStateOf(false) }
-    
+
     val hapticFeedback = LocalHapticFeedback.current
 
     val icon = when (isLogin.value) {
