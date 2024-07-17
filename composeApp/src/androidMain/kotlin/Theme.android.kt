@@ -1,23 +1,29 @@
 import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import top.yukonga.updater.kmp.AndroidAppContext
 
-@Composable
-actual fun platformColor(): ColorScheme? {
-    val darkTheme = isSystemInDarkTheme()
+actual fun platformDarkColor(): ColorScheme {
     return when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            val context = AndroidAppContext.getApplicationContext()
+            dynamicDarkColorScheme(context!!)
         }
 
-        darkTheme -> darkColorScheme()
+        else -> darkColorScheme()
+    }
+}
+
+actual fun platformLightColor(): ColorScheme {
+    return when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            val context = AndroidAppContext.getApplicationContext()
+            dynamicLightColorScheme(context!!)
+        }
+
         else -> lightColorScheme()
     }
 }

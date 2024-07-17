@@ -1,6 +1,5 @@
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -14,11 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -29,6 +25,7 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
@@ -62,13 +59,16 @@ import ui.LoginDialog
 import ui.MessageCardViews
 import ui.MoreInfoCardViews
 import ui.TextFieldViews
+import ui.TuneDialog
 import updaterkmp.composeapp.generated.resources.Res
 import updaterkmp.composeapp.generated.resources.app_name
 import updaterkmp.composeapp.generated.resources.submit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun App() {
+fun App(
+    colorMode: MutableState<Int> = remember { mutableStateOf(perfGet("colorMode")?.toInt() ?: 0) }
+) {
     val deviceName = remember { mutableStateOf(perfGet("deviceName") ?: "") }
     val codeName = remember { mutableStateOf(perfGet("codeName") ?: "") }
     val deviceRegion = remember { mutableStateOf(perfGet("deviceRegion") ?: "") }
@@ -119,70 +119,68 @@ fun App() {
         animationSpec = tween(durationMillis = 350)
     )
 
-    AppTheme {
-        Scaffold(
-            modifier = Modifier.fillMaxSize()
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .background(MaterialTheme.colorScheme.background)
-                .windowInsetsPadding(WindowInsets.statusBars)
-                .displayCutoutPadding(),
-            topBar = {
-                TopAppBar(scrollBehavior, isLogin)
-            }
-        ) { padding ->
-            Box(
-                modifier = Modifier.nestedScroll(nestedScrollConnection)
+    AppTheme(colorMode = colorMode.value) {
+        Surface {
+            Scaffold(
+                modifier = Modifier
+                    .displayCutoutPadding()
+                    .nestedScroll(scrollBehavior.nestedScrollConnection),
+                topBar = {
+                    TopAppBar(scrollBehavior, colorMode, isLogin)
+                }
             ) {
-                LazyColumn(
-                    state = listState,
-                    modifier = Modifier
-                        .padding(top = padding.calculateTopPadding())
-                        .padding(horizontal = 20.dp)
+                Box(
+                    modifier = Modifier.nestedScroll(nestedScrollConnection)
                 ) {
-                    item {
-                        BoxWithConstraints {
-                            if (maxWidth < 768.dp) {
-                                Column(
-                                    modifier = Modifier.navigationBarsPadding()
-                                ) {
-                                    LoginCardView(isLogin)
-                                    TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
-                                    MessageCardViews(curRomInfo)
-                                    MoreInfoCardViews(curRomInfo, curIconInfo)
-                                    DownloadCardViews(curRomInfo)
-                                    MessageCardViews(incRomInfo)
-                                    MoreInfoCardViews(incRomInfo, incIconInfo)
-                                    DownloadCardViews(incRomInfo)
-                                }
-                            } else {
-                                Column(
-                                    modifier = Modifier.navigationBarsPadding()
-                                ) {
-                                    Row {
-                                        Column(modifier = Modifier.weight(0.8f).padding(end = 20.dp)) {
-                                            LoginCardView(isLogin)
-                                            TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
-                                        }
-                                        Column(modifier = Modifier.weight(1.0f)) {
-                                            MessageCardViews(curRomInfo)
-                                            MoreInfoCardViews(curRomInfo, curIconInfo)
-                                            DownloadCardViews(curRomInfo)
-                                            MessageCardViews(incRomInfo)
-                                            MoreInfoCardViews(incRomInfo, incIconInfo)
-                                            DownloadCardViews(incRomInfo)
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier
+                            .padding(top = it.calculateTopPadding())
+                            .padding(horizontal = 20.dp)
+                    ) {
+                        item {
+                            BoxWithConstraints(
+                                modifier = Modifier.navigationBarsPadding()
+                            ) {
+                                if (maxWidth < 768.dp) {
+                                    Column {
+                                        LoginCardView(isLogin)
+                                        TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
+                                        MessageCardViews(curRomInfo)
+                                        MoreInfoCardViews(curRomInfo, curIconInfo)
+                                        DownloadCardViews(curRomInfo)
+                                        MessageCardViews(incRomInfo)
+                                        MoreInfoCardViews(incRomInfo, incIconInfo)
+                                        DownloadCardViews(incRomInfo)
+                                    }
+                                } else {
+                                    Column {
+                                        Row {
+                                            Column(modifier = Modifier.weight(0.8f).padding(end = 20.dp)) {
+                                                LoginCardView(isLogin)
+                                                TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
+                                            }
+                                            Column(modifier = Modifier.weight(1.0f)) {
+                                                MessageCardViews(curRomInfo)
+                                                MoreInfoCardViews(curRomInfo, curIconInfo)
+                                                DownloadCardViews(curRomInfo)
+                                                MessageCardViews(incRomInfo)
+                                                MoreInfoCardViews(incRomInfo, incIconInfo)
+                                                DownloadCardViews(incRomInfo)
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
+                    FloatActionButton(offsetHeight, updateRomInfo)
+                    Snackbar(offsetHeight)
+                    updateRomInfo(
+                        deviceName, codeName, deviceRegion, androidVersion, systemVersion, loginData,
+                        isLogin, curRomInfo, incRomInfo, curIconInfo, incIconInfo, updateRomInfo
+                    )
                 }
-                FloatActionButton(offsetHeight, updateRomInfo)
-                Snackbar(offsetHeight)
-                updateRomInfo(
-                    deviceName, codeName, deviceRegion, androidVersion, systemVersion, loginData,
-                    isLogin, curRomInfo, incRomInfo, curIconInfo, incIconInfo, updateRomInfo
-                )
             }
         }
     }
@@ -190,7 +188,7 @@ fun App() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, isLogin: MutableState<Int>) {
+private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, colorMode: MutableState<Int>, isLogin: MutableState<Int>) {
     CenterAlignedTopAppBar(
         title = {
             Text(
@@ -206,8 +204,13 @@ private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, isLogin: MutableS
             navigationIconContentColor = TopAppBarDefaults.topAppBarColors().navigationIconContentColor,
             titleContentColor = TopAppBarDefaults.topAppBarColors().titleContentColor
         ),
-        navigationIcon = { AboutDialog() },
-        actions = { LoginDialog(isLogin) },
+        navigationIcon = {
+            AboutDialog()
+        },
+        actions = {
+            TuneDialog(colorMode)
+            LoginDialog(isLogin)
+        },
         scrollBehavior = scrollBehavior
     )
 }
@@ -217,7 +220,7 @@ fun FloatActionButton(fabOffsetHeight: Dp, updateRomInfo: MutableState<Int>) {
     val hapticFeedback = LocalHapticFeedback.current
 
     Box(
-        modifier = Modifier.fillMaxSize().systemBarsPadding().padding(18.dp),
+        modifier = Modifier.fillMaxSize().navigationBarsPadding().padding(18.dp),
         contentAlignment = Alignment.BottomEnd
     ) {
         ExtendedFloatingActionButton(
