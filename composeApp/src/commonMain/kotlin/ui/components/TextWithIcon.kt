@@ -28,7 +28,7 @@ fun TextWithIcon(
     iconName: String,
     iconLink: String
 ) {
-    val painter = rememberImagePainter(iconLink)
+    val imagePainter = rememberImagePainter(iconLink)
     val content = remember { mutableStateOf("") }
     content.value = changelog
 
@@ -45,7 +45,7 @@ fun TextWithIcon(
             ) {
                 Image(
                     modifier = Modifier.size(20.dp),
-                    painter = painter,
+                    painter = imagePainter,
                     contentDescription = null,
                 )
                 Text(

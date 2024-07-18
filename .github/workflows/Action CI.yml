@@ -25,10 +25,10 @@ jobs:
       - name: Build Windows platform
         run: ./gradlew createReleaseDistributable
 
-      - name: Upload UpdaterKMP windows-x86_64-exe
+      - name: Upload Updater windows-x86_64-exe
         uses: actions/upload-artifact@v4
         with:
-          name: UpdaterKMP-windows-x86_64-exe
+          name: Updater-windows-x86_64-exe
           path: composeApp/build/compose/binaries/main-release/app/Updater
           compression-level: 9
 
@@ -50,10 +50,10 @@ jobs:
       - name: Build Darwin platform
         run: ./gradlew packageReleaseDistributionForCurrentOS
 
-      - name: Upload UpdaterKMP darwin-aarch64-dmg
+      - name: Upload Updater darwin-aarch64-dmg
         uses: actions/upload-artifact@v4
         with:
-          name: UpdaterKMP-darwin-aarch64-dmg
+          name: Updater-darwin-aarch64-dmg
           path: composeApp/build/compose/binaries/main-release/dmg
           compression-level: 9
 
@@ -82,10 +82,10 @@ jobs:
           KEY_ALIAS: ${{ secrets.ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
-      - name: Upload UpdaterKMP android-aarch64-apk
+      - name: Upload Updater android-aarch64-apk
         uses: actions/upload-artifact@v4
         with:
-          name: UpdaterKMP-android-aarch64-apk
+          name: Updater-android-aarch64-apk
           path: composeApp/build/outputs/apk/release
           compression-level: 9
 
@@ -94,17 +94,17 @@ jobs:
           bash ./gradlew packageReleaseDistributionForCurrentOS
           bash ./gradlew createReleaseDistributable
 
-      - name: Upload UpdaterKMP linux-x86_64-deb
+      - name: Upload Updater linux-x86_64-deb
         uses: actions/upload-artifact@v4
         with:
-          name: UpdaterKMP-linux-x86_64-deb
+          name: Updater-linux-x86_64-deb
           path: composeApp/build/compose/binaries/main-release/deb
           compression-level: 9
 
-      - name: Upload UpdaterKMP linux-x86_64-other
+      - name: Upload Updater linux-x86_64-other
         uses: actions/upload-artifact@v4
         with:
-          name: UpdaterKMP-linux-x86_64-other
+          name: Updater-linux-x86_64-other
           path: composeApp/build/compose/binaries/main-release/app/Updater
           compression-level: 9
 

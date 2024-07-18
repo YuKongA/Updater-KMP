@@ -45,11 +45,10 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             // Added
-            implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.kotlinx.serialization.json)
             implementation(libs.cryptography.core)
-            implementation(libs.ktor.client.core)
             implementation(libs.image.loader)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.ktor.client.core)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
@@ -110,7 +109,7 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             vcsInfo.include = false
-            proguardFiles("proguard-rules.pro")
+            proguardFiles("proguard-rules-android.pro")
             androidResources.ignoreAssetsPattern = "icon.png"
             if (keystorePath != null) signingConfig = signingConfigs.getByName("release")
         }
@@ -135,7 +134,7 @@ compose.desktop {
         mainClass = "MainKt"
 
         buildTypes.release.proguard {
-            configurationFiles.from("proguard-rules.pro")
+            configurationFiles.from("proguard-rules-jvm.pro")
         }
 
         nativeDistributions {
