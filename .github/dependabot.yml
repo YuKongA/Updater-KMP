@@ -9,16 +9,8 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-    groups:
-      maven-dependencies:
-        patterns:
-          - "*"
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
-    groups:
-      action-dependencies:
-        patterns:
-          - "*"
