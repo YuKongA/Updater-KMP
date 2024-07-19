@@ -1,6 +1,7 @@
 import androidx.compose.runtime.MutableState
 import data.DataHelper
 import io.ktor.client.call.body
+import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.post
 import io.ktor.http.ContentType
 import io.ktor.http.Parameters
@@ -106,11 +107,11 @@ suspend fun getRecoveryRomInfo(
         append("q", encryptedText)
         append("t", serviceToken)
         append("s", port)
-    }.formUrlEncode()
+    }
     val recoveryUrl = if (accountType == "GL") INTL_RECOVERY_URL else CN_RECOVERY_URL
     try {
         val response = client.post(recoveryUrl) {
-            body = TextContent(parameters, ContentType.Application.FormUrlEncoded)
+            body = FormDataContent(parameters)
         }
         val requestedEncryptedText = response.body<String>()
         client.close()

@@ -2,6 +2,7 @@
 
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import java.io.ByteArrayOutputStream
@@ -23,12 +24,12 @@ val xcf = XCFramework(appName + "Framework")
 
 kotlin {
 
-   @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+   @OptIn(ExperimentalWasmDsl::class)
    wasmJs {
-        moduleName = "composeApp"
+        moduleName = "Updater"
         browser {
             commonWebpackConfig {
-                outputFileName = "composeApp.js"
+                outputFileName = "Updater.js"
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                     static = (static ?: mutableListOf()).apply {
                         // Serve sources to debug inside browser
@@ -84,6 +85,7 @@ kotlin {
         wasmJsMain.dependencies {
             // Added
             implementation(libs.cryptography.provider.webcrypto)
+            implementation(libs.ktor.client.js)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
