@@ -8,7 +8,7 @@ import io.ktor.client.request.post
 import io.ktor.client.statement.request
 import io.ktor.http.ContentType
 import io.ktor.http.content.TextContent
-import io.ktor.util.InternalAPI
+import io.ktor.utils.io.InternalAPI
 import kotlinx.serialization.encodeToString
 import misc.json
 

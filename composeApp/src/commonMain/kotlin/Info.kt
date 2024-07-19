@@ -6,7 +6,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.Parameters
 import io.ktor.http.content.TextContent
 import io.ktor.http.formUrlEncode
-import io.ktor.util.InternalAPI
+import io.ktor.utils.io.InternalAPI
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import misc.json

@@ -7,7 +7,7 @@ hiddenapibypass = "4.3"
 image-loader = "1.8.2"
 kotlin = "2.0.0"
 kotlinx-serialization-json = "1.7.1"
-ktor-client = "2.3.12"
+ktor-client = "3.0.0-beta-2"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
