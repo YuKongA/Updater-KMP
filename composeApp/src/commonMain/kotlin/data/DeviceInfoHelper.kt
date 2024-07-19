@@ -167,7 +167,10 @@ object DeviceInfoHelper {
         Device("Xiaomi Pad 6S Pro", "sheng", "NX"),
         Device("Redmi Pad Pro", "dizi", "NS"),
         Device("Redmi Pad Pro 5G", "ruan", "FS"),
-        Device("Redmi Note 13R / POCO M6 Plus", "breeze", "NU")
+        Device("Redmi Note 13R / POCO M6 Plus", "breeze", "NU"),
+        Device("Redmi K70 Ultra", "rothko", "NN"),
+        Device("Xiaomi MIX Fold 4", "goku", "NV"),
+        Device("Xiaomi MIX Flip", "ruyi", "NI"),
     )
 
     private const val XIAOMI = "XM"
