@@ -3,6 +3,7 @@
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import java.io.ByteArrayOutputStream
 import java.util.Properties
 
@@ -21,6 +22,24 @@ val verCode = getVersionCode()
 val xcf = XCFramework(appName + "Framework")
 
 kotlin {
+
+   @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+   wasmJs {
+        moduleName = "composeApp"
+        browser {
+            commonWebpackConfig {
+                outputFileName = "composeApp.js"
+                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+                    static = (static ?: mutableListOf()).apply {
+                        // Serve sources to debug inside browser
+                        add(project.projectDir.path)
+                    }
+                }
+            }
+        }
+        binaries.executable()
+    }
+
     androidTarget()
 
     jvm("desktop")
@@ -61,6 +80,10 @@ kotlin {
             // Added
             implementation(libs.cryptography.provider.apple)
             implementation(libs.ktor.client.ios)
+        }
+        wasmJsMain.dependencies {
+            // Added
+            implementation(libs.cryptography.provider.webcrypto)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
