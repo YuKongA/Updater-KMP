@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Login
 import androidx.compose.material.icons.automirrored.outlined.Logout
@@ -40,7 +39,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
@@ -115,191 +113,188 @@ fun LoginDialog(
     if (showDialog) {
         if (isLogin.value != 1) {
             BasicAlertDialog(
-                onDismissRequest = { showDialog = false },
-                content = {
-                    Column(
+                onDismissRequest = { showDialog = false }
+            ) {
+                Column(
+                    modifier = Modifier
+                        .widthIn(min = 350.dp, max = 380.dp)
+                        .clip(RoundedCornerShape(30.dp))
+                        .background(MaterialTheme.colorScheme.surfaceContainer)
+                ) {
+                    Row(
                         modifier = Modifier
-                            .widthIn(min = 350.dp, max = 380.dp)
-                            .clip(RoundedCornerShape(30.dp))
-                            .background(MaterialTheme.colorScheme.surfaceContainer)
+                            .padding(horizontal = 24.dp)
+                            .padding(top = 24.dp, bottom = 12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = stringResource(Res.string.login),
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize
+                        )
+                        Checkbox(
                             modifier = Modifier
-                                .padding(horizontal = 24.dp)
-                                .padding(top = 24.dp, bottom = 12.dp),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                modifier = Modifier.weight(1f),
-                                text = stringResource(Res.string.login),
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = MaterialTheme.typography.titleLarge.fontSize
-                            )
-                            Checkbox(
-                                modifier = Modifier
-                                    .height(22.dp)
-                                    .padding(start = 0.dp, end = 10.dp)
-                                    .size(22.dp),
-                                checked = global,
-                                onCheckedChange = {
-                                    global = it
-                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                })
-                            Text(
-                                text = stringResource(Res.string.global),
-                                fontSize = MaterialTheme.typography.titleMedium.fontSize
-                            )
-                        }
-                        Column(
-                            modifier = Modifier.padding(horizontal = 24.dp)
-                        ) {
-                            TextField(
-                                value = account,
-                                onValueChange = { account = it },
-                                label = { Text(stringResource(Res.string.account)) },
-                                modifier = Modifier.fillMaxWidth(),
-                                singleLine = true,
-                            )
-                            var passwordVisibility by remember { mutableStateOf(false) }
-                            TextField(
-                                value = password,
-                                onValueChange = { password = it },
-                                label = { Text(stringResource(Res.string.password)) },
-                                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                                singleLine = true,
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                                visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-                                trailingIcon = {
-                                    IconButton(
-                                        onClick = { passwordVisibility = !passwordVisibility }
-                                    ) {
-                                        Icon(
-                                            imageVector = if (passwordVisibility) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                            contentDescription = null
-                                        )
-                                    }
-                                })
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Row {
-                                    Checkbox(
-                                        modifier = Modifier
-                                            .height(22.dp)
-                                            .padding(start = 0.dp, end = 10.dp)
-                                            .size(22.dp),
-                                        checked = savePassword == "1",
-                                        onCheckedChange = {
-                                            savePassword = if (it) "1" else "0"
-                                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                        })
-                                    Text(
-                                        text = stringResource(Res.string.save_password),
-                                        fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                                .height(22.dp)
+                                .padding(start = 0.dp, end = 10.dp)
+                                .size(22.dp),
+                            checked = global,
+                            onCheckedChange = {
+                                global = it
+                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                            })
+                        Text(
+                            text = stringResource(Res.string.global),
+                            fontSize = MaterialTheme.typography.titleMedium.fontSize
+                        )
+                    }
+                    Column(
+                        modifier = Modifier.padding(horizontal = 24.dp)
+                    ) {
+                        TextField(
+                            value = account,
+                            onValueChange = { account = it },
+                            label = { Text(stringResource(Res.string.account)) },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                        )
+                        var passwordVisibility by remember { mutableStateOf(false) }
+                        TextField(
+                            value = password,
+                            onValueChange = { password = it },
+                            label = { Text(stringResource(Res.string.password)) },
+                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                            singleLine = true,
+                            //keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                            visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+                            trailingIcon = {
+                                IconButton(
+                                    onClick = { passwordVisibility = !passwordVisibility }
+                                ) {
+                                    Icon(
+                                        imageVector = if (passwordVisibility) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                        contentDescription = null
                                     )
                                 }
-                                Row {
-                                    TextButton(
-                                        onClick = {
-                                            showDialog = false
-                                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                        },
-                                        modifier = Modifier.padding(end = 16.dp)
-                                    ) {
-                                        Text(
-                                            text = stringResource(Res.string.cancel),
-                                            fontSize = MaterialTheme.typography.titleMedium.fontSize
-                                        )
-                                    }
-                                    TextButton(
-                                        onClick = {
-                                            showMessage(message = messageLoginIn)
-                                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                            coroutineScope.launch {
-                                                val int = login(account.text, password.text, global, savePassword, isLogin)
-                                                when (int) {
-                                                    0 -> showMessage(message = messageLoginSuccess)
-                                                    1 -> showMessage(message = messageEmpty)
-                                                    2 -> showMessage(message = messageSign)
-                                                    3 -> showMessage(message = messageError)
-                                                    4 -> showMessage(message = messageSecurityError)
-                                                    5 -> showMessage(message = messageCrashInfo)
-                                                }
-                                            }
-                                            showDialog = false
-                                        }) {
-                                        Text(
-                                            text = stringResource(Res.string.login),
-                                            fontSize = MaterialTheme.typography.titleMedium.fontSize
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                })
-        } else {
-            BasicAlertDialog(
-                onDismissRequest = {
-                    showDialog = false
-                },
-                content = {
-                    Column(
-                        modifier = Modifier
-                            .widthIn(min = 350.dp, max = 380.dp)
-                            .clip(RoundedCornerShape(30.dp))
-                            .background(MaterialTheme.colorScheme.surfaceContainer)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .padding(horizontal = 24.dp)
-                                .padding(top = 24.dp, bottom = 12.dp)
+                            })
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = stringResource(Res.string.logout),
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = MaterialTheme.typography.titleLarge.fontSize
-                            )
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(top = 80.dp),
-                                horizontalArrangement = Arrangement.End
-                            ) {
+                            Row {
+                                Checkbox(
+                                    modifier = Modifier
+                                        .height(22.dp)
+                                        .padding(start = 0.dp, end = 10.dp)
+                                        .size(22.dp),
+                                    checked = savePassword == "1",
+                                    onCheckedChange = {
+                                        savePassword = if (it) "1" else "0"
+                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    })
+                                Text(
+                                    text = stringResource(Res.string.save_password),
+                                    fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                                )
+                            }
+                            Row {
                                 TextButton(
                                     onClick = {
                                         showDialog = false
                                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                     },
-                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                    modifier = Modifier.padding(end = 16.dp)
                                 ) {
                                     Text(
                                         text = stringResource(Res.string.cancel),
-                                        modifier = Modifier,
-                                        fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                                        fontSize = MaterialTheme.typography.titleMedium.fontSize
                                     )
                                 }
                                 TextButton(
                                     onClick = {
+                                        showMessage(message = messageLoginIn)
+                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                         coroutineScope.launch {
-                                            val boolean = logout(isLogin)
-                                            if (boolean) showMessage(message = messageLogoutSuccessful)
+                                            val int = login(account.text, password.text, global, savePassword, isLogin)
+                                            when (int) {
+                                                0 -> showMessage(message = messageLoginSuccess)
+                                                1 -> showMessage(message = messageEmpty)
+                                                2 -> showMessage(message = messageSign)
+                                                3 -> showMessage(message = messageError)
+                                                4 -> showMessage(message = messageSecurityError)
+                                                5 -> showMessage(message = messageCrashInfo)
+                                            }
                                         }
                                         showDialog = false
-                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                     }) {
                                     Text(
-                                        text = stringResource(Res.string.logout),
-                                        modifier = Modifier,
-                                        fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                                        text = stringResource(Res.string.login),
+                                        fontSize = MaterialTheme.typography.titleMedium.fontSize
                                     )
                                 }
                             }
                         }
                     }
                 }
-            )
+            }
+        } else {
+            BasicAlertDialog(
+                onDismissRequest = { showDialog = false }
+            ) {
+                Column(
+                    modifier = Modifier
+                        .widthIn(min = 350.dp, max = 380.dp)
+                        .clip(RoundedCornerShape(30.dp))
+                        .background(MaterialTheme.colorScheme.surfaceContainer)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp)
+                            .padding(top = 24.dp, bottom = 12.dp)
+                    ) {
+                        Text(
+                            text = stringResource(Res.string.logout),
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(top = 80.dp),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            TextButton(
+                                onClick = {
+                                    showDialog = false
+                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                },
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(Res.string.cancel),
+                                    modifier = Modifier,
+                                    fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                                )
+                            }
+                            TextButton(
+                                onClick = {
+                                    coroutineScope.launch {
+                                        val boolean = logout(isLogin)
+                                        if (boolean) showMessage(message = messageLogoutSuccessful)
+                                    }
+                                    showDialog = false
+                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                }) {
+                                Text(
+                                    text = stringResource(Res.string.logout),
+                                    modifier = Modifier,
+                                    fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

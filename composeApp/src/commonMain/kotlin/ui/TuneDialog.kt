@@ -65,30 +65,28 @@ fun TuneDialog(
 
     if (showDialog) {
         BasicAlertDialog(
-            onDismissRequest = { showDialog = false },
-            content = {
+            onDismissRequest = { showDialog = false }) {
+            Column(
+                modifier = Modifier
+                    .widthIn(min = 350.dp, max = 380.dp)
+                    .clip(RoundedCornerShape(30.dp))
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
+            ) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 24.dp).padding(top = 24.dp, bottom = 12.dp),
+                    text = "Extension Settings",
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = MaterialTheme.typography.titleLarge.fontSize
+                )
                 Column(
-                    modifier = Modifier
-                        .widthIn(min = 350.dp, max = 380.dp)
-                        .clip(RoundedCornerShape(30.dp))
-                        .background(MaterialTheme.colorScheme.surfaceContainer)
+                    modifier = Modifier.padding(horizontal = 24.dp)
                 ) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 24.dp).padding(top = 24.dp, bottom = 12.dp),
-                        text = "Extension Settings",
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = MaterialTheme.typography.titleLarge.fontSize
-                    )
-                    Column(
-                        modifier = Modifier.padding(horizontal = 24.dp)
-                    ) {
-                        miuiStrongToast()
-                        uiColorMode(colorMode)
-                        Spacer(modifier = Modifier.height(12.dp))
-                    }
+                    miuiStrongToast()
+                    uiColorMode(colorMode)
+                    Spacer(modifier = Modifier.height(12.dp))
                 }
             }
-        )
+        }
     }
 }
 

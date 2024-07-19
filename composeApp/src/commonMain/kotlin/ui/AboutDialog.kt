@@ -67,98 +67,97 @@ fun AboutDialog() {
 
     if (showDialog) {
         BasicAlertDialog(
-            onDismissRequest = { showDialog = false },
-            content = {
-                Column(
+            onDismissRequest = { showDialog = false }
+        ) {
+            Column(
+                modifier = Modifier
+                    .widthIn(min = 350.dp, max = 380.dp)
+                    .clip(RoundedCornerShape(30.dp))
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
+            ) {
+                Row(
                     modifier = Modifier
-                        .widthIn(min = 350.dp, max = 380.dp)
-                        .clip(RoundedCornerShape(30.dp))
-                        .background(MaterialTheme.colorScheme.surfaceContainer)
+                        .padding(horizontal = 24.dp)
+                        .padding(top = 24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Row(
+                    Box(
+                        contentAlignment = Alignment.Center,
                         modifier = Modifier
-                            .padding(horizontal = 24.dp)
-                            .padding(top = 24.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            .size(48.dp)
+                            .clip(RoundedCornerShape(50.dp))
+                            .background(MaterialTheme.colorScheme.primary)
                     ) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .size(48.dp)
-                                .clip(RoundedCornerShape(50.dp))
-                                .background(MaterialTheme.colorScheme.primary)
-                        ) {
-                            Image(
-                                imageVector = Icons.Outlined.Update,
-                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary),
-                                contentDescription = null,
-                                modifier = Modifier.size(25.dp),
-                            )
-                        }
-                        Column {
-                            Text(
-                                text = stringResource(Res.string.app_name),
-                                fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            Text(
-                                text = VersionInfo.VERSION_NAME + " (" + VersionInfo.VERSION_CODE + ")",
-                                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                            )
-                        }
+                        Image(
+                            imageVector = Icons.Outlined.Update,
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary),
+                            contentDescription = null,
+                            modifier = Modifier.size(25.dp),
+                        )
                     }
-                    Column(
-                        modifier = Modifier
-                            .padding(horizontal = 24.dp)
-                            .padding(top = 12.dp, bottom = 18.dp)
-                    ) {
-                        val uriHandler = LocalUriHandler.current
-                        Row {
-                            Text(
-                                text = stringResource(Res.string.view_source) + " ",
-                                fontSize = MaterialTheme.typography.bodyMedium.fontSize
-                            )
-                            Text(
-                                text = AnnotatedString(
-                                    text = "GitHub",
-                                    spanStyle = SpanStyle(textDecoration = TextDecoration.Underline, color = MaterialTheme.colorScheme.primary)
-                                ),
-                                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                                modifier = Modifier.clickable(
-                                    onClick = {
-                                        uriHandler.openUri("https://github.com/YuKongA/Updater-KMP")
-                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    }
-                                )
-                            )
-                        }
-                        Row {
-                            Text(
-                                text = stringResource(Res.string.join_group) + " ",
-                                fontSize = MaterialTheme.typography.bodyMedium.fontSize
-                            )
-                            Text(
-                                text = AnnotatedString(
-                                    text = "Telegram",
-                                    spanStyle = SpanStyle(textDecoration = TextDecoration.Underline, color = MaterialTheme.colorScheme.primary)
-                                ),
-                                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                                modifier = Modifier.clickable(
-                                    onClick = {
-                                        uriHandler.openUri("https://t.me/YuKongA13579")
-                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    },
-                                )
-                            )
-                        }
-                        Spacer(modifier = Modifier.padding(top = 12.dp))
+                    Column {
                         Text(
-                            text = stringResource(Res.string.opensource_info),
-                            fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                            text = stringResource(Res.string.app_name),
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            text = VersionInfo.VERSION_NAME + " (" + VersionInfo.VERSION_CODE + ")",
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                         )
                     }
                 }
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                        .padding(top = 12.dp, bottom = 18.dp)
+                ) {
+                    val uriHandler = LocalUriHandler.current
+                    Row {
+                        Text(
+                            text = stringResource(Res.string.view_source) + " ",
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                        )
+                        Text(
+                            text = AnnotatedString(
+                                text = "GitHub",
+                                spanStyle = SpanStyle(textDecoration = TextDecoration.Underline, color = MaterialTheme.colorScheme.primary)
+                            ),
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                            modifier = Modifier.clickable(
+                                onClick = {
+                                    uriHandler.openUri("https://github.com/YuKongA/Updater-KMP")
+                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                }
+                            )
+                        )
+                    }
+                    Row {
+                        Text(
+                            text = stringResource(Res.string.join_group) + " ",
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                        )
+                        Text(
+                            text = AnnotatedString(
+                                text = "Telegram",
+                                spanStyle = SpanStyle(textDecoration = TextDecoration.Underline, color = MaterialTheme.colorScheme.primary)
+                            ),
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                            modifier = Modifier.clickable(
+                                onClick = {
+                                    uriHandler.openUri("https://t.me/YuKongA13579")
+                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                },
+                            )
+                        )
+                    }
+                    Spacer(modifier = Modifier.padding(top = 12.dp))
+                    Text(
+                        text = stringResource(Res.string.opensource_info),
+                        fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                    )
+                }
             }
-        )
+        }
     }
 }
