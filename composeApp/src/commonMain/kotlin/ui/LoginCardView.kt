@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import isWasm
 import org.jetbrains.compose.resources.stringResource
 import updaterkmp.composeapp.generated.resources.Res
 import updaterkmp.composeapp.generated.resources.logged_in
@@ -64,7 +65,7 @@ fun LoginCardView(
             )
             Column(modifier = Modifier.padding(start = 20.dp)) {
                 Text(
-                    text = account,
+                    text = if (!isWasm()) account else "WebAssembly",
                     fontWeight = FontWeight.SemiBold,
                     fontSize = MaterialTheme.typography.titleMedium.fontSize
                 )

@@ -8,3 +8,5 @@ actual fun httpClientPlatform(): HttpClient {
 actual fun md5Hash(input: String): String {
     TODO("Not yet implemented")
 }
+
+actual fun isWasm(): Boolean = true

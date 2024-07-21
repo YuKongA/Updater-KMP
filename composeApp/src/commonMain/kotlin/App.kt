@@ -209,7 +209,7 @@ private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, colorMode: Mutabl
         },
         actions = {
             TuneDialog(colorMode)
-            LoginDialog(isLogin)
+            if (!isWasm()) LoginDialog(isLogin)
         },
         scrollBehavior = scrollBehavior
     )
