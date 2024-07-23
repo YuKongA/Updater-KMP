@@ -82,6 +82,10 @@ fun App(
     val incIconInfo: MutableState<List<DataHelper.IconInfoData>> = remember { mutableStateOf(listOf()) }
 
     val updateRomInfo = remember { mutableStateOf(0) }
+    updateRomInfo(
+        deviceName, codeName, deviceRegion, androidVersion, systemVersion, loginData,
+        isLogin, curRomInfo, incRomInfo, curIconInfo, incIconInfo, updateRomInfo
+    )
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
@@ -171,13 +175,9 @@ fun App(
                             }
                         }
                     }
-                    FloatActionButton(offsetHeight, updateRomInfo)
-                    Snackbar(offsetHeight)
-                    updateRomInfo(
-                        deviceName, codeName, deviceRegion, androidVersion, systemVersion, loginData,
-                        isLogin, curRomInfo, incRomInfo, curIconInfo, incIconInfo, updateRomInfo
-                    )
                 }
+                FloatActionButton(offsetHeight, updateRomInfo)
+                Snackbar(offsetHeight)
             }
         }
     }
