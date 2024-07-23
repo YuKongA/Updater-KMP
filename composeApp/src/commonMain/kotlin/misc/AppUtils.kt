@@ -10,6 +10,7 @@ import data.DeviceInfoHelper
 import data.RomInfoHelper
 import getRecoveryRomInfo
 import iconLink
+import isWasm
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -173,10 +174,11 @@ fun handleRomInfo(
         val changelog = changelogGroups.map { it.split("\n").drop(1).joinToString("\n") }
         val iconNames = changelogGroups.map { it.split("\n").first() }
 
-        val iconMainLink = recoveryRomInfo.fileMirror!!.icon
+        val iconMainLink = if (isWasm()) "https://updater.yukonga.top/icon/10/" else recoveryRomInfo.fileMirror!!.icon
         val iconNameLink = recoveryRomInfo.icon!!
 
         val iconLinks = iconLink(iconNames, iconMainLink, iconNameLink)
+        println(iconLinks)
 
         iconInfoData.value = iconNames.mapIndexed { index, iconName ->
             DataHelper.IconInfoData(

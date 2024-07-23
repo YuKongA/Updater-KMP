@@ -11,3 +11,5 @@ actual fun md5Hash(input: String): String {
     md.update(input.toByteArray())
     return md.digest().joinToString("") { "%02x".format(it) }.uppercase()
 }
+
+actual fun isWasm(): Boolean = false

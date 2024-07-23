@@ -1,11 +1,9 @@
 import androidx.compose.runtime.MutableState
 import data.DataHelper
 import io.ktor.client.call.body
+import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.post
-import io.ktor.http.ContentType
 import io.ktor.http.Parameters
-import io.ktor.http.content.TextContent
-import io.ktor.http.formUrlEncode
 import io.ktor.utils.io.InternalAPI
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -13,8 +11,8 @@ import misc.json
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-const val CN_RECOVERY_URL = "https://update.miui.com/updates/miotaV3.php"
-const val INTL_RECOVERY_URL = "https://update.intl.miui.com/updates/miotaV3.php"
+val CN_RECOVERY_URL = if (isWasm()) "https://updater.yukonga.top/updates/miotaV3.php" else "https://update.miui.com/updates/miotaV3.php"
+val INTL_RECOVERY_URL = if (isWasm()) "https://updater.yukonga.top/intl-updates/miotaV3.php" else "https://update.intl.miui.com/updates/miotaV3.php"
 var accountType = "CN"
 var port = "1"
 var security = ""
@@ -106,11 +104,11 @@ suspend fun getRecoveryRomInfo(
         append("q", encryptedText)
         append("t", serviceToken)
         append("s", port)
-    }.formUrlEncode()
-    val recoveryUrl = if (accountType == "GL") INTL_RECOVERY_URL else CN_RECOVERY_URL
+    }
+    val recoveryUrl = if (accountType != "CN") INTL_RECOVERY_URL else CN_RECOVERY_URL
     try {
         val response = client.post(recoveryUrl) {
-            body = TextContent(parameters, ContentType.Application.FormUrlEncoded)
+            body = FormDataContent(parameters)
         }
         val requestedEncryptedText = response.body<String>()
         client.close()

@@ -20,6 +20,8 @@ expect fun httpClientPlatform(): HttpClient
 
 expect fun md5Hash(input: String): String
 
+expect fun isWasm(): Boolean
+
 /**
  * Login Xiaomi account.
  *

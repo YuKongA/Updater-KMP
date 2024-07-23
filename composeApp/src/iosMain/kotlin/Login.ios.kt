@@ -24,3 +24,5 @@ actual fun md5Hash(input: String): String {
     }
     return result.joinToString("") { it.toInt().toString(16).padStart(2, '0') }.uppercase()
 }
+
+actual fun isWasm(): Boolean = false
