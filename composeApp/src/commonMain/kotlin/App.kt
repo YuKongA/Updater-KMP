@@ -4,17 +4,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -225,23 +222,12 @@ fun FloatActionButton(fabOffsetHeight: Dp, updateRomInfo: MutableState<Int>) {
     ) {
         ExtendedFloatingActionButton(
             modifier = Modifier.offset(y = fabOffsetHeight),
+            text = { Text(text = stringResource(Res.string.submit)) },
+            icon = { Icon(imageVector = Icons.Filled.Check, contentDescription = stringResource(Res.string.submit)) },
             onClick = {
                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                 updateRomInfo.value++
             }
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Check,
-                contentDescription = null,
-                modifier = Modifier.height(20.dp)
-            )
-            Spacer(
-                modifier = Modifier.width(8.dp)
-            )
-            Text(
-                text = stringResource(Res.string.submit),
-                modifier = Modifier.height(20.dp)
-            )
-        }
+        )
     }
 }
