@@ -14,7 +14,7 @@ import org.khronos.webgl.Int8Array
 import kotlin.wasm.unsafe.UnsafeWasmMemoryApi
 import kotlin.wasm.unsafe.withScopedMemoryAllocator
 
-private const val MiSanVF = "./MiSansVF.woff2"
+private const val MiSanVF = "./MiSans VF.woff2"
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
