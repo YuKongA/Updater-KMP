@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -125,13 +126,16 @@ fun App(
             Scaffold(
                 modifier = Modifier
                     .displayCutoutPadding()
+                    .imePadding()
+                    .fillMaxSize()
                     .nestedScroll(scrollBehavior.nestedScrollConnection),
                 topBar = {
                     TopAppBar(scrollBehavior, colorMode, isLogin)
                 }
             ) {
                 Box(
-                    modifier = Modifier.nestedScroll(nestedScrollConnection)
+                    modifier = Modifier
+                        .nestedScroll(nestedScrollConnection)
                 ) {
                     LazyColumn(
                         state = listState,
