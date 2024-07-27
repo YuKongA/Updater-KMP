@@ -27,7 +27,6 @@
     <string name="login_expired">登入已過期</string>
     <string name="login_expired_desc">建議重新登入</string>
     <string name="login_successful">登入成功</string>
-    <string name="request_sign_failed">請求 _sign 失敗！</string>
     <string name="account_or_password_empty">帳號或密碼為空！</string>
     <string name="no_account">未登入</string>
     <string name="login_desc">正在使用 v1 埠</string>

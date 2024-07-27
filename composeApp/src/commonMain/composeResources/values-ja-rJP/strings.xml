@@ -25,7 +25,6 @@
     <string name="cancel">キャンセル</string>
     <string name="logging_in">ログイン中</string>
     <string name="login_successful">ログイン成功</string>
-    <string name="request_sign_failed">_サインのリクエストに失敗しました！</string>
     <string name="account_or_password_empty">アカウントまたはパスワードが空です！</string>
     <string name="no_account">アカウントがありません</string>
     <string name="login_desc">v1 インターフェースを使用</string>

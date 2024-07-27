@@ -62,7 +62,6 @@ import updaterkmp.composeapp.generated.resources.login_successful
 import updaterkmp.composeapp.generated.resources.logout
 import updaterkmp.composeapp.generated.resources.logout_successful
 import updaterkmp.composeapp.generated.resources.password
-import updaterkmp.composeapp.generated.resources.request_sign_failed
 import updaterkmp.composeapp.generated.resources.save_password
 import updaterkmp.composeapp.generated.resources.security_error
 import updaterkmp.composeapp.generated.resources.toast_crash_info
@@ -90,7 +89,6 @@ fun LoginDialog(
     val messageLoginIn = stringResource(Res.string.logging_in)
     val messageLoginSuccess = stringResource(Res.string.login_successful)
     val messageEmpty = stringResource(Res.string.account_or_password_empty)
-    val messageSign = stringResource(Res.string.request_sign_failed)
     val messageError = stringResource(Res.string.login_error)
     val messageSecurityError = stringResource(Res.string.security_error)
     val messageLogoutSuccessful = stringResource(Res.string.logout_successful)
@@ -221,10 +219,9 @@ fun LoginDialog(
                                             when (int) {
                                                 0 -> showMessage(message = messageLoginSuccess)
                                                 1 -> showMessage(message = messageEmpty)
-                                                2 -> showMessage(message = messageSign)
+                                                2 -> showMessage(message = messageCrashInfo)
                                                 3 -> showMessage(message = messageError)
                                                 4 -> showMessage(message = messageSecurityError)
-                                                5 -> showMessage(message = messageCrashInfo)
                                             }
                                         }
                                         showDialog = false
