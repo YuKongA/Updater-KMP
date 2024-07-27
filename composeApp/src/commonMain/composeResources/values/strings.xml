@@ -26,7 +26,6 @@
     <string name="cancel">Cancel</string>
     <string name="logging_in">Logging in</string>
     <string name="login_successful">Login successful</string>
-    <string name="request_sign_failed">Request for _sign failed!</string>
     <string name="account_or_password_empty">Account or Password empty!</string>
     <string name="no_account">No account</string>
     <string name="login_desc">Using v1 interface</string>

@@ -5,21 +5,13 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
-import io.ktor.client.statement.request
-import io.ktor.http.ContentType
-import io.ktor.http.content.TextContent
-import io.ktor.utils.io.InternalAPI
 import kotlinx.serialization.encodeToString
 import misc.json
+import misc.md5Hash
 
-private const val testUrl = "https://hyperos.mi.com/"
-private const val loginUrl = "https://account.xiaomi.com/pass/serviceLogin"
 private const val loginAuth2Url = "https://account.xiaomi.com/pass/serviceLoginAuth2"
 
 expect fun httpClientPlatform(): HttpClient
-
-expect fun md5Hash(input: String): String
-
 expect fun isWasm(): Boolean
 
 /**
@@ -33,7 +25,6 @@ expect fun isWasm(): Boolean
  *
  * @return Login status
  */
-@OptIn(InternalAPI::class)
 suspend fun login(
     account: String,
     password: String,
@@ -47,24 +38,24 @@ suspend fun login(
 
     val client = httpClientPlatform()
 
-    try {
-        client.get(testUrl)
+    if (!isWasm()) try {
+        client.get(loginAuth2Url)
     } catch (e: Exception) {
-        return 5
+        return 2
     }
-
-    val response1 = client.get(loginUrl)
 
     val md5Hash = md5Hash(password)
-    val sign = response1.request.url.parameters["_sign"]?.replace("2&V1_passport&", "") ?: return 2
+
     val sid = if (global) "miuiota_intl" else "miuiromota"
-    val locale = if (global) "en_US" else "zh_CN"
-    val data = "_json=true&bizDeviceType=&user=$account&hash=$md5Hash&sid=$sid&_sign=$sign&_locale=$locale"
-    val response2 = client.post(loginAuth2Url) {
-        body = TextContent(data, ContentType.Application.FormUrlEncoded)
+
+    val response = client.post(loginAuth2Url) {
+        parameter("_json", "true")
+        parameter("user", account)
+        parameter("hash", md5Hash)
+        parameter("sid", sid)
     }
 
-    val authStr = response2.body<String>().replace("&&&START&&&", "")
+    val authStr = response.body<String>().replace("&&&START&&&", "")
     val authJson = json.decodeFromString<DataHelper.AuthorizeData>(authStr)
     val description = authJson.description
     val ssecurity = authJson.ssecurity
@@ -82,9 +73,9 @@ suspend fun login(
 
     if (ssecurity == null || location == null || userId.isEmpty()) return 4
 
-    val response3 = client.get(location) { parameter("_userIdNeedEncrypt", true) }
+    val response2 = client.get(location) { parameter("_userIdNeedEncrypt", true) }
 
-    val cookies = response3.headers["Set-Cookie"].toString().split("; ")[0].split("; ")[0]
+    val cookies = response2.headers["Set-Cookie"].toString().split("; ")[0].split("; ")[0]
     val serviceToken = cookies.split("serviceToken=")[1].split(";")[0]
 
     val loginInfo = DataHelper.LoginData(accountType, authResult, description, ssecurity, serviceToken, userId)

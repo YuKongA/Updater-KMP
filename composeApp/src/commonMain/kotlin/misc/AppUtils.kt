@@ -16,6 +16,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
+import org.kotlincrypto.hash.md.MD5
 import perfSet
 import updaterkmp.composeapp.generated.resources.Res
 import updaterkmp.composeapp.generated.resources.toast_crash_info
@@ -178,7 +179,6 @@ fun handleRomInfo(
         val iconNameLink = recoveryRomInfo.icon!!
 
         val iconLinks = iconLink(iconNames, iconMainLink, iconNameLink)
-        println(iconLinks)
 
         iconInfoData.value = iconNames.mapIndexed { index, iconName ->
             DataHelper.IconInfoData(
@@ -229,4 +229,20 @@ fun clearRomInfo(romInfoData: MutableState<DataHelper.RomInfoData>) {
  */
 fun downloadUrl(romVersion: String?, romFilename: String?): String {
     return "/$romVersion/$romFilename"
+}
+
+/**
+ * Generate MD5 hash.
+ *
+ * @param input: Input string
+ *
+ * @return MD5 hash
+ */
+fun md5Hash(input: String): String {
+    val md = MD5()
+    md.update(input.encodeToByteArray())
+    return md.digest().joinToString("") {
+        val hex = (it.toInt() and 0xFF).toString(16).uppercase()
+        if (hex.length == 1) "0$hex" else hex
+    }
 }

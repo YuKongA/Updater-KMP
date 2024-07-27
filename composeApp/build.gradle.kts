@@ -69,6 +69,7 @@ kotlin {
             implementation(libs.image.loader)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.ktor.client.core)
+            implementation(libs.md)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)

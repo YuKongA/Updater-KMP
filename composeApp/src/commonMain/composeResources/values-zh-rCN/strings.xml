@@ -27,7 +27,6 @@
     <string name="login_expired">登录已过期</string>
     <string name="login_expired_desc">建议重新登录</string>
     <string name="login_successful">登录成功</string>
-    <string name="request_sign_failed">请求 _sign 失败！</string>
     <string name="account_or_password_empty">账号或密码为空！</string>
     <string name="no_account">未登录</string>
     <string name="login_desc">正在使用 v1 接口</string>
