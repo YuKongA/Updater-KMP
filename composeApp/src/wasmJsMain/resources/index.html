@@ -7,9 +7,41 @@
     <link rel="icon" href="./favicon.ico">
     <link rel="shortcut icon" href="./favicon.ico">
     <script type="application/javascript" src="Updater.js"></script>
+    <style>
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+        }
+        #loading::after {
+            content: '...';
+            animation: ellipsis 1.5s infinite;
+        }
+        @keyframes ellipsis {
+            0% {
+                content: '...';
+            }
+            33% {
+                content: '.';
+            }
+            66% {
+                content: '..';
+            }
+            100% {
+                content: '...';
+            }
+        }
+        #Updater {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
+    <div id="loading">Loading</div>
     <canvas id="Updater"></canvas>
 </body>
 

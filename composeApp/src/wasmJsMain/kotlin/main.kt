@@ -23,6 +23,7 @@ fun main() {
         val fontsLoaded = remember { mutableStateOf(false) }
 
         if (fontsLoaded.value) {
+            hideLoading()
             App()
         }
 
@@ -43,6 +44,17 @@ fun ArrayBuffer.toByteArray(): ByteArray {
     val source = Int8Array(this, 0, byteLength)
     return jsInt8ArrayToKotlinByteArray(source)
 }
+
+
+@JsFun(
+    """
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('Updater').style.display = 'block';
+        }
+    """
+)
+external fun hideLoading()
 
 @JsFun(
     """ (src, size, dstAddr) => {
