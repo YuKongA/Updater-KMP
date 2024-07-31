@@ -8,6 +8,8 @@ import androidx.compose.ui.unit.sp
 import data.DataHelper
 import data.DeviceInfoHelper
 import data.RomInfoHelper
+import dev.whyoleg.cryptography.DelicateCryptographyApi
+import dev.whyoleg.cryptography.algorithms.digest.MD5
 import getRecoveryRomInfo
 import iconLink
 import isWasm
@@ -16,8 +18,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
-import org.kotlincrypto.hash.md.MD5
 import perfSet
+import provider
 import updaterkmp.composeapp.generated.resources.Res
 import updaterkmp.composeapp.generated.resources.toast_crash_info
 import updaterkmp.composeapp.generated.resources.toast_ing
@@ -238,10 +240,10 @@ fun downloadUrl(romVersion: String?, romFilename: String?): String {
  *
  * @return MD5 hash
  */
-fun md5Hash(input: String): String {
-    val md = MD5()
-    md.update(input.encodeToByteArray())
-    return md.digest().joinToString("") {
+@OptIn(DelicateCryptographyApi::class)
+suspend fun md5Hash(input: String): String {
+    val md = provider().get(MD5)
+    return md.hasher().hash(input.encodeToByteArray()).joinToString("") {
         val hex = (it.toInt() and 0xFF).toString(16).uppercase()
         if (hex.length == 1) "0$hex" else hex
     }

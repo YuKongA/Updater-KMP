@@ -20,7 +20,6 @@ After logging in to your Xiaomi account, you will use the miotaV3-v2 interface t
 - [compose-imageloader](https://github.com/qdsfdhvh/compose-imageloader) with MIT License
 - [compose-multiplatform](https://github.com/JetBrains/compose-multiplatform) with Apache-2.0 license
 - [cryptography-kotlin](https://github.com/whyoleg/cryptography-kotlin) with Apache-2.0 license
-- [hash](https://github.com/KotlinCrypto/hash) with Apache-2.0 license
 - [ktor](https://github.com/ktorio/ktor) with Apache-2.0 license
 - [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) with Apache-2.0 license
 - [XiaoMiToolV2](https://github.com/francescotescari/XiaoMiToolV2) with Apache-2.0 license
