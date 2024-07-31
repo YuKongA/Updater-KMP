@@ -8,103 +8,81 @@ on:
       - 'LICENSE'
 
 jobs:
-  Windows-x64:
-    runs-on: windows-latest
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ macos-latest, ubuntu-latest, windows-latest ]
+        include:
+          - os: windows-latest
+            platform: windows x64
+            build-command: ./gradlew createReleaseDistributable
+            artifact-path: composeApp/build/compose/binaries/main-release/app/Updater
+            artifact-name: Updater-windows-x64-exe
+          - os: macos-latest
+            platform: macos arm64
+            platformEx: android aarch64
+            build-command: ./gradlew packageReleaseDistributionForCurrentOS
+            build-commandEx: ./gradlew assembleRelease
+            artifact-path: composeApp/build/compose/binaries/main-release/dmg
+            artifact-pathEx: composeApp/build/outputs/apk/release
+            artifact-name: Updater-darwin-arm64-dmg
+            artifact-nameEx: Updater-android-aarch64-apk
+          - os: ubuntu-latest
+            platform: ubuntu x64
+            platformEx: linux x64
+            build-command: ./gradlew packageReleaseDistributionForCurrentOS
+            build-commandEx: ./gradlew createReleaseDistributable
+            artifact-path: composeApp/build/compose/binaries/main-release/deb
+            artifact-pathEx: composeApp/build/compose/binaries/main-release/app/Updater
+            artifact-name: Updater-ubuntu-x64-deb
+            artifact-nameEx: Updater-linux-x64-bin
+
     steps:
-      - name: Checkout
+      - name: Checkout sources
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup JDK 17
+      - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 17
           distribution: 'zulu'
-
-      - name: Build Windows platform
-        run: ./gradlew createReleaseDistributable
-
-      - name: Upload Updater windows-x86_64-exe
-        uses: actions/upload-artifact@v4
-        with:
-          name: Updater-windows-x86_64-exe
-          path: composeApp/build/compose/binaries/main-release/app/Updater
-          compression-level: 9
-
-  macOS-arm64:
-    runs-on: macos-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup JDK 17
-        uses: actions/setup-java@v4
-        with:
           java-version: 17
-          distribution: 'zulu'
-          cache: 'gradle'
 
-      - name: Build Darwin platform
-        run: ./gradlew packageReleaseDistributionForCurrentOS
-
-      - name: Upload Updater darwin-aarch64-dmg
-        uses: actions/upload-artifact@v4
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
         with:
-          name: Updater-darwin-aarch64-dmg
-          path: composeApp/build/compose/binaries/main-release/dmg
-          compression-level: 9
+          gradle-home-cache-cleanup: true
+          validate-wrappers: true
 
-  Linux-x64:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - name: Decode android signing key
+        if: matrix.platform == 'macos arm64' && matrix.platformEx == 'android aarch64'
+        run: echo ${{ secrets.SIGNING_KEY }} | base64 -d > keystore.jks
 
-      - name: Setup JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: 'zulu'
-          cache: 'gradle'
+      - name: Build ${{ matrix.platform }} platform
+        run: ${{ matrix.build-command }}
 
-      - name: Build Android platform
-        run: |
-          echo ${{ secrets.SIGNING_KEY }} | base64 -d > keystore.jks
-          bash ./gradlew assembleRelease
+      - name: Build ${{ matrix.platformEx }} platform
+        if: matrix.platform == 'macos arm64' || matrix.platform == 'ubuntu x64'
+        run: ${{ matrix.build-commandEx }}
         env:
           KEYSTORE_PATH: "../keystore.jks"
           KEYSTORE_PASS: ${{ secrets.KEY_STORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
-      - name: Upload Updater android-aarch64-apk
+      - name: Upload Updater ${{ matrix.platform }} artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Updater-android-aarch64-apk
-          path: composeApp/build/outputs/apk/release
+          name: ${{ matrix.artifact-name }}
+          path: ${{ matrix.artifact-path }}
           compression-level: 9
 
-      - name: Build Linux platform
-        run: |
-          bash ./gradlew packageReleaseDistributionForCurrentOS
-          bash ./gradlew createReleaseDistributable
-
-      - name: Upload Updater linux-x86_64-deb
+      - name: Upload Updater ${{ matrix.platformEx }} artifact
+        if: matrix.platform == 'macos arm64' || matrix.platform == 'ubuntu x64'
         uses: actions/upload-artifact@v4
         with:
-          name: Updater-linux-x86_64-deb
-          path: composeApp/build/compose/binaries/main-release/deb
+          name: ${{ matrix.artifact-nameEx }}
+          path: ${{ matrix.artifact-pathEx }}
           compression-level: 9
-
-      - name: Upload Updater linux-x86_64-other
-        uses: actions/upload-artifact@v4
-        with:
-          name: Updater-linux-x86_64-other
-          path: composeApp/build/compose/binaries/main-release/app/Updater
-          compression-level: 9
-
