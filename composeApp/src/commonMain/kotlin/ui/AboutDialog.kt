@@ -39,11 +39,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import misc.VersionInfo
 import org.jetbrains.compose.resources.stringResource
-import updaterkmp.composeapp.generated.resources.Res
-import updaterkmp.composeapp.generated.resources.app_name
-import updaterkmp.composeapp.generated.resources.join_group
-import updaterkmp.composeapp.generated.resources.opensource_info
-import updaterkmp.composeapp.generated.resources.view_source
+import updater.composeapp.generated.resources.Res
+import updater.composeapp.generated.resources.app_name
+import updater.composeapp.generated.resources.join_group
+import updater.composeapp.generated.resources.opensource_info
+import updater.composeapp.generated.resources.view_source
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

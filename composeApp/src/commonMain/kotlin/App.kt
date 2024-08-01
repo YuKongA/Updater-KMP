@@ -58,9 +58,9 @@ import ui.MessageCardViews
 import ui.MoreInfoCardViews
 import ui.TextFieldViews
 import ui.TuneDialog
-import updaterkmp.composeapp.generated.resources.Res
-import updaterkmp.composeapp.generated.resources.app_name
-import updaterkmp.composeapp.generated.resources.submit
+import updater.composeapp.generated.resources.Res
+import updater.composeapp.generated.resources.app_name
+import updater.composeapp.generated.resources.submit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

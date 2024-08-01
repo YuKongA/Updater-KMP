@@ -26,10 +26,10 @@ kotlin {
 
    @OptIn(ExperimentalWasmDsl::class)
    wasmJs {
-        moduleName = "Updater"
+        moduleName = "updater"
         browser {
             commonWebpackConfig {
-                outputFileName = "Updater.js"
+                outputFileName = "updater.js"
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                     static = (static ?: mutableListOf()).apply {
                         // Serve sources to debug inside browser

@@ -20,12 +20,12 @@ import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
 import perfSet
 import provider
-import updaterkmp.composeapp.generated.resources.Res
-import updaterkmp.composeapp.generated.resources.toast_crash_info
-import updaterkmp.composeapp.generated.resources.toast_ing
-import updaterkmp.composeapp.generated.resources.toast_no_info
-import updaterkmp.composeapp.generated.resources.toast_success_info
-import updaterkmp.composeapp.generated.resources.toast_wrong_info
+import updater.composeapp.generated.resources.Res
+import updater.composeapp.generated.resources.toast_crash_info
+import updater.composeapp.generated.resources.toast_ing
+import updater.composeapp.generated.resources.toast_no_info
+import updater.composeapp.generated.resources.toast_success_info
+import updater.composeapp.generated.resources.toast_wrong_info
 
 val json = Json { ignoreUnknownKeys = true }
 

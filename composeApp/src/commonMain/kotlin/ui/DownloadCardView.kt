@@ -34,12 +34,12 @@ import downloadToLocal
 import misc.MessageUtils.Companion.showMessage
 import misc.bodyFontSize
 import org.jetbrains.compose.resources.stringResource
-import updaterkmp.composeapp.generated.resources.Res
-import updaterkmp.composeapp.generated.resources.copy_button
-import updaterkmp.composeapp.generated.resources.copy_successful
-import updaterkmp.composeapp.generated.resources.download
-import updaterkmp.composeapp.generated.resources.download_button
-import updaterkmp.composeapp.generated.resources.download_start
+import updater.composeapp.generated.resources.Res
+import updater.composeapp.generated.resources.copy_button
+import updater.composeapp.generated.resources.copy_successful
+import updater.composeapp.generated.resources.download
+import updater.composeapp.generated.resources.download_button
+import updater.composeapp.generated.resources.download_start
 
 @Composable
 fun DownloadCardViews(

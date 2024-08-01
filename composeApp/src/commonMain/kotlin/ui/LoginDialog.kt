@@ -50,21 +50,21 @@ import logout
 import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
 import perfGet
-import updaterkmp.composeapp.generated.resources.Res
-import updaterkmp.composeapp.generated.resources.account
-import updaterkmp.composeapp.generated.resources.account_or_password_empty
-import updaterkmp.composeapp.generated.resources.cancel
-import updaterkmp.composeapp.generated.resources.global
-import updaterkmp.composeapp.generated.resources.logging_in
-import updaterkmp.composeapp.generated.resources.login
-import updaterkmp.composeapp.generated.resources.login_error
-import updaterkmp.composeapp.generated.resources.login_successful
-import updaterkmp.composeapp.generated.resources.logout
-import updaterkmp.composeapp.generated.resources.logout_successful
-import updaterkmp.composeapp.generated.resources.password
-import updaterkmp.composeapp.generated.resources.save_password
-import updaterkmp.composeapp.generated.resources.security_error
-import updaterkmp.composeapp.generated.resources.toast_crash_info
+import updater.composeapp.generated.resources.Res
+import updater.composeapp.generated.resources.account
+import updater.composeapp.generated.resources.account_or_password_empty
+import updater.composeapp.generated.resources.cancel
+import updater.composeapp.generated.resources.global
+import updater.composeapp.generated.resources.logging_in
+import updater.composeapp.generated.resources.login
+import updater.composeapp.generated.resources.login_error
+import updater.composeapp.generated.resources.login_successful
+import updater.composeapp.generated.resources.logout
+import updater.composeapp.generated.resources.logout_successful
+import updater.composeapp.generated.resources.password
+import updater.composeapp.generated.resources.save_password
+import updater.composeapp.generated.resources.security_error
+import updater.composeapp.generated.resources.toast_crash_info
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

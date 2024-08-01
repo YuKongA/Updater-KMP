@@ -7,9 +7,9 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import updaterkmp.composeapp.generated.resources.Res
-import updaterkmp.composeapp.generated.resources.app_name
-import updaterkmp.composeapp.generated.resources.icon
+import updater.composeapp.generated.resources.Res
+import updater.composeapp.generated.resources.app_name
+import updater.composeapp.generated.resources.icon
 
 fun main() = application {
     val state = rememberWindowState(

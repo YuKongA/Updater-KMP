@@ -1,6 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
-rootProject.name = "UpdaterKMP"
+rootProject.name = "Updater"
 
 pluginManagement {
     repositories {

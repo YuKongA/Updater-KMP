@@ -18,7 +18,7 @@ private const val MiSanVF = "./MiSans VF.woff2"
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
-    CanvasBasedWindow(canvasElementId = "Updater") {
+    CanvasBasedWindow("Updater", canvasElementId = "updaterCanvas") {
         val fontFamilyResolver = LocalFontFamilyResolver.current
         val fontsLoaded = remember { mutableStateOf(false) }
 
@@ -50,7 +50,7 @@ fun ArrayBuffer.toByteArray(): ByteArray {
     """
         function hideLoading() {
             document.getElementById('loading').style.display = 'none';
-            document.getElementById('Updater').style.display = 'block';
+            document.getElementById('updaterCanvas').style.display = 'block';
         }
     """
 )
