@@ -24,8 +24,8 @@ val xcf = XCFramework(appName + "Framework")
 
 kotlin {
 
-   @OptIn(ExperimentalWasmDsl::class)
-   wasmJs {
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
         moduleName = "updater"
         browser {
             commonWebpackConfig {
@@ -134,7 +134,7 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             vcsInfo.include = false
-            proguardFiles("proguard-rules-android.pro")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules-android.pro")
             androidResources.ignoreAssetsPattern = "icon.png"
             if (keystorePath != null) signingConfig = signingConfigs.getByName("release")
         }
