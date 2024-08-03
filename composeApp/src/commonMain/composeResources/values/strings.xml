@@ -44,5 +44,10 @@
     <string name="login_error">Login verification failed!</string>
     <string name="regions_code">Regions code</string>
     <string name="global">Global account</string>
+    <string name="extension_settings">Extension settings</string>
+    <string name="dark_theme">Display mode</string>
+    <string name="system_default">System default</string>
+    <string name="light_mode">Light mode</string>
+    <string name="dark_mode">Dark mode</string>
     <string name="opensource_info">Copyright © 2024 YuKongA, AkaneTan</string>>
 </resources>

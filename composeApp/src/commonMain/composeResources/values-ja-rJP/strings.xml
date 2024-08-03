@@ -43,5 +43,10 @@
     <string name="login_error">ログイン認証に失敗しました！</string>
     <string name="regions_code">地域コード</string>
     <string name="global">グローバルアカウント</string>
+    <string name="extension_settings">拡張機能の設定</string>
+    <string name="dark_theme">表示モード</string>
+    <string name="system_default">システムに従ってください</string>
+    <string name="light_mode">ライトモード</string>
+    <string name="dark_mode">ダークモード</string>
     <string name="opensource_info">著作権 © 2024 YuKongA, AkaneTan</string>
 </resources>

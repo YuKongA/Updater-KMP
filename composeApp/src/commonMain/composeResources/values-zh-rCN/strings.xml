@@ -43,5 +43,10 @@
     <string name="regions_code">区域代号</string>
     <string name="global">全球账号</string>
     <string name="login_error">登录验证失败！</string>
+    <string name="extension_settings">扩展设置</string>
+    <string name="dark_theme">显示模式</string>
+    <string name="system_default">跟随系统</string>
+    <string name="light_mode">浅色模式</string>
+    <string name="dark_mode">深色模式</string>
     <string name="opensource_info">版权所有 © 2024 YuKongA, AkaneTan</string>
 </resources>

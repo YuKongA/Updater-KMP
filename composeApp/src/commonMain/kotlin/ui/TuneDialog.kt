@@ -2,6 +2,7 @@ package ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -37,8 +38,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import isSupportMiuiStrongToast
+import org.jetbrains.compose.resources.stringResource
 import perfGet
 import perfSet
+import updater.composeapp.generated.resources.Res
+import updater.composeapp.generated.resources.dark_mode
+import updater.composeapp.generated.resources.dark_theme
+import updater.composeapp.generated.resources.extension_settings
+import updater.composeapp.generated.resources.light_mode
+import updater.composeapp.generated.resources.system_default
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,6 +56,7 @@ fun TuneDialog(
     var showDialog by remember { mutableStateOf(false) }
 
     val hapticFeedback = LocalHapticFeedback.current
+    val extensionSettings = stringResource(Res.string.extension_settings)
 
     IconButton(
         modifier = Modifier.widthIn(max = 48.dp),
@@ -74,7 +83,7 @@ fun TuneDialog(
             ) {
                 Text(
                     modifier = Modifier.padding(horizontal = 24.dp).padding(top = 24.dp, bottom = 12.dp),
-                    text = "Extension Settings",
+                    text = extensionSettings,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = MaterialTheme.typography.titleLarge.fontSize
                 )
@@ -119,29 +128,36 @@ fun miuiStrongToast() {
 @Composable
 fun uiColorMode(colorMode: MutableState<Int>) {
     var isDropdownExpanded by remember { mutableStateOf(false) }
-    val options = listOf("System default", "Light mode", "Dark mode")
+    val darkTheme = stringResource(Res.string.dark_theme)
+    val systemDefault = stringResource(Res.string.system_default)
+    val lightMode = stringResource(Res.string.light_mode)
+    val darkMode = stringResource(Res.string.dark_mode)
+    val options = listOf(systemDefault, lightMode, darkMode)
     val selectedOption = remember { mutableStateOf(options[colorMode.value]) }
     Row(
-        modifier = Modifier.padding(bottom = 12.dp).fillMaxWidth().clickable { isDropdownExpanded = true },
-        verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier
+            .padding(bottom = 12.dp)
+            .fillMaxWidth()
+            .clickable { isDropdownExpanded = true },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            modifier = Modifier.weight(0.8f),
-            text = "Theme",
+            text = darkTheme,
             fontWeight = FontWeight.SemiBold,
             fontSize = MaterialTheme.typography.bodyMedium.fontSize
         )
         ExposedDropdownMenuBox(
-            modifier = Modifier.weight(1f),
             expanded = isDropdownExpanded,
-            onExpandedChange = { isDropdownExpanded = it },
+            onExpandedChange = { isDropdownExpanded = it }
         ) {
             Text(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .menuAnchor(PrimaryNotEditable),
+                    .menuAnchor(PrimaryNotEditable)
+                    .widthIn(min = 100.dp),
                 text = selectedOption.value,
-                textAlign = TextAlign.End,
+                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                textAlign = TextAlign.End
             )
             ExposedDropdownMenu(
                 modifier = Modifier.exposedDropdownSize(),
@@ -151,13 +167,18 @@ fun uiColorMode(colorMode: MutableState<Int>) {
             ) {
                 options.forEachIndexed { index, option ->
                     DropdownMenuItem(
-                        text = { Text(option) },
+                        text = {
+                            Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = option,
+                                textAlign = TextAlign.Center
+                            )
+                        },
                         onClick = {
                             selectedOption.value = option
                             colorMode.value = index
                             perfSet("colorMode", index.toString())
                             isDropdownExpanded = false
-
                         }
                     )
                 }
