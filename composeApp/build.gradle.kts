@@ -23,6 +23,7 @@ val verCode = getVersionCode()
 val xcf = XCFramework(appName + "Framework")
 
 kotlin {
+    jvmToolchain(17)
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
@@ -94,10 +95,6 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
         }
     }
-
-    jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
 }
 
 android {
@@ -106,7 +103,7 @@ android {
     defaultConfig {
         applicationId = pkgName
         minSdk = 26
-        targetSdk = 35
+        targetSdk = compileSdk
         versionCode = verCode
         versionName = verName
     }
@@ -167,7 +164,7 @@ compose.desktop {
 
             packageName = appName
             packageVersion = verName
-            description = "Get HyperOS/MIUI recovery ROM update info"
+            description = "Get HyperOS/MIUI recovery ROM info"
             copyright = "Copyright © 2024 YuKongA, AkaneTan"
 
             linux {
@@ -212,7 +209,7 @@ val generateVersionInfo by tasks.registering {
                 const val VERSION_NAME = "$verName"
                 const val VERSION_CODE = $verCode
             }
-        """.trimIndent()
+            """.trimIndent()
         )
     }
 }
