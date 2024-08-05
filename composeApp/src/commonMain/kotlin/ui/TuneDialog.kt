@@ -33,8 +33,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import isSupportMiuiStrongToast
@@ -134,6 +136,10 @@ fun uiColorMode(colorMode: MutableState<Int>) {
     val darkMode = stringResource(Res.string.dark_mode)
     val options = listOf(systemDefault, lightMode, darkMode)
     val selectedOption = remember { mutableStateOf(options[colorMode.value]) }
+    val textWidthDp = options.maxOfOrNull { option ->
+        with(LocalDensity.current) { rememberTextMeasurer().measure(text = option, style = MaterialTheme.typography.bodyMedium).size.width.toDp() }
+    }
+
     Row(
         modifier = Modifier
             .padding(bottom = 12.dp)
@@ -154,7 +160,7 @@ fun uiColorMode(colorMode: MutableState<Int>) {
             Text(
                 modifier = Modifier
                     .menuAnchor(PrimaryNotEditable)
-                    .widthIn(min = 100.dp),
+                    .widthIn(min = textWidthDp?.plus(24.dp) ?: 100.dp),
                 text = selectedOption.value,
                 fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                 textAlign = TextAlign.End
