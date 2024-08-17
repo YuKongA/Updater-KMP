@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.rememberImagePainter
 import misc.bodyFontSize
+import top.yukonga.miuix.kmp.basic.MiuixText
 
 @Composable
 fun TextWithIcon(
@@ -48,14 +48,14 @@ fun TextWithIcon(
                     painter = imagePainter,
                     contentDescription = null,
                 )
-                Text(
+                MiuixText(
                     modifier = Modifier.padding(horizontal = 8.dp),
                     text = iconName,
                     fontSize = bodyFontSize,
                     fontWeight = FontWeight.Medium
                 )
             }
-            Text(
+            MiuixText(
                 text = it,
                 fontSize = bodyFontSize
             )

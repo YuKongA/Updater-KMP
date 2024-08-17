@@ -2,8 +2,6 @@ package misc
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
@@ -16,13 +14,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import perfGet
-import showExtToast
 import showToast
 import useToast
 
@@ -37,11 +31,7 @@ class MessageUtils {
 
         fun showMessage(message: String, duration: Long = 1000L) {
             if (useToast()) {
-                if (perfGet("isUseMiuiStrongToast") == "true") {
-                    showExtToast(message, duration)
-                } else {
-                    showToast(message, duration)
-                }
+                showToast(message, duration)
             } else {
                 snackbarCoroutineJob?.cancel()
                 snackbarMessage.value = message
@@ -52,17 +42,13 @@ class MessageUtils {
         }
 
         @Composable
-        fun Snackbar(
-            offsetY: Dp
-        ) {
+        fun Snackbar() {
             val snackbarHostState = remember { SnackbarHostState() }
             val snackCoroutineScope = rememberCoroutineScope()
 
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = 56.dp + 18.dp) // FAB + FAB Padding
-                    .offset(y = offsetY)
                     .systemBarsPadding(),
                 contentAlignment = Alignment.BottomCenter
             ) {

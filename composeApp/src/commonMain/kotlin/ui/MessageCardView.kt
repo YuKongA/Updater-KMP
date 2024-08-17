@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import data.DataHelper
 import misc.bodyFontSize
 import org.jetbrains.compose.resources.stringResource
+import top.yukonga.miuix.kmp.basic.MiuixCard
+import top.yukonga.miuix.kmp.basic.MiuixText
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.android_version
 import updater.composeapp.generated.resources.big_version
@@ -57,20 +57,14 @@ fun MessageCardViews(
                     fadeIn(animationSpec = tween(1500)) togetherWith fadeOut(animationSpec = tween(300))
                 }
             ) {
-                Text(
+                MiuixText(
                     text = it,
-                    modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
+                    modifier = Modifier.padding(start = 28.dp, bottom = 8.dp),
                     fontSize = MaterialTheme.typography.titleSmall.fontSize
                 )
             }
-            Card(
-                colors = CardDefaults.cardColors(
-                    contentColor = MaterialTheme.colorScheme.onBackground,
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer
-                ),
-                elevation = CardDefaults.cardElevation(2.dp),
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(10.dp)
+            MiuixCard(
+                modifier = Modifier.padding(horizontal = 28.dp).padding(bottom = 16.dp),
             ) {
                 MessageCardView(
                     romInfoState.value.device,
@@ -93,7 +87,7 @@ fun MessageCardView(
     branch: String
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier.fillMaxWidth(),
     ) {
         MessageTextView(stringResource(Res.string.code_name), device)
         MessageTextView(stringResource(Res.string.system_version), version)
@@ -118,7 +112,7 @@ fun MessageTextView(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
+        MiuixText(
             text = title,
             fontSize = bodyFontSize,
             fontWeight = FontWeight.SemiBold
@@ -129,7 +123,7 @@ fun MessageTextView(
                 fadeIn(animationSpec = tween(1500)) togetherWith fadeOut(animationSpec = tween(300))
             }
         ) {
-            Text(
+            MiuixText(
                 text = it,
                 modifier = Modifier.horizontalScroll(scrollState),
                 fontSize = bodyFontSize,

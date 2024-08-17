@@ -10,12 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -34,6 +28,9 @@ import downloadToLocal
 import misc.MessageUtils.Companion.showMessage
 import misc.bodyFontSize
 import org.jetbrains.compose.resources.stringResource
+import top.yukonga.miuix.kmp.basic.MiuixCard
+import top.yukonga.miuix.kmp.basic.MiuixText
+import top.yukonga.miuix.kmp.theme.MiuixTheme
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.copy_button
 import updater.composeapp.generated.resources.copy_successful
@@ -53,25 +50,24 @@ fun DownloadCardViews(
         enter = fadeIn(animationSpec = tween(400)),
         exit = fadeOut(animationSpec = tween(400))
     ) {
-        Card(
-            colors = CardDefaults.cardColors(
-                contentColor = MaterialTheme.colorScheme.onBackground,
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
-            ),
-            elevation = CardDefaults.cardElevation(2.dp),
-            modifier = Modifier.fillMaxWidth().padding(vertical = 20.dp),
-            shape = RoundedCornerShape(10.dp)
+        MiuixCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 28.dp, vertical = 16.dp),
         ) {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(16.dp)
-            ) {
-                Text(
+            Column {
+                MiuixText(
                     text = stringResource(Res.string.download),
                     modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                     fontSize = bodyFontSize,
                     fontWeight = FontWeight.SemiBold
                 )
-                DownloadTextView("Official (ultimateota)", romInfoState.value.official1Download, romInfoState.value.official1Download, romInfoState.value.fileName)
+                DownloadTextView(
+                    "Official (ultimateota)",
+                    romInfoState.value.official1Download,
+                    romInfoState.value.official1Download,
+                    romInfoState.value.fileName
+                )
                 DownloadTextView("Official (superota)", romInfoState.value.official2Download, romInfoState.value.official2Download, romInfoState.value.fileName)
                 DownloadTextView("CDN (cdnorg)", romInfoState.value.cdn1Download, romInfoState.value.cdn1Download, romInfoState.value.fileName)
                 DownloadTextView("CDN (aliyuncs)", romInfoState.value.cdn2Download, romInfoState.value.cdn2Download, romInfoState.value.fileName, 0.dp)
@@ -98,7 +94,7 @@ fun DownloadTextView(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
+        MiuixText(
             modifier = Modifier.fillMaxWidth(0.5f),
             text = title,
             fontSize = bodyFontSize,
@@ -110,7 +106,7 @@ fun DownloadTextView(
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (copy.isNotEmpty()) {
-                Text(
+                MiuixText(
                     modifier = Modifier
                         .padding(end = 16.dp)
                         .clickable(
@@ -124,9 +120,9 @@ fun DownloadTextView(
                     text = stringResource(Res.string.copy_button),
                     fontSize = bodyFontSize,
                     fontWeight = FontWeight.SemiBold,
-                    color = ButtonDefaults.textButtonColors().contentColor
+                    color = MiuixTheme.colorScheme.primary
                 )
-                Text(
+                MiuixText(
                     modifier = Modifier.clickable(
                         onClick = {
                             downloadToLocal(download, fileName)
@@ -137,7 +133,7 @@ fun DownloadTextView(
                     text = stringResource(Res.string.download_button),
                     fontSize = bodyFontSize,
                     fontWeight = FontWeight.SemiBold,
-                    color = ButtonDefaults.textButtonColors().contentColor
+                    color = MiuixTheme.colorScheme.primary
                 )
             }
         }

@@ -12,12 +12,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -32,6 +26,9 @@ import data.DataHelper
 import misc.MessageUtils.Companion.showMessage
 import misc.bodyFontSize
 import org.jetbrains.compose.resources.stringResource
+import top.yukonga.miuix.kmp.basic.MiuixCard
+import top.yukonga.miuix.kmp.basic.MiuixText
+import top.yukonga.miuix.kmp.theme.MiuixTheme
 import ui.components.TextWithIcon
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.changelog
@@ -53,17 +50,11 @@ fun MoreInfoCardViews(
         enter = fadeIn(animationSpec = tween(400)),
         exit = fadeOut(animationSpec = tween(400))
     ) {
-        Card(
-            colors = CardDefaults.cardColors(
-                contentColor = MaterialTheme.colorScheme.onBackground,
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
-            ),
-            elevation = CardDefaults.cardElevation(2.dp),
-            modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
-            shape = RoundedCornerShape(10.dp)
+        MiuixCard(
+            modifier = Modifier.padding(horizontal = 28.dp),
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(16.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
                 MoreTextView(stringResource(Res.string.filename), romInfoState.value.fileName)
                 MoreTextView(stringResource(Res.string.filesize), romInfoState.value.fileSize)
@@ -81,7 +72,7 @@ fun MoreTextView(
     val content = remember { mutableStateOf("") }
     content.value = text
 
-    Text(
+    MiuixText(
         text = title,
         fontSize = bodyFontSize,
         fontWeight = FontWeight.SemiBold
@@ -92,7 +83,7 @@ fun MoreTextView(
             fadeIn(animationSpec = tween(1500)) togetherWith fadeOut(animationSpec = tween(300))
         }
     ) {
-        Text(
+        MiuixText(
             text = it,
             modifier = Modifier.padding(bottom = 8.dp),
             fontSize = bodyFontSize
@@ -114,12 +105,12 @@ fun ChangelogView(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
+            MiuixText(
                 text = stringResource(Res.string.changelog),
                 fontSize = bodyFontSize,
                 fontWeight = FontWeight.SemiBold
             )
-            Text(
+            MiuixText(
                 modifier = Modifier.clickable(
                     onClick = {
                         copyToClipboard(changelog)
@@ -130,7 +121,7 @@ fun ChangelogView(
                 text = stringResource(Res.string.copy_button),
                 fontSize = bodyFontSize,
                 fontWeight = FontWeight.SemiBold,
-                color = ButtonDefaults.textButtonColors().contentColor
+                color = MiuixTheme.colorScheme.primary
             )
         }
         iconInfo.value.forEach {

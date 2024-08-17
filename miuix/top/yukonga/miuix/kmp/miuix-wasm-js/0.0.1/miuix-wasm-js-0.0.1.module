@@ -1,0 +1,209 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "url": "../../miuix/0.0.1/miuix-0.0.1.module",
+    "group": "top.yukonga.miuix.kmp",
+    "module": "miuix",
+    "version": "0.0.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.10"
+    }
+  },
+  "variants": [
+    {
+      "name": "wasmJsApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.platform.type": "wasm",
+        "org.jetbrains.kotlin.wasm.target": "js"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "2.0.20-RC2"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "miuix-wasm-js-0.0.1.klib",
+          "url": "miuix-wasm-js-0.0.1.klib",
+          "size": 281970,
+          "sha512": "ea18d7b7baf9f0b39258cfcd736fd208741186f75ab5b3b31cd5f9ab034a2422fc194a4eefafea74e3f8007be6651415f6fba176903afe04192630756e62bf77",
+          "sha256": "8354a22ca207f0252dbf685e1e7cc0e3148799ebe923bede4326219e6eeb5b55",
+          "sha1": "3747c5f8776dcba30cf46fd32289644ec54cd07a",
+          "md5": "d6924ab3ac5efb9bdd208546c31c7085"
+        }
+      ]
+    },
+    {
+      "name": "wasmJsRuntimeElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.platform.type": "wasm",
+        "org.jetbrains.kotlin.wasm.target": "js"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "2.0.20-RC2"
+          }
+        },
+        {
+          "group": "org.jetbrains.compose.runtime",
+          "module": "runtime",
+          "version": {
+            "requires": "1.7.0-alpha02"
+          }
+        },
+        {
+          "group": "org.jetbrains.compose.foundation",
+          "module": "foundation",
+          "version": {
+            "requires": "1.7.0-alpha02"
+          }
+        },
+        {
+          "group": "org.jetbrains.compose.material3",
+          "module": "material3",
+          "version": {
+            "requires": "1.7.0-alpha02"
+          }
+        },
+        {
+          "group": "org.jetbrains.compose.ui",
+          "module": "ui",
+          "version": {
+            "requires": "1.7.0-alpha02"
+          }
+        },
+        {
+          "group": "org.jetbrains.compose.components",
+          "module": "components-resources",
+          "version": {
+            "requires": "1.7.0-alpha02"
+          }
+        },
+        {
+          "group": "org.jetbrains.compose.components",
+          "module": "components-ui-tooling-preview",
+          "version": {
+            "requires": "1.7.0-alpha02"
+          }
+        },
+        {
+          "group": "dev.chrisbanes.haze",
+          "module": "haze",
+          "version": {
+            "requires": "0.9.0-alpha06"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "miuix-wasm-js-0.0.1.klib",
+          "url": "miuix-wasm-js-0.0.1.klib",
+          "size": 281970,
+          "sha512": "ea18d7b7baf9f0b39258cfcd736fd208741186f75ab5b3b31cd5f9ab034a2422fc194a4eefafea74e3f8007be6651415f6fba176903afe04192630756e62bf77",
+          "sha256": "8354a22ca207f0252dbf685e1e7cc0e3148799ebe923bede4326219e6eeb5b55",
+          "sha1": "3747c5f8776dcba30cf46fd32289644ec54cd07a",
+          "md5": "d6924ab3ac5efb9bdd208546c31c7085"
+        }
+      ]
+    },
+    {
+      "name": "wasmJsResourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.libraryelements": "kotlin-multiplatformresourcesjs",
+        "org.gradle.usage": "kotlin-multiplatformresourcesjs",
+        "org.jetbrains.kotlin.platform.type": "wasm",
+        "org.jetbrains.kotlin.wasm.target": "js"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "2.0.20-RC2"
+          }
+        },
+        {
+          "group": "org.jetbrains.compose.runtime",
+          "module": "runtime",
+          "version": {
+            "requires": "1.7.0-alpha02"
+          }
+        },
+        {
+          "group": "org.jetbrains.compose.foundation",
+          "module": "foundation",
+          "version": {
+            "requires": "1.7.0-alpha02"
+          }
+        },
+        {
+          "group": "org.jetbrains.compose.material3",
+          "module": "material3",
+          "version": {
+            "requires": "1.7.0-alpha02"
+          }
+        },
+        {
+          "group": "org.jetbrains.compose.ui",
+          "module": "ui",
+          "version": {
+            "requires": "1.7.0-alpha02"
+          }
+        },
+        {
+          "group": "org.jetbrains.compose.components",
+          "module": "components-resources",
+          "version": {
+            "requires": "1.7.0-alpha02"
+          }
+        },
+        {
+          "group": "org.jetbrains.compose.components",
+          "module": "components-ui-tooling-preview",
+          "version": {
+            "requires": "1.7.0-alpha02"
+          }
+        },
+        {
+          "group": "dev.chrisbanes.haze",
+          "module": "haze",
+          "version": {
+            "requires": "0.9.0-alpha06"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "miuix-0.0.1.kotlin_resources.zip",
+          "url": "miuix-wasm-js-0.0.1-kotlin_resources.kotlin_resources.zip",
+          "size": 2826,
+          "sha512": "307fe6adbd443494a30526aa93aa807570a36df7fc21c7785a4452da7cbc061d966c7fe1accbddcac61621688c550da0f483ccc30ecd1b5f6d7a754038df5ac8",
+          "sha256": "4495197122248b7f4940eb0c61790b038d20915a4ffb9fff84d1324b961d17ad",
+          "sha1": "d0b9a6040a5ecbf0119ff985fbf427f5750d3e07",
+          "md5": "ae2e239766b41d96047d8704178ba607"
+        }
+      ]
+    }
+  ]
+}

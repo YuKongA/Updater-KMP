@@ -2,7 +2,7 @@ name: Action CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ miuix ]
     paths-ignore:
       - 'README.md'
       - 'LICENSE'
