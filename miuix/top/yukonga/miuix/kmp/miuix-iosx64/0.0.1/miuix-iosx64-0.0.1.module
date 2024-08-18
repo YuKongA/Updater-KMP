@@ -87,11 +87,11 @@
         {
           "name": "miuix.klib",
           "url": "miuix-iosx64-0.0.1.klib",
-          "size": 278473,
-          "sha512": "74f2c51eb70f1ebb2f345b242aada6372bcb25990cca151074dff089932c77ada869c4b3e5c92c5f757c359e0c7c0d86d89b4b750c47466b8e3b7d80446559fa",
-          "sha256": "4c664d9797bd9dd9bfcec39a7da551722caa5941fd905e2f38195b2a9c9802e1",
-          "sha1": "cafc79c406034902ca303b8351be7b404206c0ca",
-          "md5": "786ae5f2dbf38b6457f25e85c7112850"
+          "size": 278707,
+          "sha512": "73ba0ca7287538a9019bb30d50b699cbacf7c3d3f10ce779489ae385c8b527d8008f770a02cf3fc12d2346512991cd2416a412822d0e7918382a1fd21f4d89f0",
+          "sha256": "e31fcf07002a099b9517ccfe89bc83bb0afc030cd07431f2a7afd70465923e69",
+          "sha1": "231182ce939d857c9a775224e527a19767d1e152",
+          "md5": "4b2b42e8b28af4c8375b783dda53c14a"
         }
       ]
     },

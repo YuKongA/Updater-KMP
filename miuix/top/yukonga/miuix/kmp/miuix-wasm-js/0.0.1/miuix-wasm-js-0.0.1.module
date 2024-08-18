@@ -37,11 +37,11 @@
         {
           "name": "miuix-wasm-js-0.0.1.klib",
           "url": "miuix-wasm-js-0.0.1.klib",
-          "size": 284403,
-          "sha512": "be96173f820f58b5a988b099562de7e440c2fff489c523ba983bc3261c983fde4067d44e8f2d526560c6c9467995e6c1fb0a0aa68c6a11db55bfe849b7547454",
-          "sha256": "ddfb5f80de6c55ac4eebc65ffa1818da5b7f37e4de7e7aceaf1b0d2d008194f2",
-          "sha1": "47c3b692d839779f01c6d379267e51201aeaf2b0",
-          "md5": "6899bd79249540a2368e326040f45120"
+          "size": 284613,
+          "sha512": "299513a92642b0e581481d17f664532443cc79b370fc46ac8169cfb8fd31260c1beb8f67732bb6ad6eda9ec6daf2d690c022a7e045f363bebb54aad3426fcec2",
+          "sha256": "1b9ead621b9181a039cde23f4619c932790c9f0524a8b4ecc792fbd8b9d14cc4",
+          "sha1": "20fae9cc21192a8d069c66e904bf45aa32fbbf30",
+          "md5": "ec0c0b2cc7b5b8066d2945bff2bf6757"
         }
       ]
     },
@@ -116,11 +116,11 @@
         {
           "name": "miuix-wasm-js-0.0.1.klib",
           "url": "miuix-wasm-js-0.0.1.klib",
-          "size": 284403,
-          "sha512": "be96173f820f58b5a988b099562de7e440c2fff489c523ba983bc3261c983fde4067d44e8f2d526560c6c9467995e6c1fb0a0aa68c6a11db55bfe849b7547454",
-          "sha256": "ddfb5f80de6c55ac4eebc65ffa1818da5b7f37e4de7e7aceaf1b0d2d008194f2",
-          "sha1": "47c3b692d839779f01c6d379267e51201aeaf2b0",
-          "md5": "6899bd79249540a2368e326040f45120"
+          "size": 284613,
+          "sha512": "299513a92642b0e581481d17f664532443cc79b370fc46ac8169cfb8fd31260c1beb8f67732bb6ad6eda9ec6daf2d690c022a7e045f363bebb54aad3426fcec2",
+          "sha256": "1b9ead621b9181a039cde23f4619c932790c9f0524a8b4ecc792fbd8b9d14cc4",
+          "sha1": "20fae9cc21192a8d069c66e904bf45aa32fbbf30",
+          "md5": "ec0c0b2cc7b5b8066d2945bff2bf6757"
         }
       ]
     },

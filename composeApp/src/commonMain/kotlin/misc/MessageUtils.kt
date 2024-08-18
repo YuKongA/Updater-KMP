@@ -58,7 +58,8 @@ class MessageUtils {
                 ) {
                     Snackbar(
                         snackbarData = it,
-                        contentColor = MiuixTheme.colorScheme.background
+                        containerColor = MiuixTheme.colorScheme.secondaryContainer,
+                        contentColor = MiuixTheme.colorScheme.onBackground
                     )
                 }
             }

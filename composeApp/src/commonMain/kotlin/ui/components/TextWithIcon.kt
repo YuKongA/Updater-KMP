@@ -9,6 +9,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -17,16 +18,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.rememberImagePainter
 import misc.bodyFontSize
+import misc.bodySmallFontSize
 import top.yukonga.miuix.kmp.basic.MiuixText
+import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 fun TextWithIcon(
     changelog: String,
     iconName: String,
-    iconLink: String
+    iconLink: String,
+    padding: Dp = 8.dp
 ) {
     val imagePainter = rememberImagePainter(iconLink)
     val content = remember { mutableStateOf("") }
@@ -39,7 +44,6 @@ fun TextWithIcon(
         }
     ) {
         Column {
-            Spacer(modifier = Modifier.size(4.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -51,14 +55,17 @@ fun TextWithIcon(
                 MiuixText(
                     modifier = Modifier.padding(horizontal = 4.dp),
                     text = iconName,
+                    color = MiuixTheme.colorScheme.subTextMain,
                     fontSize = bodyFontSize,
                     fontWeight = FontWeight.Medium
                 )
             }
             MiuixText(
                 text = it,
-                fontSize = bodyFontSize
+                color = MiuixTheme.colorScheme.subTextMain,
+                fontSize = bodySmallFontSize
             )
+            Spacer(modifier = Modifier.height(padding))
         }
     }
 }

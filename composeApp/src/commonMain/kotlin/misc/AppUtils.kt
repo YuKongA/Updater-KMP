@@ -30,6 +30,7 @@ import updater.composeapp.generated.resources.toast_wrong_info
 val json = Json { ignoreUnknownKeys = true }
 
 val bodyFontSize = 14.5.sp
+val bodySmallFontSize = 14.sp
 
 /**
  * Update the data used to display ROM info.

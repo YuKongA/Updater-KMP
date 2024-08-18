@@ -29,10 +29,8 @@ import top.yukonga.miuix.kmp.basic.MiuixSurface
 import top.yukonga.miuix.kmp.rememberMiuixTopAppBarState
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.utils.MiuixDialogUtil.Companion.MiuixDialogHost
-import ui.DownloadCardViews
 import ui.LoginCardView
-import ui.MessageCardViews
-import ui.MoreInfoCardViews
+import ui.InfoCardViews
 import ui.TextFieldViews
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.app_name
@@ -97,12 +95,8 @@ fun App() {
                                         Column(
                                             modifier = Modifier.padding(horizontal = 28.dp)
                                         ) {
-                                            MessageCardViews(curRomInfo)
-                                            MoreInfoCardViews(curRomInfo, curIconInfo)
-                                            DownloadCardViews(curRomInfo)
-                                            MessageCardViews(incRomInfo)
-                                            MoreInfoCardViews(incRomInfo, incIconInfo)
-                                            DownloadCardViews(incRomInfo)
+                                            InfoCardViews(curRomInfo, curIconInfo)
+                                            InfoCardViews(incRomInfo, incIconInfo)
                                         }
                                         Spacer(modifier = Modifier.height(12.dp))
                                     }
@@ -114,12 +108,8 @@ fun App() {
                                                 TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
                                             }
                                             Column(modifier = Modifier.weight(1.0f).padding(end = 28.dp)) {
-                                                MessageCardViews(curRomInfo)
-                                                MoreInfoCardViews(curRomInfo, curIconInfo)
-                                                DownloadCardViews(curRomInfo)
-                                                MessageCardViews(incRomInfo)
-                                                MoreInfoCardViews(incRomInfo, incIconInfo)
-                                                DownloadCardViews(incRomInfo)
+                                                InfoCardViews(curRomInfo, curIconInfo)
+                                                InfoCardViews(incRomInfo, incIconInfo)
                                             }
                                         }
                                         Spacer(modifier = Modifier.height(12.dp))
