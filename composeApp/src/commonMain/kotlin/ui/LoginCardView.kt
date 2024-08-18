@@ -49,20 +49,21 @@ fun LoginCardView(
     val icon = if (isLogin.value == 1) Icons.Filled.DoneAll else Icons.Filled.Done
 
     MiuixCard(
+        isSecondary = true,
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 28.dp)
-            .padding(vertical = 16.dp)
+            .padding(top = 16.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Icon(
+                modifier = Modifier.size(28.dp).padding(start = 6.dp),
                 imageVector = icon,
                 tint = MiuixTheme.colorScheme.onPrimary,
-                contentDescription = null,
-                modifier = Modifier.size(28.dp)
+                contentDescription = null
             )
             Column(modifier = Modifier.padding(start = 24.dp)) {
                 MiuixText(

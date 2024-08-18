@@ -64,7 +64,8 @@ fun MessageCardViews(
                 )
             }
             MiuixCard(
-                modifier = Modifier.padding(horizontal = 28.dp).padding(bottom = 16.dp),
+                isSecondary = true,
+                modifier = Modifier.padding(bottom = 16.dp),
             ) {
                 MessageCardView(
                     romInfoState.value.device,

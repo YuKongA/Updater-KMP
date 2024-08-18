@@ -37,11 +37,11 @@
         {
           "name": "miuix-desktop-0.0.1.jar",
           "url": "miuix-desktop-0.0.1.jar",
-          "size": 362467,
-          "sha512": "8916eebef3a1ce0034faa4f89dec19df62149237a9f81f91d116a55c0af543fd3bf0b398888777f1e1811f9b6a4498bf63fc0e64e982efe50caa5c6e78bccf91",
-          "sha256": "4eb6f1e744bda1e660bea92d3885cf936b595a2ce371d2b31db7447b0fa43cd3",
-          "sha1": "d10a4f7b0fd31ccbebf221a970bc7a35e4009300",
-          "md5": "1d45616eeffc2789e0ec40163234ce53"
+          "size": 364380,
+          "sha512": "52b23c1e390b1f600b8e6337bb77886ef46d186f6e7b244bdbed06b742d2e07ee82c6ecaea2e52ba8a5dcccbdf7bb8b1c452e7b27df810824658e07cf12faf83",
+          "sha256": "2d18a0e507064407cac5de5cf42ff4df100ad6fb461d0aa7819d34137b9bbe72",
+          "sha1": "0189389f9a6b77447b30745561829c755a4bace4",
+          "md5": "77fb2fad2e336e442d9b2a9bf01bf30f"
         }
       ]
     },
@@ -123,11 +123,11 @@
         {
           "name": "miuix-desktop-0.0.1.jar",
           "url": "miuix-desktop-0.0.1.jar",
-          "size": 362467,
-          "sha512": "8916eebef3a1ce0034faa4f89dec19df62149237a9f81f91d116a55c0af543fd3bf0b398888777f1e1811f9b6a4498bf63fc0e64e982efe50caa5c6e78bccf91",
-          "sha256": "4eb6f1e744bda1e660bea92d3885cf936b595a2ce371d2b31db7447b0fa43cd3",
-          "sha1": "d10a4f7b0fd31ccbebf221a970bc7a35e4009300",
-          "md5": "1d45616eeffc2789e0ec40163234ce53"
+          "size": 364380,
+          "sha512": "52b23c1e390b1f600b8e6337bb77886ef46d186f6e7b244bdbed06b742d2e07ee82c6ecaea2e52ba8a5dcccbdf7bb8b1c452e7b27df810824658e07cf12faf83",
+          "sha256": "2d18a0e507064407cac5de5cf42ff4df100ad6fb461d0aa7819d34137b9bbe72",
+          "sha1": "0189389f9a6b77447b30745561829c755a4bace4",
+          "md5": "77fb2fad2e336e442d9b2a9bf01bf30f"
         }
       ]
     }

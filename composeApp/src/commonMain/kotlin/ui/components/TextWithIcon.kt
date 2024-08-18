@@ -44,12 +44,12 @@ fun TextWithIcon(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(18.dp),
                     painter = imagePainter,
                     contentDescription = null,
                 )
                 MiuixText(
-                    modifier = Modifier.padding(horizontal = 8.dp),
+                    modifier = Modifier.padding(horizontal = 4.dp),
                     text = iconName,
                     fontSize = bodyFontSize,
                     fontWeight = FontWeight.Medium

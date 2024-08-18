@@ -36,11 +36,11 @@
         {
           "name": "miuix-release.aar",
           "url": "miuix-android-0.0.1.aar",
-          "size": 345158,
-          "sha512": "c3c4c688b9530ca35a105c1d9095b66d6ae72fbfa4021918119c94a6bb1c845b34a118dfd8352a89d0e58a888c965edeb7358618f1784f49309e2602d5d8b0b9",
-          "sha256": "78ce508b8ad8ad0a878a25c35dbaf4c0e79d88715ba8ed845f1aed105f34fb6a",
-          "sha1": "1e2cc34e8f46abd41bd3924e11301e1a3760c64c",
-          "md5": "7818cb306afa10d49329714952eba069"
+          "size": 347079,
+          "sha512": "ae96dde8055bd5a6bc993379e8a245b63277515668799af45c4ce6187084577444671dbb54537dee3f5e6df9f00f57e2e08b0f8bdc8b723f17ae64116a623a58",
+          "sha256": "3b3edbfbb166bb4be7f0925a6d905059873ad1e60ea2025602bd413b2371c6ba",
+          "sha1": "285fd21f51a4f93f94ffc21ebaec940ff0f7c24d",
+          "md5": "15b1de94a3ec656e259cad1ba56aae3c"
         }
       ]
     },
@@ -268,11 +268,11 @@
         {
           "name": "miuix-release.aar",
           "url": "miuix-android-0.0.1.aar",
-          "size": 345158,
-          "sha512": "c3c4c688b9530ca35a105c1d9095b66d6ae72fbfa4021918119c94a6bb1c845b34a118dfd8352a89d0e58a888c965edeb7358618f1784f49309e2602d5d8b0b9",
-          "sha256": "78ce508b8ad8ad0a878a25c35dbaf4c0e79d88715ba8ed845f1aed105f34fb6a",
-          "sha1": "1e2cc34e8f46abd41bd3924e11301e1a3760c64c",
-          "md5": "7818cb306afa10d49329714952eba069"
+          "size": 347079,
+          "sha512": "ae96dde8055bd5a6bc993379e8a245b63277515668799af45c4ce6187084577444671dbb54537dee3f5e6df9f00f57e2e08b0f8bdc8b723f17ae64116a623a58",
+          "sha256": "3b3edbfbb166bb4be7f0925a6d905059873ad1e60ea2025602bd413b2371c6ba",
+          "sha1": "285fd21f51a4f93f94ffc21ebaec940ff0f7c24d",
+          "md5": "15b1de94a3ec656e259cad1ba56aae3c"
         }
       ]
     }

@@ -66,7 +66,7 @@ fun TextFieldViews(
     }
 
     Column(
-        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -93,6 +93,7 @@ fun TextFieldViews(
             label = stringResource(Res.string.android_version)
         )
         MiuixTextField(
+            isSecondary = true,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 28.dp),
             value = systemVersion.value,
             onValueChange = { systemVersion.value = it },

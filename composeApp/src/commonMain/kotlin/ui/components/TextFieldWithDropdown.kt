@@ -42,7 +42,7 @@ fun TextFieldWithDropdown(
     ExposedDropdownMenuBox(
         modifier = Modifier
             .padding(horizontal = 28.dp)
-            .background(MiuixTheme.colorScheme.background)
+            .background(MiuixTheme.colorScheme.secondaryBackground)
             .fillMaxWidth(),
         expanded = isDropdownExpanded,
         onExpandedChange = {
@@ -51,6 +51,7 @@ fun TextFieldWithDropdown(
         },
     ) {
         MiuixTextField(
+            isSecondary = true,
             value = text.value,
             onValueChange = {},
             label = label,
@@ -62,8 +63,8 @@ fun TextFieldWithDropdown(
             modifier = Modifier
                 .exposedDropdownSize()
                 .heightIn(max = 250.dp),
-            containerColor = MiuixTheme.colorScheme.dropdownBackground,
-            shape = RoundedCornerShape(20.dp),
+            containerColor = MiuixTheme.colorScheme.background,
+            shape = RoundedCornerShape(16.dp),
             expanded = isDropdownExpanded,
             onDismissRequest = { isDropdownExpanded = false },
         ) {

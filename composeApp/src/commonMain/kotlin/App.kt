@@ -1,6 +1,7 @@
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
@@ -26,6 +27,7 @@ import top.yukonga.miuix.kmp.basic.MiuixLazyColumn
 import top.yukonga.miuix.kmp.basic.MiuixScaffold
 import top.yukonga.miuix.kmp.basic.MiuixSurface
 import top.yukonga.miuix.kmp.rememberMiuixTopAppBarState
+import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.utils.MiuixDialogUtil.Companion.MiuixDialogHost
 import ui.DownloadCardViews
 import ui.LoginCardView
@@ -63,6 +65,7 @@ fun App() {
     AppTheme {
         MiuixSurface {
             MiuixScaffold(
+                containerColor = MiuixTheme.colorScheme.secondaryBackground,
                 modifier = Modifier
                     .imePadding()
                     .fillMaxSize()
@@ -76,7 +79,6 @@ fun App() {
                 },
                 dialogHost = { MiuixDialogHost() }
             ) {
-                println("getWindowSize().height.dp: ${getWindowSize().height.dp}")
                 MiuixBox {
                     MiuixLazyColumn(
                         modifier = Modifier.height(getWindowSize().height.dp),
@@ -92,21 +94,26 @@ fun App() {
                                     Column {
                                         LoginCardView(isLogin)
                                         TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
-                                        MessageCardViews(curRomInfo)
-                                        MoreInfoCardViews(curRomInfo, curIconInfo)
-                                        DownloadCardViews(curRomInfo)
-                                        MessageCardViews(incRomInfo)
-                                        MoreInfoCardViews(incRomInfo, incIconInfo)
-                                        DownloadCardViews(incRomInfo)
+                                        Column(
+                                            modifier = Modifier.padding(horizontal = 28.dp)
+                                        ) {
+                                            MessageCardViews(curRomInfo)
+                                            MoreInfoCardViews(curRomInfo, curIconInfo)
+                                            DownloadCardViews(curRomInfo)
+                                            MessageCardViews(incRomInfo)
+                                            MoreInfoCardViews(incRomInfo, incIconInfo)
+                                            DownloadCardViews(incRomInfo)
+                                        }
+                                        Spacer(modifier = Modifier.height(12.dp))
                                     }
                                 } else {
                                     Column {
                                         Row {
-                                            Column(modifier = Modifier.weight(0.8f).padding(end = 20.dp)) {
+                                            Column(modifier = Modifier.weight(0.8f)) {
                                                 LoginCardView(isLogin)
                                                 TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
                                             }
-                                            Column(modifier = Modifier.weight(1.0f)) {
+                                            Column(modifier = Modifier.weight(1.0f).padding(end = 28.dp)) {
                                                 MessageCardViews(curRomInfo)
                                                 MoreInfoCardViews(curRomInfo, curIconInfo)
                                                 DownloadCardViews(curRomInfo)
@@ -115,6 +122,7 @@ fun App() {
                                                 DownloadCardViews(incRomInfo)
                                             }
                                         }
+                                        Spacer(modifier = Modifier.height(12.dp))
                                     }
                                 }
                             }

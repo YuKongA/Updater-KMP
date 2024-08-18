@@ -18,6 +18,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import showToast
+import top.yukonga.miuix.kmp.theme.MiuixTheme
 import useToast
 
 class MessageUtils {
@@ -56,7 +57,8 @@ class MessageUtils {
                     hostState = snackbarHostState
                 ) {
                     Snackbar(
-                        snackbarData = it
+                        snackbarData = it,
+                        contentColor = MiuixTheme.colorScheme.background
                     )
                 }
             }

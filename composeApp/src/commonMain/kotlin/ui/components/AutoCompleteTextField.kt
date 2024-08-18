@@ -2,6 +2,7 @@ package ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,12 +45,13 @@ fun AutoCompleteTextField(
     ExposedDropdownMenuBox(
         modifier = Modifier
             .padding(horizontal = 28.dp)
-            .background(MiuixTheme.colorScheme.background)
+            .background(MiuixTheme.colorScheme.secondaryBackground)
             .fillMaxWidth(),
         expanded = isDropdownExpanded,
         onExpandedChange = { isDropdownExpanded = text.value.isNotEmpty() }
     ) {
         MiuixTextField(
+            isSecondary = true,
             value = text.value,
             onValueChange = {
                 onValueChange.value = it
@@ -57,7 +59,8 @@ fun AutoCompleteTextField(
             },
             singleLine = true,
             label = label,
-            modifier = Modifier.menuAnchor(type = PrimaryEditable, enabled = true),
+            modifier = Modifier
+                .menuAnchor(type = PrimaryEditable, enabled = true),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = {
                 isDropdownExpanded = false
@@ -75,8 +78,8 @@ fun AutoCompleteTextField(
             modifier = Modifier
                 .exposedDropdownSize()
                 .heightIn(max = 250.dp),
-            containerColor = MiuixTheme.colorScheme.dropdownBackground,
-            shape = RoundedCornerShape(20.dp),
+            containerColor = MiuixTheme.colorScheme.background,
+            shape = RoundedCornerShape(16.dp),
             expanded = isDropdownExpanded && list.isNotEmpty(),
             onDismissRequest = { isDropdownExpanded = false }
         ) {

@@ -51,14 +51,15 @@ fun DownloadCardViews(
         exit = fadeOut(animationSpec = tween(400))
     ) {
         MiuixCard(
+            isSecondary = true,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 28.dp, vertical = 16.dp),
+                .padding(vertical = 16.dp),
         ) {
             Column {
                 MiuixText(
                     text = stringResource(Res.string.download),
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                     fontSize = bodyFontSize,
                     fontWeight = FontWeight.SemiBold
                 )

@@ -51,7 +51,7 @@ fun MoreInfoCardViews(
         exit = fadeOut(animationSpec = tween(400))
     ) {
         MiuixCard(
-            modifier = Modifier.padding(horizontal = 28.dp),
+            isSecondary = true
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth()
