@@ -37,11 +37,11 @@
         {
           "name": "miuix-wasm-js-0.0.1.klib",
           "url": "miuix-wasm-js-0.0.1.klib",
-          "size": 304628,
-          "sha512": "60d1b758085f1c88d5ca8ce9073b737efb32798322d0d183911f4d9eb8cb814e275ce377bde6ae98f080be73f8acf61778501778b406647951c7fb59698d74b2",
-          "sha256": "561fe2be6e369cf60ee9492b16634f2c3283e77419fbb53a1951b28625b4d1bf",
-          "sha1": "84dea8347e94d557af2461536f4ea586ec223273",
-          "md5": "e2b76bb393710f27596ab22275b89f5a"
+          "size": 304002,
+          "sha512": "ad630056138c7d196dd53fe010635bb620d2e75666720d245d88a414069c977b55f4c7895a6605d0079aede7b4626e4edabc5ad5eb5bc17e45dfad4b0d1051a0",
+          "sha256": "a5caa3d7a725773ff6387d11ac0d27919edd9b5630b0125ff9146401d98bf761",
+          "sha1": "8fd81d929c490f877ff1f3acb461e6fac4c691d4",
+          "md5": "ace5d29638d5caeafefb3fdc21e88de5"
         }
       ]
     },
@@ -116,11 +116,11 @@
         {
           "name": "miuix-wasm-js-0.0.1.klib",
           "url": "miuix-wasm-js-0.0.1.klib",
-          "size": 304628,
-          "sha512": "60d1b758085f1c88d5ca8ce9073b737efb32798322d0d183911f4d9eb8cb814e275ce377bde6ae98f080be73f8acf61778501778b406647951c7fb59698d74b2",
-          "sha256": "561fe2be6e369cf60ee9492b16634f2c3283e77419fbb53a1951b28625b4d1bf",
-          "sha1": "84dea8347e94d557af2461536f4ea586ec223273",
-          "md5": "e2b76bb393710f27596ab22275b89f5a"
+          "size": 304002,
+          "sha512": "ad630056138c7d196dd53fe010635bb620d2e75666720d245d88a414069c977b55f4c7895a6605d0079aede7b4626e4edabc5ad5eb5bc17e45dfad4b0d1051a0",
+          "sha256": "a5caa3d7a725773ff6387d11ac0d27919edd9b5630b0125ff9146401d98bf761",
+          "sha1": "8fd81d929c490f877ff1f3acb461e6fac4c691d4",
+          "md5": "ace5d29638d5caeafefb3fdc21e88de5"
         }
       ]
     },
@@ -139,11 +139,11 @@
         {
           "name": "miuix-wasm-js-0.0.1-sources.jar",
           "url": "miuix-wasm-js-0.0.1-sources.jar",
-          "size": 56989,
-          "sha512": "9f6b7f741a9e567400540899e60f4e451735f91ff3f7eacfdfb890b5dbda70558ca5ef3ae1773ffeebbdc5b3d5591ad3ace367e132735dfcb58ed3c7faf3eb35",
-          "sha256": "89d3a9c598042ef31876530be174d2de013955007e8dd0b1f56deb29b608d07e",
-          "sha1": "34bd1d7d0fd5d16e30429bcda30f76848b398629",
-          "md5": "ab50e2a5ae8e8ade2b260126b6304197"
+          "size": 57012,
+          "sha512": "fa4bf4f280ac64803e1a643ac56e014e4b41a4e8010516063360caef1c915417830b75a4ea1f2012a1d00ae2c9babf079514871de72cc5a1162035421d7b3a55",
+          "sha256": "5146abf398e26bbe88b740c4cc5d33bebf44a86ee1067b1f529e84be53c11d56",
+          "sha1": "c84c6464f761a207706329142fc7e4577b51db89",
+          "md5": "9cc8ca3fc9e6c2e8cbeae00c1493bc08"
         }
       ]
     },

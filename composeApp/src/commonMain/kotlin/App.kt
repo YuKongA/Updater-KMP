@@ -28,7 +28,6 @@ import top.yukonga.miuix.kmp.basic.MiuixScaffold
 import top.yukonga.miuix.kmp.basic.MiuixSurface
 import top.yukonga.miuix.kmp.rememberMiuixTopAppBarState
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.utils.MiuixDialogUtil.Companion.MiuixDialogHost
 import ui.InfoCardViews
 import ui.LoginCardView
 import ui.TextFieldViews
@@ -74,8 +73,7 @@ fun App() {
                         color = Color.Transparent,
                         scrollBehavior = scrollBehavior
                     )
-                },
-                dialogHost = { MiuixDialogHost() }
+                }
             ) {
                 MiuixBox {
                     MiuixLazyColumn(

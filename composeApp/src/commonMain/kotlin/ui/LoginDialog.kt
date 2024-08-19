@@ -44,7 +44,8 @@ import top.yukonga.miuix.kmp.basic.MiuixButton
 import top.yukonga.miuix.kmp.basic.MiuixText
 import top.yukonga.miuix.kmp.basic.MiuixTextField
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.utils.MiuixDialogUtil
+import top.yukonga.miuix.kmp.utils.MiuixPopupUtil.Companion.dismissDialog
+import top.yukonga.miuix.kmp.utils.MiuixPopupUtil.Companion.showDialog
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.account
 import updater.composeapp.generated.resources.account_or_password_empty
@@ -101,10 +102,9 @@ fun LoginDialog(
             tint = MiuixTheme.colorScheme.onBackground
         )
     }
-    MiuixDialogUtil.showDialog(
-        visible = showDialog,
-        content = {
-            if (isLogin.value != 1) {
+    if (showDialog.value && isLogin.value != 1) {
+        showDialog(
+            content = {
                 MiuixSuperDialog(
                     title = stringResource(Res.string.login),
                     onDismissRequest = { showDialog.value = false }
@@ -185,6 +185,8 @@ fun LoginDialog(
                                 text = stringResource(Res.string.login),
                                 submit = true,
                                 onClick = {
+                                    showDialog.value = false
+                                    dismissDialog()
                                     showMessage(message = messageLoginIn)
                                     hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                     coroutineScope.launch {
@@ -197,7 +199,6 @@ fun LoginDialog(
                                             4 -> showMessage(message = messageSecurityError)
                                         }
                                     }
-                                    showDialog.value = false
                                 }
                             )
                             Spacer(Modifier.width(20.dp))
@@ -206,13 +207,20 @@ fun LoginDialog(
                                 text = stringResource(Res.string.cancel),
                                 onClick = {
                                     showDialog.value = false
+                                    dismissDialog()
                                     hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                 }
                             )
                         }
                     }
                 }
-            } else {
+            }
+        )
+    }
+
+    if (showDialog.value && isLogin.value == 1) {
+        showDialog(
+            content = {
                 MiuixSuperDialog(
                     title = stringResource(Res.string.logout),
                     summary = "",
@@ -229,6 +237,7 @@ fun LoginDialog(
                                     if (boolean) showMessage(message = messageLogoutSuccessful)
                                 }
                                 showDialog.value = false
+                                dismissDialog()
                                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                             }
                         )
@@ -238,12 +247,13 @@ fun LoginDialog(
                             text = stringResource(Res.string.cancel),
                             onClick = {
                                 showDialog.value = false
+                                dismissDialog()
                                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                             }
                         )
                     }
                 }
             }
-        }
-    )
+        )
+    }
 }
