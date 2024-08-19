@@ -275,7 +275,6 @@ fun ChangelogView(
                 fontWeight = FontWeight.SemiBold,
             )
             IconButton(
-                modifier = Modifier.size(26.dp),
                 onClick = {
                     copyToClipboard(changelog)
                     showMessage(messageCopySuccessful)

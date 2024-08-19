@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import data.DeviceInfoHelper
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -94,6 +95,7 @@ fun TextFieldViews(
         )
         MiuixTextField(
             isSecondary = true,
+            insideMargin = DpSize(16.dp, 18.dp),
             modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
             value = systemVersion.value,
             onValueChange = { systemVersion.value = it },

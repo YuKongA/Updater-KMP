@@ -87,11 +87,34 @@
         {
           "name": "miuix.klib",
           "url": "miuix-iosx64-0.0.1.klib",
-          "size": 278707,
-          "sha512": "73ba0ca7287538a9019bb30d50b699cbacf7c3d3f10ce779489ae385c8b527d8008f770a02cf3fc12d2346512991cd2416a412822d0e7918382a1fd21f4d89f0",
-          "sha256": "e31fcf07002a099b9517ccfe89bc83bb0afc030cd07431f2a7afd70465923e69",
-          "sha1": "231182ce939d857c9a775224e527a19767d1e152",
-          "md5": "4b2b42e8b28af4c8375b783dda53c14a"
+          "size": 299035,
+          "sha512": "d306e3337001c18d209218f3bb1880a527fa58161bc0f5259f53b2c40e0ec5b31a766ab7414a5711778c2e122d6b6584ac9e2f329277234961c78f395cf877fd",
+          "sha256": "246115750b88333845b2735bfec2f3e903ea267e3568f221ee03d109d821f2ac",
+          "sha1": "eb30dbbfe644d6733ba6f921cc45bd4070375c54",
+          "md5": "4a807ceac8a6a7a1886bc18c91db38e2"
+        }
+      ]
+    },
+    {
+      "name": "iosX64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "ios_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "files": [
+        {
+          "name": "miuix-iosx64-0.0.1-sources.jar",
+          "url": "miuix-iosx64-0.0.1-sources.jar",
+          "size": 57537,
+          "sha512": "220b0277d988ed1ce5be2c63d442d095109dc3ac44abb907a42e8f91e22b60ee63beebad3d7410d8abefdc716e0e61027c4365ac45f77f7c85583d5ba9c2abb0",
+          "sha256": "2de0da4071d0b4f6d64f5f94eb885c1d4f170b45d852d9b52af69a115d41ff1c",
+          "sha1": "67a7bef0f3369df9fc4f6f2cc0879c965525d774",
+          "md5": "2b47d099a9098c45453cdc81d7ae1271"
         }
       ]
     },

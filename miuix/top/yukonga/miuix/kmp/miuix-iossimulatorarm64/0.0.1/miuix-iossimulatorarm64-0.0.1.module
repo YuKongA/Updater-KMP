@@ -87,11 +87,34 @@
         {
           "name": "miuix.klib",
           "url": "miuix-iossimulatorarm64-0.0.1.klib",
-          "size": 278818,
-          "sha512": "c634da8354ddb90188ba5fd078c7d1ce1530293b2c6296cf517db503d5530c6b80bbecb538f3ce8c3fe54376f16545dd60e9f9fd146bdb53293527f935b0a1b5",
-          "sha256": "14123fe3824dcd9627214597451410a128f9e9dd585ecc7f9d13923016712830",
-          "sha1": "3c50b5ef966bd61b550d07806c4802c4e545f4b5",
-          "md5": "78b6f701ffc43ba0401c0e9be2360066"
+          "size": 299148,
+          "sha512": "c6bd21101abbf1625e196138b2c052dd67bb01393e3fa9cae19345648fec506dcd8df215cccc5164a7289f8dc4de396bb32ac3819ef4e487a6e2d3a0a6fe07f3",
+          "sha256": "4b28bfa0a4b96746ec09f9fcba2d3ec3a6605a087dfee51610b1f0c80d864fcf",
+          "sha1": "0a2245322d37ad87e6878b802c9cb8582edc672f",
+          "md5": "1a20848a8786f7a243f6c8a6c3cbe460"
+        }
+      ]
+    },
+    {
+      "name": "iosSimulatorArm64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "ios_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "files": [
+        {
+          "name": "miuix-iossimulatorarm64-0.0.1-sources.jar",
+          "url": "miuix-iossimulatorarm64-0.0.1-sources.jar",
+          "size": 57735,
+          "sha512": "0201a57ef2e3e207fb03aba2f539a9fbae3a1a3977ceb22f31813fd50a7c588fdb40bc60d76fe68c979761cbfad57ab1329f8f6864e4f3c55f54614586cbbe7b",
+          "sha256": "e57b1aa0356ad289f1084b3625ed99edb7fadb6b28f3abf4aa8f7fb026e416af",
+          "sha1": "69dc433f52a315703234e625f354daec3783ef97",
+          "md5": "0e6cb2180c6d591d569a31cd7d8dd797"
         }
       ]
     },

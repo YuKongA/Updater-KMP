@@ -36,11 +36,11 @@
         {
           "name": "miuix-release.aar",
           "url": "miuix-android-0.0.1.aar",
-          "size": 347163,
-          "sha512": "fdc79c5a4b5933ad3d7b08b6d8c0ae5ba2f9aba40ad144e71cf58cccad0fe634e709f6cd8e4b880eb4e340feda7e2e6ef36b110337e38d2c1c0256646a75c3ba",
-          "sha256": "e344443068db3e97ecd8bc8f10abef34d7dcbea7f08d5190636b70c2d2859e3a",
-          "sha1": "2f593dd3167153aa11c447edf01c7c51ca790940",
-          "md5": "9944899ec0d89b6e8ac6e6facdfb9860"
+          "size": 360793,
+          "sha512": "95b3a4a077a64ad000dba1fbca6c9b80b98632ac289edf5b26527af488a8ac73837fafbcd95d8836c892610374dacf88c457e87a0476fc915103c97f428935d7",
+          "sha256": "7cec69117483a4b70acfaa6a3402eaff09213ec45f60209463435386d5bacdc8",
+          "sha1": "a6ea15bec9ccfe4a193f3e080ea5d2f5747c899f",
+          "md5": "cba7ae311978d2bb7965881245ecc234"
         }
       ]
     },
@@ -268,11 +268,34 @@
         {
           "name": "miuix-release.aar",
           "url": "miuix-android-0.0.1.aar",
-          "size": 347163,
-          "sha512": "fdc79c5a4b5933ad3d7b08b6d8c0ae5ba2f9aba40ad144e71cf58cccad0fe634e709f6cd8e4b880eb4e340feda7e2e6ef36b110337e38d2c1c0256646a75c3ba",
-          "sha256": "e344443068db3e97ecd8bc8f10abef34d7dcbea7f08d5190636b70c2d2859e3a",
-          "sha1": "2f593dd3167153aa11c447edf01c7c51ca790940",
-          "md5": "9944899ec0d89b6e8ac6e6facdfb9860"
+          "size": 360793,
+          "sha512": "95b3a4a077a64ad000dba1fbca6c9b80b98632ac289edf5b26527af488a8ac73837fafbcd95d8836c892610374dacf88c457e87a0476fc915103c97f428935d7",
+          "sha256": "7cec69117483a4b70acfaa6a3402eaff09213ec45f60209463435386d5bacdc8",
+          "sha1": "a6ea15bec9ccfe4a193f3e080ea5d2f5747c899f",
+          "md5": "cba7ae311978d2bb7965881245ecc234"
+        }
+      ]
+    },
+    {
+      "name": "releaseSourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.jvm.environment": "android",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "files": [
+        {
+          "name": "miuix-android-0.0.1-sources.jar",
+          "url": "miuix-android-0.0.1-sources.jar",
+          "size": 57485,
+          "sha512": "63e62260bccd599527cf1fcee9d23ecd87e6cd4bee09f3b07b19b61e054c13df93b75539a393e9ee32a6a5b3694e0a002442cc4b904a76a140f30d2741500d8b",
+          "sha256": "f4fe0a62b91b42f034f6b3c925624bcda8d45d9e8aba3b1f5b62ae454954f504",
+          "sha1": "ca5ef62ebec840496fe7831713585e713c555d29",
+          "md5": "23e802ca4fd680113bc753cff7fdb381"
         }
       ]
     }
