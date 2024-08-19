@@ -173,7 +173,7 @@ fun handleRomInfo(
 ) {
     if (romInfo?.bigversion != null) {
         val log = StringBuilder()
-        romInfo.changelog!!.forEach { log.append(it.key).append("\n· ").append(it.value.txt.joinToString("\n· ")).append("\n\n") }
+        romInfo.changelog!!.forEach { log.append(it.key).append("\n").append(it.value.txt.joinToString("\n")).append("\n\n") }
         val changelogGroups = log.toString().trimEnd().split("\n\n")
         val changelog = changelogGroups.map { it.split("\n").drop(1).joinToString("\n") }
         val iconNames = changelogGroups.map { it.split("\n").first() }

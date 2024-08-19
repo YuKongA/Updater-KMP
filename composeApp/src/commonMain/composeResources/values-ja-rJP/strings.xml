@@ -32,9 +32,7 @@
     <string name="logged_in">ログイン済み</string>
     <string name="login_expired">ログイン期限切れ</string>
     <string name="login_expired_desc">再ログインをお勧めします</string>
-    <string name="copy_button">コピー</string>
     <string name="copy_successful">コピー成功</string>
-    <string name="download_button">ダウンロード</string>
     <string name="download_start">ダウンロード開始</string>
     <string name="security_error">セキュリティキーの取得に失敗しました</string>
     <string name="logout">ログアウト</string>

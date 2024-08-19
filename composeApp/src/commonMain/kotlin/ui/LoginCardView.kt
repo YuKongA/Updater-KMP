@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.rounded.Done
+import androidx.compose.material.icons.rounded.DoneAll
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -19,12 +19,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import isWasm
 import org.jetbrains.compose.resources.stringResource
-import top.yukonga.miuix.kmp.MiuixSuperArrow
 import top.yukonga.miuix.kmp.basic.MiuixCard
 import top.yukonga.miuix.kmp.basic.MiuixText
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import updater.composeapp.generated.resources.Res
-import updater.composeapp.generated.resources.extension_settings
 import updater.composeapp.generated.resources.logged_in
 import updater.composeapp.generated.resources.login_desc
 import updater.composeapp.generated.resources.login_expired
@@ -46,7 +44,7 @@ fun LoginCardView(
         0 -> stringResource(Res.string.login_desc)
         else -> stringResource(Res.string.login_expired_desc)
     }
-    val icon = if (isLogin.value == 1) Icons.Filled.DoneAll else Icons.Filled.Done
+    val icon = if (isLogin.value == 1) Icons.Rounded.DoneAll else Icons.Rounded.Done
 
     MiuixCard(
         isSecondary = true,

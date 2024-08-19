@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Login
-import androidx.compose.material.icons.automirrored.outlined.Logout
+import androidx.compose.material.icons.automirrored.rounded.Login
+import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
@@ -76,8 +76,8 @@ fun LoginDialog(
     val hapticFeedback = LocalHapticFeedback.current
 
     val icon = when (isLogin.value) {
-        1 -> Icons.AutoMirrored.Outlined.Logout
-        else -> Icons.AutoMirrored.Outlined.Login
+        1 -> Icons.AutoMirrored.Rounded.Logout
+        else -> Icons.AutoMirrored.Rounded.Login
     }
 
     val messageLoginIn = stringResource(Res.string.logging_in)

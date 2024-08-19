@@ -6,12 +6,17 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ContentCopy
+import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -22,7 +27,6 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import copyToClipboard
@@ -42,10 +46,8 @@ import updater.composeapp.generated.resources.big_version
 import updater.composeapp.generated.resources.branch
 import updater.composeapp.generated.resources.changelog
 import updater.composeapp.generated.resources.code_name
-import updater.composeapp.generated.resources.copy_button
 import updater.composeapp.generated.resources.copy_successful
 import updater.composeapp.generated.resources.download
-import updater.composeapp.generated.resources.download_button
 import updater.composeapp.generated.resources.download_start
 import updater.composeapp.generated.resources.filename
 import updater.composeapp.generated.resources.filesize
@@ -76,7 +78,7 @@ fun InfoCardViews(
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
-            MessageView(
+            BaseMessageView(
                 romInfoState.value.device,
                 romInfoState.value.version,
                 romInfoState.value.bigVersion,
@@ -92,37 +94,51 @@ fun InfoCardViews(
                 romInfoState.value.fileSize
             )
 
-
             MiuixText(
                 text = stringResource(Res.string.download),
                 color = MiuixTheme.colorScheme.subTextMain,
                 fontSize = bodySmallFontSize
             )
 
-            DownloadTextView(
-                "Official (ultimate)",
-                romInfoState.value.official1Download,
-                romInfoState.value.official1Download,
-                romInfoState.value.fileName
-            )
-            DownloadTextView(
-                "Official (super)",
-                romInfoState.value.official2Download,
-                romInfoState.value.official2Download,
-                romInfoState.value.fileName
-            )
-            DownloadTextView(
-                "CDN (cdnorg)",
-                romInfoState.value.cdn1Download,
-                romInfoState.value.cdn1Download,
-                romInfoState.value.fileName
-            )
-            DownloadTextView(
-                "CDN (aliyuncs)",
-                romInfoState.value.cdn2Download,
-                romInfoState.value.cdn2Download,
-                romInfoState.value.fileName, 0.dp
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                DownloadInfoView(
+                    modifier = Modifier.weight(1f),
+                    "ultimateota",
+                    romInfoState.value.official1Download,
+                    romInfoState.value.official1Download,
+                    romInfoState.value.fileName
+                )
+                DownloadInfoView(
+                    modifier = Modifier.weight(1f),
+                    "superota",
+                    romInfoState.value.official2Download,
+                    romInfoState.value.official2Download,
+                    romInfoState.value.fileName
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                DownloadInfoView(
+                    modifier = Modifier.weight(1f),
+                    "cdnorg",
+                    romInfoState.value.cdn1Download,
+                    romInfoState.value.cdn1Download,
+                    romInfoState.value.fileName
+                )
+                DownloadInfoView(
+                    modifier = Modifier.weight(1f),
+                    "aliyuncs",
+                    romInfoState.value.cdn2Download,
+                    romInfoState.value.cdn2Download,
+                    romInfoState.value.fileName
+                )
+            }
 
             ChangelogView(
                 iconInfo,
@@ -133,7 +149,7 @@ fun InfoCardViews(
 }
 
 @Composable
-fun MessageView(
+fun BaseMessageView(
     device: String,
     version: String,
     bigVersion: String,
@@ -176,8 +192,63 @@ fun MessageTextView(
             MiuixText(
                 text = it,
                 fontSize = bodyFontSize,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.Medium
             )
+        }
+    }
+}
+
+@Composable
+fun DownloadInfoView(
+    modifier: Modifier = Modifier,
+    title: String,
+    copy: String,
+    download: String,
+    fileName: String
+) {
+    val hapticFeedback = LocalHapticFeedback.current
+
+    val messageCopySuccessful = stringResource(Res.string.copy_successful)
+    val messageDownloadStart = stringResource(Res.string.download_start)
+
+    Column(
+        modifier = modifier
+    ) {
+        MiuixText(
+            text = title,
+            fontSize = bodyFontSize,
+            fontWeight = FontWeight.Medium,
+            textAlign = TextAlign.Center
+        )
+        Row {
+            if (copy.isNotEmpty()) {
+                IconButton(
+                    onClick = {
+                        copyToClipboard(copy)
+                        showMessage(messageCopySuccessful)
+                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.ContentCopy,
+                        contentDescription = null,
+                        tint = MiuixTheme.colorScheme.onBackground
+                    )
+                }
+                IconButton(
+                    onClick = {
+                        downloadToLocal(download, fileName)
+                        showMessage(messageDownloadStart)
+                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Download,
+                        contentDescription = null,
+                        tint = MiuixTheme.colorScheme.onBackground
+                    )
+                }
+            }
         }
     }
 }
@@ -191,101 +262,40 @@ fun ChangelogView(
 
     val messageCopySuccessful = stringResource(Res.string.copy_successful)
 
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
-    ) {
+    Column {
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.padding(top = 20.dp, bottom = 24.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             MiuixText(
+                modifier = Modifier.padding(end = 6.dp),
                 text = stringResource(Res.string.changelog),
-                color = MiuixTheme.colorScheme.subTextMain,
-                fontSize = bodySmallFontSize
+                fontSize = 24.sp,
+                fontWeight = FontWeight.SemiBold,
             )
-            MiuixText(
-                modifier = Modifier.clickable(
-                    onClick = {
-                        copyToClipboard(changelog)
-                        showMessage(messageCopySuccessful)
-                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                    }
-                ),
-                text = stringResource(Res.string.copy_button),
-                fontSize = bodySmallFontSize,
-                color = MiuixTheme.colorScheme.primary
-            )
+            IconButton(
+                modifier = Modifier.size(26.dp),
+                onClick = {
+                    copyToClipboard(changelog)
+                    showMessage(messageCopySuccessful)
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.ContentCopy,
+                    contentDescription = null,
+                    tint = MiuixTheme.colorScheme.onBackground
+                )
+            }
         }
         iconInfo.value.forEachIndexed { index, it ->
             TextWithIcon(
                 changelog = it.changelog,
                 iconName = it.iconName,
                 iconLink = it.iconLink,
-                padding = if (index == iconInfo.value.size - 1) 0.dp else 4.dp
+                padding = if (index == iconInfo.value.size - 1) 0.dp else 16.dp
             )
-        }
-    }
-}
-
-
-@Composable
-fun DownloadTextView(
-    title: String,
-    copy: String,
-    download: String,
-    fileName: String,
-    bottomPadding: Dp = 4.dp,
-) {
-    val hapticFeedback = LocalHapticFeedback.current
-
-    val messageCopySuccessful = stringResource(Res.string.copy_successful)
-    val messageDownloadStart = stringResource(Res.string.download_start)
-
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(bottom = bottomPadding),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        MiuixText(
-            modifier = Modifier.fillMaxWidth(0.5f),
-            text = title,
-            fontSize = bodyFontSize,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Start
-        )
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (copy.isNotEmpty()) {
-                MiuixText(
-                    modifier = Modifier
-                        .padding(end = 24.dp)
-                        .clickable(
-                            enabled = true,
-                            onClick = {
-                                copyToClipboard(copy)
-                                showMessage(messageCopySuccessful)
-                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                            }
-                        ),
-                    text = stringResource(Res.string.copy_button),
-                    fontSize = bodyFontSize,
-                    color = MiuixTheme.colorScheme.primary
-                )
-                MiuixText(
-                    modifier = Modifier.clickable(
-                        onClick = {
-                            downloadToLocal(download, fileName)
-                            showMessage(messageDownloadStart)
-                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                        }
-                    ),
-                    text = stringResource(Res.string.download_button),
-                    fontSize = bodyFontSize,
-                    color = MiuixTheme.colorScheme.primary
-                )
-            }
         }
     }
 }
