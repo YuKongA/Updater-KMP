@@ -88,10 +88,10 @@
           "name": "miuix.klib",
           "url": "miuix-iossimulatorarm64-0.0.1.klib",
           "size": 298506,
-          "sha512": "a8810cf492a428515de447a9b7ba14a71cc485489b9d812e9c64dc7717230108e870c8e2218ac928a7f074288a38b83e94cb730e45315e401ce275764b708f7c",
-          "sha256": "2d1598b6b57ea7cfc2ef7867a88733401e4cd8f21482dcc3b2ad5091445c1694",
-          "sha1": "3d8ea431ed639e207567132298e2ba1e910f5226",
-          "md5": "fecfa29ebbf1251fc099c75d01e770c6"
+          "sha512": "565ee66858fecfa2802e0a84204f647afbbdc57f29fde7e404b0181fcaf87dbfb8a6b6cb22729ceae4c85c49d6c6b12ba5b3fec7381310beb7430e954ab3d663",
+          "sha256": "8c99fe5de240f8e787c4aa10d6bca84fc7abeaabcfe22ed203b4f92062dac3cd",
+          "sha1": "fad30c28110256997ffb41f32f1baf62532f81ad",
+          "md5": "cd1769da5dd728ed86a3c8195abdacfc"
         }
       ]
     },
@@ -110,11 +110,11 @@
         {
           "name": "miuix-iossimulatorarm64-0.0.1-sources.jar",
           "url": "miuix-iossimulatorarm64-0.0.1-sources.jar",
-          "size": 57758,
-          "sha512": "184b7ccb82d1e827e9ef010672b54c27b6db91a03b9ec0399c8cbd36fe6d1b810b0f19364b1005ad8ff7d26dd5cf602665c31c946d2378eeb4c4b8aeb3ad6d34",
-          "sha256": "d33b81a82d420ae3c95107c702d5817d9210909f6a5717926d18f9a8381c9a2f",
-          "sha1": "63343631884864bcc08a152153dc829dd7bcb924",
-          "md5": "3fc4e9b03486dc11fb21500a1b409873"
+          "size": 57756,
+          "sha512": "f704f8a07dba3313e9b7da15c0b2884c96f80cca5b8b9d606b8400f30066ed8b781edffdc8a4f1e3292f21a52da00b15934c9d17e89fd1cc9fac6c65a4c6e4da",
+          "sha256": "ab4d79488fc72c826c15d8f08508bb8cad559eab07c321323037f310acbec519",
+          "sha1": "7296847e75129901a92b8b26fd41212a33669f2d",
+          "md5": "b7c0a26a6af0c29f56761e61a47f6126"
         }
       ]
     },

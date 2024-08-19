@@ -36,11 +36,11 @@
         {
           "name": "miuix-release.aar",
           "url": "miuix-android-0.0.1.aar",
-          "size": 358183,
-          "sha512": "5a7e3288b2bc18034a00c61f3ffed2d04060c30fa4d03b8a31858661faa95ba5ffbb1a123e044449dc6ac49b8c3b517fc18d1016c7ba81e0cb4009249f6c8e07",
-          "sha256": "95a731479a333e9be39a28fa8bee3b0a95dd31aee5e9736d52f03ba9af812d8d",
-          "sha1": "56936346c311a23a39868c73bd5a372a9e11bac3",
-          "md5": "62190470cd2f0ce8674839e8578ffb38"
+          "size": 358177,
+          "sha512": "da663b07d07355a4a5c57049ecbe0907227fb086fad47046c8ba5d80d285df4d19755bd1c1441f5f5fc253fa77495b184352993b3710746cbbd5c5c2e6ad30fc",
+          "sha256": "27f77b44f1efcf0ac786e6967a42656b625b0cd335a5762a3ae1bcca125c6b73",
+          "sha1": "2fd3f4ba4715d81955649b18fde2043456eebd16",
+          "md5": "f8ce0c41295396f364fac693054bd6d9"
         }
       ]
     },
@@ -268,11 +268,11 @@
         {
           "name": "miuix-release.aar",
           "url": "miuix-android-0.0.1.aar",
-          "size": 358183,
-          "sha512": "5a7e3288b2bc18034a00c61f3ffed2d04060c30fa4d03b8a31858661faa95ba5ffbb1a123e044449dc6ac49b8c3b517fc18d1016c7ba81e0cb4009249f6c8e07",
-          "sha256": "95a731479a333e9be39a28fa8bee3b0a95dd31aee5e9736d52f03ba9af812d8d",
-          "sha1": "56936346c311a23a39868c73bd5a372a9e11bac3",
-          "md5": "62190470cd2f0ce8674839e8578ffb38"
+          "size": 358177,
+          "sha512": "da663b07d07355a4a5c57049ecbe0907227fb086fad47046c8ba5d80d285df4d19755bd1c1441f5f5fc253fa77495b184352993b3710746cbbd5c5c2e6ad30fc",
+          "sha256": "27f77b44f1efcf0ac786e6967a42656b625b0cd335a5762a3ae1bcca125c6b73",
+          "sha1": "2fd3f4ba4715d81955649b18fde2043456eebd16",
+          "md5": "f8ce0c41295396f364fac693054bd6d9"
         }
       ]
     },
@@ -291,11 +291,11 @@
         {
           "name": "miuix-android-0.0.1-sources.jar",
           "url": "miuix-android-0.0.1-sources.jar",
-          "size": 57508,
-          "sha512": "28c52993a17395ba331ee132e5a039b6fd45fceec35169662692c750eb0f3d136837b34e5e244d557d7ff6c8dbbf235f6d642615531f9b126b1aab02900e13b5",
-          "sha256": "3fc76a740b7be1d5df8a2c215bbbd86137282823eba99d5b6494901c908a886b",
-          "sha1": "79ddf195e4b1d26c0e11cc78dff9d15781bd6aff",
-          "md5": "2f7953cf97a29a7c6c2f4fc9285ce151"
+          "size": 57506,
+          "sha512": "48c80faca1e382782da14be7a2afc824e2864f9fa76ecc056cd3071903da9e879fcc6193669dd6d03e3ad68355f30b93b591147884e33e7c30f56a49442e7fdb",
+          "sha256": "2489cab06b311fcb812b6614f7ab67e4703e5879a6a3eaf43ed7c2bfb491068c",
+          "sha1": "6e770460bad75544798897035195919b644a7122",
+          "md5": "37643d0a54271a717fa3abe865023909"
         }
       ]
     }
