@@ -41,13 +41,12 @@ fun TextFieldWithDropdown(
 
     ExposedDropdownMenuBox(
         modifier = Modifier
-            .padding(horizontal = 28.dp)
+            .padding(horizontal = 20.dp)
             .background(MiuixTheme.colorScheme.secondaryBackground)
             .fillMaxWidth(),
         expanded = isDropdownExpanded,
         onExpandedChange = {
             isDropdownExpanded = it
-            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
         },
     ) {
         MiuixTextField(
@@ -63,7 +62,7 @@ fun TextFieldWithDropdown(
             modifier = Modifier
                 .exposedDropdownSize()
                 .heightIn(max = 250.dp),
-            containerColor = MiuixTheme.colorScheme.background,
+            containerColor = MiuixTheme.colorScheme.secondaryContainer,
             shape = RoundedCornerShape(16.dp),
             expanded = isDropdownExpanded,
             onDismissRequest = { isDropdownExpanded = false },

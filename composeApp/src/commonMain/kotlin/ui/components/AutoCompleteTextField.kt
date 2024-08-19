@@ -44,7 +44,7 @@ fun AutoCompleteTextField(
 
     ExposedDropdownMenuBox(
         modifier = Modifier
-            .padding(horizontal = 28.dp)
+            .padding(horizontal = 20.dp)
             .background(MiuixTheme.colorScheme.secondaryBackground)
             .fillMaxWidth(),
         expanded = isDropdownExpanded,
@@ -78,7 +78,7 @@ fun AutoCompleteTextField(
             modifier = Modifier
                 .exposedDropdownSize()
                 .heightIn(max = 250.dp),
-            containerColor = MiuixTheme.colorScheme.secondaryBackground,
+            containerColor = MiuixTheme.colorScheme.secondaryContainer,
             shape = RoundedCornerShape(16.dp),
             expanded = isDropdownExpanded && list.isNotEmpty(),
             onDismissRequest = { isDropdownExpanded = false }

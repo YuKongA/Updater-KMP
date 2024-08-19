@@ -29,8 +29,8 @@ import top.yukonga.miuix.kmp.basic.MiuixSurface
 import top.yukonga.miuix.kmp.rememberMiuixTopAppBarState
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.utils.MiuixDialogUtil.Companion.MiuixDialogHost
-import ui.LoginCardView
 import ui.InfoCardViews
+import ui.LoginCardView
 import ui.TextFieldViews
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.app_name
@@ -93,12 +93,12 @@ fun App() {
                                         LoginCardView(isLogin)
                                         TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
                                         Column(
-                                            modifier = Modifier.padding(horizontal = 28.dp)
+                                            modifier = Modifier.padding(horizontal = 20.dp)
                                         ) {
                                             InfoCardViews(curRomInfo, curIconInfo)
                                             InfoCardViews(incRomInfo, incIconInfo)
                                         }
-                                        Spacer(modifier = Modifier.height(12.dp))
+                                        Spacer(modifier = Modifier.height(4.dp))
                                     }
                                 } else {
                                     Column {
@@ -107,12 +107,12 @@ fun App() {
                                                 LoginCardView(isLogin)
                                                 TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
                                             }
-                                            Column(modifier = Modifier.weight(1.0f).padding(end = 28.dp)) {
+                                            Column(modifier = Modifier.weight(1.0f).padding(end = 20.dp)) {
                                                 InfoCardViews(curRomInfo, curIconInfo)
                                                 InfoCardViews(incRomInfo, incIconInfo)
                                             }
                                         }
-                                        Spacer(modifier = Modifier.height(12.dp))
+                                        Spacer(modifier = Modifier.height(4.dp))
                                     }
                                 }
                             }

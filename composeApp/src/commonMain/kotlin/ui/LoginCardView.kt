@@ -52,7 +52,7 @@ fun LoginCardView(
         isSecondary = true,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 28.dp)
+            .padding(horizontal = 20.dp)
             .padding(top = 16.dp)
     ) {
         Row(

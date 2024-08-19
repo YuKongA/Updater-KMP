@@ -94,7 +94,7 @@ fun TextFieldViews(
         )
         MiuixTextField(
             isSecondary = true,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 28.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
             value = systemVersion.value,
             onValueChange = { systemVersion.value = it },
             label = stringResource(Res.string.system_version),
@@ -106,7 +106,7 @@ fun TextFieldViews(
             })
         )
         MiuixButton(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 28.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
             submit = true,
             onClick = {
                 focusManager.clearFocus()

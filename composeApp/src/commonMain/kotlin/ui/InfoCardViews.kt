@@ -7,13 +7,11 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -22,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -67,66 +64,76 @@ fun InfoCardViews(
         enter = fadeIn(animationSpec = tween(400)),
         exit = fadeOut(animationSpec = tween(400))
     ) {
-        Column {
-            MiuixCard(
-                isSecondary = true,
-                modifier = Modifier.padding(bottom = 16.dp),
-            ) {
-                MiuixText(
-                    text = romInfoState.value.type.uppercase(),
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(bottom = 20.dp)
-                )
 
-                MessageCardView(
-                    romInfoState.value.device,
-                    romInfoState.value.version,
-                    romInfoState.value.bigVersion,
-                    romInfoState.value.codebase,
-                    romInfoState.value.branch
-                )
+        MiuixCard(
+            isSecondary = true,
+            modifier = Modifier.padding(bottom = 16.dp),
+        ) {
+            MiuixText(
+                text = romInfoState.value.type.uppercase(),
+                fontSize = 24.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(bottom = 24.dp)
+            )
 
-                MoreTextView(stringResource(Res.string.filename), romInfoState.value.fileName)
-                MoreTextView(stringResource(Res.string.filesize), romInfoState.value.fileSize)
-                ChangelogView(iconInfo, romInfoState.value.changelog)
+            MessageView(
+                romInfoState.value.device,
+                romInfoState.value.version,
+                romInfoState.value.bigVersion,
+                romInfoState.value.codebase,
+                romInfoState.value.branch
+            )
+            MessageTextView(
+                stringResource(Res.string.filename),
+                romInfoState.value.fileName
+            )
+            MessageTextView(
+                stringResource(Res.string.filesize),
+                romInfoState.value.fileSize
+            )
 
-                MiuixText(
-                    text = stringResource(Res.string.download),
-                    fontSize = bodyFontSize,
-                    fontWeight = FontWeight.SemiBold
-                )
-                DownloadTextView(
-                    "Official (ultimateota)",
-                    romInfoState.value.official1Download,
-                    romInfoState.value.official1Download,
-                    romInfoState.value.fileName
-                )
-                DownloadTextView(
-                    "Official (superota)",
-                    romInfoState.value.official2Download,
-                    romInfoState.value.official2Download,
-                    romInfoState.value.fileName
-                )
-                DownloadTextView(
-                    "CDN (cdnorg)",
-                    romInfoState.value.cdn1Download,
-                    romInfoState.value.cdn1Download,
-                    romInfoState.value.fileName
-                )
-                DownloadTextView(
-                    "CDN (aliyuncs)",
-                    romInfoState.value.cdn2Download,
-                    romInfoState.value.cdn2Download,
-                    romInfoState.value.fileName, 0.dp
-                )
-            }
+
+            MiuixText(
+                text = stringResource(Res.string.download),
+                color = MiuixTheme.colorScheme.subTextMain,
+                fontSize = bodySmallFontSize
+            )
+
+            DownloadTextView(
+                "Official (ultimate)",
+                romInfoState.value.official1Download,
+                romInfoState.value.official1Download,
+                romInfoState.value.fileName
+            )
+            DownloadTextView(
+                "Official (super)",
+                romInfoState.value.official2Download,
+                romInfoState.value.official2Download,
+                romInfoState.value.fileName
+            )
+            DownloadTextView(
+                "CDN (cdnorg)",
+                romInfoState.value.cdn1Download,
+                romInfoState.value.cdn1Download,
+                romInfoState.value.fileName
+            )
+            DownloadTextView(
+                "CDN (aliyuncs)",
+                romInfoState.value.cdn2Download,
+                romInfoState.value.cdn2Download,
+                romInfoState.value.fileName, 0.dp
+            )
+
+            ChangelogView(
+                iconInfo,
+                romInfoState.value.changelog
+            )
         }
     }
 }
 
 @Composable
-fun MessageCardView(
+fun MessageView(
     device: String,
     version: String,
     bigVersion: String,
@@ -149,7 +156,6 @@ fun MessageTextView(
     title: String,
     text: String
 ) {
-    val scrollState = rememberScrollState()
     val content = remember { mutableStateOf("") }
     content.value = text
 
@@ -158,8 +164,8 @@ fun MessageTextView(
     ) {
         MiuixText(
             text = title,
-            fontSize = bodyFontSize,
-            fontWeight = FontWeight.SemiBold
+            color = MiuixTheme.colorScheme.subTextMain,
+            fontSize = bodySmallFontSize
         )
         AnimatedContent(
             targetState = content.value,
@@ -169,42 +175,10 @@ fun MessageTextView(
         ) {
             MiuixText(
                 text = it,
-                modifier = Modifier.horizontalScroll(scrollState),
-                color = MiuixTheme.colorScheme.subTextMain,
-                fontSize = bodySmallFontSize,
-                fontFamily = FontFamily.Monospace,
-                maxLines = 1
+                fontSize = bodyFontSize,
+                fontWeight = FontWeight.SemiBold
             )
         }
-    }
-}
-
-@Composable
-fun MoreTextView(
-    title: String,
-    text: String
-) {
-    val content = remember { mutableStateOf("") }
-    content.value = text
-
-    MiuixText(
-        text = title,
-        fontSize = bodyFontSize,
-        fontWeight = FontWeight.SemiBold
-    )
-    AnimatedContent(
-        targetState = content.value,
-        transitionSpec = {
-            fadeIn(animationSpec = tween(1500)) togetherWith fadeOut(animationSpec = tween(300))
-        }
-    ) {
-        MiuixText(
-            text = it,
-            modifier = Modifier.padding(bottom = 16.dp),
-            color = MiuixTheme.colorScheme.subTextMain,
-            fontSize = bodySmallFontSize,
-            fontFamily = FontFamily.Monospace
-        )
     }
 }
 
@@ -218,7 +192,7 @@ fun ChangelogView(
     val messageCopySuccessful = stringResource(Res.string.copy_successful)
 
     Column(
-        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+        modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -226,8 +200,8 @@ fun ChangelogView(
         ) {
             MiuixText(
                 text = stringResource(Res.string.changelog),
-                fontSize = bodyFontSize,
-                fontWeight = FontWeight.SemiBold
+                color = MiuixTheme.colorScheme.subTextMain,
+                fontSize = bodySmallFontSize
             )
             MiuixText(
                 modifier = Modifier.clickable(
@@ -238,8 +212,7 @@ fun ChangelogView(
                     }
                 ),
                 text = stringResource(Res.string.copy_button),
-                fontSize = bodyFontSize,
-                fontWeight = FontWeight.SemiBold,
+                fontSize = bodySmallFontSize,
                 color = MiuixTheme.colorScheme.primary
             )
         }
@@ -248,7 +221,7 @@ fun ChangelogView(
                 changelog = it.changelog,
                 iconName = it.iconName,
                 iconLink = it.iconLink,
-                padding = if (index == iconInfo.value.size - 1) 0.dp else 8.dp
+                padding = if (index == iconInfo.value.size - 1) 0.dp else 4.dp
             )
         }
     }
@@ -261,7 +234,7 @@ fun DownloadTextView(
     copy: String,
     download: String,
     fileName: String,
-    bottomPadding: Dp = 8.dp,
+    bottomPadding: Dp = 4.dp,
 ) {
     val hapticFeedback = LocalHapticFeedback.current
 
@@ -276,9 +249,8 @@ fun DownloadTextView(
         MiuixText(
             modifier = Modifier.fillMaxWidth(0.5f),
             text = title,
-            color = MiuixTheme.colorScheme.subTextMain,
-            fontSize = bodySmallFontSize,
-            fontWeight = FontWeight.Medium,
+            fontSize = bodyFontSize,
+            fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Start
         )
         Row(
@@ -288,7 +260,7 @@ fun DownloadTextView(
             if (copy.isNotEmpty()) {
                 MiuixText(
                     modifier = Modifier
-                        .padding(end = 16.dp)
+                        .padding(end = 24.dp)
                         .clickable(
                             enabled = true,
                             onClick = {
@@ -298,8 +270,7 @@ fun DownloadTextView(
                             }
                         ),
                     text = stringResource(Res.string.copy_button),
-                    fontSize = bodySmallFontSize,
-                    fontWeight = FontWeight.SemiBold,
+                    fontSize = bodyFontSize,
                     color = MiuixTheme.colorScheme.primary
                 )
                 MiuixText(
@@ -311,8 +282,7 @@ fun DownloadTextView(
                         }
                     ),
                     text = stringResource(Res.string.download_button),
-                    fontSize = bodySmallFontSize,
-                    fontWeight = FontWeight.SemiBold,
+                    fontSize = bodyFontSize,
                     color = MiuixTheme.colorScheme.primary
                 )
             }
