@@ -37,11 +37,11 @@
         {
           "name": "miuix-desktop-0.0.1.jar",
           "url": "miuix-desktop-0.0.1.jar",
-          "size": 376295,
-          "sha512": "663765b07bcaa0058eb316a3590ae34432b65a2d90290743d0c1320ff6c2f9b040e30f04fc0241f4e562dd3cc92e7d56834cd03427bf02446735db22bdd0e234",
-          "sha256": "0ea6274a3c3ea7efcecbbbf12d8edd030f50022b28ba046b452946777943f61e",
-          "sha1": "4171f7a1e1c04156d232b56d91d0a86b26e49d2e",
-          "md5": "96a3932b1a0188d73f6072ea17c247b9"
+          "size": 375762,
+          "sha512": "cac3b46d2f385ac43495af608f5bf45a0edb67f646ab3726f4a61b9065ba2681f86dcdd2ad4610b183b2bee3805674356e06b2735704be4bdfd455a8e13345b3",
+          "sha256": "48f2dd5b8c97bd75523916e9aa56fc7c8729d9b5fdb38729d5f28375e1edd259",
+          "sha1": "5749170783d338fa348e754cfd1dfd905e8146ad",
+          "md5": "7919475b0b848c194f393452f541a71c"
         }
       ]
     },
@@ -123,11 +123,11 @@
         {
           "name": "miuix-desktop-0.0.1.jar",
           "url": "miuix-desktop-0.0.1.jar",
-          "size": 376295,
-          "sha512": "663765b07bcaa0058eb316a3590ae34432b65a2d90290743d0c1320ff6c2f9b040e30f04fc0241f4e562dd3cc92e7d56834cd03427bf02446735db22bdd0e234",
-          "sha256": "0ea6274a3c3ea7efcecbbbf12d8edd030f50022b28ba046b452946777943f61e",
-          "sha1": "4171f7a1e1c04156d232b56d91d0a86b26e49d2e",
-          "md5": "96a3932b1a0188d73f6072ea17c247b9"
+          "size": 375762,
+          "sha512": "cac3b46d2f385ac43495af608f5bf45a0edb67f646ab3726f4a61b9065ba2681f86dcdd2ad4610b183b2bee3805674356e06b2735704be4bdfd455a8e13345b3",
+          "sha256": "48f2dd5b8c97bd75523916e9aa56fc7c8729d9b5fdb38729d5f28375e1edd259",
+          "sha1": "5749170783d338fa348e754cfd1dfd905e8146ad",
+          "md5": "7919475b0b848c194f393452f541a71c"
         }
       ]
     },
@@ -146,11 +146,11 @@
         {
           "name": "miuix-desktop-0.0.1-sources.jar",
           "url": "miuix-desktop-0.0.1-sources.jar",
-          "size": 57234,
-          "sha512": "e038b02a5d44f7f919daf893d2d92cc65b7b451e7a3a031e7e80fc96cf0bba284e273bebbe0dd92f315ebb249272437d8da82ac261fbd75993e3b4598db18e2d",
-          "sha256": "874451526b205dd0018a8f7a27a53a886a892e57b56fedd7fc3b9fa0112e2381",
-          "sha1": "fa6584b836c4caa5b4c37221d197bf7abd61e5d5",
-          "md5": "f49beb2f42c8380c7a2f13fd97c68a0a"
+          "size": 57116,
+          "sha512": "d2f84ca6be85e17742165633b1e0d244e7fc2b686d977210e1185c7838f79254a50bed71d8e949bfcc183da35bf965fbad60ed9f902b55b7b4567027e2557e57",
+          "sha256": "8099b6575d67c7866b0781a79750b31d8f1a8e7a249f311536d5632cdc182e08",
+          "sha1": "02d8bc89ee286f4ec326b9574fef86a724c4a363",
+          "md5": "b883d41f4874728bdf7c8953e8479e75"
         }
       ]
     }

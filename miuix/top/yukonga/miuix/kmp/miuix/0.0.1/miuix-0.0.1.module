@@ -84,11 +84,11 @@
         {
           "name": "miuix-metadata-0.0.1.jar",
           "url": "miuix-0.0.1.jar",
-          "size": 28639,
-          "sha512": "759c47fe1b17debc9a304b77f5f6918969a0e2dc8c2b433decedff1497dde8282c9e0e16e1022e56d91b3c7e548ae100f192b30c35d4564529748854ef5dd75d",
-          "sha256": "ac34aafb0f8d696b4191a9b5460aa654bb09caf6fdd91c4e074a00551e8c0c87",
-          "sha1": "fdec2f0072697086eb73439fedbaded3414b87be",
-          "md5": "0621f09be53555b35473861b5266b7b6"
+          "size": 28553,
+          "sha512": "f51071e6ed28ec7ab084f95780ee3bb10741b31449e6dde48c89c745b0ef51514ad2339f1af42b15357f21fce68e40f80facd0dab51bb097aaebd21dc7c30007",
+          "sha256": "3df0c8d02839e198be319e4780601b9e0de309a3df0baf563bb08b26a5ccb951",
+          "sha1": "c2a3fa14131d2376c8880820be3205e83e04a851",
+          "md5": "1aa74f4bff3a3007d05b11127cb78df2"
         }
       ]
     },
@@ -106,11 +106,11 @@
         {
           "name": "miuix-kotlin-0.0.1-sources.jar",
           "url": "miuix-0.0.1-sources.jar",
-          "size": 55825,
-          "sha512": "98eaed3070a69e035fafe5c1f55fd432d991c6098dd7da2c9cfb5c6e90a141be1b12d7d6bc94caf6b922614d55485d2a1b50aadc45ba7d18a693de96505789de",
-          "sha256": "787bc21ef5c5a6501d28cebbee19d60533a1e8fb50c3e4b3173587c054e49561",
-          "sha1": "9b624204a8bf4798a1d55e4a49b0809bf79e0858",
-          "md5": "126a006b0ff2890e95239818ca6a0fb7"
+          "size": 55707,
+          "sha512": "7e6294574b42e40b45c01de09d68f472fe471d09032b954c5f07685fb0c2bb51dbebb5a13fa9633af83df3112ee8a8b3b15a3c0b18277163e54a5290e220af04",
+          "sha256": "dfd90b15218f0f6ab8da12bee2f0bedfc0137876530ba7f51203dd7a087cfd8d",
+          "sha1": "202fc29df129e25ac0b41df37e4665bd86dc0240",
+          "md5": "98174c0db7f2e86ce3ba4e92bfc53d29"
         }
       ]
     },
