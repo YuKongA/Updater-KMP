@@ -70,7 +70,7 @@ kotlin {
             implementation(libs.image.loader)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.ktor.client.core)
-            implementation("top.yukonga.miuix.kmp:miuix:0.0.1")
+            implementation(libs.miuix)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
