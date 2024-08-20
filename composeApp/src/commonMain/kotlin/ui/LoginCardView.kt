@@ -1,19 +1,16 @@
 package ui
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.DoneAll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.rounded.Done
+import androidx.compose.material.icons.rounded.DoneAll
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
@@ -22,6 +19,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import isWasm
 import org.jetbrains.compose.resources.stringResource
+import top.yukonga.miuix.kmp.basic.MiuixCard
+import top.yukonga.miuix.kmp.basic.MiuixText
+import top.yukonga.miuix.kmp.theme.MiuixTheme
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.logged_in
 import updater.composeapp.generated.resources.login_desc
@@ -44,36 +44,36 @@ fun LoginCardView(
         0 -> stringResource(Res.string.login_desc)
         else -> stringResource(Res.string.login_expired_desc)
     }
-    val icon = if (isLogin.value == 1) Icons.Filled.DoneAll else Icons.Filled.Done
+    val icon = if (isLogin.value == 1) Icons.Rounded.DoneAll else Icons.Rounded.Done
 
-    Card(
-        shape = RoundedCornerShape(10.dp),
-        colors = CardDefaults.cardColors(
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        ),
-        modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+    MiuixCard(
+        isSecondary = true,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .padding(top = 16.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(18.dp)
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Icon(
+                modifier = Modifier.size(28.dp).padding(start = 6.dp),
                 imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(32.dp).padding(start = 8.dp)
+                tint = MiuixTheme.colorScheme.onPrimary,
+                contentDescription = null
             )
-            Column(modifier = Modifier.padding(start = 20.dp)) {
-                Text(
+            Column(modifier = Modifier.padding(start = 24.dp)) {
+                MiuixText(
                     text = if (!isWasm()) account else "WebAssembly",
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize
+                    fontWeight = FontWeight.SemiBold
                 )
-                Text(
-                    text = info,
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize
+                MiuixText(
+                    text = info
                 )
             }
+            Spacer(modifier = Modifier.weight(1f))
+            if (!isWasm()) LoginDialog(isLogin)
         }
     }
 }

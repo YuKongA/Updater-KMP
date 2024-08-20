@@ -1,35 +1,26 @@
 package ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Analytics
-import androidx.compose.material.icons.outlined.Android
-import androidx.compose.material.icons.outlined.DeveloperMode
-import androidx.compose.material.icons.outlined.Smartphone
-import androidx.compose.material.icons.outlined.TravelExplore
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import data.DeviceInfoHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import top.yukonga.miuix.kmp.basic.MiuixButton
+import top.yukonga.miuix.kmp.basic.MiuixTextField
 import ui.components.AutoCompleteTextField
 import ui.components.TextFieldWithDropdown
 import updater.composeapp.generated.resources.Res
@@ -37,6 +28,7 @@ import updater.composeapp.generated.resources.android_version
 import updater.composeapp.generated.resources.code_name
 import updater.composeapp.generated.resources.device_name
 import updater.composeapp.generated.resources.regions_code
+import updater.composeapp.generated.resources.submit
 import updater.composeapp.generated.resources.system_version
 
 @Composable
@@ -75,7 +67,7 @@ fun TextFieldViews(
     }
 
     Column(
-        modifier = Modifier.background(Color.Unspecified).fillMaxWidth().padding(vertical = 20.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -83,41 +75,46 @@ fun TextFieldViews(
             text = deviceName,
             items = DeviceInfoHelper.deviceNames,
             onValueChange = deviceNameFlow,
-            label = stringResource(Res.string.device_name),
-            leadingIcon = Icons.Outlined.Smartphone
+            label = stringResource(Res.string.device_name)
         )
         AutoCompleteTextField(
             text = codeName,
             items = DeviceInfoHelper.codeNames,
             onValueChange = codeNameFlow,
-            label = stringResource(Res.string.code_name),
-            leadingIcon = Icons.Outlined.DeveloperMode
+            label = stringResource(Res.string.code_name)
         )
         TextFieldWithDropdown(
             text = deviceRegion,
             items = DeviceInfoHelper.regionNames,
-            label = stringResource(Res.string.regions_code),
-            leadingIcon = Icons.Outlined.TravelExplore
+            label = stringResource(Res.string.regions_code)
         )
         TextFieldWithDropdown(
             text = androidVersion,
             items = DeviceInfoHelper.androidVersions,
-            label = stringResource(Res.string.android_version),
-            leadingIcon = Icons.Outlined.Android
+            label = stringResource(Res.string.android_version)
         )
-        OutlinedTextField(
+        MiuixTextField(
+            isSecondary = true,
+            insideMargin = DpSize(16.dp, 18.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
             value = systemVersion.value,
             onValueChange = { systemVersion.value = it },
-            label = { Text(stringResource(Res.string.system_version)) },
-            leadingIcon = { Icon(imageVector = Icons.Outlined.Analytics, null) },
-            shape = RoundedCornerShape(10.dp),
-            modifier = Modifier.fillMaxWidth(),
+            label = stringResource(Res.string.system_version),
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(onSearch = {
                 focusManager.clearFocus()
                 updateRomInfo.value++
             })
+        )
+        MiuixButton(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+            submit = true,
+            onClick = {
+                focusManager.clearFocus()
+                updateRomInfo.value++
+            },
+            text = stringResource(Res.string.submit)
         )
     }
 }

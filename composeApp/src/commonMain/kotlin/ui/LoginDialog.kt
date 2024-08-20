@@ -1,30 +1,22 @@
 package ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Login
-import androidx.compose.material.icons.automirrored.outlined.Logout
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material.icons.automirrored.rounded.Login
+import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -35,12 +27,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import getPassword
@@ -50,6 +39,13 @@ import logout
 import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
 import perfGet
+import top.yukonga.miuix.kmp.MiuixSuperDialog
+import top.yukonga.miuix.kmp.basic.MiuixButton
+import top.yukonga.miuix.kmp.basic.MiuixText
+import top.yukonga.miuix.kmp.basic.MiuixTextField
+import top.yukonga.miuix.kmp.theme.MiuixTheme
+import top.yukonga.miuix.kmp.utils.MiuixPopupUtil.Companion.dismissDialog
+import top.yukonga.miuix.kmp.utils.MiuixPopupUtil.Companion.showDialog
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.account
 import updater.composeapp.generated.resources.account_or_password_empty
@@ -66,24 +62,23 @@ import updater.composeapp.generated.resources.save_password
 import updater.composeapp.generated.resources.security_error
 import updater.composeapp.generated.resources.toast_crash_info
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginDialog(
     isLogin: MutableState<Int>
 ) {
     val coroutineScope = rememberCoroutineScope()
-    var account by remember { mutableStateOf(TextFieldValue(getPassword().first)) }
-    var password by remember { mutableStateOf(TextFieldValue(getPassword().second)) }
+    var account by remember { mutableStateOf(getPassword().first) }
+    var password by remember { mutableStateOf(getPassword().second) }
 
     var global by rememberSaveable { mutableStateOf(false) }
     var savePassword by rememberSaveable { mutableStateOf(perfGet("savePassword") ?: "0") }
-    var showDialog by remember { mutableStateOf(false) }
+    val showDialog = remember { mutableStateOf(false) }
 
     val hapticFeedback = LocalHapticFeedback.current
 
     val icon = when (isLogin.value) {
-        1 -> Icons.AutoMirrored.Outlined.Logout
-        else -> Icons.AutoMirrored.Outlined.Login
+        1 -> Icons.AutoMirrored.Rounded.Logout
+        else -> Icons.AutoMirrored.Rounded.Login
     }
 
     val messageLoginIn = stringResource(Res.string.logging_in)
@@ -95,203 +90,170 @@ fun LoginDialog(
     val messageCrashInfo = stringResource(Res.string.toast_crash_info)
 
     IconButton(
-        modifier = Modifier.widthIn(max = 48.dp),
+        modifier = Modifier.size(32.dp),
         onClick = {
-            showDialog = true
+            showDialog.value = true
             hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
         }
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurface
+            tint = MiuixTheme.colorScheme.onBackground
         )
     }
-
-    if (showDialog) {
-        if (isLogin.value != 1) {
-            BasicAlertDialog(
-                onDismissRequest = { showDialog = false }
-            ) {
-                Column(
-                    modifier = Modifier
-                        .widthIn(min = 350.dp, max = 380.dp)
-                        .clip(RoundedCornerShape(30.dp))
-                        .background(MaterialTheme.colorScheme.surfaceContainer)
+    if (showDialog.value && isLogin.value != 1) {
+        showDialog(
+            content = {
+                MiuixSuperDialog(
+                    title = stringResource(Res.string.login),
+                    onDismissRequest = { showDialog.value = false }
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .padding(horizontal = 24.dp)
-                            .padding(top = 24.dp, bottom = 12.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = stringResource(Res.string.login),
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = MaterialTheme.typography.titleLarge.fontSize
-                        )
-                        Checkbox(
-                            modifier = Modifier
-                                .height(22.dp)
-                                .padding(start = 0.dp, end = 10.dp)
-                                .size(22.dp),
-                            checked = global,
-                            onCheckedChange = {
-                                global = it
-                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                            })
-                        Text(
-                            text = stringResource(Res.string.global),
-                            fontSize = MaterialTheme.typography.titleMedium.fontSize
-                        )
-                    }
-                    Column(
-                        modifier = Modifier.padding(horizontal = 24.dp)
-                    ) {
-                        TextField(
+                    Column {
+                        MiuixTextField(
                             value = account,
                             onValueChange = { account = it },
-                            label = { Text(stringResource(Res.string.account)) },
+                            label = stringResource(Res.string.account),
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
                         )
-                        var passwordVisibility by remember { mutableStateOf(false) }
-                        TextField(
+                        val passwordVisibility by remember { mutableStateOf(false) }
+                        MiuixTextField(
                             value = password,
                             onValueChange = { password = it },
-                            label = { Text(stringResource(Res.string.password)) },
+                            label = stringResource(Res.string.password),
                             modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                             singleLine = true,
-                            //keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                             visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-                            trailingIcon = {
-                                IconButton(
-                                    onClick = { passwordVisibility = !passwordVisibility }
-                                ) {
-                                    Icon(
-                                        imageVector = if (passwordVisibility) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                        contentDescription = null
-                                    )
-                                }
-                            })
+                        )
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.padding(vertical = 16.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Row {
+                            Row(
+                                modifier = Modifier.weight(1f),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Checkbox(
+                                    modifier = Modifier
+                                        .height(22.dp)
+                                        .padding(start = 0.dp, end = 10.dp)
+                                        .size(22.dp),
+                                    checked = global,
+                                    colors = CheckboxDefaults.colors(
+                                        checkedColor = MiuixTheme.colorScheme.primary,
+                                        uncheckedColor = MiuixTheme.colorScheme.subTextField,
+                                        checkmarkColor = MiuixTheme.colorScheme.background
+                                    ),
+                                    onCheckedChange = {
+                                        global = it
+                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    })
+                                MiuixText(
+                                    text = stringResource(Res.string.global),
+                                    fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                                )
+                            }
+                            Row(
+                                modifier = Modifier.weight(1f),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
                                 Checkbox(
                                     modifier = Modifier
                                         .height(22.dp)
                                         .padding(start = 0.dp, end = 10.dp)
                                         .size(22.dp),
                                     checked = savePassword == "1",
+                                    colors = CheckboxDefaults.colors(
+                                        checkedColor = MiuixTheme.colorScheme.primary,
+                                        uncheckedColor = MiuixTheme.colorScheme.subTextField,
+                                        checkmarkColor = MiuixTheme.colorScheme.background
+                                    ),
                                     onCheckedChange = {
                                         savePassword = if (it) "1" else "0"
                                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                     })
-                                Text(
+                                MiuixText(
                                     text = stringResource(Res.string.save_password),
                                     fontSize = MaterialTheme.typography.bodyMedium.fontSize
                                 )
                             }
-                            Row {
-                                TextButton(
-                                    onClick = {
-                                        showDialog = false
-                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    },
-                                    modifier = Modifier.padding(end = 16.dp)
-                                ) {
-                                    Text(
-                                        text = stringResource(Res.string.cancel),
-                                        fontSize = MaterialTheme.typography.titleMedium.fontSize
-                                    )
-                                }
-                                TextButton(
-                                    onClick = {
-                                        showMessage(message = messageLoginIn)
-                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                        coroutineScope.launch {
-                                            val int = login(account.text, password.text, global, savePassword, isLogin)
-                                            when (int) {
-                                                0 -> showMessage(message = messageLoginSuccess)
-                                                1 -> showMessage(message = messageEmpty)
-                                                2 -> showMessage(message = messageCrashInfo)
-                                                3 -> showMessage(message = messageError)
-                                                4 -> showMessage(message = messageSecurityError)
-                                            }
-                                        }
-                                        showDialog = false
-                                    }) {
-                                    Text(
-                                        text = stringResource(Res.string.login),
-                                        fontSize = MaterialTheme.typography.titleMedium.fontSize
-                                    )
-                                }
-                            }
                         }
-                    }
-                }
-            }
-        } else {
-            BasicAlertDialog(
-                onDismissRequest = { showDialog = false }
-            ) {
-                Column(
-                    modifier = Modifier
-                        .widthIn(min = 350.dp, max = 380.dp)
-                        .clip(RoundedCornerShape(30.dp))
-                        .background(MaterialTheme.colorScheme.surfaceContainer)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .padding(horizontal = 24.dp)
-                            .padding(top = 24.dp, bottom = 12.dp)
-                    ) {
-                        Text(
-                            text = stringResource(Res.string.logout),
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = MaterialTheme.typography.titleLarge.fontSize
-                        )
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(top = 80.dp),
-                            horizontalArrangement = Arrangement.End
-                        ) {
-                            TextButton(
+                        Row {
+                            MiuixButton(
+                                modifier = Modifier.weight(1f),
+                                text = stringResource(Res.string.login),
+                                submit = true,
                                 onClick = {
-                                    showDialog = false
+                                    showDialog.value = false
+                                    dismissDialog()
+                                    showMessage(message = messageLoginIn)
                                     hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                },
-                                modifier = Modifier.padding(horizontal = 16.dp)
-                            ) {
-                                Text(
-                                    text = stringResource(Res.string.cancel),
-                                    modifier = Modifier,
-                                    fontSize = MaterialTheme.typography.bodyMedium.fontSize
-                                )
-                            }
-                            TextButton(
-                                onClick = {
                                     coroutineScope.launch {
-                                        val boolean = logout(isLogin)
-                                        if (boolean) showMessage(message = messageLogoutSuccessful)
+                                        val int = login(account, password, global, savePassword, isLogin)
+                                        when (int) {
+                                            0 -> showMessage(message = messageLoginSuccess)
+                                            1 -> showMessage(message = messageEmpty)
+                                            2 -> showMessage(message = messageCrashInfo)
+                                            3 -> showMessage(message = messageError)
+                                            4 -> showMessage(message = messageSecurityError)
+                                        }
                                     }
-                                    showDialog = false
+                                }
+                            )
+                            Spacer(Modifier.width(20.dp))
+                            MiuixButton(
+                                modifier = Modifier.weight(1f),
+                                text = stringResource(Res.string.cancel),
+                                onClick = {
+                                    showDialog.value = false
+                                    dismissDialog()
                                     hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                }) {
-                                Text(
-                                    text = stringResource(Res.string.logout),
-                                    modifier = Modifier,
-                                    fontSize = MaterialTheme.typography.bodyMedium.fontSize
-                                )
-                            }
+                                }
+                            )
                         }
                     }
                 }
             }
-        }
+        )
+    }
+
+    if (showDialog.value && isLogin.value == 1) {
+        showDialog(
+            content = {
+                MiuixSuperDialog(
+                    title = stringResource(Res.string.logout),
+                    summary = "",
+                    onDismissRequest = { showDialog.value = false }
+                ) {
+                    Row {
+                        MiuixButton(
+                            modifier = Modifier.weight(1f),
+                            text = stringResource(Res.string.logout),
+                            submit = true,
+                            onClick = {
+                                coroutineScope.launch {
+                                    val boolean = logout(isLogin)
+                                    if (boolean) showMessage(message = messageLogoutSuccessful)
+                                }
+                                showDialog.value = false
+                                dismissDialog()
+                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                            }
+                        )
+                        Spacer(Modifier.width(20.dp))
+                        MiuixButton(
+                            modifier = Modifier.weight(1f),
+                            text = stringResource(Res.string.cancel),
+                            onClick = {
+                                showDialog.value = false
+                                dismissDialog()
+                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                            }
+                        )
+                    }
+                }
+            }
+        )
     }
 }
