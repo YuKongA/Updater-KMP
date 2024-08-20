@@ -105,7 +105,7 @@ fun App() {
                                                 LoginCardView(isLogin)
                                                 TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
                                             }
-                                            Column(modifier = Modifier.weight(1.0f).padding(end = 20.dp)) {
+                                            Column(modifier = Modifier.weight(1.0f).padding(end = 20.dp, top = 16.dp)) {
                                                 InfoCardViews(curRomInfo, curIconInfo)
                                                 InfoCardViews(incRomInfo, incIconInfo)
                                             }

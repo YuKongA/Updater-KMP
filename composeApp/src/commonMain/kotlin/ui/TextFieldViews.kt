@@ -111,7 +111,6 @@ fun TextFieldViews(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
             submit = true,
             onClick = {
-                focusManager.clearFocus()
                 updateRomInfo.value++
             },
             text = stringResource(Res.string.submit)
