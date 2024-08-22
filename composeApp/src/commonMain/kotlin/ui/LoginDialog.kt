@@ -1,29 +1,25 @@
 package ui
 
+import MiuixCheckbox
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Login
 import androidx.compose.material.icons.automirrored.rounded.Logout
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,11 +63,11 @@ fun LoginDialog(
     isLogin: MutableState<Int>
 ) {
     val coroutineScope = rememberCoroutineScope()
-    var account by remember { mutableStateOf(getPassword().first) }
-    var password by remember { mutableStateOf(getPassword().second) }
+    var account by mutableStateOf(getPassword().first)
+    var password by mutableStateOf(getPassword().second)
 
-    var global by rememberSaveable { mutableStateOf(false) }
-    var savePassword by rememberSaveable { mutableStateOf(perfGet("savePassword") ?: "0") }
+    var global by remember { mutableStateOf(false) }
+    var savePassword by remember { mutableStateOf(perfGet("savePassword") ?: "0") }
     val showDialog = remember { mutableStateOf(false) }
 
     val hapticFeedback = LocalHapticFeedback.current
@@ -134,48 +130,30 @@ fun LoginDialog(
                                 modifier = Modifier.weight(1f),
                                 horizontalArrangement = Arrangement.Center
                             ) {
-                                Checkbox(
-                                    modifier = Modifier
-                                        .height(22.dp)
-                                        .padding(start = 0.dp, end = 10.dp)
-                                        .size(22.dp),
+                                MiuixCheckbox(
+                                    modifier = Modifier.padding(end = 10.dp),
                                     checked = global,
-                                    colors = CheckboxDefaults.colors(
-                                        checkedColor = MiuixTheme.colorScheme.primary,
-                                        uncheckedColor = MiuixTheme.colorScheme.subTextField,
-                                        checkmarkColor = MiuixTheme.colorScheme.background
-                                    ),
                                     onCheckedChange = {
                                         global = it
                                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                     })
                                 MiuixText(
-                                    text = stringResource(Res.string.global),
-                                    fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                                    text = stringResource(Res.string.global)
                                 )
                             }
                             Row(
                                 modifier = Modifier.weight(1f),
                                 horizontalArrangement = Arrangement.Center
                             ) {
-                                Checkbox(
-                                    modifier = Modifier
-                                        .height(22.dp)
-                                        .padding(start = 0.dp, end = 10.dp)
-                                        .size(22.dp),
+                                MiuixCheckbox(
+                                    modifier = Modifier.padding(end = 10.dp),
                                     checked = savePassword == "1",
-                                    colors = CheckboxDefaults.colors(
-                                        checkedColor = MiuixTheme.colorScheme.primary,
-                                        uncheckedColor = MiuixTheme.colorScheme.subTextField,
-                                        checkmarkColor = MiuixTheme.colorScheme.background
-                                    ),
                                     onCheckedChange = {
                                         savePassword = if (it) "1" else "0"
                                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                     })
                                 MiuixText(
-                                    text = stringResource(Res.string.save_password),
-                                    fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                                    text = stringResource(Res.string.save_password)
                                 )
                             }
                         }
