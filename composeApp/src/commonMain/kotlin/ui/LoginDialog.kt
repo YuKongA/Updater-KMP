@@ -47,11 +47,13 @@ import updater.composeapp.generated.resources.account
 import updater.composeapp.generated.resources.account_or_password_empty
 import updater.composeapp.generated.resources.cancel
 import updater.composeapp.generated.resources.global
+import updater.composeapp.generated.resources.logged_in
 import updater.composeapp.generated.resources.logging_in
 import updater.composeapp.generated.resources.login
 import updater.composeapp.generated.resources.login_error
 import updater.composeapp.generated.resources.login_successful
 import updater.composeapp.generated.resources.logout
+import updater.composeapp.generated.resources.logout_confirm
 import updater.composeapp.generated.resources.logout_successful
 import updater.composeapp.generated.resources.password
 import updater.composeapp.generated.resources.save_password
@@ -201,7 +203,7 @@ fun LoginDialog(
             content = {
                 MiuixSuperDialog(
                     title = stringResource(Res.string.logout),
-                    summary = "",
+                    summary = stringResource(Res.string.logout_confirm),
                     onDismissRequest = { showDialog.value = false }
                 ) {
                     Row {

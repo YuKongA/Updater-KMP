@@ -37,6 +37,7 @@
     <string name="download_start">Start download</string>
     <string name="security_error">Failed to get security key</string>
     <string name="logout">Logout</string>
+    <string name="logout_confirm">Are you sure you want to logout?</string>
     <string name="confirm">Confirm</string>
     <string name="logout_successful">Logout successful</string>
     <string name="login_error">Login verification failed!</string>

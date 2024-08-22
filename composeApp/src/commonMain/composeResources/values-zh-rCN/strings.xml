@@ -35,9 +35,10 @@
     <string name="copy_successful">复制成功</string>
     <string name="download_start">开始下载</string>
     <string name="security_error">获取密钥失败</string>
-    <string name="logout">登出</string>
+    <string name="logout">退出</string>
+    <string name="logout_confirm">确定要退出登录么？</string>
     <string name="confirm">确定</string>
-    <string name="logout_successful">登出成功</string>
+    <string name="logout_successful">退出成功</string>
     <string name="regions_code">区域代号</string>
     <string name="global">全球账号</string>
     <string name="login_error">登录验证失败！</string>

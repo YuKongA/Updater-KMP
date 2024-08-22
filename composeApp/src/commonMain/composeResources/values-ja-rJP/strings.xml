@@ -36,6 +36,7 @@
     <string name="download_start">ダウンロード開始</string>
     <string name="security_error">セキュリティキーの取得に失敗しました</string>
     <string name="logout">ログアウト</string>
+    <string name="logout_confirm">ログアウトしてもよろしいですか?</string>
     <string name="confirm">確認</string>
     <string name="logout_successful">ログアウト成功</string>
     <string name="login_error">ログイン認証に失敗しました！</string>
