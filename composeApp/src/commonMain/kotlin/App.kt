@@ -2,11 +2,17 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -25,9 +31,7 @@ import top.yukonga.miuix.kmp.MiuixTopAppBar
 import top.yukonga.miuix.kmp.basic.MiuixBox
 import top.yukonga.miuix.kmp.basic.MiuixLazyColumn
 import top.yukonga.miuix.kmp.basic.MiuixScaffold
-import top.yukonga.miuix.kmp.basic.MiuixSurface
 import top.yukonga.miuix.kmp.rememberMiuixTopAppBarState
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 import ui.InfoCardViews
 import ui.LoginCardView
 import ui.TextFieldViews
@@ -60,65 +64,65 @@ fun App() {
     val scrollBehavior = MiuixScrollBehavior(rememberMiuixTopAppBarState())
 
     AppTheme {
-        MiuixSurface {
-            MiuixScaffold(
-                containerColor = MiuixTheme.colorScheme.secondaryBackground,
-                modifier = Modifier
-                    .imePadding()
-                    .fillMaxSize()
-                    .nestedScroll(scrollBehavior.nestedScrollConnection),
-                topBar = {
-                    MiuixTopAppBar(
-                        title = stringResource(Res.string.app_name),
-                        color = Color.Transparent,
-                        scrollBehavior = scrollBehavior
-                    )
-                }
-            ) {
-                MiuixBox {
-                    MiuixLazyColumn(
-                        modifier = Modifier.height(getWindowSize().height.dp),
-                        contentPadding = it,
-                        enableOverScroll = true,
-                        topAppBarScrollBehavior = scrollBehavior
-                    ) {
-                        item {
-                            BoxWithConstraints(
-                                modifier = Modifier.navigationBarsPadding()
-                            ) {
-                                if (maxWidth < 768.dp) {
-                                    Column {
-                                        LoginCardView(isLogin)
-                                        TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
-                                        Column(
-                                            modifier = Modifier.padding(horizontal = 20.dp)
-                                        ) {
+        MiuixScaffold(
+            modifier = Modifier
+                .imePadding()
+                .fillMaxSize()
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                MiuixTopAppBar(
+                    title = stringResource(Res.string.app_name),
+                    color = Color.Transparent,
+                    scrollBehavior = scrollBehavior
+                )
+            }
+        ) {
+            MiuixBox {
+                MiuixLazyColumn(
+                    modifier = Modifier
+                        .height(getWindowSize().height.dp)
+                        .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
+                        .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
+                    contentPadding = it,
+                    enableOverScroll = true,
+                    topAppBarScrollBehavior = scrollBehavior
+                ) {
+                    item {
+                        BoxWithConstraints(
+                            modifier = Modifier.navigationBarsPadding()
+                        ) {
+                            if (maxWidth < 768.dp) {
+                                Column {
+                                    LoginCardView(isLogin)
+                                    TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
+                                    Column(
+                                        modifier = Modifier.padding(horizontal = 20.dp)
+                                    ) {
+                                        InfoCardViews(curRomInfo, curIconInfo)
+                                        InfoCardViews(incRomInfo, incIconInfo)
+                                    }
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                }
+                            } else {
+                                Column {
+                                    Row {
+                                        Column(modifier = Modifier.weight(0.8f)) {
+                                            LoginCardView(isLogin)
+                                            TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
+                                        }
+                                        Column(modifier = Modifier.weight(1.0f).padding(end = 20.dp, top = 16.dp)) {
                                             InfoCardViews(curRomInfo, curIconInfo)
                                             InfoCardViews(incRomInfo, incIconInfo)
                                         }
-                                        Spacer(modifier = Modifier.height(4.dp))
                                     }
-                                } else {
-                                    Column {
-                                        Row {
-                                            Column(modifier = Modifier.weight(0.8f)) {
-                                                LoginCardView(isLogin)
-                                                TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
-                                            }
-                                            Column(modifier = Modifier.weight(1.0f).padding(end = 20.dp, top = 16.dp)) {
-                                                InfoCardViews(curRomInfo, curIconInfo)
-                                                InfoCardViews(incRomInfo, incIconInfo)
-                                            }
-                                        }
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                    }
+                                    Spacer(modifier = Modifier.height(4.dp))
                                 }
                             }
                         }
                     }
                 }
-                Snackbar()
             }
+            Snackbar()
         }
     }
 }

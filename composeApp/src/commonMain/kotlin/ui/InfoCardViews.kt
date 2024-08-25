@@ -65,9 +65,7 @@ fun InfoCardViews(
         enter = fadeIn(animationSpec = tween(400)),
         exit = fadeOut(animationSpec = tween(400))
     ) {
-
         MiuixCard(
-            isSecondary = true,
             modifier = Modifier.padding(bottom = 16.dp),
         ) {
             MiuixText(
@@ -95,7 +93,7 @@ fun InfoCardViews(
 
             MiuixText(
                 text = stringResource(Res.string.download),
-                color = MiuixTheme.colorScheme.subTextMain,
+                color = MiuixTheme.colorScheme.subTextBase,
                 fontSize = bodySmallFontSize
             )
 
@@ -179,7 +177,7 @@ fun MessageTextView(
     ) {
         MiuixText(
             text = title,
-            color = MiuixTheme.colorScheme.subTextMain,
+            color = MiuixTheme.colorScheme.subTextBase,
             fontSize = bodySmallFontSize
         )
         AnimatedContent(

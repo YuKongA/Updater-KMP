@@ -94,7 +94,6 @@ fun TextFieldViews(
             label = stringResource(Res.string.android_version)
         )
         MiuixTextField(
-            isSecondary = true,
             insideMargin = DpSize(16.dp, 18.dp),
             modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
             value = systemVersion.value,

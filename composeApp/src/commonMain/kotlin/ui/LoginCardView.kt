@@ -47,7 +47,6 @@ fun LoginCardView(
     val icon = if (isLogin.value == 1) Icons.Rounded.DoneAll else Icons.Rounded.Done
 
     MiuixCard(
-        isSecondary = true,
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)

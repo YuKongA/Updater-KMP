@@ -1,6 +1,5 @@
 package ui
 
-import MiuixCheckbox
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,6 +36,7 @@ import org.jetbrains.compose.resources.stringResource
 import perfGet
 import top.yukonga.miuix.kmp.MiuixSuperDialog
 import top.yukonga.miuix.kmp.basic.MiuixButton
+import top.yukonga.miuix.kmp.basic.MiuixCheckbox
 import top.yukonga.miuix.kmp.basic.MiuixText
 import top.yukonga.miuix.kmp.basic.MiuixTextField
 import top.yukonga.miuix.kmp.theme.MiuixTheme
@@ -47,7 +47,6 @@ import updater.composeapp.generated.resources.account
 import updater.composeapp.generated.resources.account_or_password_empty
 import updater.composeapp.generated.resources.cancel
 import updater.composeapp.generated.resources.global
-import updater.composeapp.generated.resources.logged_in
 import updater.composeapp.generated.resources.logging_in
 import updater.composeapp.generated.resources.login
 import updater.composeapp.generated.resources.login_error

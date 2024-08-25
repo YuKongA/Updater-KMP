@@ -1,6 +1,5 @@
 package ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -45,13 +44,11 @@ fun AutoCompleteTextField(
     ExposedDropdownMenuBox(
         modifier = Modifier
             .padding(horizontal = 20.dp)
-            .background(MiuixTheme.colorScheme.secondaryBackground)
             .fillMaxWidth(),
         expanded = isDropdownExpanded,
         onExpandedChange = { isDropdownExpanded = text.value.isNotEmpty() }
     ) {
         MiuixTextField(
-            isSecondary = true,
             insideMargin = DpSize(16.dp, 18.dp),
             value = text.value,
             onValueChange = {
@@ -79,7 +76,7 @@ fun AutoCompleteTextField(
             modifier = Modifier
                 .exposedDropdownSize()
                 .heightIn(max = 250.dp),
-            containerColor = MiuixTheme.colorScheme.secondaryContainer,
+            containerColor = MiuixTheme.colorScheme.secondary,
             shape = RoundedCornerShape(16.dp),
             expanded = isDropdownExpanded && list.isNotEmpty(),
             onDismissRequest = { isDropdownExpanded = false }
