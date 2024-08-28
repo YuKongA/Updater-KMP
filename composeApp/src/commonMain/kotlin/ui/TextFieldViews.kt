@@ -94,8 +94,8 @@ fun TextFieldViews(
             label = stringResource(Res.string.android_version)
         )
         MiuixTextField(
-            insideMargin = DpSize(16.dp, 18.dp),
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+            insideMargin = DpSize(16.dp, 20.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
             value = systemVersion.value,
             onValueChange = { systemVersion.value = it },
             label = stringResource(Res.string.system_version),
@@ -107,7 +107,7 @@ fun TextFieldViews(
             })
         )
         MiuixButton(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
             submit = true,
             onClick = {
                 updateRomInfo.value++

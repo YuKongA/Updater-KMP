@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">Updater</string>
+    <string name="about">About</string>
     <string name="view_source">View Source:</string>
     <string name="join_group">Join Group:</string>
     <string name="login">Login</string>

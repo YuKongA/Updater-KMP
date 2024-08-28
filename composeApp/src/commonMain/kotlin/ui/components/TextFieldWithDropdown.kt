@@ -41,7 +41,7 @@ fun TextFieldWithDropdown(
 
     ExposedDropdownMenuBox(
         modifier = Modifier
-            .padding(horizontal = 20.dp)
+            .padding(horizontal = 24.dp)
             .fillMaxWidth(),
         expanded = isDropdownExpanded,
         onExpandedChange = {
@@ -49,7 +49,7 @@ fun TextFieldWithDropdown(
         },
     ) {
         MiuixTextField(
-            insideMargin = DpSize(16.dp, 18.dp),
+            insideMargin = DpSize(16.dp, 20.dp),
             value = text.value,
             onValueChange = {},
             label = label,

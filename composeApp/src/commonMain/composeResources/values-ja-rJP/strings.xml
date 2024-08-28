@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="about">概要</string>
     <string name="login">ログイン</string>
     <string name="view_source">ソース コードを表示:</string>
     <string name="join_group">グループに参加:</string>

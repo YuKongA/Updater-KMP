@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="about">關於</string>
     <string name="login">登錄</string>
     <string name="view_source">查看原始碼:</string>
     <string name="join_group">加入群組:</string>
