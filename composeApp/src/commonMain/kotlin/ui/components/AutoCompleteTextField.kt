@@ -56,6 +56,7 @@ fun AutoCompleteTextField(
                 isDropdownExpanded = it.isNotEmpty()
             },
             singleLine = true,
+            backgroundColor = MiuixTheme.colorScheme.primaryContainer,
             label = label,
             modifier = Modifier
                 .menuAnchor(type = PrimaryEditable, enabled = true),

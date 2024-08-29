@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.MiuixButton
 import top.yukonga.miuix.kmp.basic.MiuixTextField
+import top.yukonga.miuix.kmp.theme.MiuixTheme
 import ui.components.AutoCompleteTextField
 import ui.components.TextFieldWithDropdown
 import updater.composeapp.generated.resources.Res
@@ -100,6 +101,7 @@ fun TextFieldViews(
             onValueChange = { systemVersion.value = it },
             label = stringResource(Res.string.system_version),
             singleLine = true,
+            backgroundColor = MiuixTheme.colorScheme.primaryContainer,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(onSearch = {
                 focusManager.clearFocus()

@@ -55,6 +55,7 @@ fun TextFieldWithDropdown(
             label = label,
             readOnly = true,
             singleLine = true,
+            backgroundColor = MiuixTheme.colorScheme.primaryContainer,
             modifier = Modifier.menuAnchor(type = PrimaryNotEditable, enabled = true)
         )
         ExposedDropdownMenu(
