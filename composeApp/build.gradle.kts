@@ -18,7 +18,7 @@ plugins {
 
 val appName = "Updater"
 val pkgName = "top.yukonga.updater.kmp"
-val verName = "1.3.0"
+val verName = "1.4.0"
 val verCode = getVersionCode()
 val xcf = XCFramework(appName + "Framework")
 
