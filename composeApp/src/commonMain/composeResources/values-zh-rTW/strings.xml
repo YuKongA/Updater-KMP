@@ -17,7 +17,7 @@
     <string name="branch">版本分支</string>
     <string name="toast_ing">正在查詢...</string>
     <string name="toast_no_info">未取得到訊息！</string>
-    <string name="toast_wrong_info">請求的版本不存在！</string>
+    <string name="toast_wrong_info">請求版本不存在！</string>
     <string name="toast_success_info">請求成功！</string>
     <string name="toast_crash_info">未連接到網路！</string>
     <string name="account">帳號</string>

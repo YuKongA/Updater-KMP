@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import data.DeviceInfoHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.MiuixButton
 import top.yukonga.miuix.kmp.basic.MiuixTextField
@@ -31,6 +32,7 @@ import updater.composeapp.generated.resources.device_name
 import updater.composeapp.generated.resources.regions_code
 import updater.composeapp.generated.resources.submit
 import updater.composeapp.generated.resources.system_version
+import updater.composeapp.generated.resources.toast_no_info
 
 @Composable
 fun TextFieldViews(
@@ -43,6 +45,8 @@ fun TextFieldViews(
 ) {
     val deviceNameFlow = MutableStateFlow(deviceName.value)
     val codeNameFlow = MutableStateFlow(codeName.value)
+
+    val toastNoInfo = stringResource(Res.string.toast_no_info)
 
     val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
@@ -105,14 +109,22 @@ fun TextFieldViews(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(onSearch = {
                 focusManager.clearFocus()
-                updateRomInfo.value++
+                if (codeName.value != "" && androidVersion.value != "" && systemVersion.value != "") {
+                    updateRomInfo.value++
+                } else {
+                    showMessage(toastNoInfo)
+                }
             })
         )
         MiuixButton(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
             submit = true,
             onClick = {
-                updateRomInfo.value++
+                if (codeName.value != "" && androidVersion.value != "" && systemVersion.value != "") {
+                    updateRomInfo.value++
+                } else {
+                    showMessage(toastNoInfo)
+                }
             },
             text = stringResource(Res.string.submit)
         )
