@@ -16,6 +16,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import isWasm
 import org.jetbrains.compose.resources.stringResource
@@ -50,7 +51,8 @@ fun LoginCardView(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
-            .padding(top = 16.dp)
+            .padding(top = 16.dp),
+        insideMargin = DpSize(18.dp, 18.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

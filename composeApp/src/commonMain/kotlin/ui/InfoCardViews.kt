@@ -26,6 +26,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import copyToClipboard
@@ -67,6 +68,7 @@ fun InfoCardViews(
     ) {
         MiuixCard(
             modifier = Modifier.padding(bottom = 16.dp),
+            insideMargin = DpSize(18.dp, 18.dp)
         ) {
             MiuixText(
                 text = romInfoState.value.type.uppercase(),

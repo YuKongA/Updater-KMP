@@ -77,7 +77,7 @@ fun AutoCompleteTextField(
             modifier = Modifier
                 .exposedDropdownSize()
                 .heightIn(max = 250.dp),
-            containerColor = MiuixTheme.colorScheme.secondary,
+            containerColor = MiuixTheme.colorScheme.textFieldBg,
             shape = RoundedCornerShape(16.dp),
             expanded = isDropdownExpanded && list.isNotEmpty(),
             onDismissRequest = { isDropdownExpanded = false }

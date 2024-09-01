@@ -8,7 +8,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MenuAnchorType.Companion.PrimaryNotEditable
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -62,7 +61,7 @@ fun TextFieldWithDropdown(
             modifier = Modifier
                 .exposedDropdownSize()
                 .heightIn(max = 250.dp),
-            containerColor = MiuixTheme.colorScheme.secondary,
+            containerColor = MiuixTheme.colorScheme.textFieldBg,
             shape = RoundedCornerShape(16.dp),
             expanded = isDropdownExpanded,
             onDismissRequest = { isDropdownExpanded = false },
@@ -76,7 +75,6 @@ fun TextFieldWithDropdown(
                             color = MiuixTheme.colorScheme.onBackground
                         )
                     },
-                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                     onClick = {
                         text.value = item
                         isDropdownExpanded = false
