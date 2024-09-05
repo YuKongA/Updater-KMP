@@ -160,6 +160,7 @@ object DeviceInfoHelper {
         Device("Redmi 13 / POCO M6 4G", "moon", "NT"),
         Device("Redmi 13C / POCO C65 (India)", "gale", "GP"),
         Device("Redmi 13C (China) / 13R / POCO M6", "air", "GQ"),
+        Device("Redmi 14C", "lake", "GT"),
         Device("Redmi K70 / POCO F6 Pro", "vermeer", "NK"),
         Device("Redmi K70 Pro", "manet", "NM"),
         Device("Redmi K70E / POCO X6 Pro", "duchamp", "NL"),
