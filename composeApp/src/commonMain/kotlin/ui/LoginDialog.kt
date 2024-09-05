@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Login
 import androidx.compose.material.icons.automirrored.rounded.Logout
+import androidx.compose.material.icons.rounded.Visibility
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -24,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -114,14 +117,27 @@ fun LoginDialog(
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
                         )
-                        val passwordVisibility by remember { mutableStateOf(false) }
+                        var passwordVisibility by remember { mutableStateOf(false) }
                         MiuixTextField(
                             value = password,
                             onValueChange = { password = it },
                             label = stringResource(Res.string.password),
                             modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                             singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                             visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+                            trailingIcon = {
+                                IconButton(
+                                    onClick = { passwordVisibility = !passwordVisibility },
+                                    content = {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Visibility,
+                                            tint = if (passwordVisibility) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.onPrimary,
+                                            contentDescription = null
+                                        )
+                                    }
+                                )
+                            }
                         )
                         Row(
                             modifier = Modifier.padding(vertical = 16.dp),
