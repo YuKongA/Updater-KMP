@@ -21,22 +21,18 @@ jobs:
             artifact-name: Updater-windows-x64-exe
           - os: macos-latest
             platform: macos arm64
-            platformEx: android aarch64
             build-command: ./gradlew packageReleaseDistributionForCurrentOS
-            build-commandEx: ./gradlew assembleRelease
             artifact-path: composeApp/build/compose/binaries/main-release/dmg
-            artifact-pathEx: composeApp/build/outputs/apk/release
             artifact-name: Updater-darwin-arm64-dmg
-            artifact-nameEx: Updater-android-aarch64-apk
           - os: ubuntu-latest
-            platform: ubuntu x64
-            platformEx: linux x64
-            build-command: ./gradlew packageReleaseDistributionForCurrentOS
-            build-commandEx: ./gradlew createReleaseDistributable
-            artifact-path: composeApp/build/compose/binaries/main-release/deb
-            artifact-pathEx: composeApp/build/compose/binaries/main-release/app/Updater
-            artifact-name: Updater-ubuntu-x64-deb
-            artifact-nameEx: Updater-linux-x64-bin
+            platform: linux x64
+            platformEx: android aarch64
+            build-command: ./gradlew createReleaseDistributable
+            build-commandEx: ./gradlew assemble
+            artifact-path: composeApp/build/compose/binaries/main-release/app/Updater
+            artifact-pathEx: composeApp/build/outputs/apk/release
+            artifact-name: Updater-linux-x64-bin
+            artifact-nameEx: Updater-android-aarch64-apk
 
     steps:
       - name: Checkout sources
@@ -54,14 +50,14 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Decode android signing key
-        if: matrix.platform == 'macos arm64' && matrix.platformEx == 'android aarch64'
+        if: matrix.platformEx == 'android aarch64'
         run: echo ${{ secrets.SIGNING_KEY }} | base64 -d > keystore.jks
 
       - name: Build ${{ matrix.platform }} platform
         run: ${{ matrix.build-command }}
 
       - name: Build ${{ matrix.platformEx }} platform
-        if: matrix.platform == 'macos arm64' || matrix.platform == 'ubuntu x64'
+        if: matrix.platformEx == 'android aarch64'
         run: ${{ matrix.build-commandEx }}
         env:
           KEYSTORE_PATH: "../keystore.jks"
@@ -77,7 +73,7 @@ jobs:
           compression-level: 9
 
       - name: Upload Updater ${{ matrix.platformEx }} artifact
-        if: matrix.platform == 'macos arm64' || matrix.platform == 'ubuntu x64'
+        if: matrix.platformEx == 'android aarch64'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-nameEx }}
@@ -91,14 +87,13 @@ jobs:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: |
           if [ ! -z "${{ secrets.BOT_TOKEN }}" ]; then
-            OUTPUT="composeApp/build/outputs/apk/release/"
-            export RELEASE=$(find $OUTPUT -name "*.apk")
+            OUTPUT=
+            export RELEASE=$(find "composeApp/build/outputs/apk/release/" -name "*.apk")
+            export DEBUG=$(find "composeApp/build/outputs/apk/debug/" -name "*.apk")
             event_path=$GITHUB_EVENT_PATH
             commit_count=$(jq -r '.commits | length' $event_path)
             { echo -e 'New CI from Updater-KMP\n'; git log -$commit_count --pretty=format:"%h %s"; } > ${{ github.workspace }}/git_log
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-            brew install gawk
-            ESCAPED="$(cat ${{ github.workspace }}/git_log | gawk '{gsub(/[_*[\]()~`>#+=\|{}.!-]/,"\\\\\\\\&")}1' | sed -e 's|"|\\"|g' -e 's|^[0-9a-z]\+|__&__|' | xxd -p -c 256 | sed 's/\(..\)/%\1/g')"
+            ESCAPED="$(cat ${{ github.workspace }}/git_log | gawk '{gsub(/[_*[\]()~`>#+=\|{}.!-]/,"\\\\\\\\&")}1' | sed -e 's|"|\\"|g' -e 's|^[0-9a-z]\+|__&__|' | hexdump -v -e '/1 "%02X"' | sed 's/\(..\)/%\1/g')"
             cd ${{ github.workspace }}
-            curl -v "https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup?chat_id=${CHANNEL_ID}&media=%5B%7B%22type%22%3A%22document%22%2C%22media%22%3A%22attach%3A%2F%2Frelease%22%2C%22caption%22%3A%22${ESCAPED}%22%2C%22parse_mode%22%3A%22MarkdownV2%22%7D%5D" -F release="@$RELEASE"
+            curl -v "https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup?chat_id=${CHANNEL_ID}&media=%5B%7B%22type%22%3A%22document%22%2C%22media%22%3A%22attach%3A%2F%2Frelease%22%7D%2C%7B%22type%22%3A%22document%22%2C%22media%22%3A%22attach%3A%2F%2Fdebug%22%2C%22caption%22%3A%22${ESCAPED}%22%2C%22parse_mode%22%3A%22MarkdownV2%22%7D%5D" -F release="@$RELEASE" -F debug="@$DEBUG"
           fi
