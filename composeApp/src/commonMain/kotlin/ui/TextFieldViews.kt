@@ -2,6 +2,7 @@ package ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
@@ -88,16 +89,20 @@ fun TextFieldViews(
             onValueChange = codeNameFlow,
             label = stringResource(Res.string.code_name)
         )
-        TextFieldWithDropdown(
-            text = deviceRegion,
-            items = DeviceInfoHelper.regionNames,
-            label = stringResource(Res.string.regions_code)
-        )
-        TextFieldWithDropdown(
-            text = androidVersion,
-            items = DeviceInfoHelper.androidVersions,
-            label = stringResource(Res.string.android_version)
-        )
+        Row {
+            TextFieldWithDropdown(
+                modifier = Modifier.weight(1f).padding(start = 24.dp, end = 8.dp),
+                text = deviceRegion,
+                items = DeviceInfoHelper.regionNames,
+                label = stringResource(Res.string.regions_code)
+            )
+            TextFieldWithDropdown(
+                modifier = Modifier.weight(1f).padding(start = 8.dp, end = 24.dp),
+                text = androidVersion,
+                items = DeviceInfoHelper.androidVersions,
+                label = stringResource(Res.string.android_version)
+            )
+        }
         MiuixTextField(
             insideMargin = DpSize(16.dp, 20.dp),
             modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),

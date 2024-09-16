@@ -29,6 +29,7 @@ import top.yukonga.miuix.kmp.theme.MiuixTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextFieldWithDropdown(
+    modifier: Modifier = Modifier,
     text: MutableState<String>,
     items: List<String>,
     label: String
@@ -39,8 +40,7 @@ fun TextFieldWithDropdown(
     val focusManager = LocalFocusManager.current
 
     ExposedDropdownMenuBox(
-        modifier = Modifier
-            .padding(horizontal = 24.dp)
+        modifier = modifier
             .fillMaxWidth(),
         expanded = isDropdownExpanded,
         onExpandedChange = {
