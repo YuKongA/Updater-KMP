@@ -28,7 +28,7 @@ jobs:
             platform: linux x64
             platformEx: android aarch64
             build-command: ./gradlew createReleaseDistributable
-            build-commandEx: ./gradlew assemble
+            build-commandEx: ./gradlew assembleDebug && ./gradlew assembleRelease
             artifact-path: composeApp/build/compose/binaries/main-release/app/Updater
             artifact-pathEx: composeApp/build/outputs/apk/release
             artifact-name: Updater-linux-x64-bin
