@@ -25,7 +25,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.MutableStateFlow
-import top.yukonga.miuix.kmp.basic.MiuixTextField
+import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,12 +43,12 @@ fun AutoCompleteTextField(
 
     ExposedDropdownMenuBox(
         modifier = Modifier
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = 12.dp)
             .fillMaxWidth(),
         expanded = isDropdownExpanded,
         onExpandedChange = { isDropdownExpanded = text.value.isNotEmpty() }
     ) {
-        MiuixTextField(
+        TextField(
             insideMargin = DpSize(16.dp, 20.dp),
             value = text.value,
             onValueChange = {

@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seiko.imageloader.rememberImagePainter
 import misc.bodyFontSize
-import top.yukonga.miuix.kmp.basic.MiuixText
+import top.yukonga.miuix.kmp.basic.Text
 
 @Composable
 fun TextWithIcon(
@@ -53,13 +53,13 @@ fun TextWithIcon(
                     painter = imagePainter,
                     contentDescription = null,
                 )
-                MiuixText(
+                Text(
                     modifier = Modifier.padding(horizontal = 6.dp),
                     text = iconName,
                     fontSize = bodyFontSize,
                 )
             }
-            MiuixText(
+            Text(
                 text = it,
                 color = if (isSystemInDarkTheme()) Color(0xFF999999) else Color(0xFF666666),
                 fontSize = 14.5.sp

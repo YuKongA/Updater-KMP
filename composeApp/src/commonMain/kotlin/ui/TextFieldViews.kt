@@ -21,8 +21,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
-import top.yukonga.miuix.kmp.basic.MiuixButton
-import top.yukonga.miuix.kmp.basic.MiuixTextField
+import top.yukonga.miuix.kmp.basic.Button
+import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import ui.components.AutoCompleteTextField
 import ui.components.TextFieldWithDropdown
@@ -73,8 +73,8 @@ fun TextFieldViews(
     }
 
     Column(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         AutoCompleteTextField(
@@ -91,21 +91,21 @@ fun TextFieldViews(
         )
         Row {
             TextFieldWithDropdown(
-                modifier = Modifier.weight(1f).padding(start = 24.dp, end = 8.dp),
+                modifier = Modifier.weight(1f).padding(start = 12.dp, end = 6.dp),
                 text = deviceRegion,
                 items = DeviceInfoHelper.regionNames,
                 label = stringResource(Res.string.regions_code)
             )
             TextFieldWithDropdown(
-                modifier = Modifier.weight(1f).padding(start = 8.dp, end = 24.dp),
+                modifier = Modifier.weight(1f).padding(start = 6.dp, end = 12.dp),
                 text = androidVersion,
                 items = DeviceInfoHelper.androidVersions,
                 label = stringResource(Res.string.android_version)
             )
         }
-        MiuixTextField(
+        TextField(
             insideMargin = DpSize(16.dp, 20.dp),
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
             value = systemVersion.value,
             onValueChange = { systemVersion.value = it },
             label = stringResource(Res.string.system_version),
@@ -121,8 +121,8 @@ fun TextFieldViews(
                 }
             })
         )
-        MiuixButton(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+        Button(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
             submit = true,
             onClick = {
                 if (codeName.value != "" && androidVersion.value != "" && systemVersion.value != "") {

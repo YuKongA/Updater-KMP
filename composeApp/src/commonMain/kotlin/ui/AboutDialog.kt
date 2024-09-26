@@ -33,8 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import misc.VersionInfo
 import org.jetbrains.compose.resources.stringResource
-import top.yukonga.miuix.kmp.MiuixSuperDialog
-import top.yukonga.miuix.kmp.basic.MiuixText
+import top.yukonga.miuix.kmp.basic.Text
+import top.yukonga.miuix.kmp.extra.SuperDialog
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.utils.MiuixPopupUtil.Companion.showDialog
 import top.yukonga.miuix.kmp.utils.squircleshape.SquircleShape
@@ -64,92 +64,92 @@ fun AboutDialog() {
         )
     }
 
-    if (showDialog.value) {
-        showDialog(
-            content = {
-                MiuixSuperDialog(
-                    title = stringResource(Res.string.about),
-                    onDismissRequest = { showDialog.value = false }
+    showDialog(
+        show = showDialog.value,
+        content = {
+            SuperDialog(
+                show = showDialog,
+                title = stringResource(Res.string.about),
+                onDismissRequest = { showDialog.value = false }
+            ) {
+                Row(
+                    modifier = Modifier.padding(bottom = 10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier.padding(bottom = 10.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(SquircleShape(13.dp))
+                            .background(MiuixTheme.colorScheme.primary)
                     ) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .size(48.dp)
-                                .clip(SquircleShape(13.dp))
-                                .background(MiuixTheme.colorScheme.primary)
-                        ) {
-                            Image(
-                                imageVector = Icons.Outlined.Update,
-                                colorFilter = ColorFilter.tint(Color.White),
-                                contentDescription = null,
-                                modifier = Modifier.size(25.dp),
-                            )
-                        }
-                        Column {
-                            MiuixText(
-                                text = stringResource(Res.string.app_name),
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            MiuixText(
-                                text = VersionInfo.VERSION_NAME + " (" + VersionInfo.VERSION_CODE + ")",
-                            )
-                        }
-                    }
-                    val uriHandler = LocalUriHandler.current
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        MiuixText(
-                            text = stringResource(Res.string.view_source) + " ",
-                        )
-                        MiuixText(
-                            text = AnnotatedString(
-                                text = "GitHub",
-                                spanStyle = SpanStyle(
-                                    textDecoration = TextDecoration.Underline,
-                                    color = MiuixTheme.colorScheme.primary
-                                )
-                            ),
-                            modifier = Modifier.clickable(
-                                onClick = {
-                                    uriHandler.openUri("https://github.com/YuKongA/Updater-KMP")
-                                }
-                            )
+                        Image(
+                            imageVector = Icons.Outlined.Update,
+                            colorFilter = ColorFilter.tint(Color.White),
+                            contentDescription = null,
+                            modifier = Modifier.size(25.dp),
                         )
                     }
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        MiuixText(
-                            text = stringResource(Res.string.join_group) + " ",
+                    Column {
+                        Text(
+                            text = stringResource(Res.string.app_name),
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.SemiBold
                         )
-                        MiuixText(
-                            text = AnnotatedString(
-                                text = "Telegram",
-                                spanStyle = SpanStyle(
-                                    textDecoration = TextDecoration.Underline,
-                                    color = MiuixTheme.colorScheme.primary
-                                )
-                            ),
-                            modifier = Modifier.clickable(
-                                onClick = {
-                                    uriHandler.openUri("https://t.me/YuKongA13579")
-                                },
-                            )
+                        Text(
+                            text = VersionInfo.VERSION_NAME + " (" + VersionInfo.VERSION_CODE + ")",
                         )
                     }
-                    MiuixText(
-                        modifier = Modifier.padding(top = 10.dp),
-                        text = stringResource(Res.string.opensource_info)
+                }
+                val uriHandler = LocalUriHandler.current
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(Res.string.view_source) + " ",
+                    )
+                    Text(
+                        text = AnnotatedString(
+                            text = "GitHub",
+                            spanStyle = SpanStyle(
+                                textDecoration = TextDecoration.Underline,
+                                color = MiuixTheme.colorScheme.primary
+                            )
+                        ),
+                        modifier = Modifier.clickable(
+                            onClick = {
+                                uriHandler.openUri("https://github.com/YuKongA/Updater-KMP")
+                            }
+                        )
                     )
                 }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(Res.string.join_group) + " ",
+                    )
+                    Text(
+                        text = AnnotatedString(
+                            text = "Telegram",
+                            spanStyle = SpanStyle(
+                                textDecoration = TextDecoration.Underline,
+                                color = MiuixTheme.colorScheme.primary
+                            )
+                        ),
+                        modifier = Modifier.clickable(
+                            onClick = {
+                                uriHandler.openUri("https://t.me/YuKongA13579")
+                            },
+                        )
+                    )
+                }
+                Text(
+                    modifier = Modifier.padding(top = 10.dp),
+                    text = stringResource(Res.string.opensource_info)
+                )
             }
-        )
-    }
+        }
+    )
 }

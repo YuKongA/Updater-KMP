@@ -26,12 +26,13 @@ import misc.MessageUtils.Companion.Snackbar
 import misc.json
 import misc.updateRomInfo
 import org.jetbrains.compose.resources.stringResource
-import top.yukonga.miuix.kmp.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.MiuixTopAppBar
-import top.yukonga.miuix.kmp.basic.MiuixBox
-import top.yukonga.miuix.kmp.basic.MiuixLazyColumn
-import top.yukonga.miuix.kmp.basic.MiuixScaffold
-import top.yukonga.miuix.kmp.rememberMiuixTopAppBarState
+import top.yukonga.miuix.kmp.basic.Box
+import top.yukonga.miuix.kmp.basic.LazyColumn
+import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
+import top.yukonga.miuix.kmp.basic.Scaffold
+import top.yukonga.miuix.kmp.basic.TopAppBar
+import top.yukonga.miuix.kmp.basic.rememberTopAppBarState
+import top.yukonga.miuix.kmp.utils.getWindowSize
 import ui.AboutDialog
 import ui.InfoCardViews
 import ui.LoginCardView
@@ -62,16 +63,16 @@ fun App() {
         isLogin, curRomInfo, incRomInfo, curIconInfo, incIconInfo, updateRomInfo
     )
 
-    val scrollBehavior = MiuixScrollBehavior(rememberMiuixTopAppBarState())
+    val scrollBehavior = MiuixScrollBehavior(rememberTopAppBarState())
 
     AppTheme {
-        MiuixScaffold(
+        Scaffold(
             modifier = Modifier
                 .imePadding()
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                MiuixTopAppBar(
+                TopAppBar(
                     title = stringResource(Res.string.app_name),
                     color = Color.Transparent,
                     scrollBehavior = scrollBehavior,
@@ -81,8 +82,8 @@ fun App() {
                 )
             }
         ) {
-            MiuixBox {
-                MiuixLazyColumn(
+            Box {
+                LazyColumn(
                     modifier = Modifier
                         .height(getWindowSize().height.dp)
                         .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
@@ -100,12 +101,12 @@ fun App() {
                                     LoginCardView(isLogin)
                                     TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
                                     Column(
-                                        modifier = Modifier.padding(horizontal = 24.dp)
+                                        modifier = Modifier.padding(horizontal = 12.dp)
                                     ) {
                                         InfoCardViews(curRomInfo, curIconInfo)
                                         InfoCardViews(incRomInfo, incIconInfo)
                                     }
-                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Spacer(modifier = Modifier.height(16.dp))
                                 }
                             } else {
                                 Column {
@@ -114,12 +115,12 @@ fun App() {
                                             LoginCardView(isLogin)
                                             TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
                                         }
-                                        Column(modifier = Modifier.weight(1.0f).padding(end = 24.dp, top = 16.dp)) {
+                                        Column(modifier = Modifier.weight(1.0f).padding(end = 12.dp, top = 6.dp)) {
                                             InfoCardViews(curRomInfo, curIconInfo)
                                             InfoCardViews(incRomInfo, incIconInfo)
                                         }
                                     }
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Spacer(modifier = Modifier.height(22.dp))
                                 }
                             }
                         }

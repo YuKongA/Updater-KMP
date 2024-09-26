@@ -1,5 +1,5 @@
 [versions]
-androidGradlePlugin = "8.6.0"
+androidGradlePlugin = "8.6.1"
 androidx-activity-compose = "1.9.2"
 compose-plugin = "1.7.0-beta02"
 cryptography = "0.3.1"
@@ -8,7 +8,7 @@ image-loader = "1.8.3"
 kotlin = "2.0.20"
 kotlinx-serialization-json = "1.7.3"
 ktor-client = "3.0.0-rc-1"
-miuix = "0.1.6"
+miuix = "0.2.1"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }

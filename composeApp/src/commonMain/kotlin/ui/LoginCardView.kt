@@ -20,8 +20,8 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import isWasm
 import org.jetbrains.compose.resources.stringResource
-import top.yukonga.miuix.kmp.basic.MiuixCard
-import top.yukonga.miuix.kmp.basic.MiuixText
+import top.yukonga.miuix.kmp.basic.Card
+import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.logged_in
@@ -47,12 +47,12 @@ fun LoginCardView(
     }
     val icon = if (isLogin.value == 1) Icons.Rounded.DoneAll else Icons.Rounded.Done
 
-    MiuixCard(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp)
-            .padding(top = 16.dp),
-        insideMargin = DpSize(18.dp, 18.dp)
+            .padding(horizontal = 10.dp)
+            .padding(top = 12.dp, bottom = 6.dp),
+        insideMargin = DpSize(16.dp, 16.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -65,11 +65,11 @@ fun LoginCardView(
                 contentDescription = null
             )
             Column(modifier = Modifier.padding(start = 24.dp)) {
-                MiuixText(
+                Text(
                     text = if (!isWasm()) account else "WebAssembly",
                     fontWeight = FontWeight.SemiBold
                 )
-                MiuixText(
+                Text(
                     text = info
                 )
             }

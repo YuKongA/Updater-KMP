@@ -36,8 +36,8 @@ import misc.MessageUtils.Companion.showMessage
 import misc.bodyFontSize
 import misc.bodySmallFontSize
 import org.jetbrains.compose.resources.stringResource
-import top.yukonga.miuix.kmp.basic.MiuixCard
-import top.yukonga.miuix.kmp.basic.MiuixText
+import top.yukonga.miuix.kmp.basic.Card
+import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import ui.components.TextWithIcon
 import updater.composeapp.generated.resources.Res
@@ -66,11 +66,11 @@ fun InfoCardViews(
         enter = fadeIn(animationSpec = tween(400)),
         exit = fadeOut(animationSpec = tween(400))
     ) {
-        MiuixCard(
-            modifier = Modifier.padding(bottom = 16.dp),
-            insideMargin = DpSize(18.dp, 18.dp)
+        Card(
+            modifier = Modifier.padding(vertical = 6.dp),
+            insideMargin = DpSize(16.dp, 16.dp)
         ) {
-            MiuixText(
+            Text(
                 text = romInfoState.value.type.uppercase(),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.SemiBold,
@@ -93,7 +93,7 @@ fun InfoCardViews(
                 romInfoState.value.fileSize
             )
 
-            MiuixText(
+            Text(
                 text = stringResource(Res.string.download),
                 color = MiuixTheme.colorScheme.subTextBase,
                 fontSize = bodySmallFontSize
@@ -177,7 +177,7 @@ fun MessageTextView(
     Column(
         modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
     ) {
-        MiuixText(
+        Text(
             text = title,
             color = MiuixTheme.colorScheme.subTextBase,
             fontSize = bodySmallFontSize
@@ -188,7 +188,7 @@ fun MessageTextView(
                 fadeIn(animationSpec = tween(1500)) togetherWith fadeOut(animationSpec = tween(300))
             }
         ) {
-            MiuixText(
+            Text(
                 text = it,
                 fontSize = bodyFontSize,
                 fontWeight = FontWeight.Medium
@@ -213,7 +213,7 @@ fun DownloadInfoView(
     Column(
         modifier = modifier
     ) {
-        MiuixText(
+        Text(
             text = title,
             fontSize = bodyFontSize,
             fontWeight = FontWeight.Medium,
@@ -263,11 +263,11 @@ fun ChangelogView(
 
     Column {
         Row(
-            modifier = Modifier.padding(top = 20.dp, bottom = 24.dp),
+            modifier = Modifier.padding(vertical = 6.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            MiuixText(
+            Text(
                 modifier = Modifier.padding(end = 6.dp),
                 text = stringResource(Res.string.changelog),
                 fontSize = 24.sp,

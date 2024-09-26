@@ -37,11 +37,11 @@ import logout
 import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
 import perfGet
-import top.yukonga.miuix.kmp.MiuixSuperDialog
-import top.yukonga.miuix.kmp.basic.MiuixButton
-import top.yukonga.miuix.kmp.basic.MiuixCheckbox
-import top.yukonga.miuix.kmp.basic.MiuixText
-import top.yukonga.miuix.kmp.basic.MiuixTextField
+import top.yukonga.miuix.kmp.basic.Button
+import top.yukonga.miuix.kmp.basic.Checkbox
+import top.yukonga.miuix.kmp.basic.Text
+import top.yukonga.miuix.kmp.basic.TextField
+import top.yukonga.miuix.kmp.extra.SuperDialog
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.utils.MiuixPopupUtil.Companion.dismissDialog
 import top.yukonga.miuix.kmp.utils.MiuixPopupUtil.Companion.showDialog
@@ -104,13 +104,15 @@ fun LoginDialog(
     }
     if (showDialog.value && isLogin.value != 1) {
         showDialog(
+            show = showDialog.value,
             content = {
-                MiuixSuperDialog(
+                SuperDialog(
+                    show = showDialog,
                     title = stringResource(Res.string.login),
                     onDismissRequest = { showDialog.value = false }
                 ) {
                     Column {
-                        MiuixTextField(
+                        TextField(
                             value = account,
                             onValueChange = { account = it },
                             label = stringResource(Res.string.account),
@@ -118,7 +120,7 @@ fun LoginDialog(
                             singleLine = true,
                         )
                         var passwordVisibility by remember { mutableStateOf(false) }
-                        MiuixTextField(
+                        TextField(
                             value = password,
                             onValueChange = { password = it },
                             label = stringResource(Res.string.password),
@@ -147,14 +149,14 @@ fun LoginDialog(
                                 modifier = Modifier.weight(1f),
                                 horizontalArrangement = Arrangement.Center
                             ) {
-                                MiuixCheckbox(
+                                Checkbox(
                                     modifier = Modifier.padding(end = 10.dp),
                                     checked = global,
                                     onCheckedChange = {
                                         global = it
                                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                     })
-                                MiuixText(
+                                Text(
                                     text = stringResource(Res.string.global)
                                 )
                             }
@@ -162,20 +164,20 @@ fun LoginDialog(
                                 modifier = Modifier.weight(1f),
                                 horizontalArrangement = Arrangement.Center
                             ) {
-                                MiuixCheckbox(
+                                Checkbox(
                                     modifier = Modifier.padding(end = 10.dp),
                                     checked = savePassword == "1",
                                     onCheckedChange = {
                                         savePassword = if (it) "1" else "0"
                                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                     })
-                                MiuixText(
+                                Text(
                                     text = stringResource(Res.string.save_password)
                                 )
                             }
                         }
                         Row {
-                            MiuixButton(
+                            Button(
                                 modifier = Modifier.weight(1f),
                                 text = stringResource(Res.string.login),
                                 submit = true,
@@ -197,7 +199,7 @@ fun LoginDialog(
                                 }
                             )
                             Spacer(Modifier.width(20.dp))
-                            MiuixButton(
+                            Button(
                                 modifier = Modifier.weight(1f),
                                 text = stringResource(Res.string.cancel),
                                 onClick = {
@@ -215,14 +217,16 @@ fun LoginDialog(
 
     if (showDialog.value && isLogin.value == 1) {
         showDialog(
+            show = showDialog.value,
             content = {
-                MiuixSuperDialog(
+                SuperDialog(
+                    show = showDialog,
                     title = stringResource(Res.string.logout),
                     summary = stringResource(Res.string.logout_confirm),
                     onDismissRequest = { showDialog.value = false }
                 ) {
                     Row {
-                        MiuixButton(
+                        Button(
                             modifier = Modifier.weight(1f),
                             text = stringResource(Res.string.logout),
                             submit = true,
@@ -237,7 +241,7 @@ fun LoginDialog(
                             }
                         )
                         Spacer(Modifier.width(20.dp))
-                        MiuixButton(
+                        Button(
                             modifier = Modifier.weight(1f),
                             text = stringResource(Res.string.cancel),
                             onClick = {
