@@ -8,7 +8,7 @@ image-loader = "1.8.3"
 kotlin = "2.0.20"
 kotlinx-serialization-json = "1.7.3"
 ktor-client = "3.0.0-rc-1"
-miuix = "0.2.1"
+miuix = "0.2.3"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
@@ -21,7 +21,7 @@ image-loader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imag
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor-client" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor-client" }
-ktor-client-ios = { module = "io.ktor:ktor-client-ios", version.ref = "ktor-client" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor-client" }
 ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor-client" }
 miuix = { module = "top.yukonga.miuix.kmp:miuix", version.ref = "miuix" }
 

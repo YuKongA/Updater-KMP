@@ -99,12 +99,14 @@ fun LoginDialog(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MiuixTheme.colorScheme.onBackground
+            tint = MiuixTheme.colorScheme.onSurface
         )
     }
-    if (showDialog.value && isLogin.value != 1) {
+
+    if (!showDialog.value) return
+
+    if (isLogin.value != 1) {
         showDialog(
-            show = showDialog.value,
             content = {
                 SuperDialog(
                     show = showDialog,
@@ -134,7 +136,7 @@ fun LoginDialog(
                                     content = {
                                         Icon(
                                             imageVector = Icons.Rounded.Visibility,
-                                            tint = if (passwordVisibility) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.onPrimary,
+                                            tint = if (passwordVisibility) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.onSecondaryContainer,
                                             contentDescription = null
                                         )
                                     }
@@ -215,9 +217,8 @@ fun LoginDialog(
         )
     }
 
-    if (showDialog.value && isLogin.value == 1) {
+    if (isLogin.value == 1) {
         showDialog(
-            show = showDialog.value,
             content = {
                 SuperDialog(
                     show = showDialog,

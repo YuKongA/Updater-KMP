@@ -61,7 +61,7 @@ fun LoginCardView(
             Icon(
                 modifier = Modifier.size(28.dp).padding(start = 6.dp),
                 imageVector = icon,
-                tint = MiuixTheme.colorScheme.onPrimary,
+                tint = MiuixTheme.colorScheme.onSurface,
                 contentDescription = null
             )
             Column(modifier = Modifier.padding(start = 24.dp)) {

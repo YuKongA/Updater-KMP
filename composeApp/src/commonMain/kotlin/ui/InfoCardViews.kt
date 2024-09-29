@@ -95,7 +95,7 @@ fun InfoCardViews(
 
             Text(
                 text = stringResource(Res.string.download),
-                color = MiuixTheme.colorScheme.subTextBase,
+                color = MiuixTheme.colorScheme.onSecondaryVariant,
                 fontSize = bodySmallFontSize
             )
 
@@ -179,7 +179,7 @@ fun MessageTextView(
     ) {
         Text(
             text = title,
-            color = MiuixTheme.colorScheme.subTextBase,
+            color = MiuixTheme.colorScheme.onSecondaryVariant,
             fontSize = bodySmallFontSize
         )
         AnimatedContent(
@@ -231,7 +231,7 @@ fun DownloadInfoView(
                     Icon(
                         imageVector = Icons.Rounded.ContentCopy,
                         contentDescription = null,
-                        tint = MiuixTheme.colorScheme.onBackground
+                        tint = MiuixTheme.colorScheme.onSurface
                     )
                 }
                 IconButton(
@@ -244,7 +244,7 @@ fun DownloadInfoView(
                     Icon(
                         imageVector = Icons.Rounded.Download,
                         contentDescription = null,
-                        tint = MiuixTheme.colorScheme.onBackground
+                        tint = MiuixTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -283,7 +283,7 @@ fun ChangelogView(
                 Icon(
                     imageVector = Icons.Rounded.ContentCopy,
                     contentDescription = null,
-                    tint = MiuixTheme.colorScheme.onBackground
+                    tint = MiuixTheme.colorScheme.onSurface
                 )
             }
         }

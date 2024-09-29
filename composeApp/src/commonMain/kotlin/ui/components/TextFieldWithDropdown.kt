@@ -53,14 +53,13 @@ fun TextFieldWithDropdown(
             label = label,
             readOnly = true,
             singleLine = true,
-            backgroundColor = MiuixTheme.colorScheme.primaryContainer,
             modifier = Modifier.menuAnchor(type = PrimaryNotEditable, enabled = true)
         )
         ExposedDropdownMenu(
             modifier = Modifier
                 .exposedDropdownSize()
                 .heightIn(max = 250.dp),
-            containerColor = MiuixTheme.colorScheme.primaryContainer,
+            containerColor = MiuixTheme.colorScheme.secondaryContainer,
             shape = RoundedCornerShape(16.dp),
             expanded = isDropdownExpanded,
             onDismissRequest = { isDropdownExpanded = false },

@@ -64,8 +64,8 @@ fun AboutDialog() {
         )
     }
 
+    if (!showDialog.value) return
     showDialog(
-        show = showDialog.value,
         content = {
             SuperDialog(
                 show = showDialog,

@@ -56,10 +56,8 @@ fun AutoCompleteTextField(
                 isDropdownExpanded = it.isNotEmpty()
             },
             singleLine = true,
-            backgroundColor = MiuixTheme.colorScheme.primaryContainer,
             label = label,
-            modifier = Modifier
-                .menuAnchor(type = PrimaryEditable, enabled = true),
+            modifier = Modifier.menuAnchor(type = PrimaryEditable, enabled = true),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = {
                 isDropdownExpanded = false
@@ -77,7 +75,7 @@ fun AutoCompleteTextField(
             modifier = Modifier
                 .exposedDropdownSize()
                 .heightIn(max = 250.dp),
-            containerColor = MiuixTheme.colorScheme.primaryContainer,
+            containerColor = MiuixTheme.colorScheme.secondaryContainer,
             shape = RoundedCornerShape(16.dp),
             expanded = isDropdownExpanded && list.isNotEmpty(),
             onDismissRequest = { isDropdownExpanded = false }

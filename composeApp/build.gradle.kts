@@ -82,7 +82,7 @@ kotlin {
         iosMain.dependencies {
             // Added
             implementation(libs.cryptography.provider.apple)
-            implementation(libs.ktor.client.ios)
+            implementation(libs.ktor.client.darwin)
         }
         wasmJsMain.dependencies {
             // Added
