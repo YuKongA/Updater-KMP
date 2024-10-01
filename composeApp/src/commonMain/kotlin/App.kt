@@ -80,21 +80,21 @@ fun App() {
                 )
             }
         ) {
-            Box {
-                LazyColumn(
-                    modifier = Modifier
-                        .height(getWindowSize().height.dp)
-                        .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
-                        .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
-                    contentPadding = it,
-                    enableOverScroll = true,
-                    topAppBarScrollBehavior = scrollBehavior
-                ) {
-                    item {
-                        BoxWithConstraints(
-                            modifier = Modifier.navigationBarsPadding()
-                        ) {
-                            if (maxWidth < 768.dp) {
+            BoxWithConstraints {
+                if (maxWidth < 600.dp) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .height(getWindowSize().height.dp)
+                            .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
+                            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
+                        contentPadding = it,
+                        enableOverScroll = true,
+                        topAppBarScrollBehavior = scrollBehavior
+                    ) {
+                        item {
+                            Box(
+                                modifier = Modifier.navigationBarsPadding()
+                            ) {
                                 Column {
                                     LoginCardView(isLogin)
                                     TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
@@ -104,21 +104,49 @@ fun App() {
                                         InfoCardViews(curRomInfo, curIconInfo)
                                         InfoCardViews(incRomInfo, incIconInfo)
                                     }
-                                    Spacer(modifier = Modifier.height(16.dp))
                                 }
-                            } else {
-                                Column {
-                                    Row {
-                                        Column(modifier = Modifier.weight(0.8f)) {
-                                            LoginCardView(isLogin)
-                                            TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
-                                        }
-                                        Column(modifier = Modifier.weight(1.0f).padding(end = 12.dp, top = 6.dp)) {
-                                            InfoCardViews(curRomInfo, curIconInfo)
-                                            InfoCardViews(incRomInfo, incIconInfo)
-                                        }
-                                    }
-                                    Spacer(modifier = Modifier.height(22.dp))
+                                Spacer(modifier = Modifier.height(6.dp))
+                            }
+                        }
+                    }
+                } else {
+                    Row(
+                        modifier = Modifier
+                            .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
+                            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal))
+                    ) {
+                        LazyColumn(
+                            modifier = Modifier
+                                .height(getWindowSize().height.dp)
+                                .weight(0.88f),
+                            contentPadding = it,
+                            topAppBarScrollBehavior = scrollBehavior
+                        ) {
+                            item {
+                                Column(
+                                    modifier = Modifier.navigationBarsPadding()
+                                ) {
+                                    LoginCardView(isLogin)
+                                    TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                }
+                            }
+                        }
+                        LazyColumn(
+                            modifier = Modifier
+                                .padding(end = 12.dp)
+                                .weight(1f),
+                            contentPadding = it,
+                            topAppBarScrollBehavior = scrollBehavior
+                        ) {
+                            item {
+                                Column(
+                                    modifier = Modifier.navigationBarsPadding()
+                                ) {
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    InfoCardViews(curRomInfo, curIconInfo)
+                                    InfoCardViews(incRomInfo, incIconInfo)
+                                    Spacer(modifier = Modifier.height(6.dp))
                                 }
                             }
                         }

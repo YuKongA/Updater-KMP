@@ -110,6 +110,7 @@ fun TextFieldViews(
             onValueChange = { systemVersion.value = it },
             label = stringResource(Res.string.system_version),
             singleLine = true,
+            backgroundColor = MiuixTheme.colorScheme.surface,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(onSearch = {
                 focusManager.clearFocus()
