@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
@@ -29,6 +29,7 @@ import top.yukonga.miuix.kmp.basic.Box
 import top.yukonga.miuix.kmp.basic.LazyColumn
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
 import top.yukonga.miuix.kmp.basic.Scaffold
+import top.yukonga.miuix.kmp.basic.Surface
 import top.yukonga.miuix.kmp.basic.TopAppBar
 import top.yukonga.miuix.kmp.basic.rememberTopAppBarState
 import top.yukonga.miuix.kmp.utils.getWindowSize
@@ -65,95 +66,96 @@ fun App() {
     val scrollBehavior = MiuixScrollBehavior(rememberTopAppBarState())
 
     AppTheme {
-        Scaffold(
-            modifier = Modifier
-                .imePadding()
-                .fillMaxSize()
-                .nestedScroll(scrollBehavior.nestedScrollConnection),
-            topBar = {
-                TopAppBar(
-                    title = stringResource(Res.string.app_name),
-                    scrollBehavior = scrollBehavior,
-                    navigationIcon = {
-                        AboutDialog()
-                    }
-                )
-            }
-        ) {
-            BoxWithConstraints {
-                if (maxWidth < 600.dp) {
-                    LazyColumn(
-                        modifier = Modifier
-                            .height(getWindowSize().height.dp)
-                            .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
-                            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
-                        contentPadding = it,
-                        enableOverScroll = true,
-                        topAppBarScrollBehavior = scrollBehavior
-                    ) {
-                        item {
-                            Box(
-                                modifier = Modifier.navigationBarsPadding()
-                            ) {
-                                Column {
-                                    LoginCardView(isLogin)
-                                    TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
-                                    Column(
-                                        modifier = Modifier.padding(horizontal = 12.dp)
-                                    ) {
-                                        InfoCardViews(curRomInfo, curIconInfo)
-                                        InfoCardViews(incRomInfo, incIconInfo)
-                                    }
-                                }
-                                Spacer(modifier = Modifier.height(6.dp))
-                            }
+        Surface {
+            Scaffold(
+                modifier = Modifier
+                    .imePadding()
+                    .fillMaxSize()
+                    .displayCutoutPadding()
+                    .nestedScroll(scrollBehavior.nestedScrollConnection),
+                topBar = {
+                    TopAppBar(
+                        title = stringResource(Res.string.app_name),
+                        scrollBehavior = scrollBehavior,
+                        navigationIcon = {
+                            AboutDialog()
                         }
-                    }
-                } else {
-                    Row(
-                        modifier = Modifier
-                            .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
-                            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal))
-                    ) {
+                    )
+                }
+            ) {
+                BoxWithConstraints {
+                    if (maxWidth < 600.dp) {
                         LazyColumn(
                             modifier = Modifier
                                 .height(getWindowSize().height.dp)
-                                .weight(0.88f),
+                                .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
                             contentPadding = it,
+                            enableOverScroll = true,
                             topAppBarScrollBehavior = scrollBehavior
                         ) {
                             item {
-                                Column(
+                                Box(
                                     modifier = Modifier.navigationBarsPadding()
                                 ) {
-                                    LoginCardView(isLogin)
-                                    TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
+                                    Column {
+                                        LoginCardView(isLogin)
+                                        TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
+                                        Column(
+                                            modifier = Modifier.padding(horizontal = 12.dp)
+                                        ) {
+                                            InfoCardViews(curRomInfo, curIconInfo)
+                                            InfoCardViews(incRomInfo, incIconInfo)
+                                        }
+                                    }
                                     Spacer(modifier = Modifier.height(6.dp))
                                 }
                             }
                         }
-                        LazyColumn(
+                    } else {
+                        Row(
                             modifier = Modifier
-                                .padding(end = 12.dp)
-                                .weight(1f),
-                            contentPadding = it,
-                            topAppBarScrollBehavior = scrollBehavior
+                                .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal))
                         ) {
-                            item {
-                                Column(
-                                    modifier = Modifier.navigationBarsPadding()
-                                ) {
-                                    Spacer(modifier = Modifier.height(6.dp))
-                                    InfoCardViews(curRomInfo, curIconInfo)
-                                    InfoCardViews(incRomInfo, incIconInfo)
-                                    Spacer(modifier = Modifier.height(6.dp))
+                            LazyColumn(
+                                modifier = Modifier
+                                    .height(getWindowSize().height.dp)
+                                    .weight(0.88f),
+                                contentPadding = it,
+                                topAppBarScrollBehavior = scrollBehavior
+                            ) {
+                                item {
+                                    Column(
+                                        modifier = Modifier.navigationBarsPadding()
+                                    ) {
+                                        LoginCardView(isLogin)
+                                        TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
+                                        Spacer(modifier = Modifier.height(6.dp))
+                                    }
+                                }
+                            }
+                            LazyColumn(
+                                modifier = Modifier
+                                    .padding(end = 12.dp)
+                                    .weight(1f),
+                                contentPadding = it,
+                                topAppBarScrollBehavior = scrollBehavior
+                            ) {
+                                item {
+                                    Column(
+                                        modifier = Modifier.navigationBarsPadding()
+                                    ) {
+                                        Spacer(modifier = Modifier.height(6.dp))
+                                        InfoCardViews(curRomInfo, curIconInfo)
+                                        InfoCardViews(incRomInfo, incIconInfo)
+                                        Spacer(modifier = Modifier.height(6.dp))
+                                    }
                                 }
                             }
                         }
                     }
                 }
+                Snackbar()
             }
-            Snackbar()
         }
     }
 }
