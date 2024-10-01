@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -71,7 +72,6 @@ fun App() {
                 modifier = Modifier
                     .imePadding()
                     .fillMaxSize()
-                    .displayCutoutPadding()
                     .nestedScroll(scrollBehavior.nestedScrollConnection),
                 topBar = {
                     TopAppBar(
@@ -88,6 +88,7 @@ fun App() {
                         LazyColumn(
                             modifier = Modifier
                                 .height(getWindowSize().height.dp)
+                                .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
                                 .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
                             contentPadding = it,
                             enableOverScroll = true,
@@ -114,6 +115,7 @@ fun App() {
                     } else {
                         Row(
                             modifier = Modifier
+                                .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
                                 .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal))
                         ) {
                             LazyColumn(
