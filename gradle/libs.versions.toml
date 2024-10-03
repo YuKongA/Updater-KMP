@@ -7,7 +7,7 @@ hiddenapibypass = "4.3"
 image-loader = "1.8.3"
 kotlin = "2.0.20"
 kotlinx-serialization-json = "1.7.3"
-ktor-client = "3.0.0-rc-1"
+ktor-client = "3.0.0-rc-2"
 miuix = "0.2.4"
 
 [libraries]
