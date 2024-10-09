@@ -4,7 +4,6 @@ import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import java.io.ByteArrayOutputStream
 import java.util.Properties
 
@@ -31,12 +30,6 @@ kotlin {
         browser {
             commonWebpackConfig {
                 outputFileName = "updater.js"
-                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                    static = (static ?: mutableListOf()).apply {
-                        // Serve sources to debug inside browser
-                        add(project.projectDir.path)
-                    }
-                }
             }
         }
         binaries.executable()
@@ -71,6 +64,7 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.ktor.client.core)
             implementation(libs.miuix)
+            implementation(libs.haze)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
