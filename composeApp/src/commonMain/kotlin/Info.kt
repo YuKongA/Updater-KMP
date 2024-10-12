@@ -11,8 +11,8 @@ import misc.json
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-val CN_RECOVERY_URL = if (isWasm()) "https://updater.yukonga.top/updates/miotaV3.php" else "https://update.miui.com/updates/miotaV3.php"
-val INTL_RECOVERY_URL = if (isWasm()) "https://updater.yukonga.top/intl-updates/miotaV3.php" else "https://update.intl.miui.com/updates/miotaV3.php"
+val CN_RECOVERY_URL = if (isWeb()) "https://updater.yukonga.top/updates/miotaV3.php" else "https://update.miui.com/updates/miotaV3.php"
+val INTL_RECOVERY_URL = if (isWeb()) "https://updater.yukonga.top/intl-updates/miotaV3.php" else "https://update.intl.miui.com/updates/miotaV3.php"
 var accountType = "CN"
 var port = "1"
 var security = ""

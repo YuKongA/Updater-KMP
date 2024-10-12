@@ -104,7 +104,7 @@ fun App() {
                 BoxWithConstraints(
                     modifier = Modifier.haze(state = hazeState)
                 ) {
-                    if (maxWidth < 600.dp) {
+                    if (maxWidth < 840.dp) {
                         LazyColumn(
                             modifier = Modifier
                                 .height(getWindowSize().height.dp)

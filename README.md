@@ -1,5 +1,5 @@
 # Updater-KMP
-This is an application that gets MIUI/HyperOS ROM information. With the [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) UI framework. **Android** / **Desktop(JVM)** / **iOS** are fully supported. **Web(WASM)** is also basically supported.
+This is an application that gets MIUI/HyperOS ROM information. With the [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) UI framework. **Android** / **Desktop(JVM)** / **iOS** are fully supported. **Web(Js/WasmJs)** is also basically supported.
 
 <div style="position:relative; display: flex; flex-wrap: nowrap;"> 
     <img style='position:absolute; z-index:1;' src='https://github.com/YuKongA/Updater-KMP/blob/main/screenshot/screenshot.jpg?raw=true'/>

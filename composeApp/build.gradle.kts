@@ -24,17 +24,6 @@ val xcf = XCFramework(appName + "Framework")
 kotlin {
     jvmToolchain(17)
 
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        moduleName = "updater"
-        browser {
-            commonWebpackConfig {
-                outputFileName = "updater.js"
-            }
-        }
-        binaries.executable()
-    }
-
     androidTarget()
 
     jvm("desktop")
@@ -46,6 +35,27 @@ kotlin {
             freeCompilerArgs += "-Xbinary=bundleId=$pkgName.framework"
             xcf.add(this)
         }
+    }
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        moduleName = "updater"
+        browser {
+            commonWebpackConfig {
+                outputFileName = "updater.js"
+            }
+        }
+        binaries.executable()
+    }
+
+    js(IR) {
+        moduleName = "updater"
+        browser {
+            commonWebpackConfig {
+                outputFileName = "updater.js"
+            }
+        }
+        binaries.executable()
     }
 
     sourceSets {
@@ -77,6 +87,11 @@ kotlin {
             // Added
             implementation(libs.cryptography.provider.apple)
             implementation(libs.ktor.client.darwin)
+        }
+        jsMain.dependencies {
+            // Added
+            implementation(libs.cryptography.provider.webcrypto)
+            implementation(libs.ktor.client.js)
         }
         wasmJsMain.dependencies {
             // Added

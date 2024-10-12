@@ -12,7 +12,7 @@ import misc.md5Hash
 private const val loginAuth2Url = "https://account.xiaomi.com/pass/serviceLoginAuth2"
 
 expect fun httpClientPlatform(): HttpClient
-expect fun isWasm(): Boolean
+expect fun isWeb(): Boolean
 
 /**
  * Login Xiaomi account.

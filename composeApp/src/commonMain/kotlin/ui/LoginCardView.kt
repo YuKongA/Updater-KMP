@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import isWasm
+import isWeb
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.Text
@@ -66,7 +66,7 @@ fun LoginCardView(
             )
             Column(modifier = Modifier.padding(start = 24.dp)) {
                 Text(
-                    text = if (!isWasm()) account else "WebAssembly",
+                    text = if (!isWeb()) account else "WebPage",
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
@@ -74,7 +74,7 @@ fun LoginCardView(
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
-            if (!isWasm()) LoginDialog(isLogin)
+            if (!isWeb()) LoginDialog(isLogin)
         }
     }
 }

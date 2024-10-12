@@ -184,8 +184,7 @@ fun LoginDialog(
                                 text = stringResource(Res.string.login),
                                 submit = true,
                                 onClick = {
-                                    showDialog.value = false
-                                    dismissDialog()
+                                    dismissDialog(showDialog)
                                     showMessage(message = messageLoginIn)
                                     hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                     coroutineScope.launch {
@@ -205,8 +204,7 @@ fun LoginDialog(
                                 modifier = Modifier.weight(1f),
                                 text = stringResource(Res.string.cancel),
                                 onClick = {
-                                    showDialog.value = false
-                                    dismissDialog()
+                                    dismissDialog(showDialog)
                                     hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                 }
                             )
@@ -236,8 +234,7 @@ fun LoginDialog(
                                     val boolean = logout(isLogin)
                                     if (boolean) showMessage(message = messageLogoutSuccessful)
                                 }
-                                showDialog.value = false
-                                dismissDialog()
+                                dismissDialog(showDialog)
                                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                             }
                         )
@@ -246,8 +243,7 @@ fun LoginDialog(
                             modifier = Modifier.weight(1f),
                             text = stringResource(Res.string.cancel),
                             onClick = {
-                                showDialog.value = false
-                                dismissDialog()
+                                dismissDialog(showDialog)
                                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                             }
                         )

@@ -5,4 +5,4 @@ actual fun httpClientPlatform(): HttpClient {
     return HttpClient(Darwin)
 }
 
-actual fun isWasm(): Boolean = false
+actual fun isWeb(): Boolean = false

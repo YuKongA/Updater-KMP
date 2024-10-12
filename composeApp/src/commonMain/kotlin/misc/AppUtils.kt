@@ -12,7 +12,7 @@ import dev.whyoleg.cryptography.DelicateCryptographyApi
 import dev.whyoleg.cryptography.algorithms.digest.MD5
 import getRecoveryRomInfo
 import iconLink
-import isWasm
+import isWeb
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -178,7 +178,7 @@ fun handleRomInfo(
         val changelog = changelogGroups.map { it.split("\n").drop(1).joinToString("\n") }
         val iconNames = changelogGroups.map { it.split("\n").first() }
 
-        val iconMainLink = if (isWasm()) "https://updater.yukonga.top/icon/10/" else recoveryRomInfo.fileMirror!!.icon
+        val iconMainLink = if (isWeb()) "https://updater.yukonga.top/icon/10/" else recoveryRomInfo.fileMirror!!.icon
         val iconNameLink = recoveryRomInfo.icon!!
 
         val iconLinks = iconLink(iconNames, iconMainLink, iconNameLink)
