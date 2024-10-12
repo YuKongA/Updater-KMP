@@ -48,16 +48,6 @@ kotlin {
         binaries.executable()
     }
 
-    js(IR) {
-        moduleName = "updater"
-        browser {
-            commonWebpackConfig {
-                outputFileName = "updater.js"
-            }
-        }
-        binaries.executable()
-    }
-
     sourceSets {
         val desktopMain by getting
 
@@ -87,11 +77,6 @@ kotlin {
             // Added
             implementation(libs.cryptography.provider.apple)
             implementation(libs.ktor.client.darwin)
-        }
-        jsMain.dependencies {
-            // Added
-            implementation(libs.cryptography.provider.webcrypto)
-            implementation(libs.ktor.client.js)
         }
         wasmJsMain.dependencies {
             // Added
