@@ -12,6 +12,6 @@ function jsInt8ArrayToKotlinByteArray(x) {
     return byteArray;
 }
 
-function copyToClipboard(text) {
+function writeToClipboard(text) {
     navigator.clipboard.writeText(text);
 }
