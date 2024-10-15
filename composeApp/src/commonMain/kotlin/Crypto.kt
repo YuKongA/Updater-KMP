@@ -1,6 +1,6 @@
 import dev.whyoleg.cryptography.CryptographyProvider
 import dev.whyoleg.cryptography.DelicateCryptographyApi
-import dev.whyoleg.cryptography.algorithms.symmetric.AES
+import dev.whyoleg.cryptography.algorithms.AES
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -13,10 +13,10 @@ expect fun generateKey()
 /**
  * Generate a Cipher to be used by the xiaomi server.
  */
-suspend fun miuiCipher(securityKey: ByteArray): AES.CBC.Cipher {
+suspend fun miuiCipher(securityKey: ByteArray): AES.IvCipher {
     val provider = provider()
     val aesCBC = provider.get(AES.CBC) // AES CBC
-    val key = aesCBC.keyDecoder().decodeFrom(AES.Key.Format.RAW, securityKey)
+    val key = aesCBC.keyDecoder().decodeFromByteArray(AES.Key.Format.RAW, securityKey)
     return key.cipher(true) // PKCS5Padding
 }
 
@@ -28,10 +28,10 @@ suspend fun miuiCipher(securityKey: ByteArray): AES.CBC.Cipher {
  *
  * @return Encrypted JSON text
  */
-@OptIn(DelicateCryptographyApi::class, ExperimentalEncodingApi::class)
+@OptIn(ExperimentalEncodingApi::class, DelicateCryptographyApi::class)
 suspend fun miuiEncrypt(jsonRequest: String, securityKey: ByteArray): String {
     val cipher = miuiCipher(securityKey)
-    val encrypted = cipher.encrypt(iv, jsonRequest.encodeToByteArray())
+    val encrypted = cipher.encryptWithIv(iv, jsonRequest.encodeToByteArray())
     return Base64.UrlSafe.encode(encrypted)
 }
 
@@ -47,7 +47,7 @@ suspend fun miuiEncrypt(jsonRequest: String, securityKey: ByteArray): String {
 suspend fun miuiDecrypt(encryptedText: String, securityKey: ByteArray): String {
     val cipher = miuiCipher(securityKey)
     val encryptedTextBytes = Base64.Mime.decode(encryptedText)
-    val decryptedTextBytes = cipher.decrypt(iv, encryptedTextBytes)
+    val decryptedTextBytes = cipher.decryptWithIv(iv, encryptedTextBytes)
     return decryptedTextBytes.decodeToString()
 }
 

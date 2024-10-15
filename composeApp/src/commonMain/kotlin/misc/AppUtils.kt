@@ -9,7 +9,7 @@ import data.DataHelper
 import data.DeviceInfoHelper
 import data.RomInfoHelper
 import dev.whyoleg.cryptography.DelicateCryptographyApi
-import dev.whyoleg.cryptography.algorithms.digest.MD5
+import dev.whyoleg.cryptography.algorithms.MD5
 import getRecoveryRomInfo
 import iconLink
 import isWeb
