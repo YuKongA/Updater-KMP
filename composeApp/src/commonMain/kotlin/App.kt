@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.lerp
 import data.DataHelper
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
@@ -49,32 +50,42 @@ import updater.composeapp.generated.resources.app_name
 
 @Composable
 fun App() {
-    val deviceName = remember { mutableStateOf(perfGet("deviceName") ?: "") }
-    val codeName = remember { mutableStateOf(perfGet("codeName") ?: "") }
-    val deviceRegion = remember { mutableStateOf(perfGet("deviceRegion") ?: "") }
-    val androidVersion = remember { mutableStateOf(perfGet("androidVersion") ?: "") }
-    val systemVersion = remember { mutableStateOf(perfGet("systemVersion") ?: "") }
-
-    val loginData = perfGet("loginInfo")?.let { json.decodeFromString<DataHelper.LoginData>(it) }
-    val isLogin = remember { mutableStateOf(loginData?.authResult?.toInt() ?: 0) }
-
-    val curRomInfo = remember { mutableStateOf(DataHelper.RomInfoData()) }
-    val incRomInfo = remember { mutableStateOf(DataHelper.RomInfoData()) }
-
-    val curIconInfo: MutableState<List<DataHelper.IconInfoData>> = remember { mutableStateOf(listOf()) }
-    val incIconInfo: MutableState<List<DataHelper.IconInfoData>> = remember { mutableStateOf(listOf()) }
-
-    val updateRomInfo = remember { mutableStateOf(0) }
-    updateRomInfo(
-        deviceName, codeName, deviceRegion, androidVersion, systemVersion, loginData,
-        isLogin, curRomInfo, incRomInfo, curIconInfo, incIconInfo, updateRomInfo
-    )
-
-    val scrollBehavior = MiuixScrollBehavior(rememberTopAppBarState())
-
-    val hazeState = remember { HazeState() }
-
     AppTheme {
+        val deviceName = remember { mutableStateOf(perfGet("deviceName") ?: "") }
+        val codeName = remember { mutableStateOf(perfGet("codeName") ?: "") }
+        val deviceRegion = remember { mutableStateOf(perfGet("deviceRegion") ?: "") }
+        val androidVersion = remember { mutableStateOf(perfGet("androidVersion") ?: "") }
+        val systemVersion = remember { mutableStateOf(perfGet("systemVersion") ?: "") }
+
+        val loginData = perfGet("loginInfo")?.let { json.decodeFromString<DataHelper.LoginData>(it) }
+        val isLogin = remember { mutableStateOf(loginData?.authResult?.toInt() ?: 0) }
+
+        val curRomInfo = remember { mutableStateOf(DataHelper.RomInfoData()) }
+        val incRomInfo = remember { mutableStateOf(DataHelper.RomInfoData()) }
+
+        val curIconInfo: MutableState<List<DataHelper.IconInfoData>> = remember { mutableStateOf(listOf()) }
+        val incIconInfo: MutableState<List<DataHelper.IconInfoData>> = remember { mutableStateOf(listOf()) }
+
+        val updateRomInfo = remember { mutableStateOf(0) }
+        updateRomInfo(
+            deviceName, codeName, deviceRegion, androidVersion, systemVersion, loginData,
+            isLogin, curRomInfo, incRomInfo, curIconInfo, incIconInfo, updateRomInfo
+        )
+
+        val scrollBehavior = MiuixScrollBehavior(rememberTopAppBarState())
+
+        val hazeState = remember { HazeState() }
+
+        val hazeStyle = HazeStyle(
+            backgroundColor = if (scrollBehavior.state.heightOffset > -1) Color.Transparent else MiuixTheme.colorScheme.background,
+            tint = HazeTint(
+                MiuixTheme.colorScheme.background.copy(
+                    if (scrollBehavior.state.heightOffset > -1) 1f
+                    else lerp(1f, 0.67f, (scrollBehavior.state.heightOffset + 1) / -143f)
+                )
+            )
+        )
+
         Surface {
             Scaffold(
                 modifier = Modifier
@@ -83,26 +94,26 @@ fun App() {
                     .nestedScroll(scrollBehavior.nestedScrollConnection),
                 topBar = {
                     TopAppBar(
-                        modifier = Modifier.hazeChild(
-                            state = hazeState,
-                            style = HazeStyle(
-                                backgroundColor = MiuixTheme.colorScheme.background,
-                                tint = HazeTint.Color(MiuixTheme.colorScheme.background.copy(0.8f)),
-                                blurRadius = 20.dp,
-                                noiseFactor = 0f
-                            )
-                        ),
                         color = Color.Transparent,
                         title = stringResource(Res.string.app_name),
                         scrollBehavior = scrollBehavior,
                         navigationIcon = {
                             AboutDialog()
-                        }
+                        },
+                        modifier = Modifier
+                            .hazeChild(
+                                hazeState
+                            ) {
+                                style = hazeStyle
+                                blurRadius = 25.dp
+                                noiseFactor = 0f
+                            }
                     )
                 }
             ) {
                 BoxWithConstraints(
-                    modifier = Modifier.haze(state = hazeState)
+                    modifier = Modifier
+                        .haze(state = hazeState)
                 ) {
                     if (maxWidth < 840.dp) {
                         LazyColumn(
