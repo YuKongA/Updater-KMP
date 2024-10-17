@@ -1,6 +1,6 @@
 [versions]
 androidGradlePlugin = "8.7.1"
-androidx-activity-compose = "1.9.2"
+androidx-activity-compose = "1.9.3"
 compose-plugin = "1.7.0"
 cryptography = "0.4.0"
 haze = "0.9.0-beta04.1"
