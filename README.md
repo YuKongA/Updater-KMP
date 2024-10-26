@@ -13,7 +13,7 @@ When obtaining the `Beta Development Version (X)`, please enter the complete sys
 ## Notes:
 Only supported `MIUI9` and above versions. The most extreme case is: Redmi 1S (armani), MIUI9, Android4.4.
 
-Only devices in the list of [DeviceInfoHelper](https://github.com/YuKongA/Updater-KMP/blob/main/composeApp/src/commonMain/kotlin/data/DeviceInfoHelper.kt#L27) are supported use `AUTO` to complete automatically, other devices still need to manually enter the full system version.
+Only devices in the list of [DeviceInfoHelper](https://github.com/YuKongA/Updater-KMP/blob/main/composeApp/src/commonMain/kotlin/data/DeviceInfoHelper.kt#L28) are supported use `AUTO` to complete automatically, other devices still need to manually enter the full system version.
 
 When you are not logged in with a Xiaomi account, you can use the miotaV3-v1 interface to obtain any detailed information of the `Pubilc Release Version` of any model.
 

@@ -178,6 +178,8 @@ object DeviceInfoHelper {
         Device("Redmi K70 Ultra / Xiaomi 14T Pro", "rothko", "NN"),
         Device("Xiaomi MIX Fold 4", "goku", "NV"),
         Device("Xiaomi MIX Flip", "ruyi", "NI"),
+        Device("Xiaomi 15", "dada", "OC"),
+        Device("Xiaomi 15 Pro", "haotian", "OB"),
     )
 
     private const val XIAOMI = "XM"
