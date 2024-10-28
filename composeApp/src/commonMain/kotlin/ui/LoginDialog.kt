@@ -12,8 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Login
 import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material.icons.rounded.Visibility
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -37,9 +35,10 @@ import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
 import perfGet
 import top.yukonga.miuix.kmp.basic.Button
-import top.yukonga.miuix.kmp.basic.Checkbox
-import top.yukonga.miuix.kmp.basic.Text
+import top.yukonga.miuix.kmp.basic.Icon
+import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.TextField
+import top.yukonga.miuix.kmp.extra.SuperCheckbox
 import top.yukonga.miuix.kmp.extra.SuperDialog
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.utils.MiuixPopupUtil.Companion.dismissDialog
@@ -127,7 +126,10 @@ fun LoginDialog(
                     visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(
-                            onClick = { passwordVisibility = !passwordVisibility },
+                            modifier = Modifier.padding(end = 6.dp),
+                            onClick = {
+                                passwordVisibility = !passwordVisibility
+                            },
                             content = {
                                 Icon(
                                     imageVector = Icons.Rounded.Visibility,
@@ -146,30 +148,26 @@ fun LoginDialog(
                         modifier = Modifier.weight(1f),
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        Checkbox(
-                            modifier = Modifier.padding(end = 10.dp),
+                        SuperCheckbox(
+                            title = stringResource(Res.string.global),
                             checked = global,
                             onCheckedChange = {
                                 global = it
                                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                            })
-                        Text(
-                            text = stringResource(Res.string.global)
+                            }
                         )
                     }
                     Row(
                         modifier = Modifier.weight(1f),
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        Checkbox(
-                            modifier = Modifier.padding(end = 10.dp),
+                        SuperCheckbox(
+                            title = stringResource(Res.string.save_password),
                             checked = savePassword == "1",
                             onCheckedChange = {
                                 savePassword = if (it) "1" else "0"
                                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                            })
-                        Text(
-                            text = stringResource(Res.string.save_password)
+                            }
                         )
                     }
                 }
