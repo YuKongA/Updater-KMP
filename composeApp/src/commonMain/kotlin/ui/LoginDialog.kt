@@ -21,7 +21,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -71,8 +70,6 @@ fun LoginDialog(
     var savePassword by remember { mutableStateOf(perfGet("savePassword") ?: "0") }
     val showDialog = remember { mutableStateOf(false) }
 
-    val hapticFeedback = LocalHapticFeedback.current
-
     val icon = when (isLogin.value) {
         1 -> Icons.AutoMirrored.Rounded.Logout
         else -> Icons.AutoMirrored.Rounded.Login
@@ -89,7 +86,6 @@ fun LoginDialog(
     IconButton(
         onClick = {
             showDialog.value = true
-            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
         }
     ) {
         Icon(
@@ -153,7 +149,6 @@ fun LoginDialog(
                             checked = global,
                             onCheckedChange = {
                                 global = it
-                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                             }
                         )
                     }
@@ -166,7 +161,6 @@ fun LoginDialog(
                             checked = savePassword == "1",
                             onCheckedChange = {
                                 savePassword = if (it) "1" else "0"
-                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                             }
                         )
                     }
@@ -179,7 +173,6 @@ fun LoginDialog(
                         onClick = {
                             dismissDialog(showDialog)
                             showMessage(message = messageLoginIn)
-                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                             coroutineScope.launch {
                                 val int = login(account, password, global, savePassword, isLogin)
                                 when (int) {
@@ -198,7 +191,6 @@ fun LoginDialog(
                         text = stringResource(Res.string.cancel),
                         onClick = {
                             dismissDialog(showDialog)
-                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                         }
                     )
                 }
@@ -226,7 +218,6 @@ fun LoginDialog(
                             if (boolean) showMessage(message = messageLogoutSuccessful)
                         }
                         dismissDialog(showDialog)
-                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                     }
                 )
                 Spacer(Modifier.width(20.dp))
@@ -235,7 +226,6 @@ fun LoginDialog(
                     text = stringResource(Res.string.cancel),
                     onClick = {
                         dismissDialog(showDialog)
-                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                     }
                 )
             }
