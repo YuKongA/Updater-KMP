@@ -47,23 +47,35 @@ fun TextWithIcon(
                 modifier = Modifier.padding(bottom = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(
-                    modifier = Modifier.size(24.dp),
-                    painter = imagePainter,
-                    contentDescription = null,
-                )
-                Text(
-                    modifier = Modifier.padding(horizontal = 6.dp),
-                    text = iconName,
-                    fontSize = bodyFontSize,
-                )
+                if (iconLink.isNotEmpty()) {
+                    Image(
+                        modifier = Modifier.size(24.dp),
+                        painter = imagePainter,
+                        contentDescription = null,
+                    )
+                    Text(
+                        modifier = Modifier.padding(horizontal = 6.dp),
+                        text = iconName,
+                        fontSize = bodyFontSize,
+                    )
+                } else {
+                    if (it.isNotEmpty() && it != " ") {
+                        Text(
+                            text = iconName,
+                            fontSize = bodyFontSize,
+                        )
+                    }
+                }
             }
-            Text(
-                text = it,
-                color = MiuixTheme.colorScheme.onSecondaryVariant,
-                fontSize = 14.5.sp
-            )
-            Spacer(modifier = Modifier.height(padding))
+            println(it)
+            if (it.isNotEmpty() && it != " ") {
+                Text(
+                    text = it,
+                    color = MiuixTheme.colorScheme.onSecondaryVariant,
+                    fontSize = 14.5.sp
+                )
+                Spacer(modifier = Modifier.height(padding))
+            }
         }
     }
 }

@@ -179,7 +179,7 @@ fun handleRomInfo(
         val iconNames = changelogGroups.map { it.split("\n").first() }
 
         val iconMainLink = if (isWeb()) "https://updater.yukonga.top/icon/10/" else recoveryRomInfo.fileMirror!!.icon
-        val iconNameLink = recoveryRomInfo.icon!!
+        val iconNameLink = recoveryRomInfo.icon ?: mapOf()
 
         val iconLinks = iconLink(iconNames, iconMainLink, iconNameLink)
 
