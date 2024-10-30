@@ -107,13 +107,11 @@ fun InfoCardViews(
                     modifier = Modifier.weight(1f),
                     "ultimateota",
                     romInfoState.value.official1Download,
-                    romInfoState.value.official1Download,
                     romInfoState.value.fileName
                 )
                 DownloadInfoView(
                     modifier = Modifier.weight(1f),
                     "superota",
-                    romInfoState.value.official2Download,
                     romInfoState.value.official2Download,
                     romInfoState.value.fileName
                 )
@@ -127,22 +125,21 @@ fun InfoCardViews(
                     modifier = Modifier.weight(1f),
                     "cdnorg",
                     romInfoState.value.cdn1Download,
-                    romInfoState.value.cdn1Download,
                     romInfoState.value.fileName
                 )
                 DownloadInfoView(
                     modifier = Modifier.weight(1f),
                     "aliyuncs",
                     romInfoState.value.cdn2Download,
-                    romInfoState.value.cdn2Download,
                     romInfoState.value.fileName
                 )
             }
-
-            ChangelogView(
-                iconInfo,
-                romInfoState.value.changelog
-            )
+            if (romInfoState.value.changelog.isNotEmpty()) {
+                ChangelogView(
+                    iconInfo,
+                    romInfoState.value.changelog
+                )
+            }
         }
     }
 }
@@ -201,8 +198,7 @@ fun MessageTextView(
 fun DownloadInfoView(
     modifier: Modifier = Modifier,
     title: String,
-    copy: String,
-    download: String,
+    url: String,
     fileName: String
 ) {
     val hapticFeedback = LocalHapticFeedback.current
@@ -220,10 +216,10 @@ fun DownloadInfoView(
             textAlign = TextAlign.Center
         )
         Row {
-            if (copy.isNotEmpty()) {
+            if (url.isNotEmpty()) {
                 IconButton(
                     onClick = {
-                        copyToClipboard(copy)
+                        copyToClipboard(url)
                         showMessage(messageCopySuccessful)
                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                     }
@@ -236,7 +232,7 @@ fun DownloadInfoView(
                 }
                 IconButton(
                     onClick = {
-                        downloadToLocal(download, fileName)
+                        downloadToLocal(url, fileName)
                         showMessage(messageDownloadStart)
                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                     }
