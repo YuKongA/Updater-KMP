@@ -180,6 +180,8 @@ object DeviceInfoHelper {
         Device("Xiaomi MIX Flip", "ruyi", "NI"),
         Device("Xiaomi 15", "dada", "OC"),
         Device("Xiaomi 15 Pro", "haotian", "OB"),
+        Device("Xiaomi Pad 7", "uke", "OZ"),
+        Device("Xiaomi Pad 7 Pro", "muyu", "OY"),
     )
 
     private const val XIAOMI = "XM"

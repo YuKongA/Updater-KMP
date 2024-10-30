@@ -67,7 +67,6 @@ fun TextWithIcon(
                     }
                 }
             }
-            println(it)
             if (it.isNotEmpty() && it != " ") {
                 Text(
                     text = it,
