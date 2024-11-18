@@ -99,22 +99,24 @@ fun InfoCardViews(
                 fontSize = bodySmallFontSize
             )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                DownloadInfoView(
-                    modifier = Modifier.weight(1f),
-                    "ultimateota",
-                    romInfoState.value.official1Download,
-                    romInfoState.value.fileName
-                )
-                DownloadInfoView(
-                    modifier = Modifier.weight(1f),
-                    "superota",
-                    romInfoState.value.official2Download,
-                    romInfoState.value.fileName
-                )
+            if (romInfoState.value.official1Download.isNotEmpty()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    DownloadInfoView(
+                        modifier = Modifier.weight(1f),
+                        "ultimateota",
+                        romInfoState.value.official1Download,
+                        romInfoState.value.fileName
+                    )
+                    DownloadInfoView(
+                        modifier = Modifier.weight(1f),
+                        "superota",
+                        romInfoState.value.official2Download,
+                        romInfoState.value.fileName
+                    )
+                }
             }
 
             Row(
@@ -123,13 +125,13 @@ fun InfoCardViews(
             ) {
                 DownloadInfoView(
                     modifier = Modifier.weight(1f),
-                    "cdnorg",
+                    "aliyuncs",
                     romInfoState.value.cdn1Download,
                     romInfoState.value.fileName
                 )
                 DownloadInfoView(
                     modifier = Modifier.weight(1f),
-                    "aliyuncs",
+                    "cdnorg",
                     romInfoState.value.cdn2Download,
                     romInfoState.value.fileName
                 )

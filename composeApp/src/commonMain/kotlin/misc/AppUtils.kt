@@ -76,6 +76,8 @@ fun updateRomInfo(
     val messageWrongResult = stringResource(Res.string.toast_wrong_info)
     val messageCrashResult = stringResource(Res.string.toast_crash_info)
 
+    var noUltimateLink = false
+
     val coroutineScope = rememberCoroutineScope()
 
     if (updateRomInfo.value != 0) {
@@ -100,13 +102,22 @@ fun updateRomInfo(
 
                     if (recoveryRomInfo.currentRom?.bigversion != null) {
 
+                        println(recoveryRomInfo.currentRom)
+                        println(recoveryRomInfo.latestRom)
                         val curRomDownload = if (recoveryRomInfo.currentRom.md5 != recoveryRomInfo.latestRom?.md5) {
                             val romInfoCurrent = getRecoveryRomInfo("", codeNameExt, regionCode, systemVersionExt, androidVersion.value, isLogin)
                             val recoveryRomInfoCurrent = json.decodeFromString<RomInfoHelper.RomInfo>(romInfoCurrent)
-                            downloadUrl(recoveryRomInfoCurrent.currentRom?.version!!, recoveryRomInfoCurrent.latestRom?.filename!!)
+                            println(recoveryRomInfoCurrent)
+                            if (recoveryRomInfoCurrent.currentRom != null) {
+                                noUltimateLink = false
+                                downloadUrl(recoveryRomInfoCurrent.currentRom.version!!, recoveryRomInfoCurrent.latestRom?.filename!!)
+                            } else {
+                                noUltimateLink = true
+                                downloadUrl(recoveryRomInfo.currentRom.version!!, recoveryRomInfo.currentRom.filename!!)
+                            }
                         } else downloadUrl(recoveryRomInfo.currentRom.version!!, recoveryRomInfo.latestRom?.filename!!)
 
-                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.currentRom, curRomInfo, curIconInfo, curRomDownload)
+                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.currentRom, curRomInfo, curIconInfo, curRomDownload, noUltimateLink)
 
                         perfSet("deviceName", deviceName.value)
                         perfSet("codeName", codeName.value)
@@ -163,13 +174,15 @@ fun updateRomInfo(
  * @param romInfoData: Data used to display ROM info
  * @param iconInfoData: Data used to display changelog icons
  * @param officialDownload: Official download URL
+ * @param noUltimateLink: No ultimate download link
  */
 fun handleRomInfo(
     recoveryRomInfo: RomInfoHelper.RomInfo,
     romInfo: RomInfoHelper.Rom?,
     romInfoData: MutableState<DataHelper.RomInfoData>,
     iconInfoData: MutableState<List<DataHelper.IconInfoData>>,
-    officialDownload: String? = null
+    officialDownload: String? = null,
+    noUltimateLink: Boolean = false
 ) {
     if (romInfo?.bigversion != null) {
         val log = StringBuilder()
@@ -206,10 +219,14 @@ fun handleRomInfo(
             },
             fileName = romInfo.filename.toString().substringBefore(".zip") + ".zip",
             fileSize = romInfo.filesize.toString(),
-            official1Download = "https://ultimateota.d.miui.com" + (officialDownload ?: downloadUrl(romInfo.version, romInfo.filename)),
-            official2Download = "https://superota.d.miui.com" + (officialDownload ?: downloadUrl(romInfo.version, romInfo.filename)),
-            cdn1Download = "https://cdnorg.d.miui.com" + downloadUrl(romInfo.version, romInfo.filename),
-            cdn2Download = "https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com" + downloadUrl(romInfo.version, romInfo.filename),
+            official1Download = if (noUltimateLink) "" else {
+                "https://ultimateota.d.miui.com" + (officialDownload ?: downloadUrl(romInfo.version, romInfo.filename))
+            },
+            official2Download = if (noUltimateLink) "" else {
+                "https://superota.d.miui.com" + (officialDownload ?: downloadUrl(romInfo.version, romInfo.filename))
+            },
+            cdn1Download = "https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com" + downloadUrl(romInfo.version, romInfo.filename),
+            cdn2Download = "https://cdnorg.d.miui.com" + downloadUrl(romInfo.version, romInfo.filename),
             changelog = log.toString().trimEnd()
         )
     }
