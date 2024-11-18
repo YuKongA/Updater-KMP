@@ -21,8 +21,12 @@ val verName = "1.5.0"
 val verCode = getVersionCode()
 val xcf = XCFramework(appName + "Framework")
 
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+}
+
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 
     androidTarget()
 
@@ -167,6 +171,8 @@ compose.desktop {
 
         buildTypes.release.proguard {
             configurationFiles.from("proguard-rules-jvm.pro")
+            version.set("7.6.0")
+            optimize.set(false)
         }
 
         nativeDistributions {
