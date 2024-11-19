@@ -101,13 +101,9 @@ fun updateRomInfo(
                     }
 
                     if (recoveryRomInfo.currentRom?.bigversion != null) {
-
-                        println(recoveryRomInfo.currentRom)
-                        println(recoveryRomInfo.latestRom)
                         val curRomDownload = if (recoveryRomInfo.currentRom.md5 != recoveryRomInfo.latestRom?.md5) {
                             val romInfoCurrent = getRecoveryRomInfo("", codeNameExt, regionCode, systemVersionExt, androidVersion.value, isLogin)
                             val recoveryRomInfoCurrent = json.decodeFromString<RomInfoHelper.RomInfo>(romInfoCurrent)
-                            println(recoveryRomInfoCurrent)
                             if (recoveryRomInfoCurrent.currentRom != null) {
                                 noUltimateLink = false
                                 downloadUrl(recoveryRomInfoCurrent.currentRom.version!!, recoveryRomInfoCurrent.latestRom?.filename!!)
@@ -186,9 +182,7 @@ fun handleRomInfo(
 ) {
     if (romInfo?.bigversion != null) {
         val log = StringBuilder()
-        if (romInfo.changelog != null) {
-            romInfo.changelog.forEach { log.append(it.key).append("\n").append(it.value.txt.joinToString("\n")).append("\n\n") }
-        }
+        romInfo.changelog?.forEach { log.append(it.key).append("\n").append(it.value.txt.joinToString("\n")).append("\n\n") }
         val changelogGroups = log.toString().trimEnd().split("\n\n")
         val changelog = changelogGroups.map { it.split("\n").drop(1).joinToString("\n") }
         val iconNames = changelogGroups.map { it.split("\n").first() }
