@@ -21,7 +21,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -33,9 +32,10 @@ import logout
 import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
 import perfGet
-import top.yukonga.miuix.kmp.basic.Button
+import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
+import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.extra.SuperCheckbox
 import top.yukonga.miuix.kmp.extra.SuperDialog
@@ -166,10 +166,10 @@ fun LoginDialog(
                     }
                 }
                 Row {
-                    Button(
+                    TextButton(
                         modifier = Modifier.weight(1f),
                         text = stringResource(Res.string.login),
-                        submit = true,
+                        colors = ButtonDefaults.textButtonColorsPrimary(),
                         onClick = {
                             dismissDialog(showDialog)
                             showMessage(message = messageLoginIn)
@@ -186,9 +186,10 @@ fun LoginDialog(
                         }
                     )
                     Spacer(Modifier.width(20.dp))
-                    Button(
+                    TextButton(
                         modifier = Modifier.weight(1f),
                         text = stringResource(Res.string.cancel),
+                        colors = ButtonDefaults.textButtonColors(),
                         onClick = {
                             dismissDialog(showDialog)
                         }
@@ -208,10 +209,10 @@ fun LoginDialog(
             }
         ) {
             Row {
-                Button(
+                TextButton(
                     modifier = Modifier.weight(1f),
                     text = stringResource(Res.string.logout),
-                    submit = true,
+                    colors = ButtonDefaults.textButtonColorsPrimary(),
                     onClick = {
                         coroutineScope.launch {
                             val boolean = logout(isLogin)
@@ -221,9 +222,10 @@ fun LoginDialog(
                     }
                 )
                 Spacer(Modifier.width(20.dp))
-                Button(
+                TextButton(
                     modifier = Modifier.weight(1f),
                     text = stringResource(Res.string.cancel),
+                    colors = ButtonDefaults.textButtonColors(),
                     onClick = {
                         dismissDialog(showDialog)
                     }

@@ -21,7 +21,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
-import top.yukonga.miuix.kmp.basic.Button
+import top.yukonga.miuix.kmp.basic.ButtonDefaults
+import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import ui.components.AutoCompleteTextField
@@ -121,9 +122,9 @@ fun TextFieldViews(
                 }
             })
         )
-        Button(
+        TextButton(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
-            submit = true,
+            colors = ButtonDefaults.textButtonColorsPrimary(),
             onClick = {
                 if (codeName.value != "" && androidVersion.value != "" && systemVersion.value != "") {
                     updateRomInfo.value++

@@ -2,6 +2,7 @@ package ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +16,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import isWeb
 import org.jetbrains.compose.resources.stringResource
@@ -52,7 +52,7 @@ fun LoginCardView(
             .fillMaxWidth()
             .padding(horizontal = 12.dp)
             .padding(top = 12.dp, bottom = 6.dp),
-        insideMargin = DpSize(16.dp, 16.dp)
+        insideMargin = PaddingValues(16.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
