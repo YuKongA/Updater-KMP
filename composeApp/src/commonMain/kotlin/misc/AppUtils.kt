@@ -207,7 +207,7 @@ fun handleRomInfo(
             codebase = romInfo.codebase.toString(),
             branch = romInfo.branch.toString(),
             bigVersion = when {
-                romInfo.osbigversion != ".0" && romInfo.osbigversion != "0.0" -> "HyperOS " + romInfo.osbigversion
+                romInfo.osbigversion != ".0" && romInfo.osbigversion != "0.0" && romInfo.osbigversion != "" -> "HyperOS " + romInfo.osbigversion
                 romInfo.bigversion.contains("816") -> romInfo.bigversion.replace("816", "HyperOS 1.0")
                 else -> "MIUI ${romInfo.bigversion}"
             },
