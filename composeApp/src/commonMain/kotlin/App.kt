@@ -122,7 +122,6 @@ fun App() {
                                 .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
                                 .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
                             contentPadding = it,
-                            enableOverScroll = true,
                             topAppBarScrollBehavior = scrollBehavior
                         ) {
                             item {
