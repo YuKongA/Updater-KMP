@@ -9,6 +9,7 @@
     <string name="system_version">システムバージョン</string>
     <string name="android_version">Android バージョン</string>
     <string name="submit">送信</string>
+    <string name="search_history">検索履歴</string>
     <string name="big_version">メジャーバージョン</string>
     <string name="filename">ファイル名</string>
     <string name="filesize">ファイルサイズ</string>

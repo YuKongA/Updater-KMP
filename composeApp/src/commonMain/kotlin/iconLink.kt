@@ -1,5 +1,3 @@
-import kotlin.collections.set
-
 /**
  * Generate maps with links with corresponding names and icons.
  *

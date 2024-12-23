@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -67,9 +68,13 @@ fun App() {
         val incIconInfo: MutableState<List<DataHelper.IconInfoData>> = remember { mutableStateOf(listOf()) }
 
         val updateRomInfo = remember { mutableStateOf(0) }
+        val searchKeywords = remember { mutableStateOf(json.decodeFromString<List<String>>(perfGet("searchKeywords") ?: "[]")) }
+        val searchKeywordsSelected = remember { mutableStateOf(0) }
+        LaunchedEffect(updateRomInfo.value) { searchKeywordsSelected.value = 0 }
+
         updateRomInfo(
             deviceName, codeName, deviceRegion, androidVersion, systemVersion, loginData,
-            isLogin, curRomInfo, incRomInfo, curIconInfo, incIconInfo, updateRomInfo
+            isLogin, curRomInfo, incRomInfo, curIconInfo, incIconInfo, updateRomInfo, searchKeywords
         )
 
         val scrollBehavior = MiuixScrollBehavior(rememberTopAppBarState())
@@ -130,7 +135,10 @@ fun App() {
                                 ) {
                                     Column {
                                         LoginCardView(isLogin)
-                                        TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
+                                        TextFieldViews(
+                                            deviceName, codeName, deviceRegion, androidVersion,
+                                            systemVersion, updateRomInfo, searchKeywords, searchKeywordsSelected
+                                        )
                                         Column(
                                             modifier = Modifier.padding(horizontal = 12.dp)
                                         ) {
@@ -160,7 +168,10 @@ fun App() {
                                         modifier = Modifier.navigationBarsPadding()
                                     ) {
                                         LoginCardView(isLogin)
-                                        TextFieldViews(deviceName, codeName, deviceRegion, androidVersion, systemVersion, updateRomInfo)
+                                        TextFieldViews(
+                                            deviceName, codeName, deviceRegion, androidVersion,
+                                            systemVersion, updateRomInfo, searchKeywords, searchKeywordsSelected
+                                        )
                                         Spacer(modifier = Modifier.height(16.dp))
                                     }
                                 }

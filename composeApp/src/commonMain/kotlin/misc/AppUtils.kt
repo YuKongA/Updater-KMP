@@ -47,6 +47,7 @@ val bodySmallFontSize = 13.sp
  * @param curIconInfo: Data used to display current changelog icons
  * @param incIconInfo: Data used to display incremental changelog icons
  * @param updateRomInfo: Update ROM info status
+ * @param searchKeywords: Recent search keywords
  */
 @Composable
 fun updateRomInfo(
@@ -61,7 +62,8 @@ fun updateRomInfo(
     incRomInfo: MutableState<DataHelper.RomInfoData>,
     curIconInfo: MutableState<List<DataHelper.IconInfoData>>,
     incIconInfo: MutableState<List<DataHelper.IconInfoData>>,
-    updateRomInfo: MutableState<Int>
+    updateRomInfo: MutableState<Int>,
+    searchKeywords: MutableState<List<String>>
 ) {
     val regionCode = DeviceInfoHelper.regionCode(deviceRegion.value)
     val deviceCode = DeviceInfoHelper.deviceCode(androidVersion.value, codeName.value, regionCode)
@@ -101,17 +103,21 @@ fun updateRomInfo(
                     }
 
                     if (recoveryRomInfo.currentRom?.bigversion != null) {
-                        val curRomDownload = if (recoveryRomInfo.currentRom.md5 != recoveryRomInfo.latestRom?.md5) {
-                            val romInfoCurrent = getRecoveryRomInfo("", codeNameExt, regionCode, systemVersionExt, androidVersion.value, isLogin)
-                            val recoveryRomInfoCurrent = json.decodeFromString<RomInfoHelper.RomInfo>(romInfoCurrent)
-                            if (recoveryRomInfoCurrent.currentRom != null) {
-                                noUltimateLink = false
-                                downloadUrl(recoveryRomInfoCurrent.currentRom.version!!, recoveryRomInfoCurrent.latestRom?.filename!!)
+                        val curRomDownload =
+                            if (recoveryRomInfo.currentRom.md5 != recoveryRomInfo.latestRom?.md5) {
+                                val romInfoCurrent =
+                                    getRecoveryRomInfo("", codeNameExt, regionCode, systemVersionExt, androidVersion.value, isLogin)
+                                val recoveryRomInfoCurrent = json.decodeFromString<RomInfoHelper.RomInfo>(romInfoCurrent)
+                                if (recoveryRomInfoCurrent.currentRom != null) {
+                                    noUltimateLink = false
+                                    downloadUrl(recoveryRomInfoCurrent.currentRom.version!!, recoveryRomInfoCurrent.latestRom?.filename!!)
+                                } else {
+                                    noUltimateLink = true
+                                    downloadUrl(recoveryRomInfo.currentRom.version!!, recoveryRomInfo.currentRom.filename!!)
+                                }
                             } else {
-                                noUltimateLink = true
-                                downloadUrl(recoveryRomInfo.currentRom.version!!, recoveryRomInfo.currentRom.filename!!)
+                                downloadUrl(recoveryRomInfo.currentRom.version!!, recoveryRomInfo.latestRom?.filename!!)
                             }
-                        } else downloadUrl(recoveryRomInfo.currentRom.version!!, recoveryRomInfo.latestRom?.filename!!)
 
                         handleRomInfo(recoveryRomInfo, recoveryRomInfo.currentRom, curRomInfo, curIconInfo, curRomDownload, noUltimateLink)
 
@@ -150,6 +156,20 @@ fun updateRomInfo(
                         showMessage(messageNoResult)
 
                     }
+
+                    val newKeyword = "${deviceName.value}-${codeName.value}-${deviceRegion.value}-${androidVersion.value}-${systemVersion.value}"
+                    val updatedKeywords = searchKeywords.value.toMutableList()
+
+                    if (updatedKeywords.contains(newKeyword)) {
+                        updatedKeywords.remove(newKeyword)
+                    } else {
+                        if (updatedKeywords.size >= 8) updatedKeywords.removeAt(updatedKeywords.size - 1)
+                    }
+
+                    updatedKeywords.add(0, newKeyword)
+                    searchKeywords.value = updatedKeywords
+                    perfSet("searchKeywords", json.encodeToString(updatedKeywords))
+
                 } else {
 
                     clearRomInfo(curRomInfo)

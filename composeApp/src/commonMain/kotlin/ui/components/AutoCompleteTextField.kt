@@ -44,6 +44,7 @@ fun AutoCompleteTextField(
     ExposedDropdownMenuBox(
         modifier = Modifier
             .padding(horizontal = 12.dp)
+            .padding(bottom = 12.dp)
             .fillMaxWidth(),
         expanded = isDropdownExpanded,
         onExpandedChange = { isDropdownExpanded = text.value.isNotEmpty() }
