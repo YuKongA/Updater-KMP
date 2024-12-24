@@ -27,8 +27,11 @@ object DeviceInfoHelper {
      */
     private val deviceList = listOf(
         Device("Redmi K30 4G", "phoenix", "GH"),
-        Device("POCO X2", "phoenixin", "GH"),
+        Device("POCO X2 4G", "phoenixin", "GH"),
+        Device("Redmi A4 5G / POCO C75 5G", "warm", "GV"),
         Device("Redmi K30 / K30i", "picasso", "GI"),
+        Device("Redmi Pad SE 8.7 4G", "spark", "HY"),
+        Device("Redmi Pad SE 8.7 WiFi", "flare", "HX"),
         Device("Xiaomi 10", "umi", "JB"),
         Device("Xiaomi 10 Pro", "cmi", "JA"),
         Device("Redmi Note 9 Pro", "joyeuse", "JZ"),
