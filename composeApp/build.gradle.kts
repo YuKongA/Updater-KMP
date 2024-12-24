@@ -4,7 +4,6 @@ import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
-import java.io.ByteArrayOutputStream
 import java.util.Properties
 
 plugins {
@@ -200,12 +199,8 @@ compose.desktop {
 }
 
 fun getGitCommitCount(): Int {
-    val out = ByteArrayOutputStream()
-    exec {
-        commandLine("git", "rev-list", "--count", "HEAD")
-        standardOutput = out
-    }
-    return out.toString().trim().toInt()
+    val process = Runtime.getRuntime().exec(arrayOf("git", "rev-list", "--count", "HEAD"))
+    return process.inputStream.bufferedReader().use { it.readText().trim().toInt() }
 }
 
 fun getVersionCode(): Int {
