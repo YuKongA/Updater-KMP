@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Atualizador</string>
+    <string name="about">Sobre</string>
+    <string name="view_source">Ver Código Fonte:</string>
+    <string name="join_group">Entrar no Grupo:</string>
+    <string name="login">Entrar</string>
+    <string name="code_name">Codename</string>
+    <string name="device_name">Nome do Dispositivo</string>
+    <string name="system_version">Versão do Sistema</string>
+    <string name="android_version">Versão do Android</string>
+    <string name="submit">Enviar</string>
+    <string name="search_history">Histórico de Pesquisa</string>
+    <string name="big_version">Versão Principal</string>
+    <string name="filename">Nome do Arquivo</string>
+    <string name="filesize">Tamanho do Arquivo</string>
+    <string name="download">URL de Download</string>
+    <string name="changelog">Registro de Alterações</string>
+    <string name="branch">Ramo</string>
+    <string name="toast_ing">Pesquisando…</string>
+    <string name="toast_no_info">Sem informações!</string>
+    <string name="toast_wrong_info">A versão solicitada não existe!</string>
+    <string name="toast_success_info">Solicitação bem-sucedida!</string>
+    <string name="toast_crash_info">Sem conexão com a rede!</string>
+    <string name="account">Conta</string>
+    <string name="password">Senha</string>
+    <string name="save_password">Salvar senha</string>
+    <string name="cancel">Cancelar</string>
+    <string name="logging_in">Entrando</string>
+    <string name="login_successful">Login bem-sucedido</string>
+    <string name="account_or_password_empty">Conta ou Senha vazia!</string>
+    <string name="no_account">Sem conta</string>
+    <string name="login_desc">Usando interface v1</string>
+    <string name="using_v2">Usando interface v2</string>
+    <string name="logged_in">Logado</string>
+    <string name="login_expired">Login expirado</string>
+    <string name="login_expired_desc">Recomendado fazer login novamente</string>
+    <string name="copy_successful">Cópia bem-sucedida</string>
+    <string name="download_start">Iniciar download</string>
+    <string name="security_error">Falha ao obter chave de segurança</string>
+    <string name="logout">Sair</string>
+    <string name="logout_confirm">Tem certeza de que deseja sair?</string>
+    <string name="confirm">Confirmar</string>
+    <string name="logout_successful">Logout bem-sucedido</string>
+    <string name="login_error">Falha na verificação de login!</string>
+    <string name="regions_code">Código de Regiões</string>
+    <string name="global">Conta global</string>
+    <string name="extension_settings">Configurações de Extensão</string>
+    <string name="dark_theme">Modo de exibição</string>
+    <string name="system_default">Padrão do sistema</string>
+    <string name="light_mode">Modo claro</string>
+    <string name="dark_mode">Modo escuro</string>
+    <string name="opensource_info">Copyright © 2024 YuKongA, AkaneTan</string>
+</resources>
