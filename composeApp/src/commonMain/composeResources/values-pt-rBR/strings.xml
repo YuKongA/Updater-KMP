@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Atualizador</string>
     <string name="about">Sobre</string>
     <string name="view_source">Ver Código Fonte:</string>
     <string name="join_group">Entrar no Grupo:</string>
