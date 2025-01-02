@@ -159,6 +159,7 @@ object DeviceInfoHelper {
         Device("Redmi Note 14 Pro 5G", "malachite", "OO"),
         Device("Redmi Note 14 Pro+ 5G", "amethyst", "OP"),
         Device("Redmi Turbo 3 / POCO F6", "peridot", "NP"),
+        Device("REDMI Turbo 4 / POCO X7 Pro", "rodin", "OJ"),
         Device("Xiaomi 13T", "aristotle", "MF"),
         Device("Xiaomi 14", "houji", "NC"),
         Device("Xiaomi 14 Pro", "shennong", "NB"),
