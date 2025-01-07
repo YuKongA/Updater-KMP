@@ -7,7 +7,7 @@ haze = "1.1.1"
 hiddenapibypass = "4.3"
 image-loader = "1.9.0"
 kotlin = "2.1.0"
-kotlinx-serialization-json = "1.7.3"
+kotlinx-serialization-json = "1.8.0"
 ktor-client = "3.0.3"
 miuix = "0.3.2"
 
