@@ -1,5 +1,7 @@
 package ui.components
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -26,7 +28,9 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.MutableStateFlow
 import top.yukonga.miuix.kmp.basic.TextField
+import top.yukonga.miuix.kmp.theme.LocalColors
 import top.yukonga.miuix.kmp.theme.MiuixTheme
+import top.yukonga.miuix.kmp.utils.MiuixIndication
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,6 +88,11 @@ fun AutoCompleteTextField(
         ) {
             list.forEach { text ->
                 DropdownMenuItem(
+                    modifier = Modifier.clickable(
+                        onClick = {},
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = MiuixIndication(backgroundColor = LocalColors.current.onBackground)
+                    ),
                     text = {
                         Text(
                             text = text,

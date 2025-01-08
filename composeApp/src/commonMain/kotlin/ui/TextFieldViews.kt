@@ -1,13 +1,14 @@
 package ui
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,14 +22,16 @@ import kotlinx.coroutines.launch
 import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
+import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.basic.TextField
+import top.yukonga.miuix.kmp.extra.DropDownMode
 import top.yukonga.miuix.kmp.extra.SpinnerEntry
 import top.yukonga.miuix.kmp.extra.SpinnerMode
+import top.yukonga.miuix.kmp.extra.SuperDropdown
 import top.yukonga.miuix.kmp.extra.SuperSpinner
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import ui.components.AutoCompleteTextField
-import ui.components.TextFieldWithDropdown
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.android_version
 import updater.composeapp.generated.resources.code_name
@@ -50,6 +53,9 @@ fun TextFieldViews(
     searchKeywords: MutableState<List<String>>,
     searchKeywordsSelected: MutableState<Int>
 ) {
+    val androidVersionSelected = remember { mutableStateOf(0) }
+    val regionSelected = remember { mutableStateOf(0) }
+
     val deviceNameFlow = MutableStateFlow(deviceName.value)
     val codeNameFlow = MutableStateFlow(codeName.value)
 
@@ -94,18 +100,30 @@ fun TextFieldViews(
             onValueChange = codeNameFlow,
             label = stringResource(Res.string.code_name)
         )
-        Row {
-            TextFieldWithDropdown(
-                modifier = Modifier.weight(1f).padding(start = 12.dp, end = 6.dp, bottom = 12.dp),
-                text = deviceRegion,
-                items = DeviceInfoHelper.regionNames,
-                label = stringResource(Res.string.regions_code)
-            )
-            TextFieldWithDropdown(
-                modifier = Modifier.weight(1f).padding(start = 6.dp, end = 12.dp, bottom = 12.dp),
-                text = androidVersion,
+        Card(
+            modifier = Modifier
+                .padding(horizontal = 12.dp)
+                .padding(bottom = 12.dp)
+        ) {
+            SuperDropdown(
+                title = stringResource(Res.string.android_version),
                 items = DeviceInfoHelper.androidVersions,
-                label = stringResource(Res.string.android_version)
+                selectedIndex = androidVersionSelected.value,
+                onSelectedIndexChange = { index ->
+                    androidVersionSelected.value = index
+                    androidVersion.value = DeviceInfoHelper.androidVersions[index]
+                },
+                mode = DropDownMode.AlwaysOnRight
+            )
+            SuperDropdown(
+                title = stringResource(Res.string.regions_code),
+                items = DeviceInfoHelper.regionNames,
+                selectedIndex = regionSelected.value,
+                onSelectedIndexChange = { index ->
+                    regionSelected.value = index
+                    deviceRegion.value = DeviceInfoHelper.regionNames[index]
+                },
+                mode = DropDownMode.AlwaysOnRight
             )
         }
         TextField(
@@ -135,22 +153,30 @@ fun TextFieldViews(
                     summary = "${parts[2]}-${parts[3]}-${parts[4]}",
                 )
             }
-            SuperSpinner(
-                title = stringResource(Res.string.search_history),
-                items = spinnerOptions,
-                selectedIndex = searchKeywordsSelected.value,
-                mode = SpinnerMode.AlwaysOnRight,
-                showValue = false,
-                onSelectedIndexChange = { index ->
-                    val parts = searchKeywords.value[index].split("-")
-                    deviceName.value = parts[0]
-                    codeName.value = parts[1]
-                    deviceRegion.value = parts[2]
-                    androidVersion.value = parts[3]
-                    systemVersion.value = parts[4]
-                    searchKeywordsSelected.value = index
-                }
-            )
+            Card(
+                modifier = Modifier
+                    .padding(horizontal = 12.dp)
+                    .padding(vertical = 12.dp)
+            ) {
+                SuperSpinner(
+                    title = stringResource(Res.string.search_history),
+                    items = spinnerOptions,
+                    selectedIndex = searchKeywordsSelected.value,
+                    mode = SpinnerMode.AlwaysOnRight,
+                    showValue = false,
+                    onSelectedIndexChange = { index ->
+                        val parts = searchKeywords.value[index].split("-")
+                        deviceName.value = parts[0]
+                        codeName.value = parts[1]
+                        deviceRegion.value = parts[2]
+                        androidVersion.value = parts[3]
+                        systemVersion.value = parts[4]
+                        searchKeywordsSelected.value = index
+                        regionSelected.value = DeviceInfoHelper.regionNames.indexOf(parts[2])
+                        androidVersionSelected.value = DeviceInfoHelper.androidVersions.indexOf(parts[3])
+                    }
+                )
+            }
         }
         TextButton(
             modifier = if (searchKeywords.value.isNotEmpty()) {
