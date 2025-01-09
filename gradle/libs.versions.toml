@@ -9,7 +9,7 @@ image-loader = "1.9.0"
 kotlin = "2.1.0"
 kotlinx-serialization-json = "1.8.0"
 ktor-client = "3.0.3"
-miuix = "0.3.2"
+miuix = "0.3.3"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }

@@ -113,7 +113,8 @@ fun TextFieldViews(
                     androidVersionSelected.value = index
                     androidVersion.value = DeviceInfoHelper.androidVersions[index]
                 },
-                mode = DropDownMode.AlwaysOnRight
+                mode = DropDownMode.AlwaysOnRight,
+                maxHeight = 300.dp
             )
             SuperDropdown(
                 title = stringResource(Res.string.regions_code),
@@ -123,7 +124,8 @@ fun TextFieldViews(
                     regionSelected.value = index
                     deviceRegion.value = DeviceInfoHelper.regionNames[index]
                 },
-                mode = DropDownMode.AlwaysOnRight
+                mode = DropDownMode.AlwaysOnRight,
+                maxHeight = 300.dp
             )
         }
         TextField(
@@ -174,7 +176,8 @@ fun TextFieldViews(
                         searchKeywordsSelected.value = index
                         regionSelected.value = DeviceInfoHelper.regionNames.indexOf(parts[2])
                         androidVersionSelected.value = DeviceInfoHelper.androidVersions.indexOf(parts[3])
-                    }
+                    },
+                    maxHeight = 300.dp
                 )
             }
         }
