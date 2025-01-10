@@ -61,6 +61,7 @@ fun AutoCompleteTextField(
             onValueChange = {
                 onValueChange.value = it
                 showTopPopup.value = it.isNotEmpty() && list.isNotEmpty()
+                if (it.isEmpty()) dismissOwnPopup(showTopPopup)
             },
             singleLine = true,
             label = label,
