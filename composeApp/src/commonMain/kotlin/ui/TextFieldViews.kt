@@ -151,7 +151,7 @@ fun TextFieldViews(
                 val parts = keyword.split("-")
                 SpinnerEntry(
                     icon = null,
-                    title = "${parts[0].ifEmpty { "Unknown" }}(${parts[1]})",
+                    title = "${parts[0].ifEmpty { "Unknown" }} (${parts[1]})",
                     summary = "${parts[2]}-${parts[3]}-${parts[4]}",
                 )
             }

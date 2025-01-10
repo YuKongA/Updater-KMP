@@ -1,5 +1,5 @@
 [versions]
-androidGradlePlugin = "8.7.3"
+androidGradlePlugin = "8.8.0"
 androidx-activity-compose = "1.9.3"
 compose-plugin = "1.7.3"
 cryptography = "0.4.0"
