@@ -95,8 +95,7 @@ fun App() {
             Scaffold(
                 modifier = Modifier
                     .imePadding()
-                    .fillMaxSize()
-                    .nestedScroll(scrollBehavior.nestedScrollConnection),
+                    .fillMaxSize(),
                 topBar = {
                     TopAppBar(
                         color = Color.Transparent,
