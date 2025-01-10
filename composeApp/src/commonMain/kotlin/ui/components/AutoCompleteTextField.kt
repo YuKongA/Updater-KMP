@@ -1,36 +1,28 @@
 package ui.components
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.MenuAnchorType.Companion.PrimaryEditable
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.MutableStateFlow
+import top.yukonga.miuix.kmp.basic.ListPopupColumn
 import top.yukonga.miuix.kmp.basic.TextField
-import top.yukonga.miuix.kmp.theme.LocalColors
+import top.yukonga.miuix.kmp.extra.DropdownImpl
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.utils.MiuixIndication
+import ui.components.SuperPopupUtil.Companion.dismissOwnPopup
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,9 +32,15 @@ fun AutoCompleteTextField(
     onValueChange: MutableStateFlow<String>,
     label: String
 ) {
-    var isDropdownExpanded by remember { mutableStateOf(false) }
+    val listForItems = ArrayList(items)
+    val showTopPopup = remember { mutableStateOf(false) }
+    val list = listForItems.filter {
+        it.startsWith(text.value, ignoreCase = true)
+                || it.contains(text.value, ignoreCase = true)
+                || it.replace(" ", "").contains(text.value, ignoreCase = true)
+    }.sortedBy { !it.startsWith(text.value, ignoreCase = true) }
 
-    val hapticFeedback = LocalHapticFeedback.current
+    LocalHapticFeedback.current
     val focusManager = LocalFocusManager.current
 
     ExposedDropdownMenuBox(
@@ -50,15 +48,19 @@ fun AutoCompleteTextField(
             .padding(horizontal = 12.dp)
             .padding(bottom = 12.dp)
             .fillMaxWidth(),
-        expanded = isDropdownExpanded,
-        onExpandedChange = { isDropdownExpanded = text.value.isNotEmpty() }
+        expanded = showTopPopup.value,
+        onExpandedChange = {
+            showTopPopup.value = text.value.isNotEmpty()
+        }
     ) {
+        println("list.isNotEmpty(): ${list.isNotEmpty()}, list: $list")
+
         TextField(
             insideMargin = DpSize(16.dp, 20.dp),
             value = text.value,
             onValueChange = {
                 onValueChange.value = it
-                isDropdownExpanded = it.isNotEmpty()
+                showTopPopup.value = it.isNotEmpty() && list.isNotEmpty()
             },
             singleLine = true,
             label = label,
@@ -66,47 +68,45 @@ fun AutoCompleteTextField(
             modifier = Modifier.menuAnchor(type = PrimaryEditable, enabled = true),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = {
-                isDropdownExpanded = false
                 focusManager.clearFocus()
+                dismissOwnPopup(showTopPopup)
             })
         )
-        val listForItems = ArrayList(items)
-        val list = listForItems.filter {
-            it.startsWith(text.value, ignoreCase = true) || it.contains(text.value, ignoreCase = true)
-                    || it.replace(" ", "").contains(text.value, ignoreCase = true)
-        }.sortedBy {
-            !it.startsWith(text.value, ignoreCase = true)
-        }
-        ExposedDropdownMenu(
-            modifier = Modifier
-                .exposedDropdownSize()
-                .heightIn(max = 250.dp),
-            containerColor = MiuixTheme.colorScheme.surface,
-            shape = RoundedCornerShape(16.dp),
-            expanded = isDropdownExpanded && list.isNotEmpty(),
-            onDismissRequest = { isDropdownExpanded = false }
+        SuperPopup(
+            show = showTopPopup,
+            onDismissRequest = {
+                showTopPopup.value = false
+            },
+            maxHeight = 300.dp
         ) {
-            list.forEach { text ->
-                DropdownMenuItem(
-                    modifier = Modifier.clickable(
-                        onClick = {},
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = MiuixIndication(backgroundColor = LocalColors.current.onBackground)
-                    ),
-                    text = {
-                        Text(
+            ListPopupColumn {
+                if (list.isEmpty()) {
+                    DropdownImpl(
+                        text = "",
+                        optionSize = 1,
+                        onSelectedIndexChange = {},
+                        isSelected = false,
+                        index = 0,
+                    ) // Currently needed, fix crash.
+                    showTopPopup.value = false
+                    dismissOwnPopup(showTopPopup)
+                } else {
+                    list.forEach { text ->
+                        DropdownImpl(
                             text = text,
-                            color = MiuixTheme.colorScheme.onBackground
+                            optionSize = list.size,
+                            onSelectedIndexChange = {
+                                onValueChange.value = text
+                                KeyboardOptions(imeAction = ImeAction.Done)
+                                focusManager.clearFocus()
+                                dismissOwnPopup(showTopPopup)
+                                showTopPopup.value = false
+                            },
+                            isSelected = false,
+                            index = 0,
                         )
-                    },
-                    onClick = {
-                        onValueChange.value = text
-                        isDropdownExpanded = false
-                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                        KeyboardOptions(imeAction = ImeAction.Done)
-                        focusManager.clearFocus()
                     }
-                )
+                }
             }
         }
     }

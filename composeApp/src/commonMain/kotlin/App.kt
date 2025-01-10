@@ -21,7 +21,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import data.DataHelper
@@ -41,11 +40,13 @@ import top.yukonga.miuix.kmp.basic.Surface
 import top.yukonga.miuix.kmp.basic.TopAppBar
 import top.yukonga.miuix.kmp.basic.rememberTopAppBarState
 import top.yukonga.miuix.kmp.theme.MiuixTheme
+import top.yukonga.miuix.kmp.utils.MiuixPopupUtil.Companion.MiuixPopupHost
 import top.yukonga.miuix.kmp.utils.getWindowSize
 import ui.AboutDialog
 import ui.InfoCardViews
 import ui.LoginCardView
 import ui.TextFieldViews
+import ui.components.SuperPopupUtil.Companion.SuperPopupHost
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.app_name
 
@@ -113,6 +114,10 @@ fun App() {
                                 noiseFactor = 0f
                             }
                     )
+                },
+                popupHost = {
+                    SuperPopupHost()
+                    MiuixPopupHost()
                 }
             ) {
                 BoxWithConstraints(
