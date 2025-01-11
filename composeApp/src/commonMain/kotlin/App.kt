@@ -1,3 +1,4 @@
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import data.DataHelper
@@ -80,6 +82,8 @@ fun App() {
 
         val scrollBehavior = MiuixScrollBehavior(rememberTopAppBarState())
 
+        val focusManager = LocalFocusManager.current
+
         val hazeState = remember { HazeState() }
 
         val hazeStyle = HazeStyle(
@@ -96,7 +100,11 @@ fun App() {
             Scaffold(
                 modifier = Modifier
                     .imePadding()
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .clickable(
+                        indication = null,
+                        interactionSource = null,
+                    ) { focusManager.clearFocus() },
                 topBar = {
                     TopAppBar(
                         color = Color.Transparent,

@@ -110,11 +110,12 @@ fun TextFieldViews(
                 items = DeviceInfoHelper.androidVersions,
                 selectedIndex = androidVersionSelected.value,
                 onSelectedIndexChange = { index ->
+                    focusManager.clearFocus()
                     androidVersionSelected.value = index
                     androidVersion.value = DeviceInfoHelper.androidVersions[index]
                 },
                 mode = DropDownMode.AlwaysOnRight,
-                maxHeight = 300.dp
+                maxHeight = 280.dp
             )
             SuperDropdown(
                 title = stringResource(Res.string.regions_code),
@@ -125,7 +126,7 @@ fun TextFieldViews(
                     deviceRegion.value = DeviceInfoHelper.regionNames[index]
                 },
                 mode = DropDownMode.AlwaysOnRight,
-                maxHeight = 300.dp
+                maxHeight = 280.dp
             )
         }
         TextField(
@@ -167,6 +168,7 @@ fun TextFieldViews(
                     mode = SpinnerMode.AlwaysOnRight,
                     showValue = false,
                     onSelectedIndexChange = { index ->
+                        focusManager.clearFocus()
                         val parts = searchKeywords.value[index].split("-")
                         deviceName.value = parts[0]
                         codeName.value = parts[1]
@@ -177,7 +179,7 @@ fun TextFieldViews(
                         regionSelected.value = DeviceInfoHelper.regionNames.indexOf(parts[2])
                         androidVersionSelected.value = DeviceInfoHelper.androidVersions.indexOf(parts[3])
                     },
-                    maxHeight = 300.dp
+                    maxHeight = 280.dp
                 )
             }
         }
@@ -191,6 +193,7 @@ fun TextFieldViews(
                 .padding(horizontal = 12.dp),
             colors = ButtonDefaults.textButtonColorsPrimary(),
             onClick = {
+                focusManager.clearFocus()
                 if (codeName.value != "" && androidVersion.value != "" && systemVersion.value != "") {
                     updateRomInfo.value++
                 } else {
