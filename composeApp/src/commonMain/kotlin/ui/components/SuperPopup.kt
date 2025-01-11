@@ -23,7 +23,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -123,9 +122,7 @@ fun SuperPopup(
     }
 
     if (show.value) {
-        val dropdownElevation by rememberUpdatedState(with(density) {
-            11.dp.toPx()
-        })
+        val dropdownElevation by rememberUpdatedState(with(density) { 22.dp.toPx() })
         showOwnPopup(
             transformOrigin = { transformOrigin }
         ) {
@@ -164,8 +161,8 @@ fun SuperPopup(
                             clip = true,
                             shape = SmoothRoundedCornerShape(16.dp),
                             shadowElevation = dropdownElevation,
-                            ambientShadowColor = Color.Black.copy(alpha = 0.3f),
-                            spotShadowColor = Color.Black.copy(alpha = 0.3f)
+                            ambientShadowColor = MiuixTheme.colorScheme.windowDimming,
+                            spotShadowColor = MiuixTheme.colorScheme.windowDimming
                         )
                         .background(MiuixTheme.colorScheme.surface)
                 ) {
