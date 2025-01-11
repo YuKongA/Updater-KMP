@@ -1,8 +1,8 @@
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.engine.cio.CIO
 
 actual fun httpClientPlatform(): HttpClient {
-    return HttpClient(OkHttp)
+    return HttpClient(CIO)
 }
 
 actual fun isWeb(): Boolean = false

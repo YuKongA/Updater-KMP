@@ -83,13 +83,13 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             // Added
             implementation(libs.cryptography.provider.jdk)
-            implementation(libs.ktor.client.okhttp)
+            implementation(libs.ktor.client.cio)
             implementation(libs.hiddenapibypass)
         }
         iosMain.dependencies {
             // Added
             implementation(libs.cryptography.provider.apple)
-            implementation(libs.ktor.client.darwin)
+            implementation(libs.ktor.client.cio)
         }
         jsMain.dependencies {
             // Added
@@ -105,7 +105,7 @@ kotlin {
             implementation(compose.desktop.currentOs)
             // Added
             implementation(libs.cryptography.provider.jdk)
-            implementation(libs.ktor.client.okhttp)
+            implementation(libs.ktor.client.cio)
         }
     }
 }
