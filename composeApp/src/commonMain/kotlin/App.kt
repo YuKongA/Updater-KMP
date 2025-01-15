@@ -57,8 +57,8 @@ fun App() {
     AppTheme {
         val deviceName = remember { mutableStateOf(perfGet("deviceName") ?: "") }
         val codeName = remember { mutableStateOf(perfGet("codeName") ?: "") }
-        val deviceRegion = remember { mutableStateOf(perfGet("deviceRegion") ?: "") }
-        val androidVersion = remember { mutableStateOf(perfGet("androidVersion") ?: "") }
+        val deviceRegion = remember { mutableStateOf(perfGet("deviceRegion") ?: "CN") }
+        val androidVersion = remember { mutableStateOf(perfGet("androidVersion") ?: "15.0") }
         val systemVersion = remember { mutableStateOf(perfGet("systemVersion") ?: "") }
 
         val loginData = perfGet("loginInfo")?.let { json.decodeFromString<DataHelper.LoginData>(it) }
