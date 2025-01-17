@@ -5,7 +5,7 @@ compose-plugin = "1.7.3"
 cryptography = "0.4.0"
 haze = "1.1.1"
 hiddenapibypass = "4.3"
-image-loader = "1.9.0"
+image-loader = "1.10.0"
 kotlin = "2.1.0"
 kotlinx-serialization-json = "1.8.0"
 #noinspection GradleDependency
