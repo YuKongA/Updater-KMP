@@ -84,7 +84,6 @@ kotlin {
             // Added
             implementation(libs.cryptography.provider.jdk)
             implementation(libs.ktor.client.cio)
-            implementation(libs.hiddenapibypass)
         }
         iosMain.dependencies {
             // Added

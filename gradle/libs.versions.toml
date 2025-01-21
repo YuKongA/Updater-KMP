@@ -1,10 +1,9 @@
 [versions]
 androidGradlePlugin = "8.8.0"
-androidx-activity-compose = "1.9.3"
+androidx-activity-compose = "1.10.0"
 compose-plugin = "1.7.3"
 cryptography = "0.4.0"
 haze = "1.2.2"
-hiddenapibypass = "5.0"
 image-loader = "1.10.0"
 kotlin = "2.1.0"
 kotlinx-serialization-json = "1.8.0"
@@ -19,7 +18,6 @@ cryptography-provider-apple = { module = "dev.whyoleg.cryptography:cryptography-
 cryptography-provider-jdk = { module = "dev.whyoleg.cryptography:cryptography-provider-jdk", version.ref = "cryptography" }
 cryptography-provider-webcrypto = { module = "dev.whyoleg.cryptography:cryptography-provider-webcrypto", version.ref = "cryptography" }
 haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
-hiddenapibypass = { module = "org.lsposed.hiddenapibypass:hiddenapibypass", version.ref = "hiddenapibypass" }
 image-loader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "image-loader" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor-client" }
