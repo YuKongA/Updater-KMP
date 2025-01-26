@@ -5,7 +5,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsets.Companion
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.captionBar
 import androidx.compose.foundation.layout.displayCutout
@@ -76,7 +75,6 @@ fun SuperPopup(
     var popupContentSize = IntSize.Zero
     var popupMargin by remember { mutableStateOf(IntRect.Zero) }
 
-
     var transformOrigin by remember { mutableStateOf(TransformOrigin.Center) }
 
     if (!listPopupStates.contains(show)) listPopupStates.add(show)
@@ -138,7 +136,7 @@ fun SuperPopup(
                         val placeable = measurable.measure(
                             constraints.copy(
                                 minHeight = 50.dp.roundToPx(),
-                                maxHeight = if (maxHeight != null) maxHeight.roundToPx() else windowBounds.height - popupMargin.top - popupMargin.bottom
+                                maxHeight = maxHeight?.roundToPx() ?: (windowBounds.height - popupMargin.top - popupMargin.bottom)
                             )
                         )
                         popupContentSize = IntSize(placeable.width, placeable.height)

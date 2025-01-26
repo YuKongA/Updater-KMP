@@ -104,7 +104,7 @@ fun AutoCompleteTextField(
                                 showTopPopup.value = false
                             },
                             isSelected = false,
-                            index = 0,
+                            index = list.indexOf(text),
                         )
                     }
                 }
