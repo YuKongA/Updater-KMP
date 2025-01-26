@@ -21,11 +21,12 @@
     <string name="toast_wrong_info">要求されたバージョンは存在しません！</string>
     <string name="toast_success_info">リクエストが成功しました！</string>
     <string name="toast_crash_info">ネットワーク接続がありません！</string>
+    <string name="toast_no_ultimate_link">ultimate リンクを取得できません!</string>
     <string name="account">アカウント</string>
     <string name="password">パスワード</string>
     <string name="save_password">パスワードを保存</string>
     <string name="cancel">キャンセル</string>
-    <string name="logging_in">ログイン中</string>
+    <string name="logging_in">ログイン中…</string>
     <string name="login_successful">ログイン成功</string>
     <string name="account_or_password_empty">アカウントまたはパスワードが空です！</string>
     <string name="no_account">アカウントがありません</string>

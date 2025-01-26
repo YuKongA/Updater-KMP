@@ -21,11 +21,12 @@
     <string name="toast_wrong_info">A versão solicitada não existe!</string>
     <string name="toast_success_info">Solicitação bem-sucedida!</string>
     <string name="toast_crash_info">Sem conexão com a rede!</string>
+    <string name="toast_no_ultimate_link">Não é possível obter o link ultimate!</string>
     <string name="account">Conta</string>
     <string name="password">Senha</string>
     <string name="save_password">Salvar senha</string>
     <string name="cancel">Cancelar</string>
-    <string name="logging_in">Entrando</string>
+    <string name="logging_in">Entrando…</string>
     <string name="login_successful">Login bem-sucedido</string>
     <string name="account_or_password_empty">Conta ou Senha vazia!</string>
     <string name="no_account">Sem conta</string>

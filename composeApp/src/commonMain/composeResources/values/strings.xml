@@ -22,11 +22,12 @@
     <string name="toast_wrong_info">Requested version does not exist!</string>
     <string name="toast_success_info">Request successful!</string>
     <string name="toast_crash_info">No network connection!</string>
+    <string name="toast_no_ultimate_link">Unable to get ultimate link!</string>
     <string name="account">Account</string>
     <string name="password">Password</string>
     <string name="save_password">Save password</string>
     <string name="cancel">Cancel</string>
-    <string name="logging_in">Logging in</string>
+    <string name="logging_in">Logging in…</string>
     <string name="login_successful">Login successful</string>
     <string name="account_or_password_empty">Account or Password empty!</string>
     <string name="no_account">No account</string>

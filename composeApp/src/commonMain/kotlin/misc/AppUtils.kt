@@ -24,6 +24,7 @@ import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.toast_crash_info
 import updater.composeapp.generated.resources.toast_ing
 import updater.composeapp.generated.resources.toast_no_info
+import updater.composeapp.generated.resources.toast_no_ultimate_link
 import updater.composeapp.generated.resources.toast_success_info
 import updater.composeapp.generated.resources.toast_wrong_info
 
@@ -77,6 +78,7 @@ fun updateRomInfo(
     val messageSuccessResult = stringResource(Res.string.toast_success_info)
     val messageWrongResult = stringResource(Res.string.toast_wrong_info)
     val messageCrashResult = stringResource(Res.string.toast_crash_info)
+    val messageNoUltimateLink = stringResource(Res.string.toast_no_ultimate_link)
 
     var noUltimateLink = false
 
@@ -107,12 +109,13 @@ fun updateRomInfo(
                             if (recoveryRomInfo.currentRom.md5 != recoveryRomInfo.latestRom?.md5) {
                                 val romInfoCurrent =
                                     getRecoveryRomInfo("", codeNameExt, regionCode, systemVersionExt, androidVersion.value, isLogin)
-                                val recoveryRomInfoCurrent = json.decodeFromString<RomInfoHelper.RomInfo>(romInfoCurrent)
-                                if (recoveryRomInfoCurrent.currentRom != null) {
+                                val recoveryRomInfoCurrent = if (romInfoCurrent.isNotEmpty()) json.decodeFromString<RomInfoHelper.RomInfo>(romInfoCurrent) else null
+                                if (recoveryRomInfoCurrent?.currentRom != null && recoveryRomInfoCurrent.latestRom != null) {
                                     noUltimateLink = false
-                                    downloadUrl(recoveryRomInfoCurrent.currentRom.version!!, recoveryRomInfoCurrent.latestRom?.filename!!)
+                                    downloadUrl(recoveryRomInfoCurrent.currentRom.version!!, recoveryRomInfoCurrent.latestRom.filename!!)
                                 } else {
                                     noUltimateLink = true
+                                    showMessage(messageNoUltimateLink)
                                     downloadUrl(recoveryRomInfo.currentRom.version!!, recoveryRomInfo.currentRom.filename!!)
                                 }
                             } else {
@@ -135,7 +138,11 @@ fun updateRomInfo(
                             clearRomInfo(incRomInfo)
                         }
 
-                        showMessage(messageSuccessResult, 1000L)
+                        if (noUltimateLink) {
+                            showMessage(messageNoUltimateLink, 1000L)
+                        } else {
+                            showMessage(messageSuccessResult, 1000L)
+                        }
 
                     } else if (recoveryRomInfo.incrementRom?.bigversion != null) {
 
