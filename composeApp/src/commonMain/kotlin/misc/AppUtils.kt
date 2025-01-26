@@ -14,7 +14,6 @@ import getRecoveryRomInfo
 import iconLink
 import isWeb
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
@@ -105,14 +104,16 @@ fun updateRomInfo(
                     }
 
                     if (recoveryRomInfo.currentRom?.bigversion != null) {
+                        noUltimateLink = false
                         val curRomDownload =
                             if (recoveryRomInfo.currentRom.md5 != recoveryRomInfo.latestRom?.md5) {
-                                val romInfoCurrent =
-                                    getRecoveryRomInfo("", codeNameExt, regionCode, systemVersionExt, androidVersion.value, isLogin)
-                                val recoveryRomInfoCurrent = if (romInfoCurrent.isNotEmpty()) json.decodeFromString<RomInfoHelper.RomInfo>(romInfoCurrent) else null
-                                if (recoveryRomInfoCurrent?.currentRom != null && recoveryRomInfoCurrent.latestRom != null) {
-                                    noUltimateLink = false
-                                    downloadUrl(recoveryRomInfoCurrent.currentRom.version!!, recoveryRomInfoCurrent.latestRom.filename!!)
+                                val romInfoCurrent = getRecoveryRomInfo("", codeNameExt, regionCode, systemVersionExt, androidVersion.value, isLogin)
+                                val recoveryRomInfoCurrent =
+                                    if (romInfoCurrent.isNotEmpty()) json.decodeFromString<RomInfoHelper.RomInfo>(romInfoCurrent) else json.decodeFromString<RomInfoHelper.RomInfo>(
+                                        romInfoCurrent
+                                    )
+                                if (recoveryRomInfoCurrent.latestRom?.filename != null) {
+                                    downloadUrl(recoveryRomInfoCurrent.currentRom?.version!!, recoveryRomInfoCurrent.latestRom.filename)
                                 } else {
                                     noUltimateLink = true
                                     showMessage(messageNoUltimateLink)
