@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,20 +30,30 @@ import data.DataHelper
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.HazeTint
-import dev.chrisbanes.haze.haze
-import dev.chrisbanes.haze.hazeChild
+import dev.chrisbanes.haze.hazeEffect
+import dev.chrisbanes.haze.hazeSource
 import misc.MessageUtils.Companion.Snackbar
 import misc.json
 import misc.updateRomInfo
 import org.jetbrains.compose.resources.stringResource
+import top.yukonga.miuix.kmp.basic.Icon
+import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.LazyColumn
+import top.yukonga.miuix.kmp.basic.ListPopup
+import top.yukonga.miuix.kmp.basic.ListPopupColumn
+import top.yukonga.miuix.kmp.basic.ListPopupDefaults
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
+import top.yukonga.miuix.kmp.basic.PopupPositionProvider
 import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.Surface
 import top.yukonga.miuix.kmp.basic.TopAppBar
 import top.yukonga.miuix.kmp.basic.rememberTopAppBarState
+import top.yukonga.miuix.kmp.extra.DropdownImpl
+import top.yukonga.miuix.kmp.icon.MiuixIcons
+import top.yukonga.miuix.kmp.icon.icons.ImmersionMore
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.utils.MiuixPopupUtil.Companion.MiuixPopupHost
+import top.yukonga.miuix.kmp.utils.MiuixPopupUtil.Companion.dismissPopup
 import top.yukonga.miuix.kmp.utils.getWindowSize
 import ui.AboutDialog
 import ui.InfoCardViews
@@ -51,6 +62,7 @@ import ui.TextFieldViews
 import ui.components.SuperPopupUtil.Companion.SuperPopupHost
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.app_name
+import updater.composeapp.generated.resources.clear_search_history
 
 @Composable
 fun App() {
@@ -96,6 +108,9 @@ fun App() {
             )
         )
 
+        val isTopPopupExpanded = remember { mutableStateOf(false) }
+        val showTopPopup = remember { mutableStateOf(false) }
+
         Surface {
             Scaffold(
                 modifier = Modifier
@@ -113,8 +128,47 @@ fun App() {
                         navigationIcon = {
                             AboutDialog()
                         },
+                        actions = {
+                            if (isTopPopupExpanded.value) {
+                                ListPopup(
+                                    show = showTopPopup,
+                                    popupPositionProvider = ListPopupDefaults.ContextMenuPositionProvider,
+                                    alignment = PopupPositionProvider.Align.TopRight,
+                                    onDismissRequest = {
+                                        isTopPopupExpanded.value = false
+                                    }
+                                ) {
+                                    ListPopupColumn {
+                                        DropdownImpl(
+                                            text = stringResource(Res.string.clear_search_history),
+                                            optionSize = 1,
+                                            isSelected = false,
+                                            onSelectedIndexChange = {
+                                                dismissPopup(showTopPopup)
+                                                searchKeywords.value = listOf()
+                                                perfRemove("searchKeywords")
+                                                isTopPopupExpanded.value = false
+                                            },
+                                            index = 0
+                                        )
+                                    }
+                                }
+                                showTopPopup.value = true
+                            }
+                            IconButton(
+                                modifier = Modifier.padding(end = 21.dp).size(40.dp),
+                                onClick = {
+                                    isTopPopupExpanded.value = true
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = MiuixIcons.ImmersionMore,
+                                    contentDescription = "Menu"
+                                )
+                            }
+                        },
                         modifier = Modifier
-                            .hazeChild(
+                            .hazeEffect(
                                 hazeState
                             ) {
                                 style = hazeStyle
@@ -130,7 +184,7 @@ fun App() {
             ) {
                 BoxWithConstraints(
                     modifier = Modifier
-                        .haze(state = hazeState)
+                        .hazeSource(state = hazeState)
                 ) {
                     if (maxWidth < 840.dp) {
                         LazyColumn(

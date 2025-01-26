@@ -10,6 +10,7 @@
     <string name="android_version">安卓版本</string>
     <string name="submit">提交</string>
     <string name="search_history">查询历史</string>
+    <string name="clear_search_history">清空查询历史</string>
     <string name="big_version">主要版本</string>
     <string name="filename">文件名</string>
     <string name="filesize">文件大小</string>

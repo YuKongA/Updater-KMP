@@ -79,7 +79,7 @@ fun updateRomInfo(
     val messageCrashResult = stringResource(Res.string.toast_crash_info)
     val messageNoUltimateLink = stringResource(Res.string.toast_no_ultimate_link)
 
-    var noUltimateLink = false
+    var noUltimateLink: Boolean
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -131,6 +131,11 @@ fun updateRomInfo(
                         perfSet("systemVersion", systemVersion.value)
                         perfSet("androidVersion", androidVersion.value)
 
+                        updateSearchKeywords(
+                            deviceName.value, codeName.value, deviceRegion.value,
+                            androidVersion.value, systemVersion.value, searchKeywords
+                        )
+
                         if (recoveryRomInfo.incrementRom?.bigversion != null) {
                             handleRomInfo(recoveryRomInfo, recoveryRomInfo.incrementRom, incRomInfo, incIconInfo)
                         } else if (recoveryRomInfo.crossRom?.bigversion != null) {
@@ -164,19 +169,6 @@ fun updateRomInfo(
                         showMessage(messageNoResult)
 
                     }
-
-                    val newKeyword = "${deviceName.value}-${codeName.value}-${deviceRegion.value}-${androidVersion.value}-${systemVersion.value}"
-                    val updatedKeywords = searchKeywords.value.toMutableList()
-
-                    if (updatedKeywords.contains(newKeyword)) {
-                        updatedKeywords.remove(newKeyword)
-                    } else {
-                        if (updatedKeywords.size >= 8) updatedKeywords.removeAt(updatedKeywords.size - 1)
-                    }
-
-                    updatedKeywords.add(0, newKeyword)
-                    searchKeywords.value = updatedKeywords
-                    perfSet("searchKeywords", json.encodeToString(updatedKeywords))
 
                 } else {
 
@@ -289,4 +281,36 @@ suspend fun md5Hash(input: String): String {
         val hex = (it.toInt() and 0xFF).toString(16).uppercase()
         if (hex.length == 1) "0$hex" else hex
     }
+}
+
+/**
+ * Update search keywords.
+ *
+ * @param deviceName: Device name
+ * @param codeName: Code name
+ * @param deviceRegion: Device region
+ * @param androidVersion: Android version
+ * @param systemVersion: System version
+ * @param searchKeywords: Recent search keywords
+ */
+fun updateSearchKeywords(
+    deviceName: String,
+    codeName: String,
+    deviceRegion: String,
+    androidVersion: String,
+    systemVersion: String,
+    searchKeywords: MutableState<List<String>>
+) {
+    val newKeyword = "$deviceName-$codeName-$deviceRegion-$androidVersion-$systemVersion"
+    val updatedKeywords = searchKeywords.value.toMutableList()
+
+    if (updatedKeywords.contains(newKeyword)) {
+        updatedKeywords.remove(newKeyword)
+    } else {
+        if (updatedKeywords.size >= 8) updatedKeywords.removeAt(updatedKeywords.size - 1)
+    }
+
+    updatedKeywords.add(0, newKeyword)
+    searchKeywords.value = updatedKeywords
+    perfSet("searchKeywords", json.encodeToString(updatedKeywords))
 }

@@ -149,7 +149,6 @@ android {
         }
         debug {
             if (keystorePath != null) signingConfig = signingConfigs.getByName("release")
-            applicationIdSuffix = ".debug"
         }
     }
     dependenciesInfo.includeInApk = false

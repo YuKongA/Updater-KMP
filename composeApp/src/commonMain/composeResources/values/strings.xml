@@ -11,6 +11,7 @@
     <string name="android_version">Android Version</string>
     <string name="submit">Submit</string>
     <string name="search_history">Search History</string>
+    <string name="clear_search_history">Clear Search History</string>
     <string name="big_version">Major Version</string>
     <string name="filename">File Name</string>
     <string name="filesize">File Size</string>

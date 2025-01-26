@@ -1,5 +1,6 @@
 package ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -147,7 +148,9 @@ fun TextFieldViews(
                 }
             })
         )
-        if (searchKeywords.value.isNotEmpty()) {
+        AnimatedVisibility(
+            visible = searchKeywords.value.isNotEmpty()
+        ) {
             val spinnerOptions = searchKeywords.value.map { keyword ->
                 val parts = keyword.split("-")
                 SpinnerEntry(
@@ -159,7 +162,7 @@ fun TextFieldViews(
             Card(
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
-                    .padding(vertical = 12.dp)
+                    .padding(top = 12.dp)
             ) {
                 SuperSpinner(
                     title = stringResource(Res.string.search_history),
@@ -184,12 +187,9 @@ fun TextFieldViews(
             }
         }
         TextButton(
-            modifier = if (searchKeywords.value.isNotEmpty()) {
-                Modifier
-            } else {
-                Modifier.padding(top = 12.dp)
-            }
+            modifier = Modifier
                 .fillMaxWidth()
+                .padding(top = 12.dp)
                 .padding(horizontal = 12.dp),
             colors = ButtonDefaults.textButtonColorsPrimary(),
             onClick = {
