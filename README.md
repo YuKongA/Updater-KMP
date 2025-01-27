@@ -1,10 +1,6 @@
 # Updater-KMP
 This is an application that gets MIUI/HyperOS ROM information. With the [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) UI framework. **Android** / **Desktop(JVM)** / **iOS** are fully supported. **Web(Js/WasmJs)** is also basically supported.
 
-<div style="position:relative; display: flex; flex-wrap: nowrap;"> 
-    <img style='position:absolute; z-index:1;' src='https://github.com/YuKongA/Updater-KMP/blob/main/screenshot/screenshot.jpg?raw=true'/>
-</div>
-
 ## Usage:
 When obtaining the `Pubilc Release Version (F)`, the suffix of the system version can be automatically completed using `AUTO`<br />For example: `OS1.0.26.0.AUTO` / `V14.0.4.0.AUTO`
 
