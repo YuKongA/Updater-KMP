@@ -52,14 +52,12 @@ import top.yukonga.miuix.kmp.extra.DropdownImpl
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.icons.ImmersionMore
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.utils.MiuixPopupUtil.Companion.MiuixPopupHost
 import top.yukonga.miuix.kmp.utils.MiuixPopupUtil.Companion.dismissPopup
 import top.yukonga.miuix.kmp.utils.getWindowSize
 import ui.AboutDialog
 import ui.InfoCardViews
 import ui.LoginCardView
 import ui.TextFieldViews
-import ui.components.SuperPopupUtil.Companion.SuperPopupHost
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.app_name
 import updater.composeapp.generated.resources.clear_search_history
@@ -108,14 +106,14 @@ fun App() {
             )
         )
 
-        val isTopPopupExpanded = remember { mutableStateOf(false) }
-        val showTopPopup = remember { mutableStateOf(false) }
+        val isMenuPopupExpanded = remember { mutableStateOf(false) }
+        val showMenuPopup = remember { mutableStateOf(false) }
 
         Surface {
             Scaffold(
                 modifier = Modifier
                     .imePadding()
-                    .fillMaxSize()
+                    .fillMaxSize().fillMaxSize()
                     .clickable(
                         indication = null,
                         interactionSource = null,
@@ -129,13 +127,13 @@ fun App() {
                             AboutDialog()
                         },
                         actions = {
-                            if (isTopPopupExpanded.value) {
+                            if (isMenuPopupExpanded.value) {
                                 ListPopup(
-                                    show = showTopPopup,
+                                    show = showMenuPopup,
                                     popupPositionProvider = ListPopupDefaults.ContextMenuPositionProvider,
                                     alignment = PopupPositionProvider.Align.TopRight,
                                     onDismissRequest = {
-                                        isTopPopupExpanded.value = false
+                                        isMenuPopupExpanded.value = false
                                     }
                                 ) {
                                     ListPopupColumn {
@@ -144,21 +142,22 @@ fun App() {
                                             optionSize = 1,
                                             isSelected = false,
                                             onSelectedIndexChange = {
-                                                dismissPopup(showTopPopup)
+                                                dismissPopup(showMenuPopup)
                                                 searchKeywords.value = listOf()
                                                 perfRemove("searchKeywords")
-                                                isTopPopupExpanded.value = false
+                                                isMenuPopupExpanded.value = false
                                             },
                                             index = 0
                                         )
                                     }
                                 }
-                                showTopPopup.value = true
+                                showMenuPopup.value = true
                             }
                             IconButton(
                                 modifier = Modifier.padding(end = 21.dp).size(40.dp),
                                 onClick = {
-                                    isTopPopupExpanded.value = true
+                                    isMenuPopupExpanded.value = true
+                                    focusManager.clearFocus()
                                 }
                             ) {
                                 Icon(
@@ -176,10 +175,6 @@ fun App() {
                                 noiseFactor = 0f
                             }
                     )
-                },
-                popupHost = {
-                    SuperPopupHost()
-                    MiuixPopupHost()
                 }
             ) {
                 BoxWithConstraints(

@@ -1,6 +1,7 @@
 package ui.components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
@@ -16,13 +17,19 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntRect
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.MutableStateFlow
+import top.yukonga.miuix.kmp.basic.ListPopup
 import top.yukonga.miuix.kmp.basic.ListPopupColumn
+import top.yukonga.miuix.kmp.basic.PopupPositionProvider
 import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.extra.DropdownImpl
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import ui.components.SuperPopupUtil.Companion.dismissOwnPopup
+import top.yukonga.miuix.kmp.utils.MiuixPopupUtil.Companion.dismissPopup
 
 @Composable
 fun AutoCompleteTextField(
@@ -32,7 +39,7 @@ fun AutoCompleteTextField(
     label: String
 ) {
     val listForItems = ArrayList(items)
-    val showTopPopup = remember { mutableStateOf(false) }
+    val showPopup = remember { mutableStateOf(false) }
     val list = listForItems.filter {
         it.startsWith(text.value, ignoreCase = true)
                 || it.contains(text.value, ignoreCase = true)
@@ -53,8 +60,8 @@ fun AutoCompleteTextField(
             value = text.value,
             onValueChange = {
                 onValueChange.value = it
-                showTopPopup.value = it.isNotEmpty() && list.isNotEmpty()
-                if (it.isEmpty()) dismissOwnPopup(showTopPopup)
+                showPopup.value = it.isNotEmpty() && list.isNotEmpty()
+                if (it.isEmpty()) dismissPopup(showPopup)
             },
             singleLine = true,
             label = label,
@@ -62,21 +69,23 @@ fun AutoCompleteTextField(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = {
                 focusManager.clearFocus()
-                dismissOwnPopup(showTopPopup)
+                dismissPopup(showPopup)
             }),
             modifier = Modifier
                 .onFocusChanged { focusState ->
                     if (focusState.isFocused) {
-                        showTopPopup.value = text.value.isNotEmpty() && list.isNotEmpty()
+                        showPopup.value = text.value.isNotEmpty() && list.isNotEmpty()
                     }
                 }
         )
-        SuperPopup(
-            show = showTopPopup,
+        ListPopup(
+            show = showPopup,
             onDismissRequest = {
-                showTopPopup.value = false
-                focusManager.clearFocus()
+                dismissPopup(showPopup)
             },
+            popupPositionProvider = AutoCompletePositionProvider,
+            alignment = PopupPositionProvider.Align.TopLeft,
+            windowDimming = false,
             maxHeight = 300.dp
         ) {
             ListPopupColumn {
@@ -88,8 +97,7 @@ fun AutoCompleteTextField(
                         isSelected = false,
                         index = 0,
                     ) // Currently needed, fix crash.
-                    showTopPopup.value = false
-                    dismissOwnPopup(showTopPopup)
+                    dismissPopup(showPopup)
                 } else {
                     list.forEach { text ->
                         DropdownImpl(
@@ -99,9 +107,7 @@ fun AutoCompleteTextField(
                                 hapticFeedback.performHapticFeedback(LongPress)
                                 onValueChange.value = text
                                 KeyboardOptions(imeAction = ImeAction.Done)
-                                focusManager.clearFocus()
-                                dismissOwnPopup(showTopPopup)
-                                showTopPopup.value = false
+                                dismissPopup(showPopup)
                             },
                             isSelected = false,
                             index = list.indexOf(text),
@@ -110,5 +116,35 @@ fun AutoCompleteTextField(
                 }
             }
         }
+    }
+}
+
+val AutoCompletePositionProvider = object : PopupPositionProvider {
+    override fun calculatePosition(
+        anchorBounds: IntRect,
+        windowBounds: IntRect,
+        layoutDirection: LayoutDirection,
+        popupContentSize: IntSize,
+        popupMargin: IntRect,
+        alignment: PopupPositionProvider.Align
+    ): IntOffset {
+
+        val offsetX: Int = anchorBounds.left
+        val offsetY: Int = anchorBounds.bottom + popupMargin.top
+
+        return IntOffset(
+            x = offsetX.coerceIn(
+                minimumValue = windowBounds.left,
+                maximumValue = (windowBounds.right - popupContentSize.width - popupMargin.right).coerceAtLeast(windowBounds.left)
+            ),
+            y = offsetY.coerceIn(
+                minimumValue = (windowBounds.top + popupMargin.top),
+                maximumValue = (windowBounds.bottom - popupContentSize.height - popupMargin.bottom).coerceAtLeast(windowBounds.top + popupMargin.top)
+            )
+        )
+    }
+
+    override fun getMargins(): PaddingValues {
+        return PaddingValues(horizontal = 20.dp, vertical = 0.dp)
     }
 }

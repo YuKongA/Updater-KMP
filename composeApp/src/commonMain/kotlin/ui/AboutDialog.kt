@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -47,10 +48,13 @@ import updater.composeapp.generated.resources.view_source
 fun AboutDialog() {
     val showDialog = remember { mutableStateOf(false) }
 
+    val focusManager = LocalFocusManager.current
+
     IconButton(
         modifier = Modifier.padding(start = 18.dp),
         onClick = {
             showDialog.value = true
+            focusManager.clearFocus()
         }) {
         Icon(
             imageVector = Icons.Rounded.Update,

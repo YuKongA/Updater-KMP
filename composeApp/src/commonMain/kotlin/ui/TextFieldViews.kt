@@ -111,9 +111,11 @@ fun TextFieldViews(
                 items = DeviceInfoHelper.androidVersions,
                 selectedIndex = androidVersionSelected.value,
                 onSelectedIndexChange = { index ->
-                    focusManager.clearFocus()
                     androidVersionSelected.value = index
                     androidVersion.value = DeviceInfoHelper.androidVersions[index]
+                },
+                onClick = {
+                    focusManager.clearFocus()
                 },
                 mode = DropDownMode.AlwaysOnRight,
                 maxHeight = 280.dp
@@ -125,6 +127,9 @@ fun TextFieldViews(
                 onSelectedIndexChange = { index ->
                     regionSelected.value = index
                     deviceRegion.value = DeviceInfoHelper.regionNames[index]
+                },
+                onClick = {
+                    focusManager.clearFocus()
                 },
                 mode = DropDownMode.AlwaysOnRight,
                 maxHeight = 280.dp
@@ -171,7 +176,6 @@ fun TextFieldViews(
                     mode = SpinnerMode.AlwaysOnRight,
                     showValue = false,
                     onSelectedIndexChange = { index ->
-                        focusManager.clearFocus()
                         val parts = searchKeywords.value[index].split("-")
                         deviceName.value = parts[0]
                         codeName.value = parts[1]
@@ -181,6 +185,9 @@ fun TextFieldViews(
                         searchKeywordsSelected.value = index
                         regionSelected.value = DeviceInfoHelper.regionNames.indexOf(parts[2])
                         androidVersionSelected.value = DeviceInfoHelper.androidVersions.indexOf(parts[3])
+                    },
+                    onClick = {
+                        focusManager.clearFocus()
                     },
                     maxHeight = 280.dp
                 )
