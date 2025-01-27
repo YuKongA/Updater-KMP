@@ -9,7 +9,7 @@ kotlin = "2.1.10"
 kotlinx-serialization-json = "1.8.0"
 #noinspection GradleDependency
 ktor-client = "3.0.0"
-miuix = "0.3.3"
+miuix = "0.3.4"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
