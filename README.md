@@ -1,10 +1,15 @@
 # Updater-KMP
-This is an application that gets MIUI/HyperOS ROM information. With the [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) UI framework. **Android** / **Desktop(JVM)** / **iOS** are fully supported. **Web(Js/WasmJs)** is also basically supported.
+This is an app to get Xiaomi official recovery rom information.
+Use [Kotlin Multiplatform](https://www.jetbrains.com/kotlin-multiplatform/) + [Compose Multiplatform](https://www.jetbrains.com/compose-multiplatform/).
+**Android** / **Desktop(JVM)** / **iOS** are fully supported.
+**Web([Js](https://updater-js.yukonga.top)/[WasmJs](https://updater-wasm.yukonga.top))** is also basically supported.
 
 ## Usage:
-When obtaining the `Pubilc Release Version (F)`, the suffix of the system version can be automatically completed using `AUTO`<br />For example: `OS1.0.26.0.AUTO` / `V14.0.4.0.AUTO`
+When obtaining the release version, system version suffix can be automatically completed using `AUTO`.<br />
+For example: `OS2.0.100.0.AUTO` / `V14.0.4.0.AUTO`.
 
-When obtaining the `Beta Development Version (X)`, please enter the complete system version<br />For example: `OS1.0.23.12.19.DEV` / `V14.0.23.5.8.DEV`
+When obtaining the other version, please enter the complete system version yourself.<br />
+For example: `OS1.0.23.12.19.DEV` / `V14.0.23.5.8.DEV`.
 
 ## Notes:
 Only supported `MIUI9` and above versions. The most extreme case is: Redmi 1S (armani), MIUI9, Android4.4.
