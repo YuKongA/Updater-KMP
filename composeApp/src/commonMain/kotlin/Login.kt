@@ -5,7 +5,6 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
-import kotlinx.serialization.encodeToString
 import misc.json
 import misc.md5Hash
 
@@ -26,11 +25,7 @@ expect fun isWeb(): Boolean
  * @return Login status
  */
 suspend fun login(
-    account: String,
-    password: String,
-    global: Boolean,
-    savePassword: String,
-    isLogin: MutableState<Int>
+    account: String, password: String, global: Boolean, savePassword: String, isLogin: MutableState<Int>
 ): Int {
     if (account.isEmpty() || password.isEmpty()) return 1
 
@@ -40,7 +35,7 @@ suspend fun login(
 
     try {
         client.get(loginAuth2Url)
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         return 2
     }
 
@@ -48,11 +43,15 @@ suspend fun login(
 
     val sid = if (global) "miuiota_intl" else "miuiromota"
 
-    val response = client.post(loginAuth2Url) {
-        parameter("_json", "true")
-        parameter("user", account)
-        parameter("hash", md5Hash)
-        parameter("sid", sid)
+    val response = try {
+        client.post(loginAuth2Url) {
+            parameter("_json", "true")
+            parameter("user", account)
+            parameter("hash", md5Hash)
+            parameter("sid", sid)
+        }
+    } catch (_: Exception) {
+        return 2
     }
 
     val authStr = response.body<String>().replace("&&&START&&&", "")
@@ -73,7 +72,11 @@ suspend fun login(
 
     if (ssecurity == null || location == null || userId.isEmpty()) return 4
 
-    val response2 = client.get(location) { parameter("_userIdNeedEncrypt", true) }
+    val response2 = try {
+        client.get(location) { parameter("_userIdNeedEncrypt", true) }
+    } catch (_: Exception) {
+        return 2
+    }
 
     val cookies = response2.headers["Set-Cookie"].toString().split("; ")[0].split("; ")[0]
     val serviceToken = cookies.split("serviceToken=")[1].split(";")[0]
