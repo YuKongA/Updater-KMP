@@ -40,7 +40,7 @@ import top.yukonga.miuix.kmp.utils.MiuixPopupUtil.Companion.dismissDialog
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.about
 import updater.composeapp.generated.resources.app_name
-import updater.composeapp.generated.resources.join_group
+import updater.composeapp.generated.resources.join_channel
 import updater.composeapp.generated.resources.opensource_info
 import updater.composeapp.generated.resources.view_source
 
@@ -125,7 +125,7 @@ fun AboutDialog() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = stringResource(Res.string.join_group) + " ",
+                text = stringResource(Res.string.join_channel) + " ",
             )
             Text(
                 text = AnnotatedString(

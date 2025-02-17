@@ -3,7 +3,7 @@
     <string name="about">概要</string>
     <string name="login">ログイン</string>
     <string name="view_source">ソース コードを表示:</string>
-    <string name="join_group">グループに参加:</string>
+    <string name="join_channel">チャンネルに参加:</string>
     <string name="code_name">コードネーム</string>
     <string name="device_name">デバイス名</string>
     <string name="system_version">システムバージョン</string>

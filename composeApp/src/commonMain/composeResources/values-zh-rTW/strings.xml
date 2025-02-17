@@ -3,7 +3,7 @@
     <string name="about">關於</string>
     <string name="login">登錄</string>
     <string name="view_source">查看原始碼:</string>
-    <string name="join_group">加入群組:</string>
+    <string name="join_channel">加入頻道:</string>
     <string name="code_name">裝置代號</string>
     <string name="device_name">裝置名稱</string>
     <string name="system_version">系統版本</string>

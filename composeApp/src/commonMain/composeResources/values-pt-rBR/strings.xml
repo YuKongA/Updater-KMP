@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="about">Sobre</string>
-    <string name="view_source">Ver Código Fonte:</string>
-    <string name="join_group">Entrar no Grupo:</string>
     <string name="login">Entrar</string>
+    <string name="view_source">Ver Código Fonte:</string>
+    <string name="join_channel">Junte-se ao canal:</string>
     <string name="code_name">Codename</string>
     <string name="device_name">Nome do Dispositivo</string>
     <string name="system_version">Versão do Sistema</string>
