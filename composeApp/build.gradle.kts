@@ -88,7 +88,7 @@ kotlin {
         iosMain.dependencies {
             // Added
             implementation(libs.cryptography.provider.apple)
-            implementation(libs.ktor.client.cio)
+            implementation(libs.ktor.client.darwin)
         }
         jsMain.dependencies {
             // Added

@@ -21,6 +21,7 @@ image-loader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imag
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor-client" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor-client" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor-client" }
 ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor-client" }
 miuix = { module = "top.yukonga.miuix.kmp:miuix", version.ref = "miuix" }
 
