@@ -69,17 +69,17 @@ fun InfoCardViews(
 
     val coroutineScope = rememberCoroutineScope()
     var metadata = remember { mutableStateOf("") }
-    var securityPatchLevel = ""
-    var buildTime = ""
+    var securityPatchLevel = remember { mutableStateOf("") }
+    var buildTime = remember { mutableStateOf("") }
 
     if (isVisible.value) {
         coroutineScope.launch {
             val url = romInfoState.value.cdn1Download
             HttpClient.init(url)
             metadata.value = Metadata().getMetadata(url)
-            securityPatchLevel = Metadata().getPostSecurityPatchLevel(metadata.value)
+            securityPatchLevel.value = Metadata().getPostSecurityPatchLevel(metadata.value)
             val timestamp = Metadata().getPostTimestamp(metadata.value)
-            buildTime = Metadata().convertTimestampToDateTime(timestamp)
+            buildTime.value = Metadata().convertTimestampToDateTime(timestamp)
         }
     }
 
@@ -107,11 +107,11 @@ fun InfoCardViews(
                 romInfoState.value.branch
             )
             AnimatedVisibility(
-                visible = securityPatchLevel.isNotEmpty() && buildTime.isNotEmpty()
+                visible = securityPatchLevel.value.isNotEmpty() && buildTime.value.isNotEmpty()
             ) {
                 MetadataView(
-                    securityPatchLevel,
-                    buildTime
+                    securityPatchLevel.value,
+                    buildTime.value
                 )
             }
             MessageTextView(
