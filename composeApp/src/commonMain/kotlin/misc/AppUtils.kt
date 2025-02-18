@@ -11,9 +11,11 @@ import data.RomInfoHelper
 import dev.whyoleg.cryptography.DelicateCryptographyApi
 import dev.whyoleg.cryptography.algorithms.MD5
 import getRecoveryRomInfo
-import iconLink
 import isWeb
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
@@ -313,4 +315,42 @@ fun updateSearchKeywords(
     updatedKeywords.add(0, newKeyword)
     searchKeywords.value = updatedKeywords
     perfSet("searchKeywords", json.encodeToString(updatedKeywords))
+}
+
+/**
+ * Generate maps with links with corresponding names and icons.
+ *
+ * @param iconNames: Icon names included in the changelog
+ * @param iconMainLink: Main link to get the icon
+ * @param iconNameLink: Links that correspond to each icon name
+ *
+ * @return Links to icons with corresponding names
+ */
+fun iconLink(iconNames: List<String>, iconMainLink: String, iconNameLink: Map<String, String>): MutableMap<String, String> {
+    val iconMap = mutableMapOf<String, String>()
+    if (iconNameLink.isNotEmpty()) {
+        for (name in iconNames) {
+            val icon = iconNameLink[name]
+            if (icon != null) {
+                val realLink = iconMainLink + icon
+                iconMap[name] = realLink
+            }
+        }
+    }
+    return iconMap
+}
+
+/**
+ * Convert timestamp to date time.
+ *
+ * @param timestamp: Timestamp
+ *
+ * @return Date time
+ */
+fun convertTimestampToDateTime(timestamp: String): String {
+    val epochSeconds = timestamp.toLongOrNull() ?: return ""
+    val instant = Instant.fromEpochSeconds(epochSeconds)
+    val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+    return "${dateTime.year}-${dateTime.monthNumber.toString().padStart(2, '0')}-${dateTime.dayOfMonth.toString().padStart(2, '0')} " +
+            "${dateTime.hour.toString().padStart(2, '0')}:${dateTime.minute.toString().padStart(2, '0')}:${dateTime.second.toString().padStart(2, '0')}"
 }

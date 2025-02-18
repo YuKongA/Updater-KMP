@@ -1,4 +1,6 @@
-import data.FileInfoHelper.FileInfo
+package misc
+
+import data.FileInfoHelper
 import okio.ByteString
 import okio.ByteString.Companion.toByteString
 
@@ -12,7 +14,7 @@ object ZipFileUtil {
     private const val ZIP64_LOCHDR = 20
     private const val ZIP64_MAGICVAL = 0xFFFFFFFFL
 
-    fun locateCentralDirectory(bytes: ByteArray, fileLength: Long): FileInfo {
+    fun locateCentralDirectory(bytes: ByteArray, fileLength: Long): FileInfoHelper.FileInfo {
         val byteString = bytes.toByteString()
         val startPos = bytes.size - ENDHDR
         var cenSize = -1L
@@ -43,7 +45,7 @@ object ZipFileUtil {
             }
         }
 
-        return FileInfo(cenOffset, cenSize)
+        return FileInfoHelper.FileInfo(cenOffset, cenSize)
     }
 
     fun locateLocalFileHeader(bytes: ByteArray, fileName: String): Long {

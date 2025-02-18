@@ -1,7 +1,5 @@
 package ui
 
-import HttpClient
-import Metadata
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -25,19 +23,23 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import copyToClipboard
 import data.DataHelper
 import downloadToLocal
+import getMetadata
+import getMetadataValue
 import isWeb
 import kotlinx.coroutines.launch
 import misc.MessageUtils.Companion.showMessage
 import misc.bodyFontSize
 import misc.bodySmallFontSize
+import misc.convertTimestampToDateTime
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.Icon
@@ -76,11 +78,10 @@ fun InfoCardViews(
     if (isVisible.value && !isWeb()) {
         coroutineScope.launch {
             val url = romInfoState.value.cdn1Download
-            HttpClient.init(url)
-            metadata.value = Metadata().getMetadata(url)
-            securityPatchLevel.value = Metadata().getPostSecurityPatchLevel(metadata.value)
-            val timestamp = Metadata().getPostTimestamp(metadata.value)
-            buildTime.value = Metadata().convertTimestampToDateTime(timestamp)
+            metadata.value = getMetadata(url)
+            securityPatchLevel.value = getMetadataValue(metadata.value, "post-security-patch-level=")
+            val timestamp = getMetadataValue(metadata.value, "post-timestamp=")
+            buildTime.value = convertTimestampToDateTime(timestamp)
         }
     }
 
@@ -248,6 +249,7 @@ fun DownloadInfoView(
     fileName: String
 ) {
     val hapticFeedback = LocalHapticFeedback.current
+    val clipboard = LocalClipboardManager.current
 
     val messageCopySuccessful = stringResource(Res.string.copy_successful)
     val messageDownloadStart = stringResource(Res.string.download_start)
@@ -265,7 +267,7 @@ fun DownloadInfoView(
             if (url.isNotEmpty()) {
                 IconButton(
                     onClick = {
-                        copyToClipboard(url)
+                        clipboard.setText(AnnotatedString(url))
                         showMessage(messageCopySuccessful)
                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                     }
@@ -300,6 +302,7 @@ fun ChangelogView(
     changelog: String
 ) {
     val hapticFeedback = LocalHapticFeedback.current
+    val clipboard = LocalClipboardManager.current
 
     val messageCopySuccessful = stringResource(Res.string.copy_successful)
 
@@ -317,7 +320,7 @@ fun ChangelogView(
             )
             IconButton(
                 onClick = {
-                    copyToClipboard(changelog)
+                    clipboard.setText(AnnotatedString(changelog))
                     showMessage(messageCopySuccessful)
                     hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                 }
