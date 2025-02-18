@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import copyToClipboard
 import data.DataHelper
 import downloadToLocal
+import isWeb
 import kotlinx.coroutines.launch
 import misc.MessageUtils.Companion.showMessage
 import misc.bodyFontSize
@@ -72,7 +73,7 @@ fun InfoCardViews(
     var securityPatchLevel = remember { mutableStateOf("") }
     var buildTime = remember { mutableStateOf("") }
 
-    if (isVisible.value) {
+    if (isVisible.value && !isWeb()) {
         coroutineScope.launch {
             val url = romInfoState.value.cdn1Download
             HttpClient.init(url)
