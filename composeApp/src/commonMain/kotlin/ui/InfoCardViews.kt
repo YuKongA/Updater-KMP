@@ -1,5 +1,7 @@
 package ui
 
+import HttpClient
+import Metadata
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -19,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -30,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import copyToClipboard
 import data.DataHelper
 import downloadToLocal
+import kotlinx.coroutines.launch
 import misc.MessageUtils.Companion.showMessage
 import misc.bodyFontSize
 import misc.bodySmallFontSize
@@ -44,6 +48,7 @@ import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.android_version
 import updater.composeapp.generated.resources.big_version
 import updater.composeapp.generated.resources.branch
+import updater.composeapp.generated.resources.build_time
 import updater.composeapp.generated.resources.changelog
 import updater.composeapp.generated.resources.code_name
 import updater.composeapp.generated.resources.copy_successful
@@ -51,15 +56,31 @@ import updater.composeapp.generated.resources.download
 import updater.composeapp.generated.resources.download_start
 import updater.composeapp.generated.resources.filename
 import updater.composeapp.generated.resources.filesize
+import updater.composeapp.generated.resources.security_patch_level
 import updater.composeapp.generated.resources.system_version
 
 @Composable
 fun InfoCardViews(
     romInfoState: MutableState<DataHelper.RomInfoData>,
-    iconInfo: MutableState<List<DataHelper.IconInfoData>>
+    iconInfo: MutableState<List<DataHelper.IconInfoData>>,
 ) {
     val isVisible = remember { mutableStateOf(false) }
     isVisible.value = romInfoState.value.type.isNotEmpty()
+
+    val coroutineScope = rememberCoroutineScope()
+    var metadata = remember { mutableStateOf("") }
+    var securityPatchLevel = ""
+    var buildTime = ""
+
+    if (isVisible.value) {
+        coroutineScope.launch {
+            val url = romInfoState.value.cdn1Download
+            HttpClient.init(url)
+            metadata.value = Metadata().getMetadata(url)
+        }
+        securityPatchLevel = Metadata().getPostSecurityPatchLevel(metadata.value)
+        buildTime = Metadata().convertTimestampToDateTime(Metadata().getPostTimestamp(metadata.value))
+    }
 
     AnimatedVisibility(
         visible = isVisible.value,
@@ -84,6 +105,14 @@ fun InfoCardViews(
                 romInfoState.value.codebase,
                 romInfoState.value.branch
             )
+            AnimatedVisibility(
+                visible = securityPatchLevel.isNotEmpty() && buildTime.isNotEmpty()
+            ) {
+                MetadataView(
+                    securityPatchLevel,
+                    buildTime
+                )
+            }
             MessageTextView(
                 stringResource(Res.string.filename),
                 romInfoState.value.fileName
@@ -143,6 +172,19 @@ fun InfoCardViews(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun MetadataView(
+    securityPatchLevel: String,
+    buildTime: String,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        MessageTextView(stringResource(Res.string.security_patch_level), securityPatchLevel)
+        MessageTextView(stringResource(Res.string.build_time), buildTime)
     }
 }
 

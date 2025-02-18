@@ -17,6 +17,8 @@
     <string name="download">URL de Download</string>
     <string name="changelog">Registro de Alterações</string>
     <string name="branch">Ramo</string>
+    <string name="security_patch_level">Nível do patch de segurança</string>
+    <string name="build_time">Hora da construção</string>
     <string name="toast_ing">Pesquisando…</string>
     <string name="toast_no_info">Sem informações!</string>
     <string name="toast_wrong_info">A versão solicitada não existe!</string>

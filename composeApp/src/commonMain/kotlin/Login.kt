@@ -1,17 +1,17 @@
 import androidx.compose.runtime.MutableState
 import data.DataHelper
-import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import misc.json
 import misc.md5Hash
+import top.yukonga.miuix.kmp.utils.Platform
+import top.yukonga.miuix.kmp.utils.platform
 
 private const val loginAuth2Url = "https://account.xiaomi.com/pass/serviceLoginAuth2"
 
-expect fun httpClientPlatform(): HttpClient
-expect fun isWeb(): Boolean
+fun isWeb(): Boolean = platform() == Platform.WasmJs || platform() == Platform.Js
 
 /**
  * Login Xiaomi account.

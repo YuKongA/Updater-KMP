@@ -17,6 +17,8 @@
     <string name="download">下載連結</string>
     <string name="changelog">更新日誌</string>
     <string name="branch">版本分支</string>
+    <string name="security_patch_level">安全補丁版本</string>
+    <string name="build_time">構建時間</string>
     <string name="toast_ing">正在查詢…</string>
     <string name="toast_no_info">未取得到訊息！</string>
     <string name="toast_wrong_info">請求版本不存在！</string>

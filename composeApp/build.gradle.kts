@@ -1,6 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
+import org.gradle.kotlin.dsl.implementation
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
@@ -75,6 +76,7 @@ kotlin {
             implementation(libs.cryptography.core)
             implementation(libs.image.loader)
             implementation(libs.kotlinx.serialization.json)
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
             implementation(libs.ktor.client.core)
             implementation(libs.miuix)
             implementation(libs.haze)
