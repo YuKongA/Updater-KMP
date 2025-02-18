@@ -1,7 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
-import org.gradle.kotlin.dsl.implementation
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
@@ -180,7 +179,7 @@ compose.desktop {
             packageName = appName
             packageVersion = verName
             description = "Get HyperOS/MIUI recovery ROM info"
-            copyright = "Copyright © 2024 YuKongA, AkaneTan"
+            copyright = "Copyright © 2024-2025 YuKongA"
 
             linux {
                 iconFile = file("src/desktopMain/resources/linux/Icon.png")
