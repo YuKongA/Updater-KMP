@@ -77,9 +77,10 @@ fun InfoCardViews(
             val url = romInfoState.value.cdn1Download
             HttpClient.init(url)
             metadata.value = Metadata().getMetadata(url)
+            securityPatchLevel = Metadata().getPostSecurityPatchLevel(metadata.value)
+            val timestamp = Metadata().getPostTimestamp(metadata.value)
+            buildTime = Metadata().convertTimestampToDateTime(timestamp)
         }
-        securityPatchLevel = Metadata().getPostSecurityPatchLevel(metadata.value)
-        buildTime = Metadata().convertTimestampToDateTime(Metadata().getPostTimestamp(metadata.value))
     }
 
     AnimatedVisibility(

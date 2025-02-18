@@ -76,7 +76,7 @@ kotlin {
             implementation(libs.cryptography.core)
             implementation(libs.image.loader)
             implementation(libs.kotlinx.serialization.json)
-            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
+            implementation(libs.kotlinx.datetime)
             implementation(libs.ktor.client.core)
             implementation(libs.miuix)
             implementation(libs.haze)
