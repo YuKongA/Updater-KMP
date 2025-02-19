@@ -25,7 +25,11 @@ fun isWeb(): Boolean = platform() == Platform.WasmJs || platform() == Platform.J
  * @return Login status
  */
 suspend fun login(
-    account: String, password: String, global: Boolean, savePassword: String, isLogin: MutableState<Int>
+    account: String,
+    password: String,
+    global: Boolean,
+    savePassword: String,
+    isLogin: MutableState<Int>
 ): Int {
     if (account.isEmpty() || password.isEmpty()) return 1
 

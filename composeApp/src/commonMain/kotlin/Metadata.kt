@@ -2,54 +2,62 @@ import misc.ZipFileUtil.locateCentralDirectory
 import misc.ZipFileUtil.locateLocalFileHeader
 import misc.ZipFileUtil.locateLocalFileOffset
 
+private const val METADATA_PATH = "META-INF/com/android/metadata"
+private const val CHUNK_SIZE = 8192
+private const val END_BYTES_SIZE = 4096
+private const val LOCAL_HEADER_SIZE = 256
+
 suspend fun getMetadata(url: String): String {
-    val metadataPath = "META-INF/com/android/metadata"
-    val endBytes = ByteArray(4096)
-
     HttpClient.init(url)
-    HttpClient.seek(HttpClient.length() - 4096)
-    HttpClient.read(endBytes)
-    val centralDirectoryInfo = locateCentralDirectory(endBytes, HttpClient.length())
-    HttpClient.seek(centralDirectoryInfo.offset)
-    val centralDirectory = ByteArray(centralDirectoryInfo.size.toInt())
-    HttpClient.read(centralDirectory)
-    val localHeaderOffset = locateLocalFileHeader(centralDirectory, metadataPath)
 
-    if (localHeaderOffset != -1L) {
-        val localHeaderBytes = ByteArray(256)
-        HttpClient.seek(localHeaderOffset)
-        HttpClient.read(localHeaderBytes)
-        val metadataOffset = locateLocalFileOffset(localHeaderBytes) + localHeaderOffset
-
-        val fileSize = (localHeaderBytes[22].toInt() and 0xff) or
-                ((localHeaderBytes[23].toInt() and 0xff) shl 8) or
-                ((localHeaderBytes[24].toInt() and 0xff) shl 16) or
-                ((localHeaderBytes[25].toInt() and 0xff) shl 24)
-
-        val chunkSize = 8192
-        val metadataContent = ByteArray(fileSize)
-        var bytesRead = 0
-
-        HttpClient.seek(metadataOffset)
-        while (bytesRead < fileSize) {
-            val remaining = fileSize - bytesRead
-            val currentChunkSize = minOf(chunkSize, remaining)
-            val chunk = ByteArray(currentChunkSize)
-            HttpClient.read(chunk)
-            chunk.forEachIndexed { index, byte ->
-                metadataContent[bytesRead + index] = byte
-            }
-            bytesRead += currentChunkSize
-        }
-        return metadataContent.decodeToString()
+    val endBytes = ByteArray(END_BYTES_SIZE).also { bytes ->
+        HttpClient.seek(HttpClient.length() - END_BYTES_SIZE)
+        HttpClient.read(bytes)
     }
-    return ""
+
+    val centralDirectoryInfo = locateCentralDirectory(endBytes, HttpClient.length())
+    val centralDirectory = ByteArray(centralDirectoryInfo.size.toInt()).also { bytes ->
+        HttpClient.seek(centralDirectoryInfo.offset)
+        HttpClient.read(bytes)
+    }
+
+    val localHeaderOffset = locateLocalFileHeader(centralDirectory, METADATA_PATH)
+    if (localHeaderOffset == -1L) return ""
+
+    val localHeaderBytes = ByteArray(LOCAL_HEADER_SIZE).also { bytes ->
+        HttpClient.seek(localHeaderOffset)
+        HttpClient.read(bytes)
+    }
+
+    val metadataOffset = locateLocalFileOffset(localHeaderBytes) + localHeaderOffset
+    val fileSize = localHeaderBytes.getFileSize()
+
+    return ByteArray(fileSize).also { content ->
+        HttpClient.seek(metadataOffset)
+        readByChunks(content, fileSize)
+    }.decodeToString()
 }
 
-internal fun getMetadataValue(metadata: String, prefix: String): String {
-    return metadata.lineSequence()
-        .find { it.startsWith(prefix) }
+private fun ByteArray.getFileSize(): Int =
+    (this[22].toInt() and 0xff) or
+            ((this[23].toInt() and 0xff) shl 8) or
+            ((this[24].toInt() and 0xff) shl 16) or
+            ((this[25].toInt() and 0xff) shl 24)
+
+private suspend fun readByChunks(content: ByteArray, fileSize: Int) {
+    var bytesRead = 0
+    while (bytesRead < fileSize) {
+        val remaining = fileSize - bytesRead
+        val currentChunkSize = minOf(CHUNK_SIZE, remaining)
+        val chunk = ByteArray(currentChunkSize)
+        HttpClient.read(chunk)
+        chunk.copyInto(content, bytesRead)
+        bytesRead += currentChunkSize
+    }
+}
+
+fun getMetadataValue(metadata: String, prefix: String): String =
+    metadata.lineSequence()
+        .firstOrNull { it.startsWith(prefix) }
         ?.substringAfter(prefix)
-        ?: ""
-}
-
+        .orEmpty()
