@@ -1,5 +1,6 @@
 package ui
 
+import Metadata
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -32,8 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import data.DataHelper
 import downloadToLocal
-import getMetadata
-import getMetadataValue
 import isWeb
 import kotlinx.coroutines.launch
 import misc.MessageUtils.Companion.showMessage
@@ -78,9 +77,9 @@ fun InfoCardViews(
     if (isVisible.value && !isWeb()) {
         coroutineScope.launch {
             val url = romInfoState.value.cdn1Download
-            metadata.value = getMetadata(url)
-            securityPatchLevel.value = getMetadataValue(metadata.value, "post-security-patch-level=")
-            val timestamp = getMetadataValue(metadata.value, "post-timestamp=")
+            metadata.value = Metadata.getMetadata(url)
+            securityPatchLevel.value = Metadata.getMetadataValue(metadata.value, "post-security-patch-level=")
+            val timestamp = Metadata.getMetadataValue(metadata.value, "post-timestamp=")
             buildTime.value = convertTimestampToDateTime(timestamp)
         }
     }
