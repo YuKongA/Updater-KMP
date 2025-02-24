@@ -63,6 +63,8 @@ object DataHelper {
         var official2Download: String = "",
         var cdn1Download: String = "",
         var cdn2Download: String = "",
-        var changelog: String = ""
+        var changelog: String = "",
+        var securityPatchLevel: String = "",
+        var timestamp: String = "",
     )
 }

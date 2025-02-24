@@ -1,6 +1,5 @@
 package ui
 
-import Metadata
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -20,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -33,12 +31,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import data.DataHelper
 import downloadToLocal
-import isWeb
-import kotlinx.coroutines.launch
 import misc.MessageUtils.Companion.showMessage
 import misc.bodyFontSize
 import misc.bodySmallFontSize
-import misc.convertTimestampToDateTime
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.Icon
@@ -69,21 +64,6 @@ fun InfoCardViews(
     val isVisible = remember { mutableStateOf(false) }
     isVisible.value = romInfoState.value.type.isNotEmpty()
 
-    val coroutineScope = rememberCoroutineScope()
-    var metadata = remember { mutableStateOf("") }
-    var securityPatchLevel = remember { mutableStateOf("") }
-    var buildTime = remember { mutableStateOf("") }
-
-    if (isVisible.value && !isWeb()) {
-        coroutineScope.launch {
-            val url = romInfoState.value.cdn1Download
-            metadata.value = Metadata.getMetadata(url)
-            securityPatchLevel.value = Metadata.getMetadataValue(metadata.value, "post-security-patch-level=")
-            val timestamp = Metadata.getMetadataValue(metadata.value, "post-timestamp=")
-            buildTime.value = convertTimestampToDateTime(timestamp)
-        }
-    }
-
     AnimatedVisibility(
         visible = isVisible.value,
         enter = fadeIn(animationSpec = tween(400)),
@@ -108,11 +88,12 @@ fun InfoCardViews(
                 romInfoState.value.branch
             )
             AnimatedVisibility(
-                visible = securityPatchLevel.value.isNotEmpty() && buildTime.value.isNotEmpty()
+                visible = romInfoState.value.securityPatchLevel.isNotEmpty()
+                        && romInfoState.value.timestamp.isNotEmpty()
             ) {
                 MetadataView(
-                    securityPatchLevel.value,
-                    buildTime.value
+                    romInfoState.value.securityPatchLevel,
+                    romInfoState.value.timestamp
                 )
             }
             MessageTextView(

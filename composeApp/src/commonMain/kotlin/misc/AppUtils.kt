@@ -1,5 +1,6 @@
 package misc
 
+import Metadata
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -194,7 +195,7 @@ fun updateRomInfo(
  * @param officialDownload: Official download URL
  * @param noUltimateLink: No ultimate download link
  */
-fun handleRomInfo(
+suspend fun handleRomInfo(
     recoveryRomInfo: RomInfoHelper.RomInfo,
     romInfo: RomInfoHelper.Rom?,
     romInfoData: MutableState<DataHelper.RomInfoData>,
@@ -222,28 +223,40 @@ fun handleRomInfo(
             )
         }
 
+        val bigVersion = when {
+            romInfo.osbigversion != ".0" && romInfo.osbigversion != "0.0" && romInfo.osbigversion != "" -> "HyperOS " + romInfo.osbigversion
+            romInfo.bigversion.contains("816") -> romInfo.bigversion.replace("816", "HyperOS 1.0")
+            else -> "MIUI ${romInfo.bigversion}"
+        }
+        val official1Download = if (noUltimateLink) "" else {
+            "https://ultimateota.d.miui.com" + (officialDownload ?: downloadUrl(romInfo.version, romInfo.filename))
+        }
+        val official2Download = if (noUltimateLink) "" else {
+            "https://superota.d.miui.com" + (officialDownload ?: downloadUrl(romInfo.version, romInfo.filename))
+        }
+        val cdn1Download = "https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com" + downloadUrl(romInfo.version, romInfo.filename)
+        val cdn2Download = "https://cdnorg.d.miui.com" + downloadUrl(romInfo.version, romInfo.filename)
+
+        val metadata = Metadata.getMetadata(cdn1Download)
+        val securityPatchLevel = Metadata.getMetadataValue(metadata, "post-security-patch-level=")
+        val timestamp = convertTimestampToDateTime(Metadata.getMetadataValue(metadata, "post-timestamp="))
+
         romInfoData.value = DataHelper.RomInfoData(
             type = romInfo.type.toString(),
             device = romInfo.device.toString(),
             version = romInfo.version.toString(),
             codebase = romInfo.codebase.toString(),
             branch = romInfo.branch.toString(),
-            bigVersion = when {
-                romInfo.osbigversion != ".0" && romInfo.osbigversion != "0.0" && romInfo.osbigversion != "" -> "HyperOS " + romInfo.osbigversion
-                romInfo.bigversion.contains("816") -> romInfo.bigversion.replace("816", "HyperOS 1.0")
-                else -> "MIUI ${romInfo.bigversion}"
-            },
+            bigVersion = bigVersion,
             fileName = romInfo.filename.toString().substringBefore(".zip") + ".zip",
             fileSize = romInfo.filesize.toString(),
-            official1Download = if (noUltimateLink) "" else {
-                "https://ultimateota.d.miui.com" + (officialDownload ?: downloadUrl(romInfo.version, romInfo.filename))
-            },
-            official2Download = if (noUltimateLink) "" else {
-                "https://superota.d.miui.com" + (officialDownload ?: downloadUrl(romInfo.version, romInfo.filename))
-            },
-            cdn1Download = "https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com" + downloadUrl(romInfo.version, romInfo.filename),
-            cdn2Download = "https://cdnorg.d.miui.com" + downloadUrl(romInfo.version, romInfo.filename),
-            changelog = log.toString().trimEnd()
+            official1Download = official1Download,
+            official2Download = official2Download,
+            cdn1Download = cdn1Download,
+            cdn2Download = cdn2Download,
+            changelog = log.toString().trimEnd(),
+            securityPatchLevel = securityPatchLevel,
+            timestamp = timestamp
         )
     }
 }
