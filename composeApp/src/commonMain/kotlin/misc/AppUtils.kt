@@ -13,6 +13,7 @@ import dev.whyoleg.cryptography.DelicateCryptographyApi
 import dev.whyoleg.cryptography.algorithms.MD5
 import getRecoveryRomInfo
 import isWeb
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -126,7 +127,7 @@ fun updateRomInfo(
                                 downloadUrl(recoveryRomInfo.currentRom.version!!, recoveryRomInfo.latestRom?.filename!!)
                             }
 
-                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.currentRom, curRomInfo, curIconInfo, curRomDownload, noUltimateLink)
+                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.currentRom, curRomInfo, curIconInfo, coroutineScope, curRomDownload, noUltimateLink)
 
                         perfSet("deviceName", deviceName.value)
                         perfSet("codeName", codeName.value)
@@ -140,9 +141,9 @@ fun updateRomInfo(
                         )
 
                         if (recoveryRomInfo.incrementRom?.bigversion != null) {
-                            handleRomInfo(recoveryRomInfo, recoveryRomInfo.incrementRom, incRomInfo, incIconInfo)
+                            handleRomInfo(recoveryRomInfo, recoveryRomInfo.incrementRom, incRomInfo, incIconInfo, coroutineScope)
                         } else if (recoveryRomInfo.crossRom?.bigversion != null) {
-                            handleRomInfo(recoveryRomInfo, recoveryRomInfo.crossRom, incRomInfo, incIconInfo)
+                            handleRomInfo(recoveryRomInfo, recoveryRomInfo.crossRom, incRomInfo, incIconInfo, coroutineScope)
                         } else {
                             clearRomInfo(incRomInfo)
                         }
@@ -155,13 +156,13 @@ fun updateRomInfo(
 
                     } else if (recoveryRomInfo.incrementRom?.bigversion != null) {
 
-                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.incrementRom, curRomInfo, curIconInfo)
+                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.incrementRom, curRomInfo, curIconInfo, coroutineScope)
                         clearRomInfo(incRomInfo)
                         showMessage(messageWrongResult)
 
                     } else if (recoveryRomInfo.crossRom?.bigversion != null) {
 
-                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.crossRom, curRomInfo, curIconInfo)
+                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.crossRom, curRomInfo, curIconInfo, coroutineScope)
                         clearRomInfo(incRomInfo)
                         showMessage(messageWrongResult)
 
@@ -192,16 +193,18 @@ fun updateRomInfo(
  * @param romInfo: Current ROM info
  * @param romInfoData: Data used to display ROM info
  * @param iconInfoData: Data used to display changelog icons
+ * @param coroutineScope: Coroutine scope
  * @param officialDownload: Official download URL
  * @param noUltimateLink: No ultimate download link
  */
-suspend fun handleRomInfo(
+fun handleRomInfo(
     recoveryRomInfo: RomInfoHelper.RomInfo,
     romInfo: RomInfoHelper.Rom?,
     romInfoData: MutableState<DataHelper.RomInfoData>,
     iconInfoData: MutableState<List<DataHelper.IconInfoData>>,
+    coroutineScope: CoroutineScope,
     officialDownload: String? = null,
-    noUltimateLink: Boolean = false
+    noUltimateLink: Boolean = false,
 ) {
     if (romInfo?.bigversion != null) {
         val log = StringBuilder()
@@ -237,10 +240,6 @@ suspend fun handleRomInfo(
         val cdn1Download = "https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com" + downloadUrl(romInfo.version, romInfo.filename)
         val cdn2Download = "https://cdnorg.d.miui.com" + downloadUrl(romInfo.version, romInfo.filename)
 
-        val metadata = Metadata.getMetadata(cdn1Download)
-        val securityPatchLevel = Metadata.getMetadataValue(metadata, "post-security-patch-level=")
-        val timestamp = convertTimestampToDateTime(Metadata.getMetadataValue(metadata, "post-timestamp="))
-
         romInfoData.value = DataHelper.RomInfoData(
             type = romInfo.type.toString(),
             device = romInfo.device.toString(),
@@ -254,10 +253,21 @@ suspend fun handleRomInfo(
             official2Download = official2Download,
             cdn1Download = cdn1Download,
             cdn2Download = cdn2Download,
-            changelog = log.toString().trimEnd(),
-            securityPatchLevel = securityPatchLevel,
-            timestamp = timestamp
+            changelog = log.toString().trimEnd()
         )
+
+        if (!isWeb()) {
+            coroutineScope.launch {
+                val metadata = Metadata.getMetadata(if (noUltimateLink) cdn1Download else official1Download)
+                val securityPatchLevel = Metadata.getMetadataValue(metadata, "post-security-patch-level=")
+                val timestamp = convertTimestampToDateTime(Metadata.getMetadataValue(metadata, "post-timestamp="))
+
+                romInfoData.value = romInfoData.value.copy(
+                    securityPatchLevel = securityPatchLevel,
+                    timestamp = timestamp
+                )
+            }
+        }
     }
 }
 

@@ -11,7 +11,7 @@ import misc.ZipFileUtil.locateLocalFileHeader
 import misc.ZipFileUtil.locateLocalFileOffset
 
 private const val METADATA_PATH = "META-INF/com/android/metadata"
-private const val CHUNK_SIZE = 8192
+private const val CHUNK_SIZE = 1024
 private const val END_BYTES_SIZE = 4096
 private const val LOCAL_HEADER_SIZE = 256
 private const val TIMEOUT_MS = 10000L
