@@ -8,7 +8,7 @@ image-loader = "1.10.0"
 kotlin = "2.1.10"
 kotlinx-serialization-json = "1.8.0"
 kotlinx-datetime = "0.6.2"
-ktor-client = "3.1.0"
+ktor-client = "3.1.1"
 miuix = "0.3.5"
 
 [libraries]
