@@ -1,6 +1,6 @@
 [versions]
-androidGradlePlugin = "8.8.1"
-androidx-activity-compose = "1.10.0"
+android-gradle-plugin = "8.8.2"
+androidx-activity-compose = "1.10.1"
 compose-plugin = "1.8.0-alpha03"
 cryptography = "0.4.0"
 haze = "1.4.0"
@@ -28,7 +28,7 @@ ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor-client
 miuix = { module = "top.yukonga.miuix.kmp:miuix", version.ref = "miuix" }
 
 [plugins]
-android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
