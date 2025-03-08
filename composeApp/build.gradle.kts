@@ -18,7 +18,6 @@ val appName = "Updater"
 val pkgName = "top.yukonga.updater.kmp"
 val verName = "1.5.1"
 val verCode = getVersionCode()
-val skiko = "0.9.2"
 val xcf = XCFramework(appName + "Framework")
 
 java {
@@ -103,7 +102,7 @@ kotlin {
             implementation(libs.ktor.client.js)
         }
         desktopMain.dependencies {
-            implementation(skikoAwtRuntimeDependency(skiko))
+            implementation(compose.desktop.currentOs)
             // Added
             implementation(libs.cryptography.provider.jdk)
             implementation(libs.ktor.client.cio)
@@ -207,27 +206,6 @@ fun getVersionCode(): Int {
     val commitCount = getGitCommitCount()
     val major = 5
     return major + commitCount
-}
-
-fun Project.skikoAwtRuntimeDependency(version: String): String {
-    val osName = System.getProperty("os.name")
-    val targetOs = when {
-        osName == "Mac OS X" -> "macos"
-        osName.startsWith("Win") -> "windows"
-        osName.startsWith("Linux") -> "linux"
-        else -> error("Unsupported OS: $osName")
-    }
-
-    val osArch = System.getProperty("os.arch")
-    val targetArch = when (osArch) {
-        "x86_64", "amd64" -> "x64"
-        "aarch64" -> "arm64"
-        else -> error("Unsupported arch: $osArch")
-    }
-
-    val target = "$targetOs-$targetArch"
-
-    return "org.jetbrains.skiko:skiko-awt-runtime-$target:$version"
 }
 
 val generateVersionInfo by tasks.registering {
