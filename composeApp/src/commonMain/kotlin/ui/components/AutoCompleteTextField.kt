@@ -29,7 +29,7 @@ import top.yukonga.miuix.kmp.basic.PopupPositionProvider
 import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.extra.DropdownImpl
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.utils.MiuixPopupUtil.Companion.dismissPopup
+import top.yukonga.miuix.kmp.utils.MiuixPopupUtils.Companion.dismissPopup
 
 @Composable
 fun AutoCompleteTextField(
