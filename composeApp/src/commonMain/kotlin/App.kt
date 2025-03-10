@@ -50,9 +50,9 @@ import top.yukonga.miuix.kmp.basic.TopAppBar
 import top.yukonga.miuix.kmp.basic.rememberTopAppBarState
 import top.yukonga.miuix.kmp.extra.DropdownImpl
 import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.icons.ImmersionMore
+import top.yukonga.miuix.kmp.icon.icons.useful.ImmersionMore
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.utils.MiuixPopupUtil.Companion.dismissPopup
+import top.yukonga.miuix.kmp.utils.MiuixPopupUtils.Companion.dismissPopup
 import top.yukonga.miuix.kmp.utils.getWindowSize
 import ui.AboutDialog
 import ui.InfoCardViews
@@ -161,7 +161,7 @@ fun App() {
                                 }
                             ) {
                                 Icon(
-                                    imageVector = MiuixIcons.ImmersionMore,
+                                    imageVector = MiuixIcons.Useful.ImmersionMore,
                                     contentDescription = "Menu"
                                 )
                             }
