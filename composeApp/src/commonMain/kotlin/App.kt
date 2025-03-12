@@ -162,6 +162,7 @@ fun App() {
                             ) {
                                 Icon(
                                     imageVector = MiuixIcons.Useful.ImmersionMore,
+                                    tint = MiuixTheme.colorScheme.onBackground,
                                     contentDescription = "Menu"
                                 )
                             }

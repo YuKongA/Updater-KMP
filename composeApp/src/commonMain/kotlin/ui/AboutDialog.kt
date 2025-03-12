@@ -58,6 +58,7 @@ fun AboutDialog() {
         }) {
         Icon(
             imageVector = Icons.Rounded.Update,
+            tint = MiuixTheme.colorScheme.onBackground,
             contentDescription = null,
         )
     }
