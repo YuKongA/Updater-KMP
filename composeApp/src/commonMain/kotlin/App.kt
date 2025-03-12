@@ -97,11 +97,11 @@ fun App() {
         val hazeState = remember { HazeState() }
 
         val hazeStyle = HazeStyle(
-            backgroundColor = if (scrollBehavior.state.heightOffset > -1) Color.Transparent else MiuixTheme.colorScheme.background,
+            backgroundColor = MiuixTheme.colorScheme.background,
             tint = HazeTint(
                 MiuixTheme.colorScheme.background.copy(
-                    if (scrollBehavior.state.heightOffset > -1) 1f
-                    else lerp(1f, 0.67f, (scrollBehavior.state.heightOffset + 1) / -143f)
+                    if (scrollBehavior.state.collapsedFraction <= 0f) 1f
+                    else lerp(1f, 0.67f, (scrollBehavior.state.collapsedFraction))
                 )
             )
         )
@@ -113,7 +113,7 @@ fun App() {
             Scaffold(
                 modifier = Modifier
                     .imePadding()
-                    .fillMaxSize().fillMaxSize()
+                    .fillMaxSize()
                     .clickable(
                         indication = null,
                         interactionSource = null,
