@@ -3,13 +3,13 @@
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.jetbrains.compose)
+    alias(libs.plugins.kotlin.cocoapods)
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.serialization)
 }
@@ -18,7 +18,6 @@ val appName = "Updater"
 val pkgName = "top.yukonga.updater.kmp"
 val verName = "1.5.1"
 val verCode = getVersionCode()
-val xcf = XCFramework(appName + "Framework")
 
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -31,12 +30,35 @@ kotlin {
 
     jvm("desktop")
 
-    listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach {
-        it.binaries.framework {
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
+    macosX64 {
+        binaries {
+            executable {
+                entryPoint = "main"
+            }
+        }
+    }
+    macosArm64 {
+        binaries {
+            executable {
+                entryPoint = "main"
+            }
+        }
+    }
+
+    cocoapods {
+        version = verName
+        summary = "Get HyperOS/MIUI recovery ROM info"
+        homepage = "https://github.com/YuKongA/Updater-KMP"
+        authors = "YuKongA"
+        license = "AGPL-3.0"
+        podfile = project.file("../iosApp/Podfile")
+        framework {
             baseName = appName + "Framework"
             isStatic = true
-            freeCompilerArgs += "-Xbinary=bundleId=$pkgName.framework"
-            xcf.add(this)
         }
     }
 
@@ -63,7 +85,6 @@ kotlin {
 
     sourceSets {
         val desktopMain by getting
-
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -87,6 +108,11 @@ kotlin {
             implementation(libs.ktor.client.cio)
         }
         iosMain.dependencies {
+            // Added
+            implementation(libs.cryptography.provider.apple)
+            implementation(libs.ktor.client.darwin)
+        }
+        macosMain.dependencies {
             // Added
             implementation(libs.cryptography.provider.apple)
             implementation(libs.ktor.client.darwin)

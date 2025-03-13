@@ -3,7 +3,7 @@ android-gradle-plugin = "8.8.2"
 androidx-activity-compose = "1.10.1"
 compose-plugin = "1.8.0-alpha04"
 cryptography = "0.4.0"
-haze = "1.5.0"
+haze = "1.6.0-SNAPSHOT"
 image-loader = "1.10.0"
 kotlin = "2.1.10"
 kotlinx-serialization-json = "1.8.0"
@@ -31,5 +31,6 @@ miuix = { module = "top.yukonga.miuix.kmp:miuix", version.ref = "miuix" }
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
+kotlin-cocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

@@ -4,7 +4,7 @@ import UpdaterFramework
 
 struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
-        MainKt.main()
+        Main_iosKt.main()
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
