@@ -1,6 +1,6 @@
 package top.yukonga.updater.kmp
 
-import App
+import MainView
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
             window.isNavigationBarContrastEnforced = false
         }
         setContent {
-            App()
+            MainView()
         }
     }
 }

@@ -191,7 +191,7 @@ android {
 
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "Main_desktopKt"
 
         buildTypes.release.proguard {
             configurationFiles.from("proguard-rules-jvm.pro")
