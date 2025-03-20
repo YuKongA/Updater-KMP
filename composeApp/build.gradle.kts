@@ -64,8 +64,8 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "updater"
         browser {
+            outputModuleName = "updater"
             commonWebpackConfig {
                 outputFileName = "updater.js"
             }
@@ -74,8 +74,8 @@ kotlin {
     }
 
     js(IR) {
-        moduleName = "updater"
         browser {
+            outputModuleName = "updater"
             commonWebpackConfig {
                 outputFileName = "updater.js"
             }
