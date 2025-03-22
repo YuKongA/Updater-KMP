@@ -112,12 +112,14 @@ fun App() {
         Surface {
             Scaffold(
                 modifier = Modifier
-                    .imePadding()
                     .fillMaxSize()
+                    .imePadding()
                     .clickable(
                         indication = null,
                         interactionSource = null,
-                    ) { focusManager.clearFocus() },
+                    ) {
+                        focusManager.clearFocus()
+                    },
                 topBar = {
                     TopAppBar(
                         color = Color.Transparent,
@@ -154,11 +156,12 @@ fun App() {
                                 showMenuPopup.value = true
                             }
                             IconButton(
-                                modifier = Modifier.padding(end = 21.dp).size(40.dp),
+                                modifier = Modifier.padding(end = 20.dp).size(40.dp),
                                 onClick = {
                                     isMenuPopupExpanded.value = true
                                     focusManager.clearFocus()
-                                }
+                                },
+                                holdDownState = isMenuPopupExpanded.value
                             ) {
                                 Icon(
                                     imageVector = MiuixIcons.Useful.ImmersionMore,

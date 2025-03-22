@@ -51,15 +51,17 @@ fun AboutDialog() {
     val focusManager = LocalFocusManager.current
 
     IconButton(
-        modifier = Modifier.padding(start = 18.dp),
+        modifier = Modifier.padding(start = 20.dp),
         onClick = {
             showDialog.value = true
             focusManager.clearFocus()
-        }) {
+        },
+        holdDownState = showDialog.value
+    ) {
         Icon(
             imageVector = Icons.Rounded.Update,
             tint = MiuixTheme.colorScheme.onBackground,
-            contentDescription = null,
+            contentDescription = "About"
         )
     }
 

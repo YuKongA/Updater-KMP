@@ -101,10 +101,30 @@ fun TextFieldViews(
             onValueChange = codeNameFlow,
             label = stringResource(Res.string.code_name)
         )
+        TextField(
+            insideMargin = DpSize(16.dp, 20.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp)
+                .padding(bottom = 12.dp),
+            value = systemVersion.value,
+            onValueChange = { systemVersion.value = it },
+            label = stringResource(Res.string.system_version),
+            singleLine = true,
+            backgroundColor = MiuixTheme.colorScheme.surface,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            keyboardActions = KeyboardActions(onSearch = {
+                focusManager.clearFocus()
+                if (codeName.value != "" && androidVersion.value != "" && systemVersion.value != "") {
+                    updateRomInfo.value++
+                } else {
+                    showMessage(toastNoInfo)
+                }
+            })
+        )
         Card(
             modifier = Modifier
                 .padding(horizontal = 12.dp)
-                .padding(bottom = 12.dp)
         ) {
             SuperDropdown(
                 title = stringResource(Res.string.android_version),
@@ -135,24 +155,6 @@ fun TextFieldViews(
                 maxHeight = 280.dp
             )
         }
-        TextField(
-            insideMargin = DpSize(16.dp, 20.dp),
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
-            value = systemVersion.value,
-            onValueChange = { systemVersion.value = it },
-            label = stringResource(Res.string.system_version),
-            singleLine = true,
-            backgroundColor = MiuixTheme.colorScheme.surface,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = {
-                focusManager.clearFocus()
-                if (codeName.value != "" && androidVersion.value != "" && systemVersion.value != "") {
-                    updateRomInfo.value++
-                } else {
-                    showMessage(toastNoInfo)
-                }
-            })
-        )
         AnimatedVisibility(
             visible = searchKeywords.value.isNotEmpty()
         ) {

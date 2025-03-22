@@ -93,12 +93,13 @@ fun LoginDialog(
         onClick = {
             showDialog.value = true
             focusManager.clearFocus()
-        }
+        },
+        holdDownState = showDialog.value
     ) {
         Icon(
             imageVector = icon,
-            contentDescription = null,
-            tint = MiuixTheme.colorScheme.onSurface
+            tint = MiuixTheme.colorScheme.onSurface,
+            contentDescription = "Login"
         )
     }
 
