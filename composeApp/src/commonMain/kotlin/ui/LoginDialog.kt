@@ -9,10 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.Login
-import androidx.compose.material.icons.automirrored.rounded.Logout
-import androidx.compose.material.icons.rounded.Visibility
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -43,6 +39,10 @@ import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.extra.SuperCheckbox
 import top.yukonga.miuix.kmp.extra.SuperDialog
+import top.yukonga.miuix.kmp.icon.MiuixIcons
+import top.yukonga.miuix.kmp.icon.icons.useful.Blocklist
+import top.yukonga.miuix.kmp.icon.icons.useful.RemoveBlocklist
+import top.yukonga.miuix.kmp.icon.icons.useful.Rename
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.utils.MiuixPopupUtils.Companion.dismissDialog
 import updater.composeapp.generated.resources.Res
@@ -75,8 +75,8 @@ fun LoginDialog(
     val showDialog = remember { mutableStateOf(false) }
 
     val icon = when (isLogin.value) {
-        1 -> Icons.AutoMirrored.Rounded.Logout
-        else -> Icons.AutoMirrored.Rounded.Login
+        1 -> MiuixIcons.Useful.Blocklist
+        else -> MiuixIcons.Useful.RemoveBlocklist
     }
 
     val messageLoginIn = stringResource(Res.string.logging_in)
@@ -139,7 +139,7 @@ fun LoginDialog(
                             },
                             content = {
                                 Icon(
-                                    imageVector = Icons.Rounded.Visibility,
+                                    imageVector = MiuixIcons.Useful.Rename,
                                     tint = if (passwordVisibility) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.onSecondaryContainer,
                                     contentDescription = null
                                 )

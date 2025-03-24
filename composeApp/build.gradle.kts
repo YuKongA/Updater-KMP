@@ -89,7 +89,6 @@ kotlin {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
-            implementation(compose.materialIconsExtended)
             implementation(compose.ui)
             implementation(compose.components.resources)
             // Added
@@ -171,7 +170,6 @@ android {
             isShrinkResources = true
             vcsInfo.include = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules-android.pro")
-            androidResources.ignoreAssetsPattern = "icon.png"
             if (keystorePath != null) signingConfig = signingConfigs.getByName("release")
         }
         debug {

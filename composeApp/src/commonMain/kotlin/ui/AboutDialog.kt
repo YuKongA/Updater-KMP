@@ -1,26 +1,17 @@
 package ui
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Update
-import androidx.compose.material.icons.rounded.Update
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
@@ -30,8 +21,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import misc.VersionInfo
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.extra.SuperDialog
@@ -40,6 +31,7 @@ import top.yukonga.miuix.kmp.utils.MiuixPopupUtils.Companion.dismissDialog
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.about
 import updater.composeapp.generated.resources.app_name
+import updater.composeapp.generated.resources.icon
 import updater.composeapp.generated.resources.join_channel
 import updater.composeapp.generated.resources.opensource_info
 import updater.composeapp.generated.resources.view_source
@@ -58,10 +50,10 @@ fun AboutDialog() {
         },
         holdDownState = showDialog.value
     ) {
-        Icon(
-            imageVector = Icons.Rounded.Update,
-            tint = MiuixTheme.colorScheme.onBackground,
-            contentDescription = "About"
+        Image(
+            painter = painterResource(Res.drawable.icon),
+            contentDescription = "About",
+            modifier = Modifier.size(24.dp),
         )
     }
 
@@ -77,20 +69,11 @@ fun AboutDialog() {
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MiuixTheme.colorScheme.primary)
-            ) {
-                Image(
-                    imageVector = Icons.Outlined.Update,
-                    colorFilter = ColorFilter.tint(Color.White),
-                    contentDescription = null,
-                    modifier = Modifier.size(25.dp),
-                )
-            }
+            Image(
+                painter = painterResource(Res.drawable.icon),
+                contentDescription = "Icon",
+                modifier = Modifier.size(45.dp),
+            )
             Column {
                 Text(
                     text = stringResource(Res.string.app_name),

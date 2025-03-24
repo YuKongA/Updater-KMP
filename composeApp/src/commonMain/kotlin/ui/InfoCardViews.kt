@@ -12,9 +12,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ContentCopy
-import androidx.compose.material.icons.rounded.Download
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -39,6 +36,9 @@ import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.Text
+import top.yukonga.miuix.kmp.icon.MiuixIcons
+import top.yukonga.miuix.kmp.icon.icons.useful.Copy
+import top.yukonga.miuix.kmp.icon.icons.useful.Save
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import ui.components.TextWithIcon
 import updater.composeapp.generated.resources.Res
@@ -253,7 +253,7 @@ fun DownloadInfoView(
                     }
                 ) {
                     Icon(
-                        imageVector = Icons.Rounded.ContentCopy,
+                        imageVector = MiuixIcons.Useful.Copy,
                         contentDescription = null,
                         tint = MiuixTheme.colorScheme.onSurface
                     )
@@ -266,7 +266,7 @@ fun DownloadInfoView(
                     }
                 ) {
                     Icon(
-                        imageVector = Icons.Rounded.Download,
+                        imageVector = MiuixIcons.Useful.Save,
                         contentDescription = null,
                         tint = MiuixTheme.colorScheme.onSurface
                     )
@@ -306,7 +306,7 @@ fun ChangelogView(
                 }
             ) {
                 Icon(
-                    imageVector = Icons.Rounded.ContentCopy,
+                    imageVector = MiuixIcons.Useful.Copy,
                     contentDescription = null,
                     tint = MiuixTheme.colorScheme.onSurface
                 )

@@ -8,9 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Done
-import androidx.compose.material.icons.rounded.DoneAll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
@@ -22,6 +19,9 @@ import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.Text
+import top.yukonga.miuix.kmp.icon.MiuixIcons
+import top.yukonga.miuix.kmp.icon.icons.useful.Confirm
+import top.yukonga.miuix.kmp.icon.icons.useful.Info
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.logged_in
@@ -45,7 +45,7 @@ fun LoginCardView(
         0 -> stringResource(Res.string.login_desc)
         else -> stringResource(Res.string.login_expired_desc)
     }
-    val icon = if (isLogin.value == 1) Icons.Rounded.DoneAll else Icons.Rounded.Done
+    val icon = if (isLogin.value == 1) MiuixIcons.Useful.Confirm else MiuixIcons.Useful.Info
 
     Card(
         modifier = Modifier
@@ -59,12 +59,12 @@ fun LoginCardView(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Icon(
-                modifier = Modifier.size(28.dp).padding(start = 6.dp),
+                modifier = Modifier.padding(start = 6.dp),
                 imageVector = icon,
                 tint = MiuixTheme.colorScheme.onSurface,
                 contentDescription = null
             )
-            Column(modifier = Modifier.padding(start = 24.dp)) {
+            Column(modifier = Modifier.padding(start = 20.dp)) {
                 Text(
                     text = if (!isWeb()) account else "WebPage",
                     fontWeight = FontWeight.SemiBold
