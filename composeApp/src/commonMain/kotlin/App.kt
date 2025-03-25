@@ -57,7 +57,7 @@ import top.yukonga.miuix.kmp.utils.getWindowSize
 import ui.AboutDialog
 import ui.InfoCardViews
 import ui.LoginCardView
-import ui.TextFieldViews
+import ui.BasicViews
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.app_name
 import updater.composeapp.generated.resources.clear_search_history
@@ -200,9 +200,9 @@ fun App() {
                                 ) {
                                     Column {
                                         LoginCardView(isLogin)
-                                        TextFieldViews(
-                                            deviceName, codeName, deviceRegion, androidVersion,
-                                            systemVersion, updateRomInfo, searchKeywords, searchKeywordsSelected
+                                        BasicViews(
+                                            deviceName, codeName, androidVersion, deviceRegion, systemVersion,
+                                            updateRomInfo, searchKeywords, searchKeywordsSelected
                                         )
                                         Column(
                                             modifier = Modifier.padding(horizontal = 12.dp)
@@ -233,9 +233,9 @@ fun App() {
                                         modifier = Modifier.navigationBarsPadding()
                                     ) {
                                         LoginCardView(isLogin)
-                                        TextFieldViews(
-                                            deviceName, codeName, deviceRegion, androidVersion,
-                                            systemVersion, updateRomInfo, searchKeywords, searchKeywordsSelected
+                                        BasicViews(
+                                            deviceName, codeName, androidVersion, deviceRegion, systemVersion,
+                                            updateRomInfo, searchKeywords, searchKeywordsSelected
                                         )
                                         Spacer(modifier = Modifier.height(16.dp))
                                     }

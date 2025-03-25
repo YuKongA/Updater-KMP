@@ -44,18 +44,22 @@ import updater.composeapp.generated.resources.system_version
 import updater.composeapp.generated.resources.toast_no_info
 
 @Composable
-fun TextFieldViews(
+fun BasicViews(
     deviceName: MutableState<String>,
     codeName: MutableState<String>,
-    deviceRegion: MutableState<String>,
     androidVersion: MutableState<String>,
+    deviceRegion: MutableState<String>,
     systemVersion: MutableState<String>,
     updateRomInfo: MutableState<Int>,
     searchKeywords: MutableState<List<String>>,
     searchKeywordsSelected: MutableState<Int>
 ) {
-    val androidVersionSelected = remember { mutableStateOf(0) }
-    val regionSelected = remember { mutableStateOf(0) }
+    val androidVersionSelected = remember {
+        mutableStateOf(DeviceInfoHelper.androidVersions.indexOf(androidVersion.value).takeIf { it >= 0 } ?: 0)
+    }
+    val regionSelected = remember {
+        mutableStateOf(DeviceInfoHelper.regionNames.indexOf(deviceRegion.value).takeIf { it >= 0 } ?: 0)
+    }
 
     val deviceNameFlow = MutableStateFlow(deviceName.value)
     val codeNameFlow = MutableStateFlow(codeName.value)
