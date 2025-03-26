@@ -1,8 +1,15 @@
 @file:Suppress("UnstableApiUsage")
 
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
+import com.android.build.gradle.internal.tasks.factory.dependsOn
+import org.gradle.kotlin.dsl.support.uppercaseFirstChar
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.internal.utils.registerOrConfigure
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
+import org.jetbrains.kotlin.konan.target.KonanTarget
 import java.util.Properties
 
 plugins {
@@ -34,18 +41,14 @@ kotlin {
     iosArm64()
     iosSimulatorArm64()
 
-    macosX64 {
-        binaries {
-            executable {
-                entryPoint = "main"
-            }
-        }
+    fun macosTargets(config: KotlinNativeTarget.() -> Unit) {
+        macosX64(config)
+        macosArm64(config)
     }
-    macosArm64 {
-        binaries {
-            executable {
-                entryPoint = "main"
-            }
+    macosTargets {
+        binaries.executable {
+            entryPoint = "main"
+            freeCompilerArgs += listOf("-linker-option", "-framework", "-linker-option", "Metal")
         }
     }
 
@@ -59,6 +62,11 @@ kotlin {
         framework {
             baseName = appName + "Framework"
             isStatic = true
+            freeCompilerArgs += listOf(
+                "-linker-option", "-framework", "-linker-option", "Metal",
+                "-linker-option", "-framework", "-linker-option", "CoreText",
+                "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+            )
         }
     }
 
@@ -250,4 +258,29 @@ val generateVersionInfo by tasks.registering {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     dependsOn(generateVersionInfo)
+}
+
+afterEvaluate {
+    project.extensions.getByType<KotlinMultiplatformExtension>().targets.withType<KotlinNativeTarget>().all {
+        binaries.withType<org.jetbrains.kotlin.gradle.plugin.mpp.NativeBinary>().all {
+            if (konanTarget === KonanTarget.MACOS_X64 || konanTarget === KonanTarget.MACOS_ARM64) {
+                if (buildType === NativeBuildType.RELEASE || buildType === NativeBuildType.DEBUG) {
+                    val buildTypeName = buildType.name.lowercase().uppercaseFirstChar()
+                    val targetName = target.targetName.uppercaseFirstChar()
+                    val copyComposeResourcesTask = tasks.registerOrConfigure<Copy>(
+                        "copy${buildTypeName}ComposeResourcesFor${targetName}"
+                    ) {
+                        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+                        from({
+                            (compilation.associatedCompilations + compilation).flatMap { compilation ->
+                                compilation.allKotlinSourceSets.map { it.resources }
+                            }
+                        })
+                        into(outputDirectory.resolve("compose-resources"))
+                    }
+                    linkTaskProvider.dependsOn(copyComposeResourcesTask)
+                }
+            }
+        }
+    }
 }
