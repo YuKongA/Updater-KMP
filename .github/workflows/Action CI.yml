@@ -21,8 +21,8 @@ jobs:
             artifact-name: Updater-windows-x64-exe
           - os: macos-latest
             platform: macos arm64
-            build-command: ./gradlew packageReleaseDistributionForCurrentOS
-            artifact-path: composeApp/build/compose/binaries/main-release/dmg
+            build-command: ./gradlew packageDmgNativeReleaseMacosArm64
+            artifact-path: composeApp/build/compose/binaries/main/native-macosArm64-release-dmg
             artifact-name: Updater-darwin-arm64-dmg
           - os: ubuntu-latest
             platform: linux x64

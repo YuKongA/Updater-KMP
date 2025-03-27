@@ -3,12 +3,14 @@
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import com.android.build.gradle.internal.tasks.factory.dependsOn
 import org.gradle.kotlin.dsl.support.uppercaseFirstChar
+import org.jetbrains.compose.desktop.application.dsl.AbstractMacOSPlatformSettings
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.compose.internal.utils.registerOrConfigure
+import org.jetbrains.compose.desktop.application.tasks.AbstractNativeMacApplicationPackageAppDirTask
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import java.util.Properties
 
@@ -41,11 +43,7 @@ kotlin {
     iosArm64()
     iosSimulatorArm64()
 
-    fun macosTargets(config: KotlinNativeTarget.() -> Unit) {
-        macosX64(config)
-        macosArm64(config)
-    }
-    macosTargets {
+    macosArm64 {
         binaries.executable {
             entryPoint = "main"
             freeCompilerArgs += listOf("-linker-option", "-framework", "-linker-option", "Metal")
@@ -212,7 +210,6 @@ compose.desktop {
             packageVersion = verName
             description = "Get HyperOS/MIUI recovery ROM info"
             copyright = "Copyright © 2024-2025 YuKongA"
-
             linux {
                 iconFile = file("src/desktopMain/resources/linux/Icon.png")
             }
@@ -224,6 +221,21 @@ compose.desktop {
                 dirChooser = true
                 perUserInstall = true
                 iconFile = file("src/desktopMain/resources/windows/Icon.ico")
+            }
+        }
+    }
+    nativeApplication {
+        targets(kotlin.targets.getByName("macosArm64"))
+        distributions {
+            targetFormats(TargetFormat.Dmg)
+            packageName = appName
+            packageVersion = verName
+            description = "Get HyperOS/MIUI recovery ROM info"
+            copyright = "Copyright © 2024-2025 YuKongA"
+            macOS {
+                bundleID = pkgName
+                iconFile = file("src/macosMain/resources/Updater.icns")
+                composeResources(file(project.rootDir.resolve("composeApp/build/bin/macosArm64/releaseExecutable/compose-resources")))
             }
         }
     }
@@ -256,31 +268,63 @@ val generateVersionInfo by tasks.registering {
     }
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+tasks.withType<KotlinCompile>().configureEach {
     dependsOn(generateVersionInfo)
 }
 
 afterEvaluate {
-    project.extensions.getByType<KotlinMultiplatformExtension>().targets.withType<KotlinNativeTarget>().all {
-        binaries.withType<org.jetbrains.kotlin.gradle.plugin.mpp.NativeBinary>().all {
-            if (konanTarget === KonanTarget.MACOS_X64 || konanTarget === KonanTarget.MACOS_ARM64) {
-                if (buildType === NativeBuildType.RELEASE || buildType === NativeBuildType.DEBUG) {
-                    val buildTypeName = buildType.name.lowercase().uppercaseFirstChar()
-                    val targetName = target.targetName.uppercaseFirstChar()
-                    val copyComposeResourcesTask = tasks.registerOrConfigure<Copy>(
-                        "copy${buildTypeName}ComposeResourcesFor${targetName}"
-                    ) {
-                        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-                        from({
-                            (compilation.associatedCompilations + compilation).flatMap { compilation ->
-                                compilation.allKotlinSourceSets.map { it.resources }
-                            }
-                        })
-                        into(outputDirectory.resolve("compose-resources"))
-                    }
-                    linkTaskProvider.dependsOn(copyComposeResourcesTask)
+    project.extensions.getByType<KotlinMultiplatformExtension>().targets
+        .withType<KotlinNativeTarget>()
+        .filter { it.konanTarget == KonanTarget.MACOS_ARM64 }
+        .forEach { target ->
+            val targetName = target.targetName.uppercaseFirstChar()
+            val buildTypes = mapOf(
+                NativeBuildType.RELEASE to target.binaries.getExecutable(NativeBuildType.RELEASE),
+                NativeBuildType.DEBUG to target.binaries.getExecutable(NativeBuildType.DEBUG)
+            )
+
+            buildTypes.forEach { (buildType, executable) ->
+                val buildTypeName = buildType.name.lowercase().uppercaseFirstChar()
+                val taskName = "copy${buildTypeName}ComposeResourcesFor${targetName}"
+
+                val copyTask = tasks.register<Copy>(taskName) {
+                    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+                    from({
+                        (executable.compilation.associatedCompilations + executable.compilation).flatMap { compilation ->
+                            compilation.allKotlinSourceSets.map { it.resources }
+                        }
+                    })
+                    into(executable.outputDirectory.resolve("compose-resources"))
                 }
+
+                target.binaries.withType<org.jetbrains.kotlin.gradle.plugin.mpp.NativeBinary>()
+                    .filter { it.buildType == buildType }
+                    .forEach {
+                        it.linkTaskProvider.dependsOn(copyTask)
+                    }
+            }
+        }
+}
+
+tasks.withType<AbstractNativeMacApplicationPackageAppDirTask>().configureEach {
+    dependsOn(generateVersionInfo)
+    doLast {
+        val packageName = packageName.get()
+        val destinationDir = outputs.files.singleFile
+        val appDir = destinationDir.resolve("$packageName.app")
+        val resourcesDir = appDir.resolve("Contents/Resources")
+        val composeResourcesDir = project.extensions.extraProperties["compose-resources"] as File?
+        if (composeResourcesDir != null && composeResourcesDir.exists()) {
+            project.copy {
+                from(composeResourcesDir)
+                into(resourcesDir.resolve("compose-resources"))
+                exclude("*.icns")
+                duplicatesStrategy = DuplicatesStrategy.EXCLUDE
             }
         }
     }
+}
+
+fun AbstractMacOSPlatformSettings.composeResources(resourcesDir: File) {
+    project.extensions.extraProperties["compose-resources"] = resourcesDir
 }
