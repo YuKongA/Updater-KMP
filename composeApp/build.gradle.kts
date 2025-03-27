@@ -314,7 +314,6 @@ afterEvaluate {
 }
 
 tasks.withType<AbstractNativeMacApplicationPackageAppDirTask>().configureEach {
-    dependsOn(generateVersionInfo)
     doLast {
         val packageName = packageName.get()
         val destinationDir = outputs.files.singleFile
