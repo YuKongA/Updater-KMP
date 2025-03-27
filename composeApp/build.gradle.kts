@@ -10,7 +10,6 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import java.util.Properties
 
@@ -27,6 +26,7 @@ val appName = "Updater"
 val pkgName = "top.yukonga.updater.kmp"
 val verName = "1.5.1"
 val verCode = getVersionCode()
+val generatedSrcDir = layout.buildDirectory.dir("generated").get().asFile.resolve("updater")
 
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -91,6 +91,9 @@ kotlin {
 
     sourceSets {
         val desktopMain by getting
+        val commonMain by getting {
+            kotlin.srcDir(generatedSrcDir.resolve("kotlin").absolutePath)
+        }
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -254,11 +257,15 @@ fun getVersionCode(): Int {
 
 val generateVersionInfo by tasks.registering {
     doLast {
-        val file = file("src/commonMain/kotlin/misc/VersionInfo.kt")
+        val file = generatedSrcDir.resolve("kotlin/misc/VersionInfo.kt")
+        if (!file.exists()) {
+            file.parentFile.mkdirs()
+            file.createNewFile()
+        }
         file.writeText(
             """
             package misc
-            
+
             object VersionInfo {
                 const val VERSION_NAME = "$verName"
                 const val VERSION_CODE = $verCode
@@ -268,7 +275,7 @@ val generateVersionInfo by tasks.registering {
     }
 }
 
-tasks.withType<KotlinCompile>().configureEach {
+tasks.named("generateComposeResClass").configure {
     dependsOn(generateVersionInfo)
 }
 
