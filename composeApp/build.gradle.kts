@@ -3,7 +3,6 @@
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import com.android.build.gradle.internal.tasks.factory.dependsOn
 import org.gradle.kotlin.dsl.support.uppercaseFirstChar
-import org.jetbrains.compose.desktop.application.dsl.AbstractMacOSPlatformSettings
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.tasks.AbstractNativeMacApplicationPackageAppDirTask
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
@@ -43,7 +42,11 @@ kotlin {
     iosArm64()
     iosSimulatorArm64()
 
-    macosArm64 {
+    fun macosTargets(config: KotlinNativeTarget.() -> Unit) {
+        macosX64(config)
+        macosArm64(config)
+    }
+    macosTargets {
         binaries.executable {
             entryPoint = "main"
             freeCompilerArgs += listOf("-linker-option", "-framework", "-linker-option", "Metal")
@@ -228,7 +231,7 @@ compose.desktop {
         }
     }
     nativeApplication {
-        targets(kotlin.targets.getByName("macosArm64"))
+        targets(kotlin.targets.getByName("macosArm64"), kotlin.targets.getByName("macosX64"))
         distributions {
             targetFormats(TargetFormat.Dmg)
             packageName = appName
@@ -238,7 +241,6 @@ compose.desktop {
             macOS {
                 bundleID = pkgName
                 iconFile = file("src/macosMain/resources/Updater.icns")
-                composeResources(file(project.rootDir.resolve("composeApp/build/bin/macosArm64/releaseExecutable/compose-resources")))
             }
         }
     }
@@ -282,31 +284,28 @@ tasks.named("generateComposeResClass").configure {
 afterEvaluate {
     project.extensions.getByType<KotlinMultiplatformExtension>().targets
         .withType<KotlinNativeTarget>()
-        .filter { it.konanTarget == KonanTarget.MACOS_ARM64 }
+        .filter { it.konanTarget == KonanTarget.MACOS_ARM64 || it.konanTarget == KonanTarget.MACOS_X64 }
         .forEach { target ->
             val targetName = target.targetName.uppercaseFirstChar()
             val buildTypes = mapOf(
                 NativeBuildType.RELEASE to target.binaries.getExecutable(NativeBuildType.RELEASE),
                 NativeBuildType.DEBUG to target.binaries.getExecutable(NativeBuildType.DEBUG)
             )
-
             buildTypes.forEach { (buildType, executable) ->
                 val buildTypeName = buildType.name.lowercase().uppercaseFirstChar()
-                val taskName = "copy${buildTypeName}ComposeResourcesFor${targetName}"
-
-                val copyTask = tasks.register<Copy>(taskName) {
-                    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-                    from({
-                        (executable.compilation.associatedCompilations + executable.compilation).flatMap { compilation ->
-                            compilation.allKotlinSourceSets.map { it.resources }
-                        }
-                    })
-                    into(executable.outputDirectory.resolve("compose-resources"))
-                }
-
-                target.binaries.withType<org.jetbrains.kotlin.gradle.plugin.mpp.NativeBinary>()
+                target.binaries.withType<org.jetbrains.kotlin.gradle.plugin.mpp.Executable>()
                     .filter { it.buildType == buildType }
                     .forEach {
+                        val taskName = "copy${buildTypeName}ComposeResourcesFor${targetName}"
+                        val copyTask = tasks.register<Copy>(taskName) {
+                            from({
+                                (executable.compilation.associatedCompilations + executable.compilation).flatMap { compilation ->
+                                    compilation.allKotlinSourceSets.map { it.resources }
+                                }
+                            })
+                            into(executable.outputDirectory.resolve("compose-resources"))
+                            exclude("*.icns")
+                        }
                         it.linkTaskProvider.dependsOn(copyTask)
                     }
             }
@@ -319,18 +318,15 @@ tasks.withType<AbstractNativeMacApplicationPackageAppDirTask>().configureEach {
         val destinationDir = outputs.files.singleFile
         val appDir = destinationDir.resolve("$packageName.app")
         val resourcesDir = appDir.resolve("Contents/Resources")
-        val composeResourcesDir = project.extensions.extraProperties["compose-resources"] as File?
-        if (composeResourcesDir != null && composeResourcesDir.exists()) {
+        val currentMacosTarget = kotlin.targets.withType<KotlinNativeTarget>()
+            .find { it.konanTarget == KonanTarget.MACOS_ARM64 || it.konanTarget == KonanTarget.MACOS_X64 }?.targetName
+        val composeResourcesDir = project.rootDir
+            .resolve("composeApp/build/bin/$currentMacosTarget/releaseExecutable/compose-resources")
+        if (composeResourcesDir.exists()) {
             project.copy {
                 from(composeResourcesDir)
                 into(resourcesDir.resolve("compose-resources"))
-                exclude("*.icns")
-                duplicatesStrategy = DuplicatesStrategy.EXCLUDE
             }
         }
     }
-}
-
-fun AbstractMacOSPlatformSettings.composeResources(resourcesDir: File) {
-    project.extensions.extraProperties["compose-resources"] = resourcesDir
 }

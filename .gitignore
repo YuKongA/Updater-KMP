@@ -422,6 +422,3 @@ obj/
 !/gradle/wrapper/gradle-wrapper.jar
 
 # End of https://www.toptal.com/developers/gitignore/api/java,linux,macos,kotlin,android,windows,composer,jetbrains,androidstudio,visualstudiocode,xcode
-
-# Ignore version info changes
-composeApp/src/commonMain/kotlin/misc/VersionInfo.kt
