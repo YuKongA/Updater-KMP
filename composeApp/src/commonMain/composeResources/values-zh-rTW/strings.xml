@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="about">關於</string>
-    <string name="login">登錄</string>
+    <string name="login">登入</string>
     <string name="view_source">查看原始碼:</string>
     <string name="join_channel">加入頻道:</string>
     <string name="code_name">裝置代號</string>
@@ -29,25 +29,25 @@
     <string name="password">密碼</string>
     <string name="save_password">儲存密碼</string>
     <string name="cancel">取消</string>
-    <string name="logging_in">登錄中…</string>
-    <string name="login_expired">登錄已過期</string>
-    <string name="login_expired_desc">建議重新登錄</string>
-    <string name="login_successful">登錄成功</string>
+    <string name="logging_in">登入中…</string>
+    <string name="login_expired">登入已過期</string>
+    <string name="login_expired_desc">建議重新登入</string>
+    <string name="login_successful">登入成功</string>
     <string name="account_or_password_empty">帳號或密碼為空！</string>
-    <string name="no_account">未登錄</string>
+    <string name="no_account">未登入</string>
     <string name="login_desc">正在使用 v1 埠</string>
     <string name="using_v2">正在使用 v2 埠</string>
-    <string name="logged_in">已登錄</string>
+    <string name="logged_in">已登入</string>
     <string name="copy_successful">複製成功</string>
     <string name="download_start">開始下載</string>
     <string name="security_error">取得金鑰失敗</string>
     <string name="logout">退出</string>
-    <string name="logout_confirm">確定要退出登錄嗎？</string>
+    <string name="logout_confirm">確定要退出登入嗎？</string>
     <string name="confirm">確定</string>
     <string name="logout_successful">退出成功</string>
     <string name="regions_code">區域代號</string>
     <string name="global">全球帳號</string>
-    <string name="login_error">登錄驗證失敗!</string>
+    <string name="login_error">登入驗證失敗!</string>
     <string name="extension_settings">擴展設定</string>
     <string name="dark_theme">顯示模式</string>
     <string name="system_default">跟隨系統</string>
