@@ -23,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
@@ -45,7 +46,6 @@ import top.yukonga.miuix.kmp.basic.ListPopupDefaults
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
 import top.yukonga.miuix.kmp.basic.PopupPositionProvider
 import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.Surface
 import top.yukonga.miuix.kmp.basic.TopAppBar
 import top.yukonga.miuix.kmp.basic.rememberTopAppBarState
 import top.yukonga.miuix.kmp.extra.DropdownImpl
@@ -55,9 +55,9 @@ import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.utils.MiuixPopupUtils.Companion.dismissPopup
 import top.yukonga.miuix.kmp.utils.getWindowSize
 import ui.AboutDialog
+import ui.BasicViews
 import ui.InfoCardViews
 import ui.LoginCardView
-import ui.BasicViews
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.app_name
 import updater.composeapp.generated.resources.clear_search_history
@@ -109,161 +109,159 @@ fun App() {
         val isMenuPopupExpanded = remember { mutableStateOf(false) }
         val showMenuPopup = remember { mutableStateOf(false) }
 
-        Surface {
-            Scaffold(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .imePadding()
-                    .clickable(
-                        indication = null,
-                        interactionSource = null,
-                    ) {
-                        focusManager.clearFocus()
-                    },
-                topBar = {
-                    TopAppBar(
-                        color = Color.Transparent,
-                        title = stringResource(Res.string.app_name),
-                        scrollBehavior = scrollBehavior,
-                        navigationIcon = {
-                            AboutDialog()
-                        },
-                        actions = {
-                            if (isMenuPopupExpanded.value) {
-                                ListPopup(
-                                    show = showMenuPopup,
-                                    popupPositionProvider = ListPopupDefaults.ContextMenuPositionProvider,
-                                    alignment = PopupPositionProvider.Align.TopRight,
-                                    onDismissRequest = {
-                                        isMenuPopupExpanded.value = false
-                                    }
-                                ) {
-                                    ListPopupColumn {
-                                        DropdownImpl(
-                                            text = stringResource(Res.string.clear_search_history),
-                                            optionSize = 1,
-                                            isSelected = false,
-                                            onSelectedIndexChange = {
-                                                dismissPopup(showMenuPopup)
-                                                searchKeywords.value = listOf()
-                                                perfRemove("searchKeywords")
-                                                isMenuPopupExpanded.value = false
-                                            },
-                                            index = 0
-                                        )
-                                    }
-                                }
-                                showMenuPopup.value = true
-                            }
-                            IconButton(
-                                modifier = Modifier.padding(end = 20.dp).size(40.dp),
-                                onClick = {
-                                    isMenuPopupExpanded.value = true
-                                    focusManager.clearFocus()
-                                },
-                                holdDownState = isMenuPopupExpanded.value
-                            ) {
-                                Icon(
-                                    imageVector = MiuixIcons.Useful.ImmersionMore,
-                                    tint = MiuixTheme.colorScheme.onBackground,
-                                    contentDescription = "Menu"
-                                )
-                            }
-                        },
-                        modifier = Modifier
-                            .hazeEffect(
-                                hazeState
-                            ) {
-                                style = hazeStyle
-                                blurRadius = 25.dp
-                                noiseFactor = 0f
-                            }
-                    )
-                }
-            ) {
-                BoxWithConstraints(
-                    modifier = Modifier
-                        .hazeSource(state = hazeState)
+        Scaffold(
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding()
+                .clickable(
+                    indication = null,
+                    interactionSource = null,
                 ) {
-                    if (maxWidth < 840.dp) {
-                        LazyColumn(
-                            modifier = Modifier
-                                .height(getWindowSize().height.dp)
-                                .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
-                                .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
-                            contentPadding = it,
-                            topAppBarScrollBehavior = scrollBehavior
+                    focusManager.clearFocus()
+                },
+            topBar = {
+                TopAppBar(
+                    color = Color.Transparent,
+                    title = stringResource(Res.string.app_name),
+                    scrollBehavior = scrollBehavior,
+                    navigationIcon = {
+                        AboutDialog()
+                    },
+                    actions = {
+                        if (isMenuPopupExpanded.value) {
+                            ListPopup(
+                                show = showMenuPopup,
+                                popupPositionProvider = ListPopupDefaults.ContextMenuPositionProvider,
+                                alignment = PopupPositionProvider.Align.TopRight,
+                                onDismissRequest = {
+                                    isMenuPopupExpanded.value = false
+                                }
+                            ) {
+                                ListPopupColumn {
+                                    DropdownImpl(
+                                        text = stringResource(Res.string.clear_search_history),
+                                        optionSize = 1,
+                                        isSelected = false,
+                                        onSelectedIndexChange = {
+                                            dismissPopup(showMenuPopup)
+                                            searchKeywords.value = listOf()
+                                            perfRemove("searchKeywords")
+                                            isMenuPopupExpanded.value = false
+                                        },
+                                        index = 0
+                                    )
+                                }
+                            }
+                            showMenuPopup.value = true
+                        }
+                        IconButton(
+                            modifier = Modifier.padding(end = 20.dp).size(40.dp),
+                            onClick = {
+                                isMenuPopupExpanded.value = true
+                                focusManager.clearFocus()
+                            },
+                            holdDownState = isMenuPopupExpanded.value
                         ) {
-                            item {
-                                Box(
-                                    modifier = Modifier.navigationBarsPadding()
-                                ) {
-                                    Column {
-                                        LoginCardView(isLogin)
-                                        BasicViews(
-                                            deviceName, codeName, androidVersion, deviceRegion, systemVersion,
-                                            updateRomInfo, searchKeywords, searchKeywordsSelected
-                                        )
-                                        Column(
-                                            modifier = Modifier.padding(horizontal = 12.dp)
-                                        ) {
-                                            InfoCardViews(curRomInfo, curIconInfo)
-                                            InfoCardViews(incRomInfo, incIconInfo)
-                                        }
-                                        Spacer(modifier = Modifier.height(16.dp))
+                            Icon(
+                                imageVector = MiuixIcons.Useful.ImmersionMore,
+                                tint = MiuixTheme.colorScheme.onBackground,
+                                contentDescription = "Menu"
+                            )
+                        }
+                    },
+                    modifier = Modifier
+                        .hazeEffect(
+                            hazeState
+                        ) {
+                            style = hazeStyle
+                            blurRadius = 25.dp
+                            noiseFactor = 0f
+                        }
+                )
+            }
+        ) {
+            BoxWithConstraints(
+                modifier = Modifier
+                    .hazeSource(state = hazeState)
+            ) {
+                if (maxWidth < 840.dp) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .height(getWindowSize().height.dp)
+                            .nestedScroll(scrollBehavior.nestedScrollConnection)
+                            .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
+                            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
+                        contentPadding = it
+                    ) {
+                        item {
+                            Box(
+                                modifier = Modifier.navigationBarsPadding()
+                            ) {
+                                Column {
+                                    LoginCardView(isLogin)
+                                    BasicViews(
+                                        deviceName, codeName, androidVersion, deviceRegion, systemVersion,
+                                        updateRomInfo, searchKeywords, searchKeywordsSelected
+                                    )
+                                    Column(
+                                        modifier = Modifier.padding(horizontal = 12.dp)
+                                    ) {
+                                        InfoCardViews(curRomInfo, curIconInfo)
+                                        InfoCardViews(incRomInfo, incIconInfo)
                                     }
+                                    Spacer(modifier = Modifier.height(16.dp))
                                 }
                             }
                         }
-                    } else {
-                        Row(
+                    }
+                } else {
+                    Row(
+                        modifier = Modifier
+                            .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
+                            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal))
+                    ) {
+                        LazyColumn(
                             modifier = Modifier
-                                .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
-                                .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal))
+                                .height(getWindowSize().height.dp)
+                                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                                .weight(0.88f),
+                            contentPadding = it,
                         ) {
-                            LazyColumn(
-                                modifier = Modifier
-                                    .height(getWindowSize().height.dp)
-                                    .weight(0.88f),
-                                contentPadding = it,
-                                topAppBarScrollBehavior = scrollBehavior
-                            ) {
-                                item {
-                                    Column(
-                                        modifier = Modifier.navigationBarsPadding()
-                                    ) {
-                                        LoginCardView(isLogin)
-                                        BasicViews(
-                                            deviceName, codeName, androidVersion, deviceRegion, systemVersion,
-                                            updateRomInfo, searchKeywords, searchKeywordsSelected
-                                        )
-                                        Spacer(modifier = Modifier.height(16.dp))
-                                    }
+                            item {
+                                Column(
+                                    modifier = Modifier.navigationBarsPadding()
+                                ) {
+                                    LoginCardView(isLogin)
+                                    BasicViews(
+                                        deviceName, codeName, androidVersion, deviceRegion, systemVersion,
+                                        updateRomInfo, searchKeywords, searchKeywordsSelected
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
                                 }
                             }
-                            LazyColumn(
-                                modifier = Modifier
-                                    .padding(end = 12.dp)
-                                    .weight(1f),
-                                contentPadding = it,
-                                topAppBarScrollBehavior = scrollBehavior
-                            ) {
-                                item {
-                                    Column(
-                                        modifier = Modifier.navigationBarsPadding()
-                                    ) {
-                                        Spacer(modifier = Modifier.height(6.dp))
-                                        InfoCardViews(curRomInfo, curIconInfo)
-                                        InfoCardViews(incRomInfo, incIconInfo)
-                                        Spacer(modifier = Modifier.height(16.dp))
-                                    }
+                        }
+                        LazyColumn(
+                            modifier = Modifier
+                                .padding(end = 12.dp)
+                                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                                .weight(1f),
+                            contentPadding = it,
+                        ) {
+                            item {
+                                Column(
+                                    modifier = Modifier.navigationBarsPadding()
+                                ) {
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    InfoCardViews(curRomInfo, curIconInfo)
+                                    InfoCardViews(incRomInfo, incIconInfo)
+                                    Spacer(modifier = Modifier.height(16.dp))
                                 }
                             }
                         }
                     }
                 }
-                Snackbar()
             }
+            Snackbar()
         }
     }
 }
