@@ -196,6 +196,7 @@ object DeviceInfoHelper {
 
     private const val XIAOMI = "XM"
 
+    private val androidW = Android("16.0", "W")
     private val androidV = Android("15.0", "V")
     private val androidU = Android("14.0", "U")
     private val androidT = Android("13.0", "T")
@@ -213,6 +214,7 @@ object DeviceInfoHelper {
     private val androidK = Android("4.4", "K")
 
     private val androidList = listOf(
+        androidW,
         androidV,
         androidU,
         androidT,
