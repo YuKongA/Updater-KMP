@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -39,7 +40,6 @@ import misc.updateRomInfo
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.LazyColumn
 import top.yukonga.miuix.kmp.basic.ListPopup
 import top.yukonga.miuix.kmp.basic.ListPopupColumn
 import top.yukonga.miuix.kmp.basic.ListPopupDefaults
@@ -54,6 +54,7 @@ import top.yukonga.miuix.kmp.icon.icons.useful.ImmersionMore
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.utils.MiuixPopupUtils.Companion.dismissPopup
 import top.yukonga.miuix.kmp.utils.getWindowSize
+import top.yukonga.miuix.kmp.utils.overScrollVertical
 import ui.AboutDialog
 import ui.BasicViews
 import ui.InfoCardViews
@@ -188,6 +189,7 @@ fun App() {
                     LazyColumn(
                         modifier = Modifier
                             .height(getWindowSize().height.dp)
+                            .overScrollVertical()
                             .nestedScroll(scrollBehavior.nestedScrollConnection)
                             .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
                             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
@@ -223,6 +225,7 @@ fun App() {
                         LazyColumn(
                             modifier = Modifier
                                 .height(getWindowSize().height.dp)
+                                .overScrollVertical()
                                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                                 .weight(0.88f),
                             contentPadding = it,
@@ -243,6 +246,7 @@ fun App() {
                         LazyColumn(
                             modifier = Modifier
                                 .padding(end = 12.dp)
+                                .overScrollVertical()
                                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                                 .weight(1f),
                             contentPadding = it,
