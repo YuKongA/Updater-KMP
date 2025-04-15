@@ -18,6 +18,7 @@
     <string name="download">Download Url</string>
     <string name="changelog">Changelog</string>
     <string name="branch">Branch</string>
+    <string name="tags">Tags</string>
     <string name="security_patch_level">Security Patch Level</string>
     <string name="build_time">Build Time</string>
     <string name="toast_ing">Searching…</string>

@@ -14,6 +14,7 @@ object RomInfoHelper {
         @SerialName("CrossRom") val crossRom: Rom? = null,
         @SerialName("Icon") val icon: Map<String, String>? = null,
         @SerialName("FileMirror") val fileMirror: FileMirror? = null,
+        @SerialName("GentleNotice") val gentleNotice: GentleNotice? = null,
     )
 
     @Serializable
@@ -30,6 +31,8 @@ object RomInfoHelper {
         val osbigversion: String? = null,
         val type: String? = null,
         val version: String? = null,
+        val isBeta: Int = 0,
+        val isGov: Int = 0,
     )
 
     @Serializable
@@ -43,5 +46,10 @@ object RomInfoHelper {
         val image: String,
         val video: String,
         val headimage: String
+    )
+
+    @Serializable
+    data class GentleNotice(
+        val text: String
     )
 }

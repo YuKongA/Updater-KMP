@@ -111,7 +111,8 @@ fun updateRomInfo(
                         noUltimateLink = false
                         val curRomDownload =
                             if (recoveryRomInfo.currentRom.md5 != recoveryRomInfo.latestRom?.md5) {
-                                val romInfoCurrent = getRecoveryRomInfo("", codeNameExt, regionCode, systemVersionExt, androidVersion.value, isLogin)
+                                val romInfoCurrent =
+                                    getRecoveryRomInfo("", codeNameExt, regionCode, systemVersionExt, androidVersion.value, isLogin)
                                 val recoveryRomInfoCurrent =
                                     if (romInfoCurrent.isNotEmpty()) json.decodeFromString<RomInfoHelper.RomInfo>(romInfoCurrent) else json.decodeFromString<RomInfoHelper.RomInfo>(
                                         romInfoCurrent
@@ -127,7 +128,15 @@ fun updateRomInfo(
                                 downloadUrl(recoveryRomInfo.currentRom.version!!, recoveryRomInfo.latestRom?.filename!!)
                             }
 
-                        handleRomInfo(recoveryRomInfo, recoveryRomInfo.currentRom, curRomInfo, curIconInfo, coroutineScope, curRomDownload, noUltimateLink)
+                        handleRomInfo(
+                            recoveryRomInfo,
+                            recoveryRomInfo.currentRom,
+                            curRomInfo,
+                            curIconInfo,
+                            coroutineScope,
+                            curRomDownload,
+                            noUltimateLink
+                        )
 
                         perfSet("deviceName", deviceName.value)
                         perfSet("codeName", codeName.value)
@@ -211,13 +220,24 @@ fun handleRomInfo(
         romInfo.changelog?.forEach { log.append(it.key).append("\n").append(it.value.txt.joinToString("\n")).append("\n\n") }
         val changelogGroups = log.toString().trimEnd().split("\n\n")
         val changelog = changelogGroups.map { it.split("\n").drop(1).joinToString("\n") }
-        val iconNames = changelogGroups.map { it.split("\n").first() }
 
+        val gentleNotice = recoveryRomInfo.gentleNotice?.text
+        val formattedGentleNotice = gentleNotice
+            ?.replace("<li>", "\n· ")
+            ?.replace("</li>", "")
+            ?.replace("<p>", "\n")
+            ?.replace("</p>", "")
+            ?.replace("&nbsp;", " ")
+            ?.replace("&#160;", "")
+            ?.replace(Regex("<[^>]*>"), "")
+            ?.trim()
+        val gentle = StringBuilder()
+        formattedGentleNotice?.forEach { gentle.append(it) }
+
+        val iconNames = changelogGroups.map { it.split("\n").first() }
         val iconMainLink = if (isWeb()) "https://updater.yukonga.top/icon/10/" else recoveryRomInfo.fileMirror!!.icon
         val iconNameLink = recoveryRomInfo.icon ?: mapOf()
-
         val iconLinks = iconLink(iconNames, iconMainLink, iconNameLink)
-
         iconInfoData.value = iconNames.mapIndexed { index, iconName ->
             DataHelper.IconInfoData(
                 iconName = iconName,
@@ -237,7 +257,8 @@ fun handleRomInfo(
         val official2Download = if (noUltimateLink) "" else {
             "https://superota.d.miui.com" + (officialDownload ?: downloadUrl(romInfo.version, romInfo.filename))
         }
-        val cdn1Download = "https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com" + downloadUrl(romInfo.version, romInfo.filename)
+        val cdn1Download =
+            "https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com" + downloadUrl(romInfo.version, romInfo.filename)
         val cdn2Download = "https://cdnorg.d.miui.com" + downloadUrl(romInfo.version, romInfo.filename)
 
         romInfoData.value = DataHelper.RomInfoData(
@@ -249,11 +270,14 @@ fun handleRomInfo(
             bigVersion = bigVersion,
             fileName = romInfo.filename.toString().substringBefore(".zip") + ".zip",
             fileSize = romInfo.filesize.toString(),
+            isBeta = romInfo.isBeta == 1,
+            isGov = romInfo.isGov == 1,
             official1Download = official1Download,
             official2Download = official2Download,
             cdn1Download = cdn1Download,
             cdn2Download = cdn2Download,
-            changelog = log.toString().trimEnd()
+            changelog = log.toString().trimEnd(),
+            gentleNotice = gentle.toString().trimEnd(),
         )
 
         if (!isWeb()) {
@@ -375,5 +399,7 @@ fun convertTimestampToDateTime(timestamp: String): String {
     val instant = Instant.fromEpochSeconds(epochSeconds)
     val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
     return "${dateTime.year}-${dateTime.monthNumber.toString().padStart(2, '0')}-${dateTime.dayOfMonth.toString().padStart(2, '0')} " +
-            "${dateTime.hour.toString().padStart(2, '0')}:${dateTime.minute.toString().padStart(2, '0')}:${dateTime.second.toString().padStart(2, '0')}"
+            "${dateTime.hour.toString().padStart(2, '0')}:${dateTime.minute.toString().padStart(2, '0')}:${
+                dateTime.second.toString().padStart(2, '0')
+            }"
 }

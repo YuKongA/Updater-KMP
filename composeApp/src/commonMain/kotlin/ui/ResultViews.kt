@@ -55,6 +55,7 @@ import updater.composeapp.generated.resources.filename
 import updater.composeapp.generated.resources.filesize
 import updater.composeapp.generated.resources.security_patch_level
 import updater.composeapp.generated.resources.system_version
+import updater.composeapp.generated.resources.tags
 
 @Composable
 fun InfoCardViews(
@@ -77,7 +78,7 @@ fun InfoCardViews(
                 text = romInfoState.value.type.uppercase(),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(bottom = 24.dp)
+                modifier = Modifier.padding(bottom = 12.dp)
             )
 
             BaseMessageView(
@@ -87,6 +88,21 @@ fun InfoCardViews(
                 romInfoState.value.codebase,
                 romInfoState.value.branch
             )
+
+            if (romInfoState.value.isBeta) {
+                MessageTextView(
+                    stringResource(Res.string.tags),
+                    "Beta"
+                )
+            }
+
+            if (romInfoState.value.isGov) {
+                MessageTextView(
+                    stringResource(Res.string.tags),
+                    "Government"
+                )
+            }
+
             AnimatedVisibility(
                 visible = romInfoState.value.securityPatchLevel.isNotEmpty()
                         && romInfoState.value.timestamp.isNotEmpty()
@@ -148,10 +164,26 @@ fun InfoCardViews(
                     romInfoState.value.fileName
                 )
             }
+
             if (romInfoState.value.changelog.isNotEmpty()) {
                 ChangelogView(
                     iconInfo,
                     romInfoState.value.changelog
+                )
+            }
+
+            if (romInfoState.value.gentleNotice.isNotEmpty()) {
+                Text(
+                    modifier = Modifier.padding(top = 16.dp),
+                    text = romInfoState.value.gentleNotice.split("\n").first(),
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    text = romInfoState.value.gentleNotice.split("\n").drop(1).joinToString("\n"),
+                    color = MiuixTheme.colorScheme.onSecondaryVariant,
+                    fontSize = 14.5.sp,
+                    modifier = Modifier.padding(top = 12.dp)
                 )
             }
         }
