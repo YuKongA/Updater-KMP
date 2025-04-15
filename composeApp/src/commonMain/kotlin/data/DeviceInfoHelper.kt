@@ -3,19 +3,19 @@ package data
 object DeviceInfoHelper {
 
     data class Android(
-        val androidNumericCode: String,
+        val androidVersionCode: String,
         val androidLetterCode: String
     )
 
     data class Region(
-        val regionNameExt: String,
+        val regionCodeName: String,
         val regionCode: String,
         val regionName: String = regionCode
     )
 
     data class Device(
         val deviceName: String,
-        val codeName: String,
+        val deviceCodeName: String,
         val deviceCode: String
     )
 
@@ -245,37 +245,26 @@ object DeviceInfoHelper {
 
     private val regionList = listOf(CN, GL, EEA, RU, TW, ID, TR, IN, JP, KR)
 
+    private val deviceNameToDeviceCodeName = deviceList.associateBy({ it.deviceName }, { it.deviceCodeName })
+    private val deviceCodeNameToDeviceName = deviceList.associateBy({ it.deviceCodeName }, { it.deviceName })
+    private val regionNameToRegionCode = regionList.associateBy({ it.regionName }, { it.regionCode })
+    private val regionNameToRegionCodeName = regionList.associateBy({ it.regionName }, { it.regionCodeName })
+    private val androidVersionCodeToAndroidLetterCode = androidList.associateBy { it.androidVersionCode }
+
     val deviceNames = deviceList.map { it.deviceName }
-
-    val codeNames = deviceList.map { it.codeName }
-
+    val codeNames = deviceList.map { it.deviceCodeName }
     val regionNames = regionList.map { it.regionName }
+    val androidVersions = androidList.map { it.androidVersionCode }
 
-    val androidVersions = androidList.map { it.androidNumericCode }
+    fun codeName(deviceName: String): String = deviceNameToDeviceCodeName[deviceName] ?: ""
+    fun deviceName(deviceCodeName: String): String = deviceCodeNameToDeviceName[deviceCodeName] ?: ""
+    fun regionCode(regionName: String): String = regionNameToRegionCode[regionName] ?: ""
+    fun regionCodeName(regionName: String): String = regionNameToRegionCodeName[regionName] ?: ""
 
-    fun codeName(deviceName: String): String {
-        val device = deviceList.find { it.deviceName == deviceName } ?: return ""
-        return device.codeName
-    }
 
-    fun deviceName(codeName: String): String {
-        val device = deviceList.find { it.codeName == codeName } ?: return ""
-        return device.deviceName
-    }
-
-    fun regionCode(regionName: String): String {
-        val region = regionList.find { it.regionName == regionName } ?: return ""
-        return region.regionCode
-    }
-
-    fun regionNameExt(regionName: String): String {
-        val region = regionList.find { it.regionName == regionName } ?: return ""
-        return region.regionNameExt
-    }
-
-    fun deviceCode(androidVersion: String, codeName: String, regionCode: String): String {
-        val android = androidList.find { it.androidNumericCode == androidVersion } ?: return ""
-        val device = deviceList.find { it.codeName == codeName } ?: return ""
+    fun deviceCode(androidVersionCode: String, codeName: String, regionCode: String): String {
+        val android = androidVersionCodeToAndroidLetterCode[androidVersionCode] ?: return ""
+        val device = deviceList.find { it.deviceCodeName == codeName } ?: return ""
         return "${android.androidLetterCode}${device.deviceCode}${regionCode}$XIAOMI"
     }
 }

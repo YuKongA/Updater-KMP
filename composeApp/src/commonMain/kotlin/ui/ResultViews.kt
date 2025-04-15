@@ -43,6 +43,7 @@ import top.yukonga.miuix.kmp.theme.MiuixTheme
 import ui.components.TextWithIcon
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.android_version
+import updater.composeapp.generated.resources.attention
 import updater.composeapp.generated.resources.big_version
 import updater.composeapp.generated.resources.branch
 import updater.composeapp.generated.resources.build_time
@@ -175,12 +176,12 @@ fun InfoCardViews(
             if (romInfoState.value.gentleNotice.isNotEmpty()) {
                 Text(
                     modifier = Modifier.padding(top = 16.dp),
-                    text = romInfoState.value.gentleNotice.split("\n").first(),
+                    text = stringResource(Res.string.attention),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.SemiBold,
                 )
                 Text(
-                    text = romInfoState.value.gentleNotice.split("\n").drop(1).joinToString("\n"),
+                    text = romInfoState.value.gentleNotice,
                     color = MiuixTheme.colorScheme.onSecondaryVariant,
                     fontSize = 14.5.sp,
                     modifier = Modifier.padding(top = 12.dp)

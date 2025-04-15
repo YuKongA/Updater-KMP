@@ -20,6 +20,7 @@
     <string name="tags">标记信息</string>
     <string name="security_patch_level">安全补丁版本</string>
     <string name="build_time">构建时间</string>
+    <string name="attention">注意事项</string>
     <string name="toast_ing">正在查询…</string>
     <string name="toast_no_info">未查询到信息！</string>
     <string name="toast_wrong_info">请求版本不存在！</string>

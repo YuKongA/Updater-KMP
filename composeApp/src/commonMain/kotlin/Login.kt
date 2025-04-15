@@ -32,63 +32,49 @@ suspend fun login(
     isLogin: MutableState<Int>
 ): Int {
     if (account.isEmpty() || password.isEmpty()) return 1
-
     if (savePassword != "1") deletePassword()
 
     val client = httpClientPlatform()
+    val sid = if (global) "miuiota_intl" else "miuiromota"
+    val md5Hash = md5Hash(password)
 
     try {
         client.get(loginAuth2Url)
-    } catch (_: Exception) {
-        return 2
-    }
-
-    val md5Hash = md5Hash(password)
-
-    val sid = if (global) "miuiota_intl" else "miuiromota"
-
-    val response = try {
-        client.post(loginAuth2Url) {
+        val response = client.post(loginAuth2Url) {
             parameter("_json", "true")
             parameter("user", account)
             parameter("hash", md5Hash)
             parameter("sid", sid)
         }
-    } catch (_: Exception) {
-        return 2
-    }
 
-    val authStr = response.body<String>().replace("&&&START&&&", "")
-    val authJson = json.decodeFromString<DataHelper.AuthorizeData>(authStr)
-    val description = authJson.description
-    val ssecurity = authJson.ssecurity
-    val location = authJson.location
-    val userId = authJson.userId.toString()
-    val accountType = if (global) "GL" else "CN"
-    val authResult = if (authJson.result == "ok") "1" else "0"
+        val authStr = response.body<String>().replace("&&&START&&&", "")
+        val authJson = json.decodeFromString<DataHelper.AuthorizeData>(authStr)
+        val description = authJson.description
+        val ssecurity = authJson.ssecurity
+        val location = authJson.location
+        val userId = authJson.userId.toString()
+        val accountType = if (global) "GL" else "CN"
+        val authResult = if (authJson.result == "ok") "1" else "0"
 
-    if (description == "成功") {
+        if (description != "成功") return 3
+        if (ssecurity == null || location == null || userId.isEmpty()) return 4
+
         if (savePassword == "1") {
             perfSet("savePassword", "1")
             savePassword(account, password)
         }
-    } else return 3
 
-    if (ssecurity == null || location == null || userId.isEmpty()) return 4
+        val response2 = client.get(location) { parameter("_userIdNeedEncrypt", true) }
+        val cookies = response2.headers["Set-Cookie"].toString().split("; ")[0].split("; ")[0]
+        val serviceToken = cookies.split("serviceToken=")[1].split(";")[0]
 
-    val response2 = try {
-        client.get(location) { parameter("_userIdNeedEncrypt", true) }
+        val loginInfo = DataHelper.LoginData(accountType, authResult, description, ssecurity, serviceToken, userId)
+        perfSet("loginInfo", json.encodeToString(loginInfo))
+        isLogin.value = 1
+        return 0
     } catch (_: Exception) {
         return 2
     }
-
-    val cookies = response2.headers["Set-Cookie"].toString().split("; ")[0].split("; ")[0]
-    val serviceToken = cookies.split("serviceToken=")[1].split(";")[0]
-
-    val loginInfo = DataHelper.LoginData(accountType, authResult, description, ssecurity, serviceToken, userId)
-    perfSet("loginInfo", json.encodeToString(loginInfo))
-    isLogin.value = 1
-    return 0
 }
 
 /**

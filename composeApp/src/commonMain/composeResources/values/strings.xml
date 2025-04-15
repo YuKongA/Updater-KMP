@@ -21,6 +21,7 @@
     <string name="tags">Tags</string>
     <string name="security_patch_level">Security Patch Level</string>
     <string name="build_time">Build Time</string>
+    <string name="attention">Attention</string>
     <string name="toast_ing">Searching…</string>
     <string name="toast_no_info">No information!</string>
     <string name="toast_wrong_info">Requested version does not exist!</string>

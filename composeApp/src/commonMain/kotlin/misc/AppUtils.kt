@@ -71,8 +71,8 @@ fun updateRomInfo(
 ) {
     val regionCode = DeviceInfoHelper.regionCode(deviceRegion.value)
     val deviceCode = DeviceInfoHelper.deviceCode(androidVersion.value, codeName.value, regionCode)
-    val regionNameExt = DeviceInfoHelper.regionNameExt(deviceRegion.value)
-    val codeNameExt = codeName.value + regionNameExt
+    val regionCodeName = DeviceInfoHelper.regionCodeName(deviceRegion.value)
+    val codeNameExt = codeName.value + regionCodeName
     val systemVersionExt = systemVersion.value.uppercase().replace("^OS1".toRegex(), "V816").replace("AUTO$".toRegex(), deviceCode)
     val branchExt = if (systemVersion.value.uppercase().endsWith(".DEV")) "X" else "F"
 
@@ -221,18 +221,12 @@ fun handleRomInfo(
         val changelogGroups = log.toString().trimEnd().split("\n\n")
         val changelog = changelogGroups.map { it.split("\n").drop(1).joinToString("\n") }
 
-        val gentleNotice = recoveryRomInfo.gentleNotice?.text
-        val formattedGentleNotice = gentleNotice
-            ?.replace("<li>", "\n· ")
-            ?.replace("</li>", "")
-            ?.replace("<p>", "\n")
-            ?.replace("</p>", "")
-            ?.replace("&nbsp;", " ")
-            ?.replace("&#160;", "")
-            ?.replace(Regex("<[^>]*>"), "")
-            ?.trim()
         val gentle = StringBuilder()
+        val formattedGentleNotice = recoveryRomInfo.gentleNotice?.text?.replace("<li>", "\n· ")
+            ?.replace("</li>", "")?.replace("<p>", "\n")?.replace("</p>", "")?.replace("&nbsp;", " ")
+            ?.replace("&#160;", "")?.replace(Regex("<[^>]*>"), "")?.trim()
         formattedGentleNotice?.forEach { gentle.append(it) }
+        val gentleNotice = gentle.toString().trimEnd().split("\n").drop(1).joinToString("\n")
 
         val iconNames = changelogGroups.map { it.split("\n").first() }
         val iconMainLink = if (isWeb()) "https://updater.yukonga.top/icon/10/" else recoveryRomInfo.fileMirror!!.icon
@@ -277,7 +271,7 @@ fun handleRomInfo(
             cdn1Download = cdn1Download,
             cdn2Download = cdn2Download,
             changelog = log.toString().trimEnd(),
-            gentleNotice = gentle.toString().trimEnd(),
+            gentleNotice = gentleNotice,
         )
 
         if (!isWeb()) {

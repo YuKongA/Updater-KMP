@@ -4,7 +4,7 @@ import dev.whyoleg.cryptography.algorithms.AES
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-val iv = "0102030405060708".encodeToByteArray()
+private val iv = "0102030405060708".encodeToByteArray()
 
 expect suspend fun provider(): CryptographyProvider
 

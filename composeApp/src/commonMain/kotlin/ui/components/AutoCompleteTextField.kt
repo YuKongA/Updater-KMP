@@ -38,14 +38,14 @@ fun AutoCompleteTextField(
     onValueChange: MutableStateFlow<String>,
     label: String
 ) {
-    val listForItems = ArrayList(items)
+    val filteredList = remember(text.value, items) {
+        items.filter {
+            it.startsWith(text.value, ignoreCase = true)
+                    || it.contains(text.value, ignoreCase = true)
+                    || it.replace(" ", "").contains(text.value, ignoreCase = true)
+        }.sortedBy { !it.startsWith(text.value, ignoreCase = true) }
+    }
     val showPopup = remember { mutableStateOf(false) }
-    val list = listForItems.filter {
-        it.startsWith(text.value, ignoreCase = true)
-                || it.contains(text.value, ignoreCase = true)
-                || it.replace(" ", "").contains(text.value, ignoreCase = true)
-    }.sortedBy { !it.startsWith(text.value, ignoreCase = true) }
-
     val hapticFeedback = LocalHapticFeedback.current
     val focusManager = LocalFocusManager.current
 
@@ -60,7 +60,7 @@ fun AutoCompleteTextField(
             value = text.value,
             onValueChange = {
                 onValueChange.value = it
-                showPopup.value = it.isNotEmpty() && list.isNotEmpty()
+                showPopup.value = it.isNotEmpty() && filteredList.isNotEmpty()
                 if (it.isEmpty()) dismissPopup(showPopup)
             },
             singleLine = true,
@@ -74,7 +74,7 @@ fun AutoCompleteTextField(
             modifier = Modifier
                 .onFocusChanged { focusState ->
                     if (focusState.isFocused) {
-                        showPopup.value = text.value.isNotEmpty() && list.isNotEmpty()
+                        showPopup.value = text.value.isNotEmpty() && filteredList.isNotEmpty()
                     }
                 }
         )
@@ -89,7 +89,7 @@ fun AutoCompleteTextField(
             maxHeight = 300.dp
         ) {
             ListPopupColumn {
-                if (list.isEmpty()) {
+                if (filteredList.isEmpty()) {
                     DropdownImpl(
                         text = "",
                         optionSize = 1,
@@ -99,18 +99,17 @@ fun AutoCompleteTextField(
                     ) // Currently needed, fix crash.
                     dismissPopup(showPopup)
                 } else {
-                    list.forEach { text ->
+                    filteredList.forEach { item ->
                         DropdownImpl(
-                            text = text,
-                            optionSize = list.size,
+                            text = item,
+                            optionSize = filteredList.size,
                             onSelectedIndexChange = {
                                 hapticFeedback.performHapticFeedback(LongPress)
-                                onValueChange.value = text
-                                KeyboardOptions(imeAction = ImeAction.Done)
+                                onValueChange.value = item
                                 dismissPopup(showPopup)
                             },
                             isSelected = false,
-                            index = list.indexOf(text),
+                            index = filteredList.indexOf(item),
                         )
                     }
                 }

@@ -62,16 +62,21 @@ import updater.composeapp.generated.resources.save_password
 import updater.composeapp.generated.resources.security_error
 import updater.composeapp.generated.resources.toast_crash_info
 
+private const val DEFAULT_REGION = "CN"
+private const val PASSWORD_SAVE_KEY = "savePassword"
+private const val PASSWORD_SAVE_ENABLED = "1"
+private const val PASSWORD_SAVE_DISABLED = "0"
+
 @Composable
 fun LoginDialog(
     isLogin: MutableState<Int>
 ) {
     val coroutineScope = rememberCoroutineScope()
-    var account by mutableStateOf(getPassword().first)
-    var password by mutableStateOf(getPassword().second)
+    var account by remember { mutableStateOf(getPassword().first) }
+    var password by remember { mutableStateOf(getPassword().second) }
 
     var global by remember { mutableStateOf(false) }
-    var savePassword by remember { mutableStateOf(perfGet("savePassword") ?: "0") }
+    var savePassword by remember { mutableStateOf(perfGet(PASSWORD_SAVE_KEY) ?: PASSWORD_SAVE_DISABLED) }
     val showDialog = remember { mutableStateOf(false) }
 
     val icon = when (isLogin.value) {
@@ -169,9 +174,9 @@ fun LoginDialog(
                     ) {
                         SuperCheckbox(
                             title = stringResource(Res.string.save_password),
-                            checked = savePassword == "1",
+                            checked = savePassword == PASSWORD_SAVE_ENABLED,
                             onCheckedChange = {
-                                savePassword = if (it) "1" else "0"
+                                savePassword = if (it) PASSWORD_SAVE_ENABLED else PASSWORD_SAVE_DISABLED
                             }
                         )
                     }

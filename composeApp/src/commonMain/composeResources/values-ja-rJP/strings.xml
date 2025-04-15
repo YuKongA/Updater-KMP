@@ -20,6 +20,7 @@
     <string name="tags">タグ</string>
     <string name="security_patch_level">セキュリティ パッチ レベル</string>
     <string name="build_time">ビルド時間</string>
+    <string name="attention">注意</string>
     <string name="toast_ing">検索中…</string>
     <string name="toast_no_info">情報がありません！</string>
     <string name="toast_wrong_info">要求されたバージョンは存在しません！</string>

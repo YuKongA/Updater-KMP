@@ -1,16 +1,20 @@
 package ui
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -19,7 +23,6 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import data.DeviceInfoHelper
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
@@ -44,6 +47,50 @@ import updater.composeapp.generated.resources.system_version
 import updater.composeapp.generated.resources.toast_no_info
 
 @Composable
+private fun SearchHistoryView(
+    searchKeywords: MutableState<List<String>>,
+    searchKeywordsSelected: MutableState<Int>,
+    onHistorySelect: (String) -> Unit
+) {
+    AnimatedVisibility(
+        visible = searchKeywords.value.isNotEmpty(),
+        enter = fadeIn() + expandVertically(),
+        exit = fadeOut() + shrinkVertically()
+    ) {
+        val localFocusManager = LocalFocusManager.current
+        val spinnerOptions = searchKeywords.value.map { keyword ->
+            val parts = keyword.split("-")
+            SpinnerEntry(
+                icon = null,
+                title = "${parts.getOrElse(0) { "" }.ifEmpty { "Unknown" }} (${parts.getOrElse(1) { "" }})",
+                summary = "${parts.getOrElse(2) { "" }}-${parts.getOrElse(3) { "" }}-${parts.getOrElse(4) { "" }}",
+            )
+        }
+        Card(
+            modifier = Modifier
+                .padding(horizontal = 12.dp)
+                .padding(top = 12.dp)
+        ) {
+            SuperSpinner(
+                title = stringResource(Res.string.search_history),
+                items = spinnerOptions,
+                selectedIndex = searchKeywordsSelected.value,
+                mode = SpinnerMode.AlwaysOnRight,
+                showValue = false,
+                onSelectedIndexChange = { index ->
+                    onHistorySelect(searchKeywords.value[index])
+                    searchKeywordsSelected.value = index
+                },
+                onClick = {
+                    localFocusManager.clearFocus()
+                },
+                maxHeight = 280.dp
+            )
+        }
+    }
+}
+
+@Composable
 fun BasicViews(
     deviceName: MutableState<String>,
     codeName: MutableState<String>,
@@ -61,30 +108,29 @@ fun BasicViews(
         mutableStateOf(DeviceInfoHelper.regionNames.indexOf(deviceRegion.value).takeIf { it >= 0 } ?: 0)
     }
 
-    val deviceNameFlow = MutableStateFlow(deviceName.value)
-    val codeNameFlow = MutableStateFlow(codeName.value)
+    val deviceNameFlow = remember { MutableStateFlow(deviceName.value) }
+    val codeNameFlow = remember { MutableStateFlow(codeName.value) }
 
     val toastNoInfo = stringResource(Res.string.toast_no_info)
 
-    val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
 
-    coroutineScope.launch {
+    LaunchedEffect(deviceNameFlow) {
         deviceNameFlow.collect { newValue ->
-            if (deviceName.value != deviceNameFlow.value) {
-                val text = DeviceInfoHelper.codeName(newValue)
-                if (text != "") codeName.value = text
+            if (deviceName.value != newValue) {
                 deviceName.value = newValue
+                val text = DeviceInfoHelper.codeName(newValue)
+                if (text.isNotEmpty()) codeName.value = text
             }
         }
     }
 
-    coroutineScope.launch {
+    LaunchedEffect(codeNameFlow) {
         codeNameFlow.collect { newValue ->
-            if (codeName.value != codeNameFlow.value) {
-                val text = DeviceInfoHelper.deviceName(newValue)
-                if (text != "") deviceName.value = text
+            if (codeName.value != newValue) {
                 codeName.value = newValue
+                val text = DeviceInfoHelper.deviceName(newValue)
+                if (text.isNotEmpty()) deviceName.value = text
             }
         }
     }
@@ -159,46 +205,20 @@ fun BasicViews(
                 maxHeight = 280.dp
             )
         }
-        AnimatedVisibility(
-            visible = searchKeywords.value.isNotEmpty()
-        ) {
-            val spinnerOptions = searchKeywords.value.map { keyword ->
+        SearchHistoryView(
+            searchKeywords = searchKeywords,
+            searchKeywordsSelected = searchKeywordsSelected,
+            onHistorySelect = { keyword ->
                 val parts = keyword.split("-")
-                SpinnerEntry(
-                    icon = null,
-                    title = "${parts[0].ifEmpty { "Unknown" }} (${parts[1]})",
-                    summary = "${parts[2]}-${parts[3]}-${parts[4]}",
-                )
+                deviceName.value = parts[0]
+                codeName.value = parts[1]
+                deviceRegion.value = parts[2]
+                androidVersion.value = parts[3]
+                systemVersion.value = parts[4]
+                regionSelected.value = DeviceInfoHelper.regionNames.indexOf(parts[2])
+                androidVersionSelected.value = DeviceInfoHelper.androidVersions.indexOf(parts[3])
             }
-            Card(
-                modifier = Modifier
-                    .padding(horizontal = 12.dp)
-                    .padding(top = 12.dp)
-            ) {
-                SuperSpinner(
-                    title = stringResource(Res.string.search_history),
-                    items = spinnerOptions,
-                    selectedIndex = searchKeywordsSelected.value,
-                    mode = SpinnerMode.AlwaysOnRight,
-                    showValue = false,
-                    onSelectedIndexChange = { index ->
-                        val parts = searchKeywords.value[index].split("-")
-                        deviceName.value = parts[0]
-                        codeName.value = parts[1]
-                        deviceRegion.value = parts[2]
-                        androidVersion.value = parts[3]
-                        systemVersion.value = parts[4]
-                        searchKeywordsSelected.value = index
-                        regionSelected.value = DeviceInfoHelper.regionNames.indexOf(parts[2])
-                        androidVersionSelected.value = DeviceInfoHelper.androidVersions.indexOf(parts[3])
-                    },
-                    onClick = {
-                        focusManager.clearFocus()
-                    },
-                    maxHeight = 280.dp
-                )
-            }
-        }
+        )
         TextButton(
             modifier = Modifier
                 .fillMaxWidth()
