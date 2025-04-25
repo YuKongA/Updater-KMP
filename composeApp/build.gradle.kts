@@ -204,6 +204,7 @@ compose.desktop {
         mainClass = "Main_desktopKt"
 
         buildTypes.release.proguard {
+            optimize = false
             configurationFiles.from("proguard-rules-jvm.pro")
         }
 
