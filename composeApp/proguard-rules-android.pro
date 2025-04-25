@@ -1,1 +1,1 @@
--dontwarn org.slf4j.**
+-dontwarn org.slf4j.helpers.SubstituteLogger

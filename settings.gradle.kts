@@ -13,7 +13,7 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        //maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
 
@@ -27,8 +27,7 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-        maven("https://raw.githubusercontent.com/miuix-kotlin-multiplatform/maven-repository/main/repository/releases")
+        //maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         maven("https://raw.githubusercontent.com/miuix-kotlin-multiplatform/maven-repository/main/repository/snapshots")
     }
 }

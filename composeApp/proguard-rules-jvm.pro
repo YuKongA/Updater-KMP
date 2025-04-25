@@ -1,3 +1,3 @@
--dontwarn org.slf4j.**
+-dontwarn org.slf4j.helpers.SubstituteLogger
 -dontwarn okhttp3.internal.platform.**
--dontwarn io.ktor.network.sockets.**
+-dontwarn io.ktor.network.sockets.SocketBase**
