@@ -190,24 +190,20 @@ fun BasicViews(
                 mode = DropDownMode.AlwaysOnRight,
                 maxHeight = 280.dp
             )
-            AnimatedVisibility(
-                visible = systemVersion.value.uppercase().endsWith(".AUTO")
-            ) {
-                SuperDropdown(
-                    title = stringResource(Res.string.regions_code),
-                    items = DeviceInfoHelper.regionNames,
-                    selectedIndex = regionSelected.value,
-                    onSelectedIndexChange = { index ->
-                        regionSelected.value = index
-                        deviceRegion.value = DeviceInfoHelper.regionNames[index]
-                    },
-                    onClick = {
-                        focusManager.clearFocus()
-                    },
-                    mode = DropDownMode.AlwaysOnRight,
-                    maxHeight = 280.dp
-                )
-            }
+            SuperDropdown(
+                title = stringResource(Res.string.regions_code),
+                items = DeviceInfoHelper.regionNames,
+                selectedIndex = regionSelected.value,
+                onSelectedIndexChange = { index ->
+                    regionSelected.value = index
+                    deviceRegion.value = DeviceInfoHelper.regionNames[index]
+                },
+                onClick = {
+                    focusManager.clearFocus()
+                },
+                mode = DropDownMode.AlwaysOnRight,
+                maxHeight = 280.dp
+            )
         }
         SearchHistoryView(
             searchKeywords = searchKeywords,
