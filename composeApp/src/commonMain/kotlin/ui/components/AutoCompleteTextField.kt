@@ -81,6 +81,7 @@ fun AutoCompleteTextField(
         ListPopup(
             show = showPopup,
             onDismissRequest = {
+                focusManager.clearFocus()
                 dismissPopup(showPopup)
             },
             popupPositionProvider = AutoCompletePositionProvider,
@@ -106,6 +107,7 @@ fun AutoCompleteTextField(
                             onSelectedIndexChange = {
                                 hapticFeedback.performHapticFeedback(LongPress)
                                 onValueChange.value = item
+                                focusManager.clearFocus()
                                 dismissPopup(showPopup)
                             },
                             isSelected = false,
