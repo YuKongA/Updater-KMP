@@ -62,7 +62,6 @@ import updater.composeapp.generated.resources.save_password
 import updater.composeapp.generated.resources.security_error
 import updater.composeapp.generated.resources.toast_crash_info
 
-private const val DEFAULT_REGION = "CN"
 private const val PASSWORD_SAVE_KEY = "savePassword"
 private const val PASSWORD_SAVE_ENABLED = "1"
 private const val PASSWORD_SAVE_DISABLED = "0"

@@ -16,18 +16,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import copyToClipboard
 import data.DataHelper
 import downloadToLocal
+import kotlinx.coroutines.launch
 import misc.MessageUtils.Companion.showMessage
 import misc.bodyFontSize
 import misc.bodySmallFontSize
@@ -262,7 +264,9 @@ fun DownloadInfoView(
     fileName: String
 ) {
     val hapticFeedback = LocalHapticFeedback.current
-    val clipboard = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
+
+    val coroutineScope = rememberCoroutineScope()
 
     val messageCopySuccessful = stringResource(Res.string.copy_successful)
     val messageDownloadStart = stringResource(Res.string.download_start)
@@ -280,7 +284,9 @@ fun DownloadInfoView(
             if (url.isNotEmpty()) {
                 IconButton(
                     onClick = {
-                        clipboard.setText(AnnotatedString(url))
+                        coroutineScope.launch {
+                            clipboard.copyToClipboard(url)
+                        }
                         showMessage(messageCopySuccessful)
                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                     }
@@ -315,7 +321,9 @@ fun ChangelogView(
     changelog: String
 ) {
     val hapticFeedback = LocalHapticFeedback.current
-    val clipboard = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
+
+    val coroutineScope = rememberCoroutineScope()
 
     val messageCopySuccessful = stringResource(Res.string.copy_successful)
 
@@ -333,7 +341,9 @@ fun ChangelogView(
             )
             IconButton(
                 onClick = {
-                    clipboard.setText(AnnotatedString(changelog))
+                    coroutineScope.launch {
+                        clipboard.copyToClipboard(changelog)
+                    }
                     showMessage(messageCopySuccessful)
                     hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                 }
