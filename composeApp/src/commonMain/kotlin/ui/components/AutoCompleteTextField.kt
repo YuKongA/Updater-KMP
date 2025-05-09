@@ -66,8 +66,8 @@ fun AutoCompleteTextField(
     val hapticFeedback = LocalHapticFeedback.current
     val focusManager = LocalFocusManager.current
 
-    LaunchedEffect(isFocused, onValueChange.value.isNotEmpty()) {
-        showPopup.value = isFocused && filteredList.isNotEmpty()
+    LaunchedEffect(isFocused, onValueChange.value) {
+        showPopup.value = isFocused && text.value.isNotEmpty()
     }
 
     Box(
@@ -105,9 +105,9 @@ fun AutoCompleteTextField(
             enableWindowDim = false,
             maxHeight = 280.dp
         ) {
-            if (filteredList.isNotEmpty()) {
-                AutoCompleteListPopupColumn {
-                    filteredList.forEach { item ->
+            AutoCompleteListPopupColumn {
+                if (filteredList.isNotEmpty()) {
+                    filteredList.forEachIndexed { index, item ->
                         AutoCompleteDropdownImpl(
                             text = item,
                             optionSize = filteredList.size,
@@ -118,9 +118,17 @@ fun AutoCompleteTextField(
                                 showPopup.value = false
                             },
                             isSelected = false,
-                            index = filteredList.indexOf(item),
+                            index = index,
                         )
                     }
+                } else {
+                    AutoCompleteDropdownImpl(
+                        text = null,
+                        optionSize = 0,
+                        onSelectedIndexChange = {},
+                        isSelected = false,
+                        index = 0,
+                    )
                 }
             }
         }
@@ -136,10 +144,8 @@ val AutoCompletePositionProvider = object : PopupPositionProvider {
         popupMargin: IntRect,
         alignment: PopupPositionProvider.Align
     ): IntOffset {
-
         val offsetX: Int = anchorBounds.left
         val offsetY: Int = anchorBounds.bottom + popupMargin.top
-
         return IntOffset(
             x = offsetX.coerceIn(
                 minimumValue = windowBounds.left,
@@ -166,16 +172,16 @@ fun AutoCompleteListPopupColumn(
             .verticalScroll(rememberScrollState())
             .animateContentSize(
                 spring(
-                    stiffness = 5000f,
+                    stiffness = 8000f,
                     visibilityThreshold = IntSize.VisibilityThreshold
                 )
             )
     ) { constraints ->
         var listHeight = 0
-        val tempConstraints = constraints.copy(minWidth = 0, maxWidth = constraints.maxWidth, minHeight = 0)
+        val tempConstraints = constraints.copy(minWidth = 0, maxWidth = 288.dp.roundToPx(), minHeight = 0)
         val listWidth = subcompose("miuixPopupListFake", content).map {
             it.measure(tempConstraints)
-        }.maxOf { it.width }.coerceIn(0, constraints.maxWidth)
+        }.maxOf { it.width }.coerceIn(0, 288.dp.roundToPx())
         val childConstraints = constraints.copy(minWidth = listWidth, maxWidth = listWidth, minHeight = 0)
         val placeables = subcompose("miuixPopupListReal", content).map {
             val placeable = it.measure(childConstraints)
@@ -194,7 +200,7 @@ fun AutoCompleteListPopupColumn(
 
 @Composable
 fun AutoCompleteDropdownImpl(
-    text: String,
+    text: String?,
     optionSize: Int,
     isSelected: Boolean,
     index: Int,
@@ -213,22 +219,30 @@ fun AutoCompleteDropdownImpl(
     } else {
         dropdownColors.containerColor
     }
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-            .clickable {
-                onSelectedIndexChange(index)
-            }
-            .background(backgroundColor)
-            .padding(horizontal = 20.dp)
-            .padding(top = additionalTopPadding, bottom = additionalBottomPadding)
-    ) {
-        Text(
-            text = text,
-            fontSize = MiuixTheme.textStyles.body1.fontSize,
-            fontWeight = FontWeight.Medium,
-            color = textColor,
-        )
+
+    if (text != null) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .clickable {
+                    onSelectedIndexChange(index)
+                }
+                .background(backgroundColor)
+                .padding(horizontal = 20.dp)
+                .padding(top = additionalTopPadding, bottom = additionalBottomPadding)
+        ) {
+            Text(
+                text = text,
+                fontSize = MiuixTheme.textStyles.body1.fontSize,
+                fontWeight = FontWeight.Medium,
+                color = textColor,
+            )
+        }
+    } else {
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+        ) {}
     }
 }

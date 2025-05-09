@@ -1,4 +1,3 @@
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -114,13 +113,7 @@ fun App() {
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
-                .imePadding()
-                .clickable(
-                    indication = null,
-                    interactionSource = null,
-                ) {
-                    focusManager.clearFocus()
-                },
+                .imePadding(),
             topBar = {
                 TopAppBar(
                     color = Color.Transparent,
