@@ -44,7 +44,6 @@ import top.yukonga.miuix.kmp.icon.icons.useful.Blocklist
 import top.yukonga.miuix.kmp.icon.icons.useful.RemoveBlocklist
 import top.yukonga.miuix.kmp.icon.icons.useful.Rename
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.utils.MiuixPopupUtils.Companion.dismissDialog
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.account
 import updater.composeapp.generated.resources.account_or_password_empty
@@ -112,7 +111,7 @@ fun LoginDialog(
             show = showDialog,
             title = stringResource(Res.string.login),
             onDismissRequest = {
-                dismissDialog(showDialog)
+                showDialog.value = false
             }
         ) {
             Column {
@@ -186,7 +185,7 @@ fun LoginDialog(
                         text = stringResource(Res.string.login),
                         colors = ButtonDefaults.textButtonColorsPrimary(),
                         onClick = {
-                            dismissDialog(showDialog)
+                            showDialog.value = false
                             showMessage(message = messageLoginIn)
                             coroutineScope.launch {
                                 val int = login(account, password, global, savePassword, isLogin)
@@ -206,7 +205,7 @@ fun LoginDialog(
                         text = stringResource(Res.string.cancel),
                         colors = ButtonDefaults.textButtonColors(),
                         onClick = {
-                            dismissDialog(showDialog)
+                            showDialog.value = false
                         }
                     )
                 }
@@ -220,7 +219,7 @@ fun LoginDialog(
             title = stringResource(Res.string.logout),
             summary = stringResource(Res.string.logout_confirm),
             onDismissRequest = {
-                dismissDialog(showDialog)
+                showDialog.value = false
             }
         ) {
             Row {
@@ -233,7 +232,7 @@ fun LoginDialog(
                             val boolean = logout(isLogin)
                             if (boolean) showMessage(message = messageLogoutSuccessful)
                         }
-                        dismissDialog(showDialog)
+                        showDialog.value = false
                     }
                 )
                 Spacer(Modifier.width(20.dp))
@@ -242,7 +241,7 @@ fun LoginDialog(
                     text = stringResource(Res.string.cancel),
                     colors = ButtonDefaults.textButtonColors(),
                     onClick = {
-                        dismissDialog(showDialog)
+                        showDialog.value = false
                     }
                 )
             }

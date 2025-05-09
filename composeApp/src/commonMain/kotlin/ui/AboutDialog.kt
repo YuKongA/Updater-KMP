@@ -27,7 +27,6 @@ import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.extra.SuperDialog
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.utils.MiuixPopupUtils.Companion.dismissDialog
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.about
 import updater.composeapp.generated.resources.app_name
@@ -61,7 +60,7 @@ fun AboutDialog() {
         show = showDialog,
         title = stringResource(Res.string.about),
         onDismissRequest = {
-            dismissDialog(showDialog)
+            showDialog.value = false
         }
     ) {
         Row(

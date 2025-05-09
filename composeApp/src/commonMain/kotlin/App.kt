@@ -20,8 +20,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -52,7 +54,6 @@ import top.yukonga.miuix.kmp.extra.DropdownImpl
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.icons.useful.ImmersionMore
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.utils.MiuixPopupUtils.Companion.dismissPopup
 import top.yukonga.miuix.kmp.utils.getWindowSize
 import top.yukonga.miuix.kmp.utils.overScrollVertical
 import ui.AboutDialog
@@ -107,7 +108,7 @@ fun App() {
             )
         )
 
-        val isMenuPopupExpanded = remember { mutableStateOf(false) }
+        var isTopPopupExpanded by remember { mutableStateOf(false) }
         val showMenuPopup = remember { mutableStateOf(false) }
 
         Scaffold(
@@ -129,13 +130,14 @@ fun App() {
                         AboutDialog()
                     },
                     actions = {
-                        if (isMenuPopupExpanded.value) {
+                        if (isTopPopupExpanded) {
                             ListPopup(
                                 show = showMenuPopup,
                                 popupPositionProvider = ListPopupDefaults.ContextMenuPositionProvider,
                                 alignment = PopupPositionProvider.Align.TopRight,
                                 onDismissRequest = {
-                                    isMenuPopupExpanded.value = false
+                                    showMenuPopup.value = false
+                                    isTopPopupExpanded = false
                                 }
                             ) {
                                 ListPopupColumn {
@@ -144,10 +146,10 @@ fun App() {
                                         optionSize = 1,
                                         isSelected = false,
                                         onSelectedIndexChange = {
-                                            dismissPopup(showMenuPopup)
+                                            showMenuPopup.value = false
+                                            isTopPopupExpanded = false
                                             searchKeywords.value = listOf()
                                             perfRemove("searchKeywords")
-                                            isMenuPopupExpanded.value = false
                                         },
                                         index = 0
                                     )
@@ -155,19 +157,22 @@ fun App() {
                             }
                             showMenuPopup.value = true
                         }
-                        IconButton(
-                            modifier = Modifier.padding(end = 20.dp).size(40.dp),
-                            onClick = {
-                                isMenuPopupExpanded.value = true
-                                focusManager.clearFocus()
-                            },
-                            holdDownState = isMenuPopupExpanded.value
-                        ) {
-                            Icon(
-                                imageVector = MiuixIcons.Useful.ImmersionMore,
-                                tint = MiuixTheme.colorScheme.onBackground,
-                                contentDescription = "Menu"
-                            )
+                        if (searchKeywords.value != emptyList<String>()) {
+                            IconButton(
+                                modifier = Modifier.padding(end = 20.dp).size(40.dp),
+                                onClick = {
+                                    showMenuPopup.value = true
+                                    isTopPopupExpanded = true
+                                    focusManager.clearFocus()
+                                },
+                                holdDownState = showMenuPopup.value
+                            ) {
+                                Icon(
+                                    imageVector = MiuixIcons.Useful.ImmersionMore,
+                                    tint = MiuixTheme.colorScheme.onBackground,
+                                    contentDescription = "Menu"
+                                )
+                            }
                         }
                     },
                     modifier = Modifier
@@ -193,7 +198,8 @@ fun App() {
                             .nestedScroll(scrollBehavior.nestedScrollConnection)
                             .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
                             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
-                        contentPadding = it
+                        contentPadding = it,
+                        overscrollEffect = null
                     ) {
                         item {
                             Box(
@@ -229,6 +235,7 @@ fun App() {
                                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                                 .weight(0.88f),
                             contentPadding = it,
+                            overscrollEffect = null
                         ) {
                             item {
                                 Column(
@@ -250,6 +257,7 @@ fun App() {
                                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                                 .weight(1f),
                             contentPadding = it,
+                            overscrollEffect = null
                         ) {
                             item {
                                 Column(
