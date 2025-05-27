@@ -109,6 +109,7 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
             implementation(libs.ktor.client.core)
+            implementation(libs.pbandk.runtime)
             implementation(libs.miuix)
             implementation(libs.haze)
         }
@@ -276,8 +277,24 @@ val generateVersionInfo by tasks.registering {
     }
 }
 
+val generateProtobuf by tasks.registering {
+    dependsOn(":protobuf-codegen:generateProto")
+
+    doLast {
+        val targetDir = generatedSrcDir.resolve("kotlin")
+        if (targetDir.exists()) targetDir.deleteRecursively() else targetDir.mkdirs()
+
+        val sourceDir = project(":protobuf-codegen").projectDir.resolve("build/generated/sources/proto/main/pbandk")
+        copy {
+            from(sourceDir)
+            into(targetDir)
+            include("**/*.kt")
+        }
+    }
+}
+
 tasks.named("generateComposeResClass").configure {
-    dependsOn(generateVersionInfo)
+    dependsOn(generateVersionInfo, generateProtobuf)
 }
 
 afterEvaluate {

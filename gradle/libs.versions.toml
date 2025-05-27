@@ -10,6 +10,8 @@ kotlinx-serialization-json = "1.8.1"
 kotlinx-datetime = "0.6.2"
 ktor-client = "3.1.3"
 miuix = "0.4.5"
+pbandk = "0.16.0"
+protobuf-plugin = "0.9.5"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
@@ -26,6 +28,7 @@ ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor-clie
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor-client" }
 ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor-client" }
 miuix = { module = "top.yukonga.miuix.kmp:miuix", version.ref = "miuix" }
+pbandk-runtime = { module = "pro.streem.pbandk:pbandk-runtime", version.ref = "pbandk" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
@@ -34,3 +37,4 @@ jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-plugi
 kotlin-cocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+google-protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }
