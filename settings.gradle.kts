@@ -41,3 +41,4 @@ android {
 }
 
 include(":composeApp")
+include(":protobuf-codegen")
