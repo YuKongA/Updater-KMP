@@ -1,7 +1,6 @@
 package data
 
 object DeviceInfoHelper {
-
     data class Android(
         val androidVersionCode: String,
         val androidLetterCode: String
@@ -265,7 +264,6 @@ object DeviceInfoHelper {
     fun deviceName(deviceCodeName: String): String = deviceCodeNameToDeviceName[deviceCodeName] ?: ""
     fun regionCode(regionName: String): String = regionNameToRegionCode[regionName] ?: ""
     fun regionCodeName(regionName: String): String = regionNameToRegionCodeName[regionName] ?: ""
-
 
     fun deviceCode(androidVersionCode: String, codeName: String, regionCode: String): String {
         val android = androidVersionCodeToAndroidLetterCode[androidVersionCode] ?: return ""

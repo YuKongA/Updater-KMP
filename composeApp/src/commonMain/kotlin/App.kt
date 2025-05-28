@@ -154,11 +154,10 @@ fun App() {
                             IconButton(
                                 modifier = Modifier.padding(end = 20.dp).size(40.dp),
                                 onClick = {
-                                    showMenuPopup.value = true
                                     isTopPopupExpanded = true
                                     focusManager.clearFocus()
                                 },
-                                holdDownState = showMenuPopup.value
+                                holdDownState = isTopPopupExpanded
                             ) {
                                 Icon(
                                     imageVector = MiuixIcons.Useful.ImmersionMore,

@@ -4,7 +4,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 object RomInfoHelper {
-
     @Serializable
     data class RomInfo(
         @SerialName("AuthResult") val authResult: Int? = null,

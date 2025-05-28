@@ -3,7 +3,6 @@ package data
 import kotlinx.serialization.Serializable
 
 object DataHelper {
-
     @Serializable
     data class AuthorizeData(
         val description: String? = null,

@@ -5,46 +5,50 @@ import okio.ByteString
 import okio.ByteString.Companion.toByteString
 
 object ZipFileUtil {
-    private const val CENSIG = 0x02014b50L        // "PK\001\002"
-    private const val LOCSIG = 0x04034b50L        // "PK\003\004"
-    private const val ENDSIG = 0x06054b50L        // "PK\005\006"
-    private const val ENDHDR = 22
-    private const val ZIP64_ENDSIG = 0x06064b50L  // "PK\006\006"
-    private const val ZIP64_LOCSIG = 0x07064b50L  // "PK\006\007"
-    private const val ZIP64_LOCHDR = 20
-    private const val ZIP64_MAGICVAL = 0xFFFFFFFFL
+    private const val CENSIG = 0x02014b50L         // "PK\001\002" - Central directory file header signature
+    private const val LOCSIG = 0x04034b50L         // "PK\003\004" - Local file header signature
+    private const val ENDSIG = 0x06054b50L         // "PK\005\006" - End of central directory record signature
+    private const val ENDHDR = 22                  // Minimum size of end of central directory record
+    private const val ZIP64_ENDSIG = 0x06064b50L   // "PK\006\006" - Zip64 end of central directory record signature
+    private const val ZIP64_LOCSIG = 0x07064b50L   // "PK\006\007" - Zip64 end of central directory locator signature
+    private const val ZIP64_LOCHDR = 20            // Size of Zip64 end of central directory locator
+    private const val ZIP64_MAGICVAL = 0xFFFFFFFFL // Marker for Zip64 fields
 
     fun locateCentralDirectory(bytes: ByteArray, fileLength: Long): FileInfoHelper.FileInfo {
         val byteString = bytes.toByteString()
-        val startPos = bytes.size - ENDHDR
+        val searchStartPos = bytes.size - ENDHDR
         var cenSize = -1L
         var cenOffset = -1L
 
-        for (i in 0..startPos) {
-            val position = startPos - i
-            if (byteString.getIntLe(position).toLong() == ENDSIG) {
-                val endSigOffset = position + 4
-                val sizeMagic = byteString.getIntLe(endSigOffset + 12)
+        for (currentScanPos in searchStartPos downTo 0) {
+            if ((byteString.getIntLe(currentScanPos).toLong() and 0xFFFFFFFFL) == ENDSIG) {
+                val cenDirOffsetFieldPos = currentScanPos + 16
+                val cenDirSizeFieldPos = currentScanPos + 12
 
-                if (sizeMagic.toUInt().toLong() == ZIP64_MAGICVAL) {
-                    val zip64LocPos = endSigOffset - ZIP64_LOCHDR
-                    if (byteString.getIntLe(zip64LocPos - 4).toLong() == ZIP64_LOCSIG) {
-                        val zip64EndOffset = byteString.getLongLe(zip64LocPos + 4)
-                        val zip64Pos = 4096 - (fileLength - zip64EndOffset).toInt()
+                val offsetOfCentralDir = byteString.getIntLe(cenDirOffsetFieldPos).toLong() and 0xFFFFFFFFL
+                val sizeOfCentralDir = byteString.getIntLe(cenDirSizeFieldPos).toLong() and 0xFFFFFFFFL
 
-                        if (byteString.getIntLe(zip64Pos).toLong() == ZIP64_ENDSIG) {
-                            cenSize = byteString.getLongLe(zip64Pos + 40).toULong().toLong()
-                            cenOffset = byteString.getLongLe(zip64Pos + 48).toULong().toLong()
+                if (offsetOfCentralDir == ZIP64_MAGICVAL || sizeOfCentralDir == ZIP64_MAGICVAL) {
+                    val zip64LocatorPos = currentScanPos - ZIP64_LOCHDR
+                    if (zip64LocatorPos >= 0 && (byteString.getIntLe(zip64LocatorPos).toLong() and 0xFFFFFFFFL) == ZIP64_LOCSIG) {
+                        val zip64EocdRecordOffsetInFile = byteString.getLongLe(zip64LocatorPos + 8)
+                        val zip64EocdRecordOffsetInBuffer = bytes.size - (fileLength - zip64EocdRecordOffsetInFile).toInt()
+                        if (zip64EocdRecordOffsetInBuffer >= 0
+                            && (zip64EocdRecordOffsetInBuffer + 56) <= bytes.size
+                            && (byteString.getIntLe(zip64EocdRecordOffsetInBuffer).toLong() and 0xFFFFFFFFL) == ZIP64_ENDSIG
+                        ) {
+                            cenSize = byteString.getLongLe(zip64EocdRecordOffsetInBuffer + 40)
+                            cenOffset = byteString.getLongLe(zip64EocdRecordOffsetInBuffer + 48)
+                            break
                         }
                     }
                 } else {
-                    cenSize = byteString.getIntLe(endSigOffset + 8).toUInt().toLong()
-                    cenOffset = byteString.getIntLe(endSigOffset + 12).toUInt().toLong()
+                    cenSize = sizeOfCentralDir
+                    cenOffset = offsetOfCentralDir
                     break
                 }
             }
         }
-
         return FileInfoHelper.FileInfo(cenOffset, cenSize)
     }
 
@@ -53,45 +57,37 @@ object ZipFileUtil {
         var pos = 0
         var localHeaderOffset = -1L
 
-        while (pos < bytes.size) {
-            if (byteString.getIntLe(pos).toLong() == CENSIG) {
-                pos += 28
-                val fileNameLength = byteString.getShortLe(pos).toUInt().toInt()
-                pos += 2
-                val extraFieldLength = byteString.getShortLe(pos).toUInt().toInt()
-                pos += 2
-                val fileCommentLength = byteString.getShortLe(pos).toUInt().toInt()
-                pos += 10
-                val localHeaderOffsetTemp = byteString.getIntLe(pos).toUInt().toLong()
-                pos += 4
+        while (pos + 46 <= bytes.size) {
+            if ((byteString.getIntLe(pos).toLong() and 0xFFFFFFFFL) == CENSIG) {
+                val fileNameLength = byteString.getShortLe(pos + 28).toInt() and 0xFFFF
+                val extraFieldLength = byteString.getShortLe(pos + 30).toInt() and 0xFFFF
+                val fileCommentLength = byteString.getShortLe(pos + 32).toInt() and 0xFFFF
+                val relativeOffsetOfLocalHeader = byteString.getIntLe(pos + 42).toLong() and 0xFFFFFFFFL
 
-                val currentFileName = byteString.substring(pos, pos + fileNameLength).utf8()
+                val fileNameStartPos = pos + 46
+                if (fileNameStartPos + fileNameLength > bytes.size) break
+
+                val currentFileName = byteString.substring(fileNameStartPos, fileNameStartPos + fileNameLength).utf8()
                 if (fileName == currentFileName) {
-                    localHeaderOffset = localHeaderOffsetTemp
+                    localHeaderOffset = relativeOffsetOfLocalHeader
                     break
                 }
-                pos += fileNameLength + extraFieldLength + fileCommentLength
+                pos = fileNameStartPos + fileNameLength + extraFieldLength + fileCommentLength
             } else {
                 break
             }
         }
-
         return localHeaderOffset
     }
 
     fun locateLocalFileOffset(bytes: ByteArray): Long {
         val byteString = bytes.toByteString()
-        var localFileOffset = -1L
-
-        if (byteString.getIntLe(0).toLong() == LOCSIG) {
-            var pos = 26
-            val fileNameLength = byteString.getShortLe(pos).toUInt().toInt()
-            pos += 2
-            val extraFieldLength = byteString.getShortLe(pos).toUInt().toInt()
-            localFileOffset = (pos + 2 + fileNameLength + extraFieldLength).toLong()
+        if ((byteString.getIntLe(0).toLong() and 0xFFFFFFFFL) == LOCSIG) {
+            val fileNameLength = byteString.getShortLe(26).toInt() and 0xFFFF
+            val extraFieldLength = byteString.getShortLe(28).toInt() and 0xFFFF
+            return (30L + fileNameLength + extraFieldLength)
         }
-
-        return localFileOffset
+        return -1L
     }
 
     private fun ByteString.getIntLe(pos: Int): Int {
