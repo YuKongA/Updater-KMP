@@ -5,6 +5,7 @@ compose-plugin = "1.8.1"
 cryptography = "0.4.0"
 haze = "1.7.0-SNAPSHOT"
 image-loader = "1.10.0"
+jna = "5.13.0"
 kotlin = "2.1.21"
 kotlinx-serialization-json = "1.8.1"
 kotlinx-datetime = "0.6.2"
@@ -19,6 +20,8 @@ cryptography-provider-jdk = { module = "dev.whyoleg.cryptography:cryptography-pr
 cryptography-provider-webcrypto = { module = "dev.whyoleg.cryptography:cryptography-provider-webcrypto", version.ref = "cryptography" }
 haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 image-loader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "image-loader" }
+jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
+jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor-client" }

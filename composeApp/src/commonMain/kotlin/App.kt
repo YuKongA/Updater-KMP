@@ -1,3 +1,4 @@
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -63,8 +64,12 @@ import updater.composeapp.generated.resources.app_name
 import updater.composeapp.generated.resources.clear_search_history
 
 @Composable
-fun App() {
-    AppTheme {
+fun App(
+    isDarkTheme: Boolean = isSystemInDarkTheme()
+) {
+    AppTheme(
+        isDarkTheme = isDarkTheme
+    ) {
         val deviceName = remember { mutableStateOf(perfGet("deviceName") ?: "") }
         val codeName = remember { mutableStateOf(perfGet("codeName") ?: "") }
         val deviceRegion = remember { mutableStateOf(perfGet("deviceRegion") ?: "CN") }
