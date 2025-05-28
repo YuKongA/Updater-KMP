@@ -18,6 +18,7 @@
     <string name="changelog">Registro de Alterações</string>
     <string name="branch">Ramo</string>
     <string name="tags">Etiquetas</string>
+    <string name="fingerprint">Impressão digital</string>
     <string name="security_patch_level">Nível do patch de segurança</string>
     <string name="build_time">Hora da construção</string>
     <string name="attention">ATENÇÃO</string>

@@ -56,6 +56,7 @@ import updater.composeapp.generated.resources.download
 import updater.composeapp.generated.resources.download_start
 import updater.composeapp.generated.resources.filename
 import updater.composeapp.generated.resources.filesize
+import updater.composeapp.generated.resources.fingerprint
 import updater.composeapp.generated.resources.security_patch_level
 import updater.composeapp.generated.resources.system_version
 import updater.composeapp.generated.resources.tags
@@ -65,41 +66,41 @@ fun InfoCardViews(
     romInfoState: MutableState<DataHelper.RomInfoData>,
     iconInfo: MutableState<List<DataHelper.IconInfoData>>,
 ) {
-    val isVisible = remember { mutableStateOf(false) }
-    isVisible.value = romInfoState.value.type.isNotEmpty()
+    val romInfo = romInfoState.value
+    val isVisible = romInfo.type.isNotEmpty()
 
     AnimatedVisibility(
-        visible = isVisible.value,
+        visible = isVisible,
         enter = fadeIn(animationSpec = tween(400)),
         exit = fadeOut(animationSpec = tween(400))
     ) {
         Card(
-            modifier = Modifier.padding(vertical = 6.dp),
+            modifier = Modifier.padding(bottom = 12.dp),
             insideMargin = PaddingValues(16.dp)
         ) {
             Text(
-                text = romInfoState.value.type.uppercase(),
+                text = romInfo.type.uppercase(),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
             BaseMessageView(
-                romInfoState.value.device,
-                romInfoState.value.version,
-                romInfoState.value.bigVersion,
-                romInfoState.value.codebase,
-                romInfoState.value.branch
+                romInfo.device,
+                romInfo.version,
+                romInfo.bigVersion,
+                romInfo.codebase,
+                romInfo.branch
             )
 
-            if (romInfoState.value.isBeta) {
+            if (romInfo.isBeta) {
                 MessageTextView(
                     stringResource(Res.string.tags),
                     "Beta"
                 )
             }
 
-            if (romInfoState.value.isGov) {
+            if (romInfo.isGov) {
                 MessageTextView(
                     stringResource(Res.string.tags),
                     "Government"
@@ -107,21 +108,21 @@ fun InfoCardViews(
             }
 
             AnimatedVisibility(
-                visible = romInfoState.value.securityPatchLevel.isNotEmpty()
-                        && romInfoState.value.timestamp.isNotEmpty()
+                visible = romInfo.timestamp.isNotEmpty()
             ) {
                 MetadataView(
-                    romInfoState.value.securityPatchLevel,
-                    romInfoState.value.timestamp
+                    romInfo.fingerprint,
+                    romInfo.securityPatchLevel,
+                    romInfo.timestamp
                 )
             }
             MessageTextView(
                 stringResource(Res.string.filename),
-                romInfoState.value.fileName
+                romInfo.fileName
             )
             MessageTextView(
                 stringResource(Res.string.filesize),
-                romInfoState.value.fileSize
+                romInfo.fileSize
             )
 
             Text(
@@ -130,7 +131,7 @@ fun InfoCardViews(
                 fontSize = bodySmallFontSize
             )
 
-            if (romInfoState.value.official1Download.isNotEmpty()) {
+            if (romInfo.official1Download.isNotEmpty()) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Start
@@ -138,14 +139,14 @@ fun InfoCardViews(
                     DownloadInfoView(
                         modifier = Modifier.weight(1f),
                         "ultimateota",
-                        romInfoState.value.official1Download,
-                        romInfoState.value.fileName
+                        romInfo.official1Download,
+                        romInfo.fileName
                     )
                     DownloadInfoView(
                         modifier = Modifier.weight(1f),
                         "superota",
-                        romInfoState.value.official2Download,
-                        romInfoState.value.fileName
+                        romInfo.official2Download,
+                        romInfo.fileName
                     )
                 }
             }
@@ -157,25 +158,25 @@ fun InfoCardViews(
                 DownloadInfoView(
                     modifier = Modifier.weight(1f),
                     "aliyuncs",
-                    romInfoState.value.cdn1Download,
-                    romInfoState.value.fileName
+                    romInfo.cdn1Download,
+                    romInfo.fileName
                 )
                 DownloadInfoView(
                     modifier = Modifier.weight(1f),
                     "cdnorg",
-                    romInfoState.value.cdn2Download,
-                    romInfoState.value.fileName
+                    romInfo.cdn2Download,
+                    romInfo.fileName
                 )
             }
 
-            if (romInfoState.value.changelog.isNotEmpty()) {
+            if (romInfo.changelog.isNotEmpty()) {
                 ChangelogView(
                     iconInfo,
-                    romInfoState.value.changelog
+                    romInfo.changelog
                 )
             }
 
-            if (romInfoState.value.gentleNotice.isNotEmpty()) {
+            if (romInfo.gentleNotice.isNotEmpty()) {
                 Text(
                     modifier = Modifier.padding(top = 16.dp),
                     text = stringResource(Res.string.attention),
@@ -183,7 +184,7 @@ fun InfoCardViews(
                     fontWeight = FontWeight.SemiBold,
                 )
                 Text(
-                    text = romInfoState.value.gentleNotice,
+                    text = romInfo.gentleNotice,
                     color = MiuixTheme.colorScheme.onSecondaryVariant,
                     fontSize = 14.5.sp,
                     modifier = Modifier.padding(top = 12.dp)
@@ -195,12 +196,14 @@ fun InfoCardViews(
 
 @Composable
 fun MetadataView(
+    fingerprint: String,
     securityPatchLevel: String,
     buildTime: String,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
     ) {
+        MessageTextView(stringResource(Res.string.fingerprint), fingerprint)
         MessageTextView(stringResource(Res.string.security_patch_level), securityPatchLevel)
         MessageTextView(stringResource(Res.string.build_time), buildTime)
     }

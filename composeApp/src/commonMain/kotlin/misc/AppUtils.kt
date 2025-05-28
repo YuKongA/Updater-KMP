@@ -277,12 +277,14 @@ fun handleRomInfo(
         if (!isWeb()) {
             coroutineScope.launch {
                 val metadata = Metadata.getMetadata(if (noUltimateLink) cdn1Download else official1Download)
+                val fingerprint = Metadata.getMetadataValue(metadata, "post-build=")
                 val securityPatchLevel = Metadata.getMetadataValue(metadata, "post-security-patch-level=")
                 val timestamp = convertTimestampToDateTime(Metadata.getMetadataValue(metadata, "post-timestamp="))
 
                 romInfoData.value = romInfoData.value.copy(
+                    fingerprint = fingerprint,
                     securityPatchLevel = securityPatchLevel,
-                    timestamp = timestamp
+                    timestamp = timestamp,
                 )
             }
         }

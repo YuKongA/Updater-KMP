@@ -12,13 +12,14 @@
     <string name="search_history">查詢歷史</string>
     <string name="clear_search_history">清空查詢歷史</string>
     <string name="big_version">主要版本</string>
-    <string name="filename">檔案名</string>
+    <string name="filename">檔案名稱</string>
     <string name="filesize">檔案大小</string>
     <string name="download">下載連結</string>
     <string name="changelog">更新日誌</string>
     <string name="branch">版本分支</string>
     <string name="tags">標記訊息</string>
-    <string name="security_patch_level">安全補丁版本</string>
+    <string name="fingerprint">指紋訊息</string>
+    <string name="security_patch_level">安全補丁</string>
     <string name="build_time">構建時間</string>
     <string name="attention">注意事項</string>
     <string name="toast_ing">正在查詢…</string>

@@ -36,7 +36,7 @@ object RomInfoHelper {
 
     @Serializable
     data class Changelog(
-        val txt: List<String>
+        val txt: List<String>,
     )
 
     @Serializable
@@ -44,11 +44,11 @@ object RomInfoHelper {
         val icon: String,
         val image: String,
         val video: String,
-        val headimage: String
+        val headimage: String,
     )
 
     @Serializable
     data class GentleNotice(
-        val text: String
+        val text: String,
     )
 }

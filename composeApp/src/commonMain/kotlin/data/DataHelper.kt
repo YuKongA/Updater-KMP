@@ -45,7 +45,7 @@ object DataHelper {
         val security: String,
         val token: String,
         val v: String,
-        val unlock: String
+        val unlock: String,
     )
 
     @Serializable
@@ -66,6 +66,7 @@ object DataHelper {
         var cdn2Download: String = "",
         var changelog: String = "",
         var gentleNotice: String = "",
+        var fingerprint: String = "",
         var securityPatchLevel: String = "",
         var timestamp: String = "",
     )

@@ -3,19 +3,19 @@ package data
 object DeviceInfoHelper {
     data class Android(
         val androidVersionCode: String,
-        val androidLetterCode: String
+        val androidLetterCode: String,
     )
 
     data class Region(
         val regionCodeName: String,
         val regionCode: String,
-        val regionName: String = regionCode
+        val regionName: String = regionCode,
     )
 
     data class Device(
         val deviceName: String,
         val deviceCodeName: String,
-        val deviceCode: String
+        val deviceCode: String,
     )
 
     /**
@@ -233,7 +233,7 @@ object DeviceInfoHelper {
         androidM,
         androidLMr1,
         androidL,
-        androidK
+        androidK,
     )
 
     private val CN = Region("", "CN")

@@ -136,7 +136,7 @@ fun BasicViews(
     }
 
     Column(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         AutoCompleteTextField(

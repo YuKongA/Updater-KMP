@@ -2,7 +2,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.displayCutout
@@ -168,9 +167,7 @@ fun App() {
                         }
                     },
                     modifier = Modifier
-                        .hazeEffect(
-                            hazeState
-                        ) {
+                        .hazeEffect(hazeState) {
                             style = hazeStyle
                             blurRadius = 25.dp
                             noiseFactor = 0f
@@ -195,7 +192,8 @@ fun App() {
                     ) {
                         item {
                             Box(
-                                modifier = Modifier.navigationBarsPadding()
+                                modifier = Modifier
+                                    .navigationBarsPadding()
                             ) {
                                 Column {
                                     LoginCardView(isLogin)
@@ -204,12 +202,12 @@ fun App() {
                                         updateRomInfo, searchKeywords, searchKeywordsSelected
                                     )
                                     Column(
-                                        modifier = Modifier.padding(horizontal = 12.dp)
+                                        modifier = Modifier
+                                            .padding(horizontal = 12.dp)
                                     ) {
                                         InfoCardViews(curRomInfo, curIconInfo)
                                         InfoCardViews(incRomInfo, incIconInfo)
                                     }
-                                    Spacer(modifier = Modifier.height(16.dp))
                                 }
                             }
                         }
@@ -231,14 +229,14 @@ fun App() {
                         ) {
                             item {
                                 Column(
-                                    modifier = Modifier.navigationBarsPadding()
+                                    modifier = Modifier
+                                        .navigationBarsPadding()
                                 ) {
                                     LoginCardView(isLogin)
                                     BasicViews(
                                         deviceName, codeName, androidVersion, deviceRegion, systemVersion,
                                         updateRomInfo, searchKeywords, searchKeywordsSelected
                                     )
-                                    Spacer(modifier = Modifier.height(16.dp))
                                 }
                             }
                         }
@@ -253,12 +251,12 @@ fun App() {
                         ) {
                             item {
                                 Column(
-                                    modifier = Modifier.navigationBarsPadding()
+                                    modifier = Modifier
+                                        .navigationBarsPadding()
+                                        .padding(top = 6.dp)
                                 ) {
-                                    Spacer(modifier = Modifier.height(6.dp))
                                     InfoCardViews(curRomInfo, curIconInfo)
                                     InfoCardViews(incRomInfo, incIconInfo)
-                                    Spacer(modifier = Modifier.height(16.dp))
                                 }
                             }
                         }
