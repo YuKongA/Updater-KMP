@@ -30,8 +30,8 @@ object MacOSThemeManager {
     suspend fun listenMacOSThemeChanges(onThemeChanged: (Boolean) -> Unit) {
         try {
             while (currentCoroutineContext().isActive) {
-                val currentTheme = isMacOSDarkTheme()
-                onThemeChanged(currentTheme)
+                val currentSystemThemeIsDark = isMacOSDarkTheme()
+                onThemeChanged(currentSystemThemeIsDark)
             }
         } catch (_: Exception) {
         }
