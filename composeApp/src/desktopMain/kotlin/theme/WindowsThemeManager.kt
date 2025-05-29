@@ -1,4 +1,4 @@
-package windows
+package theme
 
 import com.sun.jna.Native
 import com.sun.jna.Pointer
@@ -32,7 +32,7 @@ object WindowsThemeManager {
         }
     }
 
-    fun isDarkTheme(): Boolean {
+    fun isWindowsDarkTheme(): Boolean {
         return try {
             val value = Advapi32Util.registryGetIntValue(
                 WinReg.HKEY_CURRENT_USER,
@@ -87,7 +87,7 @@ object WindowsThemeManager {
 
                 if (!currentCoroutineContext().isActive) break
                 if (notifyResult == WinError.ERROR_SUCCESS) {
-                    val currentSystemThemeIsDark = isDarkTheme()
+                    val currentSystemThemeIsDark = isWindowsDarkTheme()
                     onThemeChanged(currentSystemThemeIsDark)
                 } else {
                     break
