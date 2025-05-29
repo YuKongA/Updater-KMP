@@ -27,6 +27,8 @@ import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.extra.SuperDialog
 import top.yukonga.miuix.kmp.theme.MiuixTheme
+import top.yukonga.miuix.kmp.utils.Platform
+import top.yukonga.miuix.kmp.utils.platform
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.about
 import updater.composeapp.generated.resources.app_name
@@ -36,13 +38,13 @@ import updater.composeapp.generated.resources.opensource_info
 import updater.composeapp.generated.resources.view_source
 
 @Composable
-fun AboutDialog() {
+fun AboutDialog(
+) {
     val showDialog = remember { mutableStateOf(false) }
-
     val focusManager = LocalFocusManager.current
 
     IconButton(
-        modifier = Modifier.padding(start = 20.dp),
+        modifier = Modifier.padding(start = if (platform() != Platform.IOS && platform() != Platform.Android) 10.dp else 20.dp),
         onClick = {
             showDialog.value = true
             focusManager.clearFocus()
@@ -52,7 +54,9 @@ fun AboutDialog() {
         Image(
             painter = painterResource(Res.drawable.icon),
             contentDescription = "About",
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier
+                .size(32.dp)
+                .padding(4.dp),
         )
     }
 

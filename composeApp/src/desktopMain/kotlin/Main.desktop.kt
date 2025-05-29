@@ -25,7 +25,7 @@ import javax.swing.SwingUtilities
 
 fun main() = application {
     val state = rememberWindowState(
-        size = DpSize(420.dp, 840.dp),
+        size = DpSize(1200.dp, 800.dp),
         position = WindowPosition.Aligned(Alignment.Center)
     )
 

@@ -67,7 +67,8 @@ fun updateRomInfo(
     curIconInfo: MutableState<List<DataHelper.IconInfoData>>,
     incIconInfo: MutableState<List<DataHelper.IconInfoData>>,
     updateRomInfo: MutableState<Int>,
-    searchKeywords: MutableState<List<String>>
+    searchKeywords: MutableState<List<String>>,
+    searchKeywordsSelected: MutableState<Int>,
 ) {
     val regionCode = DeviceInfoHelper.regionCode(deviceRegion.value)
     val deviceCode = DeviceInfoHelper.deviceCode(androidVersion.value, codeName.value, regionCode)
@@ -182,6 +183,8 @@ fun updateRomInfo(
                         showMessage(messageNoResult)
 
                     }
+
+                    searchKeywordsSelected.value = 0
 
                 } else {
 

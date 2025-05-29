@@ -53,7 +53,7 @@ fun main() {
 
     Window(
         title = "Updater",
-        size = DpSize(420.dp, 820.dp)
+        size = DpSize(1200.dp, 800.dp),
     ) {
         val isDarkTheme by isDarkThemeState.collectAsState()
         App(isDarkTheme)
