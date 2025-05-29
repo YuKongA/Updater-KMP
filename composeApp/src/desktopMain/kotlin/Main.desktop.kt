@@ -41,9 +41,7 @@ fun main() = application {
                 LaunchedEffect(Unit) {
                     withContext(Dispatchers.IO) {
                         WindowsThemeManager.listenWindowsThemeChanges { newSystemThemeIsDark ->
-                            if (isDarkTheme != newSystemThemeIsDark) {
-                                isDarkTheme = newSystemThemeIsDark
-                            }
+                            if (isDarkTheme != newSystemThemeIsDark) isDarkTheme = newSystemThemeIsDark
                         }
                     }
                 }
@@ -60,9 +58,7 @@ fun main() = application {
                 LaunchedEffect(Unit) {
                     withContext(Dispatchers.IO) {
                         MacOSThemeManager.listenMacOSThemeChanges { newSystemThemeIsDark ->
-                            if (isDarkTheme != newSystemThemeIsDark) {
-                                isDarkTheme = newSystemThemeIsDark
-                            }
+                            if (isDarkTheme != newSystemThemeIsDark) isDarkTheme = newSystemThemeIsDark
                         }
                     }
                 }

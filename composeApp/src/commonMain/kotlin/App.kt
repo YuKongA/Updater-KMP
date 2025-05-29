@@ -258,7 +258,7 @@ fun App(
                                 Column(
                                     modifier = Modifier
                                         .navigationBarsPadding()
-                                        .padding(top = 6.dp)
+                                        .padding(top = 12.dp)
                                 ) {
                                     InfoCardViews(curRomInfo, curIconInfo)
                                     InfoCardViews(incRomInfo, incIconInfo)
