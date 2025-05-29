@@ -64,12 +64,8 @@ import updater.composeapp.generated.resources.app_name
 import updater.composeapp.generated.resources.clear_search_history
 
 @Composable
-fun App(
-    isDarkTheme: Boolean = isSystemInDarkTheme()
-) {
-    AppTheme(
-        isDarkTheme = isDarkTheme
-    ) {
+fun App() {
+    AppTheme {
         val deviceName = remember { mutableStateOf(perfGet("deviceName") ?: "") }
         val codeName = remember { mutableStateOf(perfGet("codeName") ?: "") }
         val deviceRegion = remember { mutableStateOf(perfGet("deviceRegion") ?: "CN") }
