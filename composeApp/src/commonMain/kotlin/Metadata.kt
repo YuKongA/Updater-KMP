@@ -8,6 +8,7 @@ import kotlinx.coroutines.withTimeout
 import misc.ZipFileUtil.locateCentralDirectory
 import misc.ZipFileUtil.locateLocalFileHeader
 import misc.ZipFileUtil.locateLocalFileOffset
+import platform.httpClientPlatform
 import kotlin.math.min
 
 private const val METADATA_PATH = "META-INF/com/android/metadata"

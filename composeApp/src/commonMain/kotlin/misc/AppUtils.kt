@@ -21,8 +21,8 @@ import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
-import perfSet
-import provider
+import platform.perfSet
+import platform.provider
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.toast_crash_info
 import updater.composeapp.generated.resources.toast_ing

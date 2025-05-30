@@ -6,6 +6,13 @@ import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import misc.json
 import misc.md5Hash
+import platform.generateKey
+import platform.httpClientPlatform
+import platform.ownDecrypt
+import platform.ownEncrypt
+import platform.perfGet
+import platform.perfRemove
+import platform.perfSet
 import top.yukonga.miuix.kmp.utils.Platform
 import top.yukonga.miuix.kmp.utils.platform
 

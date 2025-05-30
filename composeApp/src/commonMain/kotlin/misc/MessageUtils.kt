@@ -17,9 +17,9 @@ import androidx.compose.ui.Modifier
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import showToast
+import platform.showToast
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import useToast
+import platform.useToast
 
 class MessageUtils {
 
