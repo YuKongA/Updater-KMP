@@ -232,13 +232,13 @@ fun handleRomInfo(
         val gentleNotice = gentle.toString().trimEnd().split("\n").drop(1).joinToString("\n")
 
         val iconNames = changelogGroups.map { it.split("\n").first() }
-        val iconMainLink = if (isWeb()) "https://updater.yukonga.top/icon/10/" else recoveryRomInfo.fileMirror!!.icon
+        val iconMainLink = recoveryRomInfo.fileMirror!!.icon
         val iconNameLink = recoveryRomInfo.icon ?: mapOf()
         val iconLinks = iconLink(iconNames, iconMainLink, iconNameLink)
         iconInfoData.value = iconNames.mapIndexed { index, iconName ->
             DataHelper.IconInfoData(
                 iconName = iconName,
-                iconLink = iconLinks[iconName] ?: "",
+                iconLink = if (isWeb()) "" else iconLinks[iconName] ?: "",
                 changelog = changelog[index]
             )
         }
