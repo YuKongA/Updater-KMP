@@ -7,6 +7,10 @@ on:
       - 'README.md'
       - 'LICENSE'
 
+permissions:
+  contents: read
+  actions: read
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
