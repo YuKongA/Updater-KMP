@@ -10,12 +10,14 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.sun.jna.Platform.isLinux
 import com.sun.jna.Platform.isMac
 import com.sun.jna.Platform.isWindows
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import theme.LinuxThemeManager
 import theme.MacOSThemeManager
 import theme.WindowsThemeManager
 import updater.composeapp.generated.resources.Res
@@ -58,6 +60,18 @@ fun main() = application {
                 LaunchedEffect(Unit) {
                     withContext(Dispatchers.IO) {
                         MacOSThemeManager.listenMacOSThemeChanges { newSystemThemeIsDark ->
+                            if (isDarkTheme != newSystemThemeIsDark) isDarkTheme = newSystemThemeIsDark
+                        }
+                    }
+                }
+                App(isDarkTheme)
+            }
+
+            isLinux() -> {
+                var isDarkTheme by remember { mutableStateOf(LinuxThemeManager.isLinuxDarkTheme()) }
+                LaunchedEffect(Unit) {
+                    withContext(Dispatchers.IO) {
+                        LinuxThemeManager.listenLinuxThemeChanges { newSystemThemeIsDark ->
                             if (isDarkTheme != newSystemThemeIsDark) isDarkTheme = newSystemThemeIsDark
                         }
                     }
