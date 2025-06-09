@@ -16,17 +16,6 @@ object MacOSThemeManager {
         }
     }
 
-    fun setMacOSTitleBarTheme(window: ComposeWindow, isDark: Boolean) {
-        try {
-            // This needed JetBrains Runtime
-            window.rootPane.putClientProperty(
-                "apple.awt.windowAppearance",
-                if (isDark) "NSAppearanceNameVibrantDark" else "NSAppearanceNameVibrantLight",
-            )
-        } catch (_: Exception) {
-        }
-    }
-
     suspend fun listenMacOSThemeChanges(onThemeChanged: (Boolean) -> Unit) {
         try {
             while (currentCoroutineContext().isActive) {

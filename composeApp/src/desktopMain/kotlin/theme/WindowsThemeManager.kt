@@ -5,6 +5,7 @@ import com.sun.jna.Pointer
 import com.sun.jna.platform.win32.Advapi32
 import com.sun.jna.platform.win32.Advapi32Util
 import com.sun.jna.platform.win32.WinDef
+import com.sun.jna.platform.win32.WinDef.HWND
 import com.sun.jna.platform.win32.WinError
 import com.sun.jna.platform.win32.WinNT
 import com.sun.jna.platform.win32.WinReg
@@ -18,7 +19,7 @@ object WindowsThemeManager {
 
     private interface DwmApi : StdCallLibrary {
         fun DwmSetWindowAttribute(
-            hwnd: Pointer,
+            hwnd: HWND,
             dwAttribute: Int,
             pvAttribute: Pointer,
             cbAttribute: Int
@@ -47,11 +48,11 @@ object WindowsThemeManager {
 
     fun setWindowsTitleBarTheme(window: java.awt.Window, isDark: Boolean) {
         try {
-            val hwnd = WinDef.HWND(Native.getComponentPointer(window))
+            val hwnd = HWND(Native.getComponentPointer(window))
             val darkModeValue = WinDef.BOOLByReference(WinDef.BOOL(isDark))
 
             DwmApi.INSTANCE.DwmSetWindowAttribute(
-                hwnd.pointer,
+                hwnd,
                 DwmApi.DWMWA_USE_IMMERSIVE_DARK_MODE,
                 darkModeValue.pointer,
                 4,

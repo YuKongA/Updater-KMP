@@ -62,11 +62,6 @@ fun main() = application {
                         }
                     }
                 }
-                LaunchedEffect(isDarkTheme, window) {
-                    SwingUtilities.invokeLater {
-                        MacOSThemeManager.setMacOSTitleBarTheme(window, isDarkTheme)
-                    }
-                }
                 App(isDarkTheme)
             }
 

@@ -222,6 +222,7 @@ compose.desktop {
             }
             macOS {
                 bundleID = pkgName
+                jvmArgs("-Dapple.awt.application.appearance=system")
                 iconFile = file("src/desktopMain/resources/macos/Icon.icns")
             }
             windows {
