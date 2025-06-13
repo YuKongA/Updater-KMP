@@ -47,9 +47,6 @@ kotlin {
         macosArm64(config)
     }
     macosTargets {
-        compilerOptions {
-            freeCompilerArgs.add("-Xbinary=preCodegenInlineThreshold=40")
-        }
         binaries.executable {
             entryPoint = "main"
         }
@@ -62,9 +59,6 @@ kotlin {
         authors = "YuKongA"
         license = "AGPL-3.0"
         podfile = project.file("../iosApp/Podfile")
-        compilerOptions {
-            freeCompilerArgs.add("-Xbinary=preCodegenInlineThreshold=40")
-        }
         framework {
             baseName = appName + "Framework"
             isStatic = true
@@ -302,7 +296,7 @@ afterEvaluate {
                         val copyTask = tasks.register<Copy>(taskName) {
                             from({
                                 (executable.compilation.associatedCompilations + executable.compilation).flatMap { compilation ->
-                                    compilation.allKotlinSourceSets.map { it.resources }
+                                    compilation.allKotlinSourceSets.map { it -> it.resources }
                                 }
                             })
                             into(executable.outputDirectory.resolve("compose-resources"))
