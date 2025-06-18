@@ -1,7 +1,7 @@
 [versions]
 android-gradle-plugin = "8.10.1"
 androidx-activity-compose = "1.10.1"
-compose-plugin = "1.8.1"
+compose-plugin = "1.8.2"
 cryptography = "0.4.0"
 haze = "1.6.4"
 image-loader = "1.10.0"
