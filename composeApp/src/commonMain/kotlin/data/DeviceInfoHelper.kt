@@ -180,12 +180,14 @@ object DeviceInfoHelper {
         Device("Redmi K70E / POCO X6 Pro", "duchamp", "NL"),
         Device("REDMI K80", "zorn", "OK"),
         Device("REDMI K80 Pro", "miro", "OM"),
+        Device("REDMI K80 Ultra", "dali", "ON"),
         Device("Xiaomi 14 Ultra", "aurora", "NA"),
         Device("Xiaomi Pad 6S Pro", "sheng", "NX"),
         Device("Redmi Pad Pro WiFi", "dizi", "NS"),
         Device("Redmi Pad Pro 5G", "ruan", "FS"),
         Device("REDMI Pad 2 4G", "koto", "OW"),
         Device("REDMI Pad 2", "taiko", "OV"),
+        Device("REDMI KPad", "turner", "AO"),
         Device("Redmi Note 13R / POCO M6 Plus", "breeze", "NU"),
         Device("Redmi K70 Ultra / Xiaomi 14T Pro", "rothko", "NN"),
         Device("Xiaomi MIX Fold 4", "goku", "NV"),
@@ -196,8 +198,10 @@ object DeviceInfoHelper {
         Device("Xiaomi 15 Ultra", "xuanyuan", "OA"),
         Device("Xiaomi Pad 7", "uke", "OZ"),
         Device("Xiaomi Pad 7 Pro", "muyu", "OY"),
+        Device("Xiaomi Pad 7S Pro", "violin", "OT"),
         Device("Xiaomi Pad 7 Ultra", "jinghu", "OX"),
         Device("Xiaomi Civi 5 Pro", "luming", "OI"),
+        Device("Xiaomi MIX Filp 2", "bixi", "OH"),
     )
 
     private const val XIAOMI = "XM"
