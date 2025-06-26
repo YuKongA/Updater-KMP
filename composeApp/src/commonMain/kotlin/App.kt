@@ -41,8 +41,8 @@ import dev.chrisbanes.haze.HazeTint
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
 import misc.MessageUtils.Companion.Snackbar
+import misc.UpdateRomInfo
 import misc.json
-import misc.updateRomInfo
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import platform.perfGet
@@ -353,7 +353,7 @@ fun App(
         val searchKeywords = remember { mutableStateOf(json.decodeFromString<List<String>>(perfGet("searchKeywords") ?: "[]")) }
         val searchKeywordsSelected = remember { mutableStateOf(0) }
 
-        updateRomInfo(
+        UpdateRomInfo(
             deviceName, codeName, deviceRegion, androidVersion, systemVersion, loginData,
             isLogin, curRomInfo, incRomInfo, curIconInfo, incIconInfo, updateRomInfoState, searchKeywords, searchKeywordsSelected
         )
