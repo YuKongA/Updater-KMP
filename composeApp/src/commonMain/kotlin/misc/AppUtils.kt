@@ -15,8 +15,8 @@ import getRecoveryRomInfo
 import isWeb
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import misc.MessageUtils.Companion.showMessage
@@ -30,6 +30,8 @@ import updater.composeapp.generated.resources.toast_no_info
 import updater.composeapp.generated.resources.toast_no_ultimate_link
 import updater.composeapp.generated.resources.toast_success_info
 import updater.composeapp.generated.resources.toast_wrong_info
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 val json = Json { ignoreUnknownKeys = true }
 
@@ -54,7 +56,7 @@ val bodySmallFontSize = 13.sp
  * @param searchKeywords: Recent search keywords
  */
 @Composable
-fun updateRomInfo(
+fun UpdateRomInfo(
     deviceName: MutableState<String>,
     codeName: MutableState<String>,
     deviceRegion: MutableState<String>,
@@ -393,12 +395,13 @@ fun iconLink(iconNames: List<String>, iconMainLink: String, iconNameLink: Map<St
  *
  * @return Date time
  */
+@OptIn(ExperimentalTime::class)
 fun convertTimestampToDateTime(timestamp: String): String {
     val epochSeconds = timestamp.toLongOrNull() ?: return ""
     val instant = Instant.fromEpochSeconds(epochSeconds)
     val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-    return "${dateTime.year}-${dateTime.monthNumber.toString().padStart(2, '0')}-${dateTime.dayOfMonth.toString().padStart(2, '0')} " +
-            "${dateTime.hour.toString().padStart(2, '0')}:${dateTime.minute.toString().padStart(2, '0')}:${
-                dateTime.second.toString().padStart(2, '0')
-            }"
+    return "${dateTime.year}/${dateTime.month.number}/${dateTime.day} " +
+            dateTime.hour.toString().padStart(2, '0') +
+            ":${dateTime.minute.toString().padStart(2, '0')}" +
+            ":${dateTime.second.toString().padStart(2, '0')}"
 }
