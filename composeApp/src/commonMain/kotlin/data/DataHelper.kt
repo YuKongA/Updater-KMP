@@ -58,6 +58,7 @@ object DataHelper {
         var bigVersion: String = "",
         var fileName: String = "",
         var fileSize: String = "",
+        var md5: String = "",
         var isBeta: Boolean = false,
         var isGov: Boolean = false,
         var official1Download: String = "",

@@ -14,6 +14,7 @@
     <string name="big_version">メジャーバージョン</string>
     <string name="filename">ファイル名</string>
     <string name="filesize">ファイルサイズ</string>
+    <string name="filemd5">ファイル MD5</string>
     <string name="download">ダウンロード URL</string>
     <string name="changelog">変更履歴</string>
     <string name="branch">ブランチ</string>

@@ -269,6 +269,7 @@ fun handleRomInfo(
             bigVersion = bigVersion,
             fileName = romInfo.filename.toString().substringBefore(".zip") + ".zip",
             fileSize = romInfo.filesize.toString(),
+            md5 = romInfo.md5.toString(),
             isBeta = romInfo.isBeta == 1,
             isGov = romInfo.isGov == 1,
             official1Download = official1Download,

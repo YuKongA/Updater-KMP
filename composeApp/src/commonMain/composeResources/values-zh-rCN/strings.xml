@@ -14,6 +14,7 @@
     <string name="big_version">主要版本</string>
     <string name="filename">文件名称</string>
     <string name="filesize">文件大小</string>
+    <string name="filemd5">文件校验</string>
     <string name="download">下载链接</string>
     <string name="changelog">更新日志</string>
     <string name="branch">分支版本</string>

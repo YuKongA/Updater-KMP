@@ -14,6 +14,7 @@
     <string name="big_version">Versão Principal</string>
     <string name="filename">Nome do Arquivo</string>
     <string name="filesize">Tamanho do Arquivo</string>
+    <string name="filemd5">MD5 do Arquivo</string>
     <string name="download">URL de Download</string>
     <string name="changelog">Registro de Alterações</string>
     <string name="branch">Ramo</string>

@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,13 +28,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import data.DataHelper
-import platform.downloadToLocal
 import kotlinx.coroutines.launch
 import misc.MessageUtils.Companion.showMessage
 import misc.bodyFontSize
 import misc.bodySmallFontSize
 import org.jetbrains.compose.resources.stringResource
 import platform.copyToClipboard
+import platform.downloadToLocal
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
@@ -54,6 +55,7 @@ import updater.composeapp.generated.resources.code_name
 import updater.composeapp.generated.resources.copy_successful
 import updater.composeapp.generated.resources.download
 import updater.composeapp.generated.resources.download_start
+import updater.composeapp.generated.resources.filemd5
 import updater.composeapp.generated.resources.filename
 import updater.composeapp.generated.resources.filesize
 import updater.composeapp.generated.resources.fingerprint
@@ -116,9 +118,14 @@ fun InfoCardViews(
                     romInfo.timestamp
                 )
             }
+
             MessageTextView(
                 stringResource(Res.string.filename),
                 romInfo.fileName
+            )
+            MessageTextView(
+                stringResource(Res.string.filemd5),
+                romInfo.md5
             )
             MessageTextView(
                 stringResource(Res.string.filesize),
@@ -233,7 +240,11 @@ fun MessageTextView(
     title: String,
     text: String
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    val clipboard = LocalClipboard.current
+    val hapticFeedback = LocalHapticFeedback.current
     val content = remember { mutableStateOf("") }
+    val messageCopySuccessful = stringResource(Res.string.copy_successful)
     content.value = text
 
     Column(
@@ -253,7 +264,17 @@ fun MessageTextView(
             Text(
                 text = it,
                 fontSize = bodyFontSize,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.combinedClickable(
+                    onClick = {},
+                    onLongClick = {
+                        coroutineScope.launch {
+                            clipboard.copyToClipboard(it)
+                        }
+                        showMessage(messageCopySuccessful)
+                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }
+                )
             )
         }
     }
