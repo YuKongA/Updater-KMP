@@ -187,7 +187,7 @@ object DeviceInfoHelper {
         Device("Redmi Pad Pro 5G", "ruan", "FS"),
         Device("REDMI Pad 2 4G", "koto", "OW"),
         Device("REDMI Pad 2", "taiko", "OV"),
-        Device("REDMI KPad", "turner", "AO"),
+        Device("REDMI K Pad", "turner", "AO"),
         Device("Redmi Note 13R / POCO M6 Plus", "breeze", "NU"),
         Device("Redmi K70 Ultra / Xiaomi 14T Pro", "rothko", "NN"),
         Device("Xiaomi MIX Fold 4", "goku", "NV"),
