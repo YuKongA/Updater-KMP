@@ -1,10 +1,11 @@
 package platform
 
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.Clipboard
+import platform.AppKit.NSPasteboard
+import platform.AppKit.NSPasteboardTypeString
 
-@OptIn(ExperimentalComposeUiApi::class)
 actual suspend fun Clipboard.copyToClipboard(string: String) {
-    this.setClipEntry(ClipEntry.withPlainText(string))
+    val pasteboard = NSPasteboard.generalPasteboard
+    pasteboard.clearContents()
+    pasteboard.setString(string, forType = NSPasteboardTypeString)
 }
