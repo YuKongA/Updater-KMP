@@ -145,11 +145,8 @@ kotlin {
 
 android {
     namespace = pkgName
-    compileSdk = 36
     defaultConfig {
         applicationId = pkgName
-        minSdk = 26
-        targetSdk = compileSdk
         versionCode = verCode
         versionName = verName
     }
