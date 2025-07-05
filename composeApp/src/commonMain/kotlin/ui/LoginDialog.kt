@@ -31,7 +31,7 @@ import login
 import logout
 import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
-import platform.perfGet
+import platform.prefGet
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
@@ -74,7 +74,7 @@ fun LoginDialog(
     var password by remember { mutableStateOf(getPassword().second) }
 
     var global by remember { mutableStateOf(false) }
-    var savePassword by remember { mutableStateOf(perfGet(PASSWORD_SAVE_KEY) ?: PASSWORD_SAVE_DISABLED) }
+    var savePassword by remember { mutableStateOf(prefGet(PASSWORD_SAVE_KEY) ?: PASSWORD_SAVE_DISABLED) }
     val showDialog = remember { mutableStateOf(false) }
 
     val icon = when (isLogin.value) {

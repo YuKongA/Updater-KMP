@@ -10,7 +10,7 @@ import misc.json
 import platform.httpClientPlatform
 import platform.miuiDecrypt
 import platform.miuiEncrypt
-import platform.perfGet
+import platform.prefGet
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -87,8 +87,8 @@ suspend fun getRecoveryRomInfo(
     androidVersion: String,
     isLogin: MutableState<Int>
 ): String {
-    if (perfGet("loginInfo") != null && isLogin.value == 1) {
-        val loginInfo = perfGet("loginInfo")?.let { json.decodeFromString<DataHelper.LoginData>(it) }
+    if (prefGet("loginInfo") != null && isLogin.value == 1) {
+        val loginInfo = prefGet("loginInfo")?.let { json.decodeFromString<DataHelper.LoginData>(it) }
         val authResult = loginInfo?.authResult
         if (authResult != "3") {
             accountType = loginInfo?.accountType.toString().ifEmpty { "CN" }

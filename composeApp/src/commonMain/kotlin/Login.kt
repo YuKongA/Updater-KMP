@@ -10,9 +10,9 @@ import platform.generateKey
 import platform.httpClientPlatform
 import platform.ownDecrypt
 import platform.ownEncrypt
-import platform.perfGet
-import platform.perfRemove
-import platform.perfSet
+import platform.prefGet
+import platform.prefRemove
+import platform.prefSet
 import top.yukonga.miuix.kmp.utils.Platform
 import top.yukonga.miuix.kmp.utils.platform
 
@@ -67,7 +67,7 @@ suspend fun login(
         if (ssecurity == null || location == null || userId.isEmpty()) return 4
 
         if (savePassword == "1") {
-            perfSet("savePassword", "1")
+            prefSet("savePassword", "1")
             savePassword(account, password)
         }
 
@@ -76,7 +76,7 @@ suspend fun login(
         val serviceToken = cookies.split("serviceToken=")[1].split(";")[0]
 
         val loginInfo = DataHelper.LoginData(accountType, authResult, description, ssecurity, serviceToken, userId)
-        perfSet("loginInfo", json.encodeToString(loginInfo))
+        prefSet("loginInfo", json.encodeToString(loginInfo))
         isLogin.value = 1
         return 0
     } catch (_: Exception) {
@@ -92,7 +92,7 @@ suspend fun login(
  * @return Logout status
  */
 fun logout(isLogin: MutableState<Int>): Boolean {
-    perfRemove("loginInfo")
+    prefRemove("loginInfo")
     isLogin.value = 0
     return true
 }
@@ -107,20 +107,20 @@ fun savePassword(account: String, password: String) {
     generateKey()
     val encryptedAccount = ownEncrypt(account)
     val encryptedPassword = ownEncrypt(password)
-    perfSet("account", encryptedAccount.first)
-    perfSet("accountIv", encryptedAccount.second)
-    perfSet("password", encryptedPassword.first)
-    perfSet("passwordIv", encryptedPassword.second)
+    prefSet("account", encryptedAccount.first)
+    prefSet("accountIv", encryptedAccount.second)
+    prefSet("password", encryptedPassword.first)
+    prefSet("passwordIv", encryptedPassword.second)
 }
 
 /**
  * Delete Xiaomi's account & password.
  */
 fun deletePassword() {
-    perfRemove("account")
-    perfRemove("accountIv")
-    perfRemove("password")
-    perfRemove("passwordIv")
+    prefRemove("account")
+    prefRemove("accountIv")
+    prefRemove("password")
+    prefRemove("passwordIv")
 }
 
 /**
@@ -129,11 +129,11 @@ fun deletePassword() {
  * @return Pair of Xiaomi's account & password
  */
 fun getPassword(): Pair<String, String> {
-    if (perfGet("account") != null && perfGet("password") != null && perfGet("accountIv") != null && perfGet("passwordIv") != null) {
-        val encryptedAccount = perfGet("account").toString()
-        val encodedAccountKey = perfGet("accountIv").toString()
-        val encryptedPassword = perfGet("password").toString()
-        val encodedPasswordKey = perfGet("passwordIv").toString()
+    if (prefGet("account") != null && prefGet("password") != null && prefGet("accountIv") != null && prefGet("passwordIv") != null) {
+        val encryptedAccount = prefGet("account").toString()
+        val encodedAccountKey = prefGet("accountIv").toString()
+        val encryptedPassword = prefGet("password").toString()
+        val encodedPasswordKey = prefGet("passwordIv").toString()
         val account = ownDecrypt(encryptedAccount, encodedAccountKey)
         val password = ownDecrypt(encryptedPassword, encodedPasswordKey)
         return Pair(account, password)

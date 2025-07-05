@@ -21,7 +21,7 @@ import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
-import platform.perfSet
+import platform.prefSet
 import platform.provider
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.toast_crash_info
@@ -118,7 +118,7 @@ fun UpdateRomInfo(
                         if (recoveryRomInfo.authResult != 1 && authResult != "3") {
                             loginData.authResult = "3"
                             isLogin.value = 3
-                            perfSet("loginInfo", json.encodeToString(loginData))
+                            prefSet("loginInfo", json.encodeToString(loginData))
                         }
                     }
 
@@ -153,12 +153,12 @@ fun UpdateRomInfo(
                             noUltimateLink
                         )
 
-                        perfSet("deviceName", deviceName.value)
-                        perfSet("codeName", codeName.value)
-                        perfSet("deviceRegion", deviceRegion.value)
-                        perfSet("deviceCarrier", deviceCarrier.value)
-                        perfSet("systemVersion", systemVersion.value)
-                        perfSet("androidVersion", androidVersion.value)
+                        prefSet("deviceName", deviceName.value)
+                        prefSet("codeName", codeName.value)
+                        prefSet("deviceRegion", deviceRegion.value)
+                        prefSet("deviceCarrier", deviceCarrier.value)
+                        prefSet("systemVersion", systemVersion.value)
+                        prefSet("androidVersion", androidVersion.value)
 
                         updateSearchKeywords(
                             deviceName.value, codeName.value, deviceRegion.value, deviceCarrier.value,
@@ -377,7 +377,7 @@ fun updateSearchKeywords(
 
     updatedKeywords.add(0, newKeyword)
     searchKeywords.value = updatedKeywords
-    perfSet("searchKeywords", json.encodeToString(updatedKeywords))
+    prefSet("searchKeywords", json.encodeToString(updatedKeywords))
 }
 
 /**

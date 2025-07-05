@@ -2,14 +2,14 @@ package platform
 
 import kotlinx.browser.window
 
-actual fun perfSet(key: String, value: String) {
+actual fun prefSet(key: String, value: String) {
     window.localStorage.setItem(key, value)
 }
 
-actual fun perfGet(key: String): String? {
+actual fun prefGet(key: String): String? {
     return window.localStorage.getItem(key)
 }
 
-actual fun perfRemove(key: String) {
+actual fun prefRemove(key: String) {
     window.localStorage.removeItem(key)
 }

@@ -45,8 +45,8 @@ import misc.UpdateRomInfo
 import misc.json
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import platform.perfGet
-import platform.perfRemove
+import platform.prefGet
+import platform.prefRemove
 import top.yukonga.miuix.kmp.basic.HorizontalDivider
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
@@ -85,14 +85,14 @@ fun App(
     AppTheme(
         isDarkTheme = isDarkTheme
     ) {
-        val deviceName = remember { mutableStateOf(perfGet("deviceName") ?: "") }
-        val codeName = remember { mutableStateOf(perfGet("codeName") ?: "") }
-        val deviceRegion = remember { mutableStateOf(perfGet("deviceRegion") ?: "Default (CN)") }
-        val deviceCarrier = remember { mutableStateOf(perfGet("deviceCarrier") ?: "Default (Xiaomi)") }
-        val androidVersion = remember { mutableStateOf(perfGet("androidVersion") ?: "15.0") }
-        val systemVersion = remember { mutableStateOf(perfGet("systemVersion") ?: "") }
+        val deviceName = remember { mutableStateOf(prefGet("deviceName") ?: "") }
+        val codeName = remember { mutableStateOf(prefGet("codeName") ?: "") }
+        val deviceRegion = remember { mutableStateOf(prefGet("deviceRegion") ?: "Default (CN)") }
+        val deviceCarrier = remember { mutableStateOf(prefGet("deviceCarrier") ?: "Default (Xiaomi)") }
+        val androidVersion = remember { mutableStateOf(prefGet("androidVersion") ?: "15.0") }
+        val systemVersion = remember { mutableStateOf(prefGet("systemVersion") ?: "") }
 
-        val loginData = perfGet("loginInfo")?.let { json.decodeFromString<DataHelper.LoginData>(it) }
+        val loginData = prefGet("loginInfo")?.let { json.decodeFromString<DataHelper.LoginData>(it) }
         val isLogin = remember { mutableStateOf(loginData?.authResult?.toInt() ?: 0) }
 
         val curRomInfo = remember { mutableStateOf(DataHelper.RomInfoData()) }
@@ -102,7 +102,7 @@ fun App(
         val incIconInfo: MutableState<List<DataHelper.IconInfoData>> = remember { mutableStateOf(listOf()) }
 
         val updateRomInfoState = remember { mutableStateOf(0) }
-        val searchKeywords = remember { mutableStateOf(json.decodeFromString<List<String>>(perfGet("searchKeywords") ?: "[]")) }
+        val searchKeywords = remember { mutableStateOf(json.decodeFromString<List<String>>(prefGet("searchKeywords") ?: "[]")) }
         val searchKeywordsSelected = remember { mutableStateOf(0) }
 
         UpdateRomInfo(
@@ -128,7 +128,7 @@ fun App(
 
         val onClearSearchHistory = {
             searchKeywords.value = listOf()
-            perfRemove("searchKeywords")
+            prefRemove("searchKeywords")
         }
 
         BoxWithConstraints {

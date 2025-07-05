@@ -4,14 +4,14 @@ import platform.Foundation.NSUserDefaults
 
 private val preferences = NSUserDefaults.standardUserDefaults()
 
-actual fun perfSet(key: String, value: String) {
+actual fun prefSet(key: String, value: String) {
     preferences.setObject(value, key)
 }
 
-actual fun perfGet(key: String): String? {
+actual fun prefGet(key: String): String? {
     return preferences.stringForKey(key)
 }
 
-actual fun perfRemove(key: String) {
+actual fun prefRemove(key: String) {
     preferences.removeObjectForKey(key)
 }
