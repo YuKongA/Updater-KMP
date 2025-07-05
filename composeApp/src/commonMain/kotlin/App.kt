@@ -87,8 +87,8 @@ fun App(
     ) {
         val deviceName = remember { mutableStateOf(perfGet("deviceName") ?: "") }
         val codeName = remember { mutableStateOf(perfGet("codeName") ?: "") }
-        val deviceRegion = remember { mutableStateOf(perfGet("deviceRegion") ?: "CN") }
-        val deviceCarrier = remember { mutableStateOf(perfGet("deviceCarrier") ?: "Xiaomi") }
+        val deviceRegion = remember { mutableStateOf(perfGet("deviceRegion") ?: "Default (CN)") }
+        val deviceCarrier = remember { mutableStateOf(perfGet("deviceCarrier") ?: "Default (Xiaomi)") }
         val androidVersion = remember { mutableStateOf(perfGet("androidVersion") ?: "15.0") }
         val systemVersion = remember { mutableStateOf(perfGet("systemVersion") ?: "") }
 
