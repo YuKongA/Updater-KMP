@@ -18,6 +18,12 @@ object DeviceInfoHelper {
         val deviceCode: String,
     )
 
+    data class Carrier(
+        val carrierName: String,
+        val carrierCode: String,
+        val regionAppend: String = "",
+    )
+
     /**
      * List of Xiaomi devices.
      *
@@ -204,8 +210,6 @@ object DeviceInfoHelper {
         Device("Xiaomi MIX Filp 2", "bixi", "OH"),
     )
 
-    private const val XIAOMI = "XM"
-
     private val androidW = Android("16.0", "W")
     private val androidV = Android("15.0", "V")
     private val androidU = Android("14.0", "U")
@@ -243,8 +247,8 @@ object DeviceInfoHelper {
     )
 
     private val CN = Region("", "CN")
-    private val GL = Region("_global", "MI", "GL")
-    private val EEA = Region("_eea_global", "EU", "EEA")
+    private val GL = Region("_global", "MI", "GL (MI)")
+    private val EEA = Region("_eea_global", "EU", "EEA (EU)")
     private val RU = Region("_ru_global", "RU")
     private val TW = Region("_tw_global", "TW")
     private val ID = Region("_id_global", "ID")
@@ -255,25 +259,36 @@ object DeviceInfoHelper {
 
     private val regionList = listOf(CN, GL, EEA, RU, TW, ID, TR, IN, JP, KR)
 
+    private  val XM = Carrier("Xiaomi", "XM")
+    private val SB = Carrier("SoftBank", "SB","_sb")
+    private val KD = Carrier("KDDI", "KD","_kd")
+    
+    private  val carrierList = listOf(XM, SB, KD)
+
     private val deviceNameToDeviceCodeName = deviceList.associateBy({ it.deviceName }, { it.deviceCodeName })
     private val deviceCodeNameToDeviceName = deviceList.associateBy({ it.deviceCodeName }, { it.deviceName })
     private val regionNameToRegionCode = regionList.associateBy({ it.regionName }, { it.regionCode })
     private val regionNameToRegionCodeName = regionList.associateBy({ it.regionName }, { it.regionCodeName })
+    private val carrierNameToCarrierCode = carrierList.associateBy({ it.carrierName }, { it.carrierCode })
+    private val carrierNameToCarrierCodeName = carrierList.associateBy({ it.carrierName }, { it.regionAppend })
     private val androidVersionCodeToAndroidLetterCode = androidList.associateBy { it.androidVersionCode }
 
     val deviceNames = deviceList.map { it.deviceName }
     val codeNames = deviceList.map { it.deviceCodeName }
     val regionNames = regionList.map { it.regionName }
+    val carrierNames = carrierList.map { it.carrierName }
     val androidVersions = androidList.map { it.androidVersionCode }
 
     fun codeName(deviceName: String): String = deviceNameToDeviceCodeName[deviceName] ?: ""
     fun deviceName(deviceCodeName: String): String = deviceCodeNameToDeviceName[deviceCodeName] ?: ""
     fun regionCode(regionName: String): String = regionNameToRegionCode[regionName] ?: ""
+    fun carrierCode(carrierName: String): String = carrierNameToCarrierCode[carrierName] ?: ""
     fun regionCodeName(regionName: String): String = regionNameToRegionCodeName[regionName] ?: ""
+    fun carrierCodeName(carrierName: String): String = carrierNameToCarrierCodeName[carrierName] ?: ""
 
-    fun deviceCode(androidVersionCode: String, codeName: String, regionCode: String): String {
+    fun deviceCode(androidVersionCode: String, codeName: String, regionCode: String, carrierCode: String): String {
         val android = androidVersionCodeToAndroidLetterCode[androidVersionCode] ?: return ""
         val device = deviceList.find { it.deviceCodeName == codeName } ?: return ""
-        return "${android.androidLetterCode}${device.deviceCode}${regionCode}$XIAOMI"
+        return "${android.androidLetterCode}${device.deviceCode}${regionCode}${carrierCode}"
     }
 }

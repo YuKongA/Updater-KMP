@@ -50,7 +50,8 @@
     <string name="confirm">Confirmar</string>
     <string name="logout_successful">Logout bem-sucedido</string>
     <string name="login_error">Falha na verificação de login!</string>
-    <string name="regions_code">Código de Regiões</string>
+    <string name="region_code">Código de Regiões</string>
+    <string name="carrier_code">Código da Operadora</string>
     <string name="global">Conta global</string>
     <string name="extension_settings">Configurações de Extensão</string>
     <string name="dark_theme">Modo de exibição</string>

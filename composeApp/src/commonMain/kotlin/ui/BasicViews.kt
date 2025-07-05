@@ -38,9 +38,10 @@ import top.yukonga.miuix.kmp.theme.MiuixTheme
 import ui.components.AutoCompleteTextField
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.android_version
+import updater.composeapp.generated.resources.carrier_code
 import updater.composeapp.generated.resources.code_name
 import updater.composeapp.generated.resources.device_name
-import updater.composeapp.generated.resources.regions_code
+import updater.composeapp.generated.resources.region_code
 import updater.composeapp.generated.resources.search_history
 import updater.composeapp.generated.resources.submit
 import updater.composeapp.generated.resources.system_version
@@ -63,7 +64,7 @@ private fun SearchHistoryView(
             SpinnerEntry(
                 icon = null,
                 title = "${parts.getOrElse(0) { "" }.ifEmpty { "Unknown" }} (${parts.getOrElse(1) { "" }})",
-                summary = "${parts.getOrElse(2) { "" }}-${parts.getOrElse(3) { "" }}-${parts.getOrElse(4) { "" }}",
+                summary = "${parts.getOrElse(2) { "" }}-${parts.getOrElse(3) { "" }}-${parts.getOrElse(4) { "" }}-${parts.getOrElse(5) { "" }}",
             )
         }
         Card(
@@ -96,6 +97,7 @@ fun BasicViews(
     codeName: MutableState<String>,
     androidVersion: MutableState<String>,
     deviceRegion: MutableState<String>,
+    deviceCarrier: MutableState<String>,
     systemVersion: MutableState<String>,
     updateRomInfo: MutableState<Int>,
     searchKeywords: MutableState<List<String>>,
@@ -106,6 +108,10 @@ fun BasicViews(
     }
     val regionSelected = remember {
         mutableStateOf(DeviceInfoHelper.regionNames.indexOf(deviceRegion.value).takeIf { it >= 0 } ?: 0)
+    }
+
+    val carrierSelected = remember {
+        mutableStateOf(DeviceInfoHelper.carrierNames.indexOf(deviceCarrier.value).takeIf { it >= 0 } ?: 0)
     }
 
     val deviceNameFlow = remember { MutableStateFlow(deviceName.value) }
@@ -191,12 +197,26 @@ fun BasicViews(
                 maxHeight = 280.dp
             )
             SuperDropdown(
-                title = stringResource(Res.string.regions_code),
+                title = stringResource(Res.string.region_code),
                 items = DeviceInfoHelper.regionNames,
                 selectedIndex = regionSelected.value,
                 onSelectedIndexChange = { index ->
                     regionSelected.value = index
                     deviceRegion.value = DeviceInfoHelper.regionNames[index]
+                },
+                onClick = {
+                    focusManager.clearFocus()
+                },
+                mode = DropDownMode.AlwaysOnRight,
+                maxHeight = 280.dp
+            )
+            SuperDropdown(
+                title = stringResource(Res.string.carrier_code),
+                items = DeviceInfoHelper.carrierNames,
+                selectedIndex = carrierSelected.value,
+                onSelectedIndexChange = { index ->
+                    carrierSelected.value = index
+                    deviceCarrier.value = DeviceInfoHelper.carrierNames[index]
                 },
                 onClick = {
                     focusManager.clearFocus()
@@ -213,10 +233,12 @@ fun BasicViews(
                 deviceName.value = parts[0]
                 codeName.value = parts[1]
                 deviceRegion.value = parts[2]
-                androidVersion.value = parts[3]
-                systemVersion.value = parts[4]
+                deviceCarrier.value = parts[3]
+                androidVersion.value = parts[4]
+                systemVersion.value = parts[5]
                 regionSelected.value = DeviceInfoHelper.regionNames.indexOf(parts[2])
-                androidVersionSelected.value = DeviceInfoHelper.androidVersions.indexOf(parts[3])
+                carrierSelected.value = DeviceInfoHelper.carrierNames.indexOf(parts[3])
+                androidVersionSelected.value = DeviceInfoHelper.androidVersions.indexOf(parts[4])
             }
         )
         TextButton(

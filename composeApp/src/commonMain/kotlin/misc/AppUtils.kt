@@ -60,6 +60,7 @@ fun UpdateRomInfo(
     deviceName: MutableState<String>,
     codeName: MutableState<String>,
     deviceRegion: MutableState<String>,
+    deviceCarrier: MutableState<String>,
     androidVersion: MutableState<String>,
     systemVersion: MutableState<String>,
     loginData: DataHelper.LoginData?,
@@ -73,9 +74,16 @@ fun UpdateRomInfo(
     searchKeywordsSelected: MutableState<Int>,
 ) {
     val regionCode = DeviceInfoHelper.regionCode(deviceRegion.value)
-    val deviceCode = DeviceInfoHelper.deviceCode(androidVersion.value, codeName.value, regionCode)
+    val carrierCode = DeviceInfoHelper.carrierCode(deviceCarrier.value)
+    val deviceCode = DeviceInfoHelper.deviceCode(androidVersion.value, codeName.value, regionCode, carrierCode)
     val regionCodeName = DeviceInfoHelper.regionCodeName(deviceRegion.value)
-    val codeNameExt = codeName.value + regionCodeName
+    val carrierCodeName = DeviceInfoHelper.carrierCodeName(deviceCarrier.value)
+
+    val codeNameExt = if (regionCodeName.isNotEmpty()) {
+        codeName.value + regionCodeName.replace("_global", "") + carrierCodeName + "_global"
+    } else {
+        codeName.value + carrierCodeName
+    }
     val systemVersionExt = systemVersion.value.uppercase().replace("^OS1".toRegex(), "V816").replace("AUTO$".toRegex(), deviceCode)
     val branchExt = if (systemVersion.value.uppercase().endsWith(".DEV")) "X" else "F"
 
@@ -148,7 +156,7 @@ fun UpdateRomInfo(
                         perfSet("androidVersion", androidVersion.value)
 
                         updateSearchKeywords(
-                            deviceName.value, codeName.value, deviceRegion.value,
+                            deviceName.value, codeName.value, deviceRegion.value, deviceCarrier.value,
                             androidVersion.value, systemVersion.value, searchKeywords
                         )
 
@@ -348,11 +356,12 @@ fun updateSearchKeywords(
     deviceName: String,
     codeName: String,
     deviceRegion: String,
+    deviceCarrier: String,
     androidVersion: String,
     systemVersion: String,
     searchKeywords: MutableState<List<String>>
 ) {
-    val newKeyword = "$deviceName-$codeName-$deviceRegion-$androidVersion-$systemVersion"
+    val newKeyword = "$deviceName-$codeName-$deviceRegion-$deviceCarrier-$androidVersion-$systemVersion"
     val updatedKeywords = searchKeywords.value.toMutableList()
 
     if (updatedKeywords.contains(newKeyword)) {

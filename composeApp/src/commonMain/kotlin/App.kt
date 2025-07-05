@@ -141,6 +141,7 @@ private fun PortraitAppView(
     codeName: MutableState<String>,
     androidVersion: MutableState<String>,
     deviceRegion: MutableState<String>,
+    deviceCarrier: MutableState<String>,
     systemVersion: MutableState<String>,
     updateRomInfoState: MutableState<Int>,
     searchKeywordsSelected: MutableState<Int>,
@@ -192,7 +193,7 @@ private fun PortraitAppView(
                     Column {
                         LoginCardView(isLogin)
                         BasicViews(
-                            deviceName, codeName, androidVersion, deviceRegion, systemVersion,
+                            deviceName, codeName, androidVersion, deviceRegion, deviceCarrier, systemVersion,
                             updateRomInfoState, searchKeywords, searchKeywordsSelected
                         )
                         Column(modifier = Modifier.padding(horizontal = 12.dp)) {
@@ -218,6 +219,7 @@ private fun LandscapeAppView(
     codeName: MutableState<String>,
     androidVersion: MutableState<String>,
     deviceRegion: MutableState<String>,
+    deviceCarrier: MutableState<String>,
     systemVersion: MutableState<String>,
     updateRomInfoState: MutableState<Int>,
     searchKeywordsSelected: MutableState<Int>,
@@ -266,7 +268,7 @@ private fun LandscapeAppView(
                     item {
                         LoginCardView(isLogin)
                         BasicViews(
-                            deviceName, codeName, androidVersion, deviceRegion, systemVersion,
+                            deviceName, codeName, androidVersion, deviceRegion, deviceCarrier, systemVersion,
                             updateRomInfoState, searchKeywords, searchKeywordsSelected
                         )
                         Spacer(
@@ -337,6 +339,7 @@ fun App(
         val deviceName = remember { mutableStateOf(perfGet("deviceName") ?: "") }
         val codeName = remember { mutableStateOf(perfGet("codeName") ?: "") }
         val deviceRegion = remember { mutableStateOf(perfGet("deviceRegion") ?: "CN") }
+        val deviceCarrier = remember { mutableStateOf(perfGet("deviceCarrier") ?: "Xiaomi") }
         val androidVersion = remember { mutableStateOf(perfGet("androidVersion") ?: "15.0") }
         val systemVersion = remember { mutableStateOf(perfGet("systemVersion") ?: "") }
 
@@ -354,7 +357,7 @@ fun App(
         val searchKeywordsSelected = remember { mutableStateOf(0) }
 
         UpdateRomInfo(
-            deviceName, codeName, deviceRegion, androidVersion, systemVersion, loginData,
+            deviceName, codeName, deviceRegion, deviceCarrier, androidVersion, systemVersion, loginData,
             isLogin, curRomInfo, incRomInfo, curIconInfo, incIconInfo, updateRomInfoState, searchKeywords, searchKeywordsSelected
         )
 
@@ -394,6 +397,7 @@ fun App(
                     codeName = codeName,
                     androidVersion = androidVersion,
                     deviceRegion = deviceRegion,
+                    deviceCarrier = deviceCarrier,
                     systemVersion = systemVersion,
                     updateRomInfoState = updateRomInfoState,
                     searchKeywordsSelected = searchKeywordsSelected,
@@ -414,6 +418,7 @@ fun App(
                     codeName = codeName,
                     androidVersion = androidVersion,
                     deviceRegion = deviceRegion,
+                    deviceCarrier = deviceCarrier,
                     systemVersion = systemVersion,
                     updateRomInfoState = updateRomInfoState,
                     searchKeywordsSelected = searchKeywordsSelected,
