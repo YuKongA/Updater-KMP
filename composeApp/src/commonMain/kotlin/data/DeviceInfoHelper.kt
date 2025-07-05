@@ -207,7 +207,7 @@ object DeviceInfoHelper {
         Device("Xiaomi Pad 7S Pro", "violin", "OT"),
         Device("Xiaomi Pad 7 Ultra", "jinghu", "OX"),
         Device("Xiaomi Civi 5 Pro", "luming", "OI"),
-        Device("Xiaomi MIX Filp 2", "bixi", "OH"),
+        Device("Xiaomi MIX Flip 2", "bixi", "OH"),
     )
 
     private val androidW = Android("16.0", "W")
