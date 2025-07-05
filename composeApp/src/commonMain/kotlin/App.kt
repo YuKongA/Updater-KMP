@@ -79,6 +79,110 @@ import updater.composeapp.generated.resources.clear_search_history
 import updater.composeapp.generated.resources.icon
 
 @Composable
+fun App(
+    isDarkTheme: Boolean = isSystemInDarkTheme()
+) {
+    AppTheme(
+        isDarkTheme = isDarkTheme
+    ) {
+        val deviceName = remember { mutableStateOf(perfGet("deviceName") ?: "") }
+        val codeName = remember { mutableStateOf(perfGet("codeName") ?: "") }
+        val deviceRegion = remember { mutableStateOf(perfGet("deviceRegion") ?: "CN") }
+        val deviceCarrier = remember { mutableStateOf(perfGet("deviceCarrier") ?: "Xiaomi") }
+        val androidVersion = remember { mutableStateOf(perfGet("androidVersion") ?: "15.0") }
+        val systemVersion = remember { mutableStateOf(perfGet("systemVersion") ?: "") }
+
+        val loginData = perfGet("loginInfo")?.let { json.decodeFromString<DataHelper.LoginData>(it) }
+        val isLogin = remember { mutableStateOf(loginData?.authResult?.toInt() ?: 0) }
+
+        val curRomInfo = remember { mutableStateOf(DataHelper.RomInfoData()) }
+        val incRomInfo = remember { mutableStateOf(DataHelper.RomInfoData()) }
+
+        val curIconInfo: MutableState<List<DataHelper.IconInfoData>> = remember { mutableStateOf(listOf()) }
+        val incIconInfo: MutableState<List<DataHelper.IconInfoData>> = remember { mutableStateOf(listOf()) }
+
+        val updateRomInfoState = remember { mutableStateOf(0) }
+        val searchKeywords = remember { mutableStateOf(json.decodeFromString<List<String>>(perfGet("searchKeywords") ?: "[]")) }
+        val searchKeywordsSelected = remember { mutableStateOf(0) }
+
+        UpdateRomInfo(
+            deviceName, codeName, deviceRegion, deviceCarrier, androidVersion, systemVersion, loginData,
+            isLogin, curRomInfo, incRomInfo, curIconInfo, incIconInfo, updateRomInfoState, searchKeywords, searchKeywordsSelected
+        )
+
+        val scrollBehavior = MiuixScrollBehavior(rememberTopAppBarState())
+        val focusManager = LocalFocusManager.current
+        val hazeState = remember { HazeState() }
+
+        val hazeStyle = HazeStyle(
+            backgroundColor = MiuixTheme.colorScheme.background,
+            tint = HazeTint(
+                MiuixTheme.colorScheme.background.copy(
+                    if (scrollBehavior.state.collapsedFraction <= 0f) 1f
+                    else lerp(1f, 0.67f, (scrollBehavior.state.collapsedFraction))
+                )
+            )
+        )
+
+        val showMenuPopup = remember { mutableStateOf(false) }
+
+        val onClearSearchHistory = {
+            searchKeywords.value = listOf()
+            perfRemove("searchKeywords")
+        }
+
+        BoxWithConstraints {
+            if (maxWidth < 768.dp) {
+                PortraitAppView(
+                    hazeState = hazeState,
+                    hazeStyle = hazeStyle,
+                    scrollBehavior = scrollBehavior,
+                    focusManager = focusManager,
+                    showMenuPopup = showMenuPopup,
+                    searchKeywords = searchKeywords,
+                    onClearSearchHistory = onClearSearchHistory,
+                    isLogin = isLogin,
+                    deviceName = deviceName,
+                    codeName = codeName,
+                    androidVersion = androidVersion,
+                    deviceRegion = deviceRegion,
+                    deviceCarrier = deviceCarrier,
+                    systemVersion = systemVersion,
+                    updateRomInfoState = updateRomInfoState,
+                    searchKeywordsSelected = searchKeywordsSelected,
+                    curRomInfo = curRomInfo,
+                    curIconInfo = curIconInfo,
+                    incRomInfo = incRomInfo,
+                    incIconInfo = incIconInfo
+                )
+            } else {
+                LandscapeAppView(
+                    scrollBehavior = scrollBehavior,
+                    focusManager = focusManager,
+                    showMenuPopup = showMenuPopup,
+                    searchKeywords = searchKeywords,
+                    onClearSearchHistory = onClearSearchHistory,
+                    isLogin = isLogin,
+                    deviceName = deviceName,
+                    codeName = codeName,
+                    androidVersion = androidVersion,
+                    deviceRegion = deviceRegion,
+                    deviceCarrier = deviceCarrier,
+                    systemVersion = systemVersion,
+                    updateRomInfoState = updateRomInfoState,
+                    searchKeywordsSelected = searchKeywordsSelected,
+                    curRomInfo = curRomInfo,
+                    curIconInfo = curIconInfo,
+                    incRomInfo = incRomInfo,
+                    incIconInfo = incIconInfo
+                )
+            }
+        }
+        Snackbar()
+    }
+}
+
+@Composable
 private fun MenuActions(
     searchKeywordsState: MutableState<List<String>>,
     showMenuPopup: MutableState<Boolean>,
@@ -326,109 +430,5 @@ private fun LandscapeAppView(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun App(
-    isDarkTheme: Boolean = isSystemInDarkTheme()
-) {
-    AppTheme(
-        isDarkTheme = isDarkTheme
-    ) {
-        val deviceName = remember { mutableStateOf(perfGet("deviceName") ?: "") }
-        val codeName = remember { mutableStateOf(perfGet("codeName") ?: "") }
-        val deviceRegion = remember { mutableStateOf(perfGet("deviceRegion") ?: "CN") }
-        val deviceCarrier = remember { mutableStateOf(perfGet("deviceCarrier") ?: "Xiaomi") }
-        val androidVersion = remember { mutableStateOf(perfGet("androidVersion") ?: "15.0") }
-        val systemVersion = remember { mutableStateOf(perfGet("systemVersion") ?: "") }
-
-        val loginData = perfGet("loginInfo")?.let { json.decodeFromString<DataHelper.LoginData>(it) }
-        val isLogin = remember { mutableStateOf(loginData?.authResult?.toInt() ?: 0) }
-
-        val curRomInfo = remember { mutableStateOf(DataHelper.RomInfoData()) }
-        val incRomInfo = remember { mutableStateOf(DataHelper.RomInfoData()) }
-
-        val curIconInfo: MutableState<List<DataHelper.IconInfoData>> = remember { mutableStateOf(listOf()) }
-        val incIconInfo: MutableState<List<DataHelper.IconInfoData>> = remember { mutableStateOf(listOf()) }
-
-        val updateRomInfoState = remember { mutableStateOf(0) }
-        val searchKeywords = remember { mutableStateOf(json.decodeFromString<List<String>>(perfGet("searchKeywords") ?: "[]")) }
-        val searchKeywordsSelected = remember { mutableStateOf(0) }
-
-        UpdateRomInfo(
-            deviceName, codeName, deviceRegion, deviceCarrier, androidVersion, systemVersion, loginData,
-            isLogin, curRomInfo, incRomInfo, curIconInfo, incIconInfo, updateRomInfoState, searchKeywords, searchKeywordsSelected
-        )
-
-        val scrollBehavior = MiuixScrollBehavior(rememberTopAppBarState())
-        val focusManager = LocalFocusManager.current
-        val hazeState = remember { HazeState() }
-
-        val hazeStyle = HazeStyle(
-            backgroundColor = MiuixTheme.colorScheme.background,
-            tint = HazeTint(
-                MiuixTheme.colorScheme.background.copy(
-                    if (scrollBehavior.state.collapsedFraction <= 0f) 1f
-                    else lerp(1f, 0.67f, (scrollBehavior.state.collapsedFraction))
-                )
-            )
-        )
-
-        val showMenuPopup = remember { mutableStateOf(false) }
-
-        val onClearSearchHistory = {
-            searchKeywords.value = listOf()
-            perfRemove("searchKeywords")
-        }
-
-        BoxWithConstraints {
-            if (maxWidth < 768.dp) {
-                PortraitAppView(
-                    hazeState = hazeState,
-                    hazeStyle = hazeStyle,
-                    scrollBehavior = scrollBehavior,
-                    focusManager = focusManager,
-                    showMenuPopup = showMenuPopup,
-                    searchKeywords = searchKeywords,
-                    onClearSearchHistory = onClearSearchHistory,
-                    isLogin = isLogin,
-                    deviceName = deviceName,
-                    codeName = codeName,
-                    androidVersion = androidVersion,
-                    deviceRegion = deviceRegion,
-                    deviceCarrier = deviceCarrier,
-                    systemVersion = systemVersion,
-                    updateRomInfoState = updateRomInfoState,
-                    searchKeywordsSelected = searchKeywordsSelected,
-                    curRomInfo = curRomInfo,
-                    curIconInfo = curIconInfo,
-                    incRomInfo = incRomInfo,
-                    incIconInfo = incIconInfo
-                )
-            } else {
-                LandscapeAppView(
-                    scrollBehavior = scrollBehavior,
-                    focusManager = focusManager,
-                    showMenuPopup = showMenuPopup,
-                    searchKeywords = searchKeywords,
-                    onClearSearchHistory = onClearSearchHistory,
-                    isLogin = isLogin,
-                    deviceName = deviceName,
-                    codeName = codeName,
-                    androidVersion = androidVersion,
-                    deviceRegion = deviceRegion,
-                    deviceCarrier = deviceCarrier,
-                    systemVersion = systemVersion,
-                    updateRomInfoState = updateRomInfoState,
-                    searchKeywordsSelected = searchKeywordsSelected,
-                    curRomInfo = curRomInfo,
-                    curIconInfo = curIconInfo,
-                    incRomInfo = incRomInfo,
-                    incIconInfo = incIconInfo
-                )
-            }
-        }
-        Snackbar()
     }
 }

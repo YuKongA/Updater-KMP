@@ -82,7 +82,11 @@ fun UpdateRomInfo(
     val codeNameExt = if (regionCodeName.isNotEmpty()) {
         codeName.value + regionCodeName.replace("_global", "") + carrierCodeName + "_global"
     } else {
-        codeName.value + carrierCodeName
+        if (regionCode == "CN" && carrierCode == "DM") {
+            codeName.value + "_demo"
+        } else {
+            codeName.value + carrierCodeName
+        }
     }
     val systemVersionExt = systemVersion.value.uppercase().replace("^OS1".toRegex(), "V816").replace("AUTO$".toRegex(), deviceCode)
     val branchExt = if (systemVersion.value.uppercase().endsWith(".DEV")) "X" else "F"
@@ -152,6 +156,7 @@ fun UpdateRomInfo(
                         perfSet("deviceName", deviceName.value)
                         perfSet("codeName", codeName.value)
                         perfSet("deviceRegion", deviceRegion.value)
+                        perfSet("deviceCarrier", deviceCarrier.value)
                         perfSet("systemVersion", systemVersion.value)
                         perfSet("androidVersion", androidVersion.value)
 
