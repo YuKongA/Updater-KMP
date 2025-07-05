@@ -267,6 +267,7 @@ object DeviceInfoHelper {
 
     private val XM = Carrier("Default (Xiaomi)", "XM")
     private val DM = Carrier("MiStore (Demo)", "DM")
+    private val DC = Carrier("DeviceLockController", "DC", "_dc")
     private val AT = Carrier("AT&T", "AT", "_at")
     private val BY = Carrier("Bouygues", "BY", "_by")
     private val CR = Carrier("Claro", "CR", "_cr")
@@ -284,7 +285,7 @@ object DeviceInfoHelper {
     private val VC = Carrier("Vodacom", "VC", "_vc")
     private val VF = Carrier("Vodafone", "VF", "_vf")
 
-    private val carrierList = listOf(XM, DM, AT, BY, CR, EN, HG, KD, MS, MT, OR, SB, SF, TF, TG, TM, VC, VF)
+    private val carrierList = listOf(XM, DM, DC, AT, BY, CR, EN, HG, KD, MS, MT, OR, SB, SF, TF, TG, TM, VC, VF)
 
     private val deviceNameToDeviceCodeName = deviceList.associateBy({ it.deviceName }, { it.deviceCodeName })
     private val deviceCodeNameToDeviceName = deviceList.associateBy({ it.deviceCodeName }, { it.deviceName })
