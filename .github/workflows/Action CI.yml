@@ -16,14 +16,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ macos-latest, ubuntu-latest, windows-latest ]
+        os: [ macos-latest, ubuntu-latest, ubuntu-24.04-arm, windows-latest ]
         include:
-          - os: windows-latest
-            platform: windows x64
-            build-command: ./gradlew createReleaseDistributable
-            artifact-path: composeApp/build/compose/binaries/main-release/app/Updater
-            artifact-name: Updater-windows-x64-exe
-            jdk-distribution: jetbrains
           - os: macos-latest
             platform: macos arm64
             build-command: ./gradlew packageDmgNativeReleaseMacosArm64
@@ -40,6 +34,18 @@ jobs:
             artifact-name: Updater-linux-x64-bin
             artifact-nameEx: Updater-android-aarch64-apk
             jdk-distribution: zulu
+          - os: ubuntu-24.04-arm
+            platform: linux arm64
+            build-command: ./gradlew createReleaseDistributable
+            artifact-path: composeApp/build/compose/binaries/main-release/app/Updater
+            artifact-name: Updater-linux-arm64-bin
+            jdk-distribution: zulu
+          - os: windows-latest
+            platform: windows x64
+            build-command: ./gradlew createReleaseDistributable
+            artifact-path: composeApp/build/compose/binaries/main-release/app/Updater
+            artifact-name: Updater-windows-x64-exe
+            jdk-distribution: jetbrains
 
     steps:
       - name: Checkout sources
@@ -77,7 +83,6 @@ jobs:
         with:
           name: ${{ matrix.artifact-name }}
           path: ${{ matrix.artifact-path }}
-          compression-level: 9
 
       - name: Upload Updater ${{ matrix.platformEx }} artifact
         if: matrix.platformEx == 'android aarch64'
@@ -85,7 +90,6 @@ jobs:
         with:
           name: ${{ matrix.artifact-nameEx }}
           path: ${{ matrix.artifact-pathEx }}
-          compression-level: 9
 
       - name: Post to Telegram ci channel
         if: ${{ success() && matrix.platformEx == 'android aarch64' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && github.ref_type != 'tag' }}
