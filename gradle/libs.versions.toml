@@ -1,5 +1,5 @@
 [versions]
-android-gradle-plugin = "8.11.0"
+android-gradle-plugin = "8.11.1"
 androidx-activity-compose = "1.10.1"
 compose-plugin = "1.8.2"
 cryptography = "0.5.0"
