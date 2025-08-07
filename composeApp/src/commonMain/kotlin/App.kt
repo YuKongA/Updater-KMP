@@ -3,11 +3,13 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.captionBar
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -32,6 +34,7 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import data.DataHelper
@@ -69,6 +72,7 @@ import top.yukonga.miuix.kmp.utils.Platform
 import top.yukonga.miuix.kmp.utils.getWindowSize
 import top.yukonga.miuix.kmp.utils.overScrollVertical
 import top.yukonga.miuix.kmp.utils.platform
+import top.yukonga.miuix.kmp.utils.scrollEndHaptic
 import ui.AboutDialog
 import ui.BasicViews
 import ui.InfoCardViews
@@ -131,7 +135,10 @@ fun App(
             prefRemove("searchKeywords")
         }
 
-        BoxWithConstraints {
+        BoxWithConstraints(
+            modifier = Modifier
+                .scrollEndHaptic()
+        ) {
             if (maxWidth < 768.dp) {
                 PortraitAppView(
                     hazeState = hazeState,
@@ -333,12 +340,12 @@ private fun LandscapeAppView(
     incIconInfo: MutableState<List<DataHelper.IconInfoData>>
 ) {
     Scaffold(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) { scaffoldPaddingValues ->
         Row(
             modifier = Modifier
-                .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
-                .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal))
+                .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Start))
+                .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Start))
         ) {
             Column(
                 modifier = Modifier
@@ -356,7 +363,11 @@ private fun LandscapeAppView(
                             focusManager = focusManager,
                             onClearSearchHistory = onClearSearchHistory
                         )
-                    }
+                    },
+                    defaultWindowInsetsPadding = false,
+                    modifier = Modifier
+                        .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Start))
+                        .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Start))
                 )
                 HorizontalDivider(
                     thickness = 1.dp
@@ -410,7 +421,11 @@ private fun LandscapeAppView(
                         .fillMaxHeight()
                         .padding(horizontal = 12.dp)
                         .overScrollVertical(),
-                    contentPadding = scaffoldPaddingValues,
+                    contentPadding = PaddingValues(
+                        top = scaffoldPaddingValues.calculateTopPadding(),
+                        bottom = scaffoldPaddingValues.calculateBottomPadding(),
+                        end = scaffoldPaddingValues.calculateEndPadding(LocalLayoutDirection.current)
+                    ),
                     overscrollEffect = null
                 ) {
                     item {
