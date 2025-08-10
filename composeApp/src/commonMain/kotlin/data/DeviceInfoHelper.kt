@@ -184,9 +184,9 @@ object DeviceInfoHelper {
         Device("Redmi K70 / POCO F6 Pro", "vermeer", "NK"),
         Device("Redmi K70 Pro", "manet", "NM"),
         Device("Redmi K70E / POCO X6 Pro", "duchamp", "NL"),
-        Device("REDMI K80", "zorn", "OK"),
+        Device("REDMI K80 / POCO F7 Pro", "zorn", "OK"),
         Device("REDMI K80 Pro", "miro", "OM"),
-        Device("REDMI K80 Ultra", "dali", "ON"),
+        Device("REDMI K80 Ultra / POCO F7 Ultra", "dali", "ON"),
         Device("Xiaomi 14 Ultra", "aurora", "NA"),
         Device("Xiaomi Pad 6S Pro", "sheng", "NX"),
         Device("Redmi Pad Pro WiFi", "dizi", "NS"),
@@ -208,6 +208,7 @@ object DeviceInfoHelper {
         Device("Xiaomi Pad 7 Ultra", "jinghu", "OX"),
         Device("Xiaomi Civi 5 Pro", "luming", "OI"),
         Device("Xiaomi MIX Flip 2", "bixi", "OH"),
+        Device("REDMI 15 5G", "spring", "OU"),
     )
 
     private val androidW = Android("16.0", "W")
