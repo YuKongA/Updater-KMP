@@ -188,7 +188,12 @@ android {
                 (this as BaseVariantOutputImpl).outputFileName = "$appName-v$versionName($versionCode)-$name.apk"
             }
         }
-        resources.excludes += "**"
+    }
+}
+
+androidComponents {
+    onVariants(selector().withBuildType("release")) {
+        it.packaging.resources.excludes.add("**")
     }
 }
 
