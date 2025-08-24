@@ -209,8 +209,11 @@ object DeviceInfoHelper {
         Device("Xiaomi Civi 5 Pro", "luming", "OI"),
         Device("Xiaomi MIX Flip 2", "bixi", "OH"),
         Device("REDMI 15C / POCO C85", "dew", "BN"),
-        Device("REDMI 15", "creek", "BO"),
-        Device("REDMI 15 5G / POCO M7 Plus", "spring", "OU"),
+        Device("REDMI 15 / POCO M7", "creek", "BO"),
+        Device("REDMI 15 5G / Note 15R / POCO M7 Plus", "spring", "OU"),
+        Device("REDMI Note 15", "kunzite", "PQ"),
+        Device("REDMI Note 15 Pro", "lapis", "PP"),
+        Device("REDMI Note 15 Pro+", "flourite", "PR"),
     )
 
     private val androidW = Android("16.0", "W")
