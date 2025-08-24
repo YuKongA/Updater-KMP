@@ -43,6 +43,7 @@ import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.icons.useful.Copy
 import top.yukonga.miuix.kmp.icon.icons.useful.Save
 import top.yukonga.miuix.kmp.theme.MiuixTheme
+import ui.components.PayloadDumperView
 import ui.components.TextWithIcon
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.android_version
@@ -199,6 +200,18 @@ fun InfoCardViews(
             }
         }
     }
+
+    val payloadUrl = remember(romInfo) {
+        romInfo.cdn1Download.takeIf { it.isNotEmpty() }
+            ?: romInfo.cdn2Download.takeIf { it.isNotEmpty() }
+            ?: romInfo.official1Download.takeIf { it.isNotEmpty() }
+            ?: romInfo.official2Download
+    }
+
+    PayloadDumperView(
+        url = payloadUrl,
+        modifier = Modifier.fillMaxWidth()
+    )
 }
 
 @Composable
