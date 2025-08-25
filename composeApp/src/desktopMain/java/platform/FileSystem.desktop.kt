@@ -2,12 +2,11 @@ package platform
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import platform.FileSystem.getDownloadsDirectory
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
 
 actual object FileSystem {
-
     actual suspend fun getDownloadsDirectory(): String {
         val userHome = System.getProperty("user.home")
         val os = System.getProperty("os.name").lowercase()
@@ -27,79 +26,23 @@ actual object FileSystem {
         }
     }
 
-    actual suspend fun saveFile(
-        data: ByteArray,
-        fileName: String,
-        directory: String?
-    ): Result<String> = withContext(Dispatchers.IO) {
-        try {
-            val targetDirectory = directory ?: getDownloadsDirectory()
-            val dir = File(targetDirectory)
-
-            // 确保目录存在
-            if (!dir.exists()) {
-                dir.mkdirs()
-            }
-
-            val file = File(dir, fileName)
-            FileOutputStream(file).use { output ->
-                output.write(data)
-                output.flush()
-            }
-
-            Result.success(file.absolutePath)
-        } catch (e: IOException) {
-            Result.failure(e)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    actual suspend fun fileExists(filePath: String): Boolean = withContext(Dispatchers.IO) {
-        try {
-            File(filePath).exists()
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-    actual suspend fun getFileSize(filePath: String): Long? = withContext(Dispatchers.IO) {
-        try {
-            val file = File(filePath)
-            if (file.exists()) file.length() else null
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    actual suspend fun deleteFile(filePath: String): Boolean = withContext(Dispatchers.IO) {
-        try {
-            File(filePath).delete()
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-    actual suspend fun createDirectory(directoryPath: String): Boolean = withContext(Dispatchers.IO) {
-        try {
-            File(directoryPath).mkdirs()
-        } catch (e: Exception) {
-            false
-        }
-    }
 }
 
 actual suspend fun saveFileWithProgress(
     data: ByteArray,
     fileName: String,
-    directory: String?,
+    folder: String?,
     onProgress: (FileSaveProgress) -> Unit
 ): Result<String> = withContext(Dispatchers.IO) {
     try {
-        val targetDirectory = directory ?: FileSystem.getDownloadsDirectory()
+        val downloadsDirectory = getDownloadsDirectory()
+        val targetDirectory = if (!folder.isNullOrBlank()) {
+            File(downloadsDirectory, folder).absolutePath
+        } else {
+            downloadsDirectory
+        }
         val dir = File(targetDirectory)
 
-        // 确保目录存在
         if (!dir.exists()) {
             dir.mkdirs()
         }

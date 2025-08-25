@@ -308,8 +308,8 @@ private fun PortraitAppView(
                             updateRomInfoState, searchKeywords, searchKeywordsSelected
                         )
                         Column(modifier = Modifier.padding(horizontal = 12.dp)) {
-                            InfoCardViews(curRomInfo, curIconInfo)
-                            InfoCardViews(incRomInfo, incIconInfo)
+                            InfoCardViews(curRomInfo, curIconInfo, updateRomInfoState)
+                            InfoCardViews(incRomInfo, incIconInfo, updateRomInfoState)
                         }
                     }
                 }
@@ -432,8 +432,8 @@ private fun LandscapeAppView(
                         Column(
                             modifier = Modifier.padding(top = 12.dp)
                         ) {
-                            InfoCardViews(curRomInfo, curIconInfo)
-                            InfoCardViews(incRomInfo, incIconInfo)
+                            InfoCardViews(curRomInfo, curIconInfo, updateRomInfoState)
+                            InfoCardViews(incRomInfo, incIconInfo, updateRomInfoState)
                         }
                         Spacer(
                             Modifier.height(

@@ -47,6 +47,7 @@ import ui.MessageTextView
 @Composable
 fun PayloadDumperView(
     url: String,
+    version: String,
     modifier: Modifier = Modifier
 ) {
     var payloadInfo by remember { mutableStateOf<PayloadHelper.PayloadInfo?>(null) }
@@ -132,6 +133,7 @@ fun PayloadDumperView(
                                         url = url,
                                         payloadInfo = payloadInfo!!,
                                         partitionName = partitionName,
+                                        version = version,
                                         onProgress = { progress ->
                                             partitionList = partitionList.map { partition ->
                                                 if (partition.partitionName == partitionName) {

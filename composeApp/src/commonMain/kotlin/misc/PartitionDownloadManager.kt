@@ -21,13 +21,11 @@ class PartitionDownloadManager {
 
     companion object {
 
-        /**
-         * 下载指定分区并保存到本地（恢复为原始 raw 文件）
-         */
         suspend fun downloadPartitionToFile(
             url: String,
             payloadInfo: PayloadHelper.PayloadInfo,
             partitionName: String,
+            version: String? = null,
             onProgress: (DownloadProgress) -> Unit = {}
         ): Result<String> {
             return try {
@@ -69,7 +67,7 @@ class PartitionDownloadManager {
                 val saveResult = saveFileWithProgress(
                     data = partitionData,
                     fileName = fileName,
-                    directory = null
+                    folder = version
                 ) { saveProgress ->
                     val adjustedProgress = 0.9f + (saveProgress.progress * 0.1f)
                     onProgress(
@@ -117,9 +115,6 @@ class PartitionDownloadManager {
             }
         }
 
-        /**
-         * 下载指定分区到内存
-         */
         suspend fun downloadPartition(
             url: String,
             payloadInfo: PayloadHelper.PayloadInfo,
@@ -183,7 +178,6 @@ class PartitionDownloadManager {
                         )
                     }
 
-                // 合并所有数据块
                 val totalData = ByteArray(totalBytesDownloaded.toInt())
                 var offset = 0
                 partitionData.forEach { chunk ->
@@ -191,14 +185,13 @@ class PartitionDownloadManager {
                     offset += chunk.size
                 }
 
-                // 下载完成
                 onProgress(
                     DownloadProgress(
                         partitionName = partitionName,
                         bytesDownloaded = totalBytesDownloaded,
                         totalBytes = totalSize,
-                        progress = 0.7f, // 下载阶段完成，占总进度70%
-                        isCompleted = false, // 整个流程还未完成
+                        progress = 0.7f,
+                        isCompleted = false,
                         error = "下载完成，正在重建分区..."
                     )
                 )
@@ -209,9 +202,6 @@ class PartitionDownloadManager {
             }
         }
 
-        /**
-         * 获取所有分区的信息
-         */
         fun getAllPartitionsInfo(payloadInfo: PayloadHelper.PayloadInfo): List<PayloadHelper.PartitionInfo> {
             return payloadInfo.deltaArchiveManifest.partitions.map { partition ->
                 val rawSize = partition.newPartitionInfo?.size ?: 0L
@@ -228,20 +218,14 @@ class PartitionDownloadManager {
             }
         }
 
-        /**
-         * 格式化文件大小
-         */
         fun formatFileSize(bytes: Long): String {
             if (bytes <= 0) return "0 B"
-            val units = arrayOf("B", "KB", "MB", "GB", "TB")
+            val units = arrayOf("B", "KB", "MB", "GB")
             val digitGroups = (log10(bytes.toDouble()) / log10(1024.0)).toInt()
             val size = bytes / 1024.0.pow(digitGroups.toDouble())
             return "${(size * 100).toLong() / 100.0} ${units[digitGroups]}"
         }
 
-        /**
-         * 将pbandk.ByteArr转换为十六进制字符串
-         */
         fun formatHashToHex(hash: ByteArr?): String {
             return hash?.array?.joinToString("") { byte ->
                 val value = byte.toInt() and 0xFF

@@ -6,8 +6,6 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
 import org.tukaani.xz.XZInputStream
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.util.zip.GZIPInputStream
-import java.util.zip.InflaterInputStream
 
 actual object Compression {
 
