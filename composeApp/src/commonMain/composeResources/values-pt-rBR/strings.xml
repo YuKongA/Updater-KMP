@@ -9,6 +9,7 @@
     <string name="system_version">Versão do Sistema</string>
     <string name="android_version">Versão do Android</string>
     <string name="submit">Enviar</string>
+    <string name="analysis">Análise de Payload</string>
     <string name="search_history">Histórico de Pesquisa</string>
     <string name="clear_search_history">Limpar histórico de Pesquisa</string>
     <string name="big_version">Versão Principal</string>

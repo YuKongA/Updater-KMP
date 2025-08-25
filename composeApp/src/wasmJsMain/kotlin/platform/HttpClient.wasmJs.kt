@@ -7,9 +7,9 @@ import io.ktor.client.plugins.HttpTimeout
 actual fun httpClientPlatform(): HttpClient {
     return HttpClient(Js).config {
         install(HttpTimeout) {
-            requestTimeoutMillis = 10000
+            requestTimeoutMillis = 60000
             connectTimeoutMillis = 10000
-            socketTimeoutMillis = 10000
+            socketTimeoutMillis = 60000
         }
     }
 }
