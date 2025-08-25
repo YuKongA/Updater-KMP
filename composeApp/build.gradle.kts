@@ -103,14 +103,18 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
             implementation(libs.ktor.client.core)
+            implementation(libs.pbandk.runtime)
             implementation(libs.miuix)
             implementation(libs.haze)
+            implementation(libs.okio)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
             // Added
             implementation(libs.cryptography.provider.jdk)
             implementation(libs.ktor.client.cio)
+            implementation(libs.compress.commons)
+            implementation(libs.tukaani.xz)
         }
         iosMain.dependencies {
             // Added
@@ -137,6 +141,8 @@ kotlin {
             // Added
             implementation(libs.cryptography.provider.jdk)
             implementation(libs.ktor.client.cio)
+            implementation(libs.compress.commons)
+            implementation(libs.tukaani.xz)
             implementation(libs.jna)
             implementation(libs.jna.platform)
         }
@@ -289,8 +295,24 @@ val generateVersionInfo by tasks.registering {
     }
 }
 
+val generateProtobuf by tasks.registering {
+    dependsOn(":protobuf-codegen:generateProto")
+
+    doLast {
+        val targetDir = generatedSrcDir.resolve("kotlin")
+        if (targetDir.exists()) targetDir.deleteRecursively() else targetDir.mkdirs()
+
+        val sourceDir = project(":protobuf-codegen").projectDir.resolve("build/generated/sources/proto/main/pbandk")
+        copy {
+            from(sourceDir)
+            into(targetDir)
+            include("**/*.kt")
+        }
+    }
+}
+
 tasks.named("generateComposeResClass").configure {
-    dependsOn(generateVersionInfo)
+    dependsOn(generateVersionInfo, generateProtobuf)
 }
 
 afterEvaluate {
