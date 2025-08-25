@@ -13,6 +13,9 @@ ktor-client = "3.2.3"
 miuix = "0.5.1"
 pbandk = "0.16.0"
 protobuf-plugin = "0.9.5"
+okio = "3.16.0"
+compress-commons = "1.28.0"
+tukaani-xz = "1.10"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
@@ -32,6 +35,9 @@ ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "kto
 ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor-client" }
 miuix = { module = "top.yukonga.miuix.kmp:miuix", version.ref = "miuix" }
 pbandk-runtime = { module = "pro.streem.pbandk:pbandk-runtime", version.ref = "pbandk" }
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
+compress-commons = { module = "org.apache.commons:commons-compress", version.ref = "compress-commons" }
+tukaani-xz = { module = "org.tukaani:xz", version.ref = "tukaani-xz" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }

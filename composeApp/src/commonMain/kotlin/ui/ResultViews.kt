@@ -43,6 +43,8 @@ import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.icons.useful.Copy
 import top.yukonga.miuix.kmp.icon.icons.useful.Save
 import top.yukonga.miuix.kmp.theme.MiuixTheme
+import top.yukonga.miuix.kmp.utils.Platform
+import top.yukonga.miuix.kmp.utils.platform
 import ui.components.PayloadDumperView
 import ui.components.TextWithIcon
 import updater.composeapp.generated.resources.Res
@@ -201,17 +203,21 @@ fun InfoCardViews(
         }
     }
 
-    val payloadUrl = remember(romInfo) {
-        romInfo.cdn1Download.takeIf { it.isNotEmpty() }
-            ?: romInfo.cdn2Download.takeIf { it.isNotEmpty() }
-            ?: romInfo.official1Download.takeIf { it.isNotEmpty() }
-            ?: romInfo.official2Download
-    }
+    if (platform() == Platform.Desktop || platform() == Platform.Android) {
+        val payloadUrl = remember(romInfo) {
+            romInfo.official1Download.takeIf { it.isNotEmpty() }
+                ?: romInfo.official2Download.takeIf { it.isNotEmpty() }
+                ?: romInfo.cdn1Download.takeIf { it.isNotEmpty() }
+                ?: romInfo.cdn2Download
+        }
 
-    PayloadDumperView(
-        url = payloadUrl,
-        modifier = Modifier.fillMaxWidth()
-    )
+        if (!payloadUrl.contains("_incremental", ignoreCase = true)) {
+            PayloadDumperView(
+                url = payloadUrl,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
 }
 
 @Composable

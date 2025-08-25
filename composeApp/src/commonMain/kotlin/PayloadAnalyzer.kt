@@ -1,5 +1,4 @@
 import chromeos_update_engine.DeltaArchiveManifest
-import chromeos_update_engine.PartitionUpdate
 import data.PayloadHelper
 import io.ktor.client.request.get
 import io.ktor.client.request.head
@@ -144,30 +143,6 @@ class PayloadAnalyzer private constructor() {
     }
 
     /**
-     * 提取分区列表
-     */
-    private suspend fun extractPartitionList(url: String): List<PayloadHelper.PartitionInfo> {
-        val payloadInfo = extractPayloadInfo(url) ?: return emptyList()
-
-        return payloadInfo.deltaArchiveManifest.partitions.map { partition ->
-            val rawSize = calculatePartitionRawSize(partition)
-            val compressedSize = calculatePartitionCompressedSize(partition)
-
-            PayloadHelper.PartitionInfo(
-                partitionName = partition.partitionName,
-                size = compressedSize,
-                rawSize = rawSize,
-                sha256 = partition.newPartitionInfo?.hash?.array?.joinToString("") { byte ->
-                    val value = byte.toInt() and 0xFF
-                    if (value < 16) "0${value.toString(16)}" else value.toString(16)
-                }?.take(16) ?: "",
-                isDownloading = false,
-                progress = 0f
-            )
-        }
-    }
-
-    /**
      * 分段下载指定分区的数据 - 优化版本，支持并行下载
      */
     private fun downloadPartitionData(
@@ -274,22 +249,6 @@ class PayloadAnalyzer private constructor() {
                 return downloadChunkWithRetry(url, start, size, attempt + 1)
             }
             return null
-        }
-    }
-
-    /**
-     * 计算分区原始大小
-     */
-    private fun calculatePartitionRawSize(partition: PartitionUpdate): Long {
-        return partition.newPartitionInfo?.size ?: 0L
-    }
-
-    /**
-     * 计算分区压缩大小
-     */
-    private fun calculatePartitionCompressedSize(partition: PartitionUpdate): Long {
-        return partition.operations.sumOf { operation ->
-            operation.dataLength ?: 0L
         }
     }
 

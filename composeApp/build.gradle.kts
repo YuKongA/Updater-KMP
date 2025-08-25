@@ -106,12 +106,15 @@ kotlin {
             implementation(libs.pbandk.runtime)
             implementation(libs.miuix)
             implementation(libs.haze)
+            implementation(libs.okio)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
             // Added
             implementation(libs.cryptography.provider.jdk)
             implementation(libs.ktor.client.cio)
+            implementation(libs.compress.commons)
+            implementation(libs.tukaani.xz)
         }
         iosMain.dependencies {
             // Added
@@ -138,6 +141,8 @@ kotlin {
             // Added
             implementation(libs.cryptography.provider.jdk)
             implementation(libs.ktor.client.cio)
+            implementation(libs.compress.commons)
+            implementation(libs.tukaani.xz)
             implementation(libs.jna)
             implementation(libs.jna.platform)
         }

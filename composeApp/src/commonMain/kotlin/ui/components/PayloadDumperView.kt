@@ -9,13 +9,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
@@ -37,6 +33,7 @@ import data.PayloadHelper
 import kotlinx.coroutines.launch
 import misc.MessageUtils.Companion.showMessage
 import misc.PartitionDownloadManager
+import top.yukonga.miuix.kmp.basic.BasicComponent
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.CircularProgressIndicator
 import top.yukonga.miuix.kmp.basic.Icon
@@ -45,7 +42,7 @@ import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.icons.useful.Save
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import kotlin.math.roundToInt
+import ui.MessageTextView
 
 @Composable
 fun PayloadDumperView(
@@ -90,9 +87,10 @@ fun PayloadDumperView(
             insideMargin = PaddingValues(16.dp)
         ) {
             Text(
-                text = "PAYLOAD DUMPER",
+                text = "PAYLOAD",
                 fontSize = 24.sp,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(bottom = 12.dp)
             )
 
             when {
@@ -143,10 +141,6 @@ fun PayloadDumperView(
                                                     )
                                                 } else partition
                                             }
-
-                                            if (progress.error != null) {
-                                                showMessage(progress.error)
-                                            }
                                         }
                                     ).fold(
                                         onSuccess = { filePath ->
@@ -187,20 +181,18 @@ private fun PayloadInfoContent(
     onPartitionDownload: (String) -> Unit
 ) {
     Column {
-        InfoRow("Format Version", payloadInfo.header.fileFormatVersion.toString())
-        InfoRow("Manifest Size", "${payloadInfo.header.manifestSize} bytes")
-        InfoRow("Block Size", "${payloadInfo.blockSize} bytes")
-        InfoRow("Data Offset", "${payloadInfo.dataOffset} bytes")
-        InfoRow("Archive Size", PartitionDownloadManager.formatFileSize(payloadInfo.archiveSize))
-        InfoRow("Partitions Count", "${partitionList.size}")
-
-        Spacer(modifier = Modifier.height(16.dp))
+        MessageTextView("Format Version", payloadInfo.header.fileFormatVersion.toString())
+        MessageTextView("Manifest Size", "${payloadInfo.header.manifestSize} bytes")
+        MessageTextView("Block Size", "${payloadInfo.blockSize} bytes")
+        MessageTextView("Data Offset", "${payloadInfo.dataOffset} bytes")
+        MessageTextView("Archive Size", PartitionDownloadManager.formatFileSize(payloadInfo.archiveSize))
+        MessageTextView("Partitions Count", "${partitionList.size}")
 
         Text(
             text = "Partitions",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(bottom = 8.dp)
+            fontSize = 24.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(bottom = 12.dp)
         )
 
         LazyColumn(
@@ -222,50 +214,20 @@ private fun PartitionCard(
     partition: PayloadHelper.PartitionInfo,
     onDownloadClick: () -> Unit
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f).fillMaxWidth()) {
-            Text(
-                text = partition.partitionName,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                color = MiuixTheme.colorScheme.onSurface
-            )
-            Text(
-                text = "Size: ${PartitionDownloadManager.formatFileSize(partition.size)}",
-                fontSize = 12.sp,
-                color = MiuixTheme.colorScheme.onSecondaryVariant
-            )
-            Text(
-                text = "Raw Size: ${PartitionDownloadManager.formatFileSize(partition.rawSize)}",
-                fontSize = 12.sp,
-                color = MiuixTheme.colorScheme.onSecondaryVariant
-            )
-            if (partition.sha256.isNotEmpty()) {
-                Text(
-                    text = "Hash: ${partition.sha256}",
-                    fontSize = 12.sp,
-                    color = MiuixTheme.colorScheme.onSecondaryVariant
-                )
-            }
-        }
 
-        Column(modifier = Modifier.weight(1f).fillMaxWidth(), horizontalAlignment = Alignment.End) {
+    BasicComponent(
+        title = partition.partitionName,
+        summary = "Size: ${PartitionDownloadManager.formatFileSize(partition.size)}" +
+                "\nRaw Size: ${PartitionDownloadManager.formatFileSize(partition.rawSize)}",
+        rightActions = {
             if (partition.isDownloading) {
                 CircularProgressIndicator(
-                    progress = partition.progress,
-                    modifier = Modifier.size(24.dp)
-                )
-                Text(
-                    text = "${(partition.progress * 100).roundToInt()}%",
-                    fontSize = 10.sp,
-                    color = MiuixTheme.colorScheme.onSecondaryVariant
+                    progress = partition.progress
                 )
             } else {
-                IconButton(onClick = onDownloadClick) {
+                IconButton(
+                    onClick = onDownloadClick
+                ) {
                     Icon(
                         imageVector = MiuixIcons.Useful.Save,
                         contentDescription = "Download partition",
@@ -273,29 +235,7 @@ private fun PartitionCard(
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun InfoRow(
-    label: String,
-    value: String
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = label,
-            fontSize = 14.sp,
-            color = MiuixTheme.colorScheme.onSecondaryVariant
-        )
-        Text(
-            text = value,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            color = MiuixTheme.colorScheme.onSurface
-        )
-    }
+        },
+        insideMargin = PaddingValues(0.dp),
+    )
 }
