@@ -9,7 +9,7 @@
     <string name="system_version">系统版本</string>
     <string name="android_version">安卓版本</string>
     <string name="submit">提交</string>
-    <string name="analysis">Payload 分析</string>
+    <string name="analysis">解析 Payload</string>
     <string name="search_history">查询历史</string>
     <string name="clear_search_history">清空查询历史</string>
     <string name="big_version">主要版本</string>
@@ -75,6 +75,6 @@
     <string name="download_successful">下载成功</string>
     <string name="download_failed">下载失败</string>
     <string name="download_error">下载出错</string>
-    <string name="analysis_failed">分析 payload.bin 失败</string>
+    <string name="analysis_failed">解析 payload.bin 失败</string>
     <string name="opensource_info">版权所有 © 2024-2025 YuKongA</string>
 </resources>

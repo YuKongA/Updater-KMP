@@ -6,6 +6,19 @@ import kotlinx.serialization.Serializable
 import misc.RemoteDeviceListManager
 
 object DeviceInfoHelper {
+    @Serializable
+    data class Device(
+        val deviceName: String,
+        val deviceCodeName: String,
+        val deviceCode: String,
+    )
+
+    @Serializable
+    data class RemoteDeviceList(
+        val devices: List<Device>,
+        val version: String,
+    )
+
     data class Android(
         val androidVersionCode: String,
         val androidLetterCode: String,
@@ -15,13 +28,6 @@ object DeviceInfoHelper {
         val regionCodeName: String,
         val regionCode: String,
         val regionName: String = regionCode,
-    )
-
-    @Serializable
-    data class Device(
-        val deviceName: String,
-        val deviceCodeName: String,
-        val deviceCode: String,
     )
 
     data class Carrier(
@@ -230,18 +236,8 @@ object DeviceInfoHelper {
      * Update the current device list with remote or embedded data based
      */
     suspend fun updateDeviceList() {
-        try {
-            val source = RemoteDeviceListManager.getDeviceListSource()
-            currentDeviceList = when (source) {
-                RemoteDeviceListManager.DeviceListSource.REMOTE -> {
-                    RemoteDeviceListManager.getDeviceList(embeddedDeviceList)
-                }
-
-                RemoteDeviceListManager.DeviceListSource.EMBEDDED -> embeddedDeviceList
-            }
-            rebuildMappings()
-        } catch (_: Exception) {
-        }
+        currentDeviceList = RemoteDeviceListManager.getDeviceList(embeddedDeviceList)
+        rebuildMappings()
     }
 
     /**

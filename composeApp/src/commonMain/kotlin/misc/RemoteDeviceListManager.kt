@@ -5,7 +5,6 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import platform.httpClientPlatform
 import platform.prefGet
@@ -16,34 +15,21 @@ import platform.prefSet
  */
 object RemoteDeviceListManager {
 
-    @Serializable
-    data class RemoteDeviceListData(
-        val devices: List<DeviceInfoHelper.Device>,
-        val version: String,
-    )
 
     private const val DEVICE_LIST_URL = "https://raw.githubusercontent.com/YuKongA/Updater-KMP/device-list/device.json"
-    private const val CACHED_DEVICE_LIST_KEY = "cached_device_list"
-    private const val DEVICE_LIST_VERSION_KEY = "device_list_version"
-    private const val DEVICE_LIST_UPDATE_ENABLED_KEY = "device_list_update_enabled"
-
-    private val client = httpClientPlatform()
+    private const val DEVICE_LIST_CACHED_KEY = "deviceListCached"
+    private const val DEVICE_LIST_VERSION_KEY = "deviceListVersion"
+    private const val DEVICE_LIST_SOURCE_KEY = "deviceListSource"
     private val json = Json { ignoreUnknownKeys = true }
 
-    /**
-     * Enable or disable remote device list updates
-     */
-    fun setUpdateEnabled(enabled: Boolean) {
-        prefSet(DEVICE_LIST_UPDATE_ENABLED_KEY, enabled.toString())
-    }
 
     /**
      * Get cached device list, or null if no cached data exists
      */
     fun getCachedDeviceList(): List<DeviceInfoHelper.Device>? {
-        val cachedData = prefGet(CACHED_DEVICE_LIST_KEY) ?: return null
+        val cachedData = prefGet(DEVICE_LIST_CACHED_KEY) ?: return null
         return try {
-            val remoteData = json.decodeFromString<RemoteDeviceListData>(cachedData)
+            val remoteData = json.decodeFromString<DeviceInfoHelper.RemoteDeviceList>(cachedData)
             remoteData.devices
         } catch (_: Exception) {
             null
@@ -62,18 +48,19 @@ object RemoteDeviceListManager {
     suspend fun updateDeviceList(): List<DeviceInfoHelper.Device>? {
         return try {
             withContext(Dispatchers.Main) {
+                val client = httpClientPlatform()
                 val response = client.get(DEVICE_LIST_URL)
                 val jsonContent = response.bodyAsText()
 
-                val remoteData = json.decodeFromString<RemoteDeviceListData>(jsonContent)
+                val remoteData = json.decodeFromString<DeviceInfoHelper.RemoteDeviceList>(jsonContent)
 
                 val currentVersion = getCachedVersion()
                 if (currentVersion != null && currentVersion >= remoteData.version) {
                     return@withContext getCachedDeviceList()
                 }
 
-                prefSet(CACHED_DEVICE_LIST_KEY, jsonContent)
                 prefSet(DEVICE_LIST_VERSION_KEY, remoteData.version)
+                prefSet(DEVICE_LIST_CACHED_KEY, jsonContent)
 
                 remoteData.devices
             }
@@ -84,7 +71,6 @@ object RemoteDeviceListManager {
 
     enum class DeviceListSource { REMOTE, EMBEDDED }
 
-    private const val DEVICE_LIST_SOURCE_KEY = "device_list_source"
 
     fun getDeviceListSource(): DeviceListSource {
         return when (prefGet(DEVICE_LIST_SOURCE_KEY)) {
