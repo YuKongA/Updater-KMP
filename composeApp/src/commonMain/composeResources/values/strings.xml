@@ -60,5 +60,14 @@
     <string name="system_default">System default</string>
     <string name="light_mode">Light mode</string>
     <string name="dark_mode">Dark mode</string>
+    <string name="device_list_settings">Device List Settings</string>
+    <string name="update_device_list">Update Device List</string>
+    <string name="device_list_updated">Device list updated successfully</string>
+    <string name="device_list_update_failed">Failed to update device list</string>
+    <string name="device_list_last_update">Last updated: %1$s</string>
+    <string name="device_list_version">Version: %1$s</string>
+    <string name="enable_auto_update">Enable automatic updates</string>
+    <string name="clear_device_cache">Clear Device Cache</string>
+    <string name="device_cache_cleared">Device cache cleared</string>
     <string name="opensource_info">Copyright © 2024-2025 YuKongA</string>
 </resources>

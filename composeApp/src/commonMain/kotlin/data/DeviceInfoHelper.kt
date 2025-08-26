@@ -1,5 +1,8 @@
 package data
 
+import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.Serializable
+
 object DeviceInfoHelper {
     data class Android(
         val androidVersionCode: String,
@@ -12,6 +15,7 @@ object DeviceInfoHelper {
         val regionName: String = regionCode,
     )
 
+    @Serializable
     data class Device(
         val deviceName: String,
         val deviceCodeName: String,
@@ -30,7 +34,7 @@ object DeviceInfoHelper {
      * For auto-completion of device designators and system version suffixes.
      *
      */
-    private val deviceList = listOf(
+    private val embeddedDeviceList = listOf(
         Device("Redmi K30 4G", "phoenix", "GH"),
         Device("POCO X2 4G", "phoenixin", "GH"),
         Device("Redmi A4 5G / POCO C75 5G", "warm", "GV"),
@@ -216,6 +220,39 @@ object DeviceInfoHelper {
         Device("REDMI Note 15 Pro+", "flourite", "PR"),
     )
 
+    // Current device list - can be updated with remote data
+    private var currentDeviceList: List<Device> = embeddedDeviceList
+    
+    /**
+     * Update the current device list with remote data
+     */
+    suspend fun updateDeviceList() {
+        try {
+            val updatedList = RemoteDeviceListManager.getDeviceList(embeddedDeviceList)
+            if (updatedList.isNotEmpty()) {
+                currentDeviceList = updatedList
+                rebuildMappings()
+            }
+        } catch (e: Exception) {
+            // Keep using current list on error
+        }
+    }
+    
+    /**
+     * Get the current device list (embedded + remote if available)
+     */
+    fun getCurrentDeviceList(): List<Device> = currentDeviceList
+    
+    /**
+     * Rebuild all mappings when device list is updated
+     */
+    private fun rebuildMappings() {
+        _deviceNameToDeviceCodeName = currentDeviceList.associateBy({ it.deviceName }, { it.deviceCodeName })
+        _deviceCodeNameToDeviceName = currentDeviceList.associateBy({ it.deviceCodeName }, { it.deviceName })
+        _deviceNames = currentDeviceList.map { it.deviceName }
+        _codeNames = currentDeviceList.map { it.deviceCodeName }
+    }
+
     private val androidW = Android("16.0", "W")
     private val androidV = Android("15.0", "V")
     private val androidU = Android("14.0", "U")
@@ -293,22 +330,27 @@ object DeviceInfoHelper {
 
     private val carrierList = listOf(XM, DM, DC, AT, BY, CR, EN, HG, KD, MS, MT, OR, SB, SF, TF, TG, TM, VC, VF)
 
-    private val deviceNameToDeviceCodeName = deviceList.associateBy({ it.deviceName }, { it.deviceCodeName })
-    private val deviceCodeNameToDeviceName = deviceList.associateBy({ it.deviceCodeName }, { it.deviceName })
+    // Device mappings - can be updated when device list changes
+    private var _deviceNameToDeviceCodeName = currentDeviceList.associateBy({ it.deviceName }, { it.deviceCodeName })
+    private var _deviceCodeNameToDeviceName = currentDeviceList.associateBy({ it.deviceCodeName }, { it.deviceName })
+    private var _deviceNames = currentDeviceList.map { it.deviceName }
+    private var _codeNames = currentDeviceList.map { it.deviceCodeName }
+    
+    // Static mappings for regions, carriers and android versions
     private val regionNameToRegionCode = regionList.associateBy({ it.regionName }, { it.regionCode })
     private val regionNameToRegionCodeName = regionList.associateBy({ it.regionName }, { it.regionCodeName })
     private val carrierNameToCarrierCode = carrierList.associateBy({ it.carrierName }, { it.carrierCode })
     private val carrierNameToCarrierCodeName = carrierList.associateBy({ it.carrierName }, { it.regionAppend })
     private val androidVersionCodeToAndroidLetterCode = androidList.associateBy { it.androidVersionCode }
 
-    val deviceNames = deviceList.map { it.deviceName }
-    val codeNames = deviceList.map { it.deviceCodeName }
+    val deviceNames get() = _deviceNames
+    val codeNames get() = _codeNames
     val regionNames = regionList.map { it.regionName }
     val carrierNames = carrierList.map { it.carrierName }
     val androidVersions = androidList.map { it.androidVersionCode }
 
-    fun codeName(deviceName: String): String = deviceNameToDeviceCodeName[deviceName] ?: ""
-    fun deviceName(deviceCodeName: String): String = deviceCodeNameToDeviceName[deviceCodeName] ?: ""
+    fun codeName(deviceName: String): String = _deviceNameToDeviceCodeName[deviceName] ?: ""
+    fun deviceName(deviceCodeName: String): String = _deviceCodeNameToDeviceName[deviceCodeName] ?: ""
     fun regionCode(regionName: String): String = regionNameToRegionCode[regionName] ?: ""
     fun carrierCode(carrierName: String): String = carrierNameToCarrierCode[carrierName] ?: ""
     fun regionCodeName(regionName: String): String = regionNameToRegionCodeName[regionName] ?: ""
@@ -316,7 +358,7 @@ object DeviceInfoHelper {
 
     fun deviceCode(androidVersionCode: String, codeName: String, regionCode: String, carrierCode: String): String {
         val android = androidVersionCodeToAndroidLetterCode[androidVersionCode] ?: return ""
-        val device = deviceList.find { it.deviceCodeName == codeName } ?: return ""
+        val device = currentDeviceList.find { it.deviceCodeName == codeName } ?: return ""
         return "${android.androidLetterCode}${device.deviceCode}${regionCode}${carrierCode}"
     }
 }
