@@ -2,12 +2,12 @@
 
 ## Repository Summary
 
-**Updater-KMP** is a Kotlin Multiplatform application using Compose Multiplatform to get Xiaomi official recovery ROM information. It supports **Android**, **Desktop (JVM)**, **iOS**, **macOS**, **JS**, and **WasmJS** platforms.
+**Updater-KMP** is a Kotlin Multiplatform application using Compose Multiplatform that provides information about official Xiaomi ROM releases. It supports **Android**, **Desktop (JVM)**, **iOS**, **macOS**, **JS**, and **WasmJS** platforms.
 
 The app allows users to:
 - Get detailed information about Xiaomi ROM releases (public/beta/dev versions)
-- Use device auto-detection with `AUTO` suffix (e.g., `OS2.0.100.0.AUTO`)
-- Access different ROM sources based on login status
+- Use automatic device code completion with `AUTO` suffix (e.g., `OS2.0.100.0.AUTO`)
+- Access authenticated ROM sources when logged in with Xiaomi account
 - Download and analyze ROM payloads and partitions
 
 ## High-Level Repository Information
@@ -17,7 +17,7 @@ The app allows users to:
 - **Primary Language**: Kotlin
 - **Build System**: Gradle with Kotlin DSL
 - **Target Platforms**: Android, Desktop (JVM), iOS, macOS, JS, WasmJS
-- **Repository Size**: ~50 Kotlin source files across multiple platform source sets
+- **Repository Size**: Multiple Kotlin source files organized across platform-specific source sets
 - **Key Dependencies**: Ktor (HTTP client), kotlinx.serialization, cryptography-kotlin, miuix (UI library), Haze (blur effects)
 
 **Toolchain Requirements:**
@@ -28,16 +28,16 @@ The app allows users to:
 
 ## Build Instructions
 
-**Current Build Status**: ✅ **Builds successfully locally and in CI** - Repository access issues have been resolved.
+**Current Build Status**: ✅ **Builds successfully locally and in CI** - Dependency access issues have been resolved.
 
 **GitHub Actions CI Status**: ✅ **Works correctly** - All platforms build successfully in CI environment.
 
 ### Recommended Approach for Coding Agents
 
 **For all changes** (UI, business logic, data structures, build configurations):
-1. Local builds now work reliably - you can build and test changes locally
-2. Use the provided build commands to validate changes before committing
-3. GitHub Actions CI provides additional validation across all supported platforms
+1. Build and test changes locally using the commands below
+2. Validate changes with appropriate platform-specific build commands before committing
+3. GitHub Actions CI provides comprehensive validation across all supported platforms
 
 **For build-related changes**:
 1. Test locally using the appropriate build commands below
@@ -77,20 +77,20 @@ The app allows users to:
   - `KEY_ALIAS`: Key alias
   - `KEY_PASSWORD`: Key password
 
-**Build Times (from CI):**
+**Build Times (estimated from CI):**
 - Desktop build: ~3-5 minutes
 - Android build: ~5-7 minutes  
 - macOS build: ~5-8 minutes
 
 ### Testing
 
-**No explicit test configuration found** in the repository. However, you can validate changes using:
+**No unit test suite configured** in the repository. Validate changes using:
 - Local builds with the appropriate platform target (Android: `./gradlew assembleDebug`, Desktop: `./gradlew desktopJar`)
 - GitHub Actions CI for comprehensive cross-platform validation
 
 ### Linting/Code Quality
 
-**No explicit linting configuration found**. The project uses standard Kotlin code formatting.
+**No explicit linting configuration** found. The project follows standard Kotlin code formatting conventions.
 
 ## Project Layout and Architecture
 
@@ -152,7 +152,7 @@ Updater-KMP/
 
 **Key Business Logic:**
 - **Device Detection**: `DeviceInfoHelper.kt` contains device codes and auto-completion logic
-- **ROM Processing**: `AppUtils.kt` handles ROM info retrieval and processing
+- **ROM Processing**: `AppUtils.kt` handles ROM information retrieval and processing
 - **Payload Analysis**: `PayloadAnalyzer.kt` can analyze and extract ROM payload contents
 - **Download Management**: `PartitionDownloadManager.kt` handles parallel ROM downloads
 
@@ -177,11 +177,11 @@ Updater-KMP/
 
 ### Validation Steps for Changes
 
-1. **Local builds work reliably**: Use the appropriate gradlew command for your target platform
+1. **Local builds**: Use the appropriate gradlew command for your target platform
 2. **Platform-specific testing**: 
    - Android: `./gradlew assembleDebug` or `./gradlew assembleRelease`
    - Desktop: `./gradlew desktopJar` or `./gradlew desktopRun`
-   - For complete builds: `./gradlew build` (excludes iOS/macOS on non-Mac systems)
+   - Cross-platform: `./gradlew build` (excludes iOS/macOS on non-Mac systems)
 3. **Cross-platform validation**: Changes to `commonMain` should be tested on multiple platforms
 4. **ROM processing logic**: Test with valid device codes from `DeviceInfoHelper.kt`
 5. **UI changes**: Test on both desktop and mobile form factors
@@ -192,7 +192,7 @@ Updater-KMP/
 - **Native Libraries**: JNA for platform-specific operations on desktop
 - **Compression Libraries**: Apache Commons Compress and XZ for ROM archive handling
 - **Cryptography**: Multi-platform crypto operations for ROM verification
-- **Device Database**: Large embedded device list in `DeviceInfoHelper.kt` (150+ Xiaomi devices with codes)
+- **Device Database**: Embedded device list in `DeviceInfoHelper.kt` (150+ Xiaomi devices with codes)
 
 ### Important Implementation Details
 
@@ -200,8 +200,8 @@ Updater-KMP/
 - **File operations vary significantly** between platforms (see `platform/FileSystem.*`)
 - **HTTP clients differ** per platform (CIO for Android/JVM, Darwin for iOS/macOS, JS for web)
 - **UI theming** supports system dark mode detection across all platforms
-- **Device auto-detection** relies on hardcoded device codes in `DeviceInfoHelper.kt` - contains ~150 Xiaomi devices
-- **ROM version formats**: Supports `AUTO` suffix (e.g., `OS2.0.100.0.AUTO`) for auto-completion
+- **Device auto-detection** relies on hardcoded device codes in `DeviceInfoHelper.kt` - contains 150+ Xiaomi devices
+- **ROM version formats**: Supports `AUTO` suffix (e.g., `OS2.0.100.0.AUTO`) for automatic device code completion
 - **Payload analysis**: Can extract and analyze partition data from Xiaomi ROM files
 
 ### Key Code Snippets
@@ -215,10 +215,10 @@ Device("Display Name", "codename", "deviceCode")
 
 **ROM Version Processing (AppUtils.kt)**:
 ```kotlin
-// Version transformation logic:
+// Version transformation logic that converts ROM versions and substitutes device codes:
 val systemVersionExt = systemVersion.value.uppercase()
-    .replace("^OS1".toRegex(), "V816")
-    .replace("AUTO$".toRegex(), deviceCode)
+    .replace("^OS1".toRegex(), "V816")      // Convert OS1 prefix to V816
+    .replace("AUTO$".toRegex(), deviceCode) // Replace AUTO suffix with actual device code
 ```
 
 **Platform Abstraction Pattern**:
@@ -260,21 +260,21 @@ composeApp/src/commonMain/kotlin/ui/
 
 ### Key Business Logic Files
 
-- **`misc/AppUtils.kt`** (426 lines): Core ROM processing, device detection, download URL generation
-- **`PayloadAnalyzer.kt`** (328 lines): Advanced ROM payload extraction and analysis  
-- **`data/DeviceInfoHelper.kt`** (500+ lines): Complete Xiaomi device database with codes
+- **`misc/AppUtils.kt`**: Core ROM processing, device detection, download URL generation
+- **`PayloadAnalyzer.kt`**: ROM payload extraction and analysis  
+- **`data/DeviceInfoHelper.kt`**: Xiaomi device database with device codes
 - **`misc/MessageUtils.kt`**: Toast and snackbar message handling
 - **`misc/PartitionDownloadManager.kt`**: Parallel download manager for ROM partitions
 
 ## Important Notes for Coding Agents
 
-1. **Local builds work reliably** - The repository builds successfully both locally and in CI
-2. **Use appropriate build commands** - Test changes locally with the documented platform-specific commands  
-3. **Platform-specific builds** - The documented commands work in both local and CI environments
+1. **Builds work reliably** - The repository builds successfully both locally and in CI
+2. **Validate with platform-specific commands** - Test changes locally with the documented build commands  
+3. **Multi-platform support** - The documented commands work in both local and CI environments
 4. **Expect/Actual pattern** - Platform-specific code uses Kotlin MPP's expect/actual mechanism
-5. **Device codes are crucial** - When working with ROM detection, reference `DeviceInfoHelper.kt` for valid device codes
-6. **Large codebase** - Focus changes on specific modules rather than broad refactoring
-7. **No unit tests** - Rely on build success and functional validation rather than test suites
-8. **Local validation recommended** - Use local builds for immediate feedback, CI for comprehensive cross-platform testing
+5. **Device codes are essential** - When working with ROM detection, reference `DeviceInfoHelper.kt` for valid device codes
+6. **Modular architecture** - Focus changes on specific modules to maintain code organization
+7. **Build-based validation** - Rely on build success and functional validation rather than unit test suites
+8. **Local-first development** - Use local builds for immediate feedback, CI for comprehensive cross-platform testing
 
-**Updated Status** - Build issues have been resolved. Local development and testing is now fully supported.
+**Updated Status** - Dependency access issues have been resolved. Local development and testing are now fully supported.
