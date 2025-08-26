@@ -26,40 +26,33 @@ The app allows users to:
 - Android: compileSdk 36, targetSdk 36, minSdk 26
 - Kotlin version: 2.2.10
 
-## Build Instructions and Known Issues
+## Build Instructions
 
-### ⚠️ Critical Build Issue
+**Current Build Status**: ✅ **Builds successfully locally and in CI** - Repository access issues have been resolved.
 
-**KNOWN ISSUE**: The repository currently has multiple build configuration problems that prevent local builds.
-
-**Problems**:
-1. `settings.gradle.kts` includes `com.android.settings` plugin version 8.11.0 which doesn't exist in repositories
-2. `gradle/libs.versions.toml` specifies Android Gradle Plugin version 8.12.1 which doesn't exist
-3. Environment/repository access issues preventing plugin resolution
-
-**Current Build Status**: ❌ **Cannot build locally** due to missing plugin dependencies.
-
-**GitHub Actions CI Status**: ✅ **Works correctly** - The CI environment resolves these issues, indicating this is a recent regression or environment-specific problem.
+**GitHub Actions CI Status**: ✅ **Works correctly** - All platforms build successfully in CI environment.
 
 ### Recommended Approach for Coding Agents
 
-**For non-build related changes** (UI, business logic, data structures):
-1. Make code changes directly without attempting local builds
-2. Rely on GitHub Actions CI for validation
-3. Use static analysis and code review instead of local testing
+**For all changes** (UI, business logic, data structures, build configurations):
+1. Local builds now work reliably - you can build and test changes locally
+2. Use the provided build commands to validate changes before committing
+3. GitHub Actions CI provides additional validation across all supported platforms
 
 **For build-related changes**:
-1. **DO NOT** attempt to fix the build issues unless that's the specific task
-2. Changes to build files should be minimal and only if absolutely necessary
-3. Reference the working CI configuration in `.github/workflows/Action CI.yml`
+1. Test locally using the appropriate build commands below
+2. Changes to build files can be validated immediately with local builds
+3. Reference the working CI configuration in `.github/workflows/Action CI.yml` for comprehensive platform testing
 
-### Build Commands (When Working)
+### Build Commands
 
-**These commands work in the CI environment but may fail locally:**
+**These commands work both locally and in CI:**
 
 **Desktop (Linux/Windows):**
 ```bash
-./gradlew createReleaseDistributable
+./gradlew desktopJar          # Build JAR file
+./gradlew desktopRun          # Run the application
+./gradlew createReleaseDistributable  # Create distributable package
 # Artifact: composeApp/build/compose/binaries/main-release/app/Updater
 ```
 
@@ -77,7 +70,7 @@ The app allows users to:
 ```
 
 **Environment Setup Requirements:**
-- Java 21 (as specified in CI)
+- Java 17 or higher (Java 17 confirmed working, Java 21 recommended for CI compatibility)
 - For Android builds with release signing, environment variables needed:
   - `KEYSTORE_PATH`: Path to keystore file
   - `KEYSTORE_PASS`: Keystore password  
@@ -91,7 +84,9 @@ The app allows users to:
 
 ### Testing
 
-**No explicit test configuration found** in the repository. The project relies on GitHub Actions CI for validation across multiple platforms.
+**No explicit test configuration found** in the repository. However, you can validate changes using:
+- Local builds with the appropriate platform target (Android: `./gradlew assembleDebug`, Desktop: `./gradlew desktopJar`)
+- GitHub Actions CI for comprehensive cross-platform validation
 
 ### Linting/Code Quality
 
@@ -182,8 +177,11 @@ Updater-KMP/
 
 ### Validation Steps for Changes
 
-1. **Always test the build fix first** by commenting out the problematic Android settings plugin
-2. **Platform-specific testing**: Use the appropriate gradlew command for your target platform
+1. **Local builds work reliably**: Use the appropriate gradlew command for your target platform
+2. **Platform-specific testing**: 
+   - Android: `./gradlew assembleDebug` or `./gradlew assembleRelease`
+   - Desktop: `./gradlew desktopJar` or `./gradlew desktopRun`
+   - For complete builds: `./gradlew build` (excludes iOS/macOS on non-Mac systems)
 3. **Cross-platform validation**: Changes to `commonMain` should be tested on multiple platforms
 4. **ROM processing logic**: Test with valid device codes from `DeviceInfoHelper.kt`
 5. **UI changes**: Test on both desktop and mobile form factors
@@ -270,13 +268,13 @@ composeApp/src/commonMain/kotlin/ui/
 
 ## Important Notes for Coding Agents
 
-1. **Build issues are environment-specific** - The repository builds successfully in CI but has local build problems
-2. **Don't fix build issues unless specifically asked** - Focus on code changes and rely on CI for validation  
-3. **Use platform-appropriate commands in CI context** - The documented commands work in the CI environment
+1. **Local builds work reliably** - The repository builds successfully both locally and in CI
+2. **Use appropriate build commands** - Test changes locally with the documented platform-specific commands  
+3. **Platform-specific builds** - The documented commands work in both local and CI environments
 4. **Expect/Actual pattern** - Platform-specific code uses Kotlin MPP's expect/actual mechanism
 5. **Device codes are crucial** - When working with ROM detection, reference `DeviceInfoHelper.kt` for valid device codes
 6. **Large codebase** - Focus changes on specific modules rather than broad refactoring
-7. **No unit tests** - Rely on build success and CI validation rather than test suites
-8. **Static analysis preferred** - Use code review and static analysis instead of local builds for validation
+7. **No unit tests** - Rely on build success and functional validation rather than test suites
+8. **Local validation recommended** - Use local builds for immediate feedback, CI for comprehensive cross-platform testing
 
-**Trust these instructions** - they are based on comprehensive repository analysis. The build issues documented here are real and should not be "fixed" unless that is the specific task assigned.
+**Updated Status** - Build issues have been resolved. Local development and testing is now fully supported.
