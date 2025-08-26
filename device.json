@@ -1,7 +1,6 @@
 {
     "devices": [
-        { "deviceName": "Redmi K30 4G", "deviceCodeName": "phoenix", "deviceCode": "GH" },
-        { "deviceName": "POCO X2 4G", "deviceCodeName": "phoenixin", "deviceCode": "GH" },
+        { "deviceName": "Redmi K30 4G / POCO X2 4G", "deviceCodeName": "phoenix", "deviceCode": "GH" },
         { "deviceName": "Redmi A4 5G / POCO C75 5G", "deviceCodeName": "warm", "deviceCode": "GV" },
         { "deviceName": "Redmi A5 / POCO C71", "deviceCodeName": "serenity", "deviceCode": "GW" },
         { "deviceName": "Redmi K30 / K30i", "deviceCodeName": "picasso", "deviceCode": "GI" },
@@ -184,5 +183,5 @@
         { "deviceName": "REDMI Note 15 Pro", "deviceCodeName": "lapis", "deviceCode": "PP" },
         { "deviceName": "REDMI Note 15 Pro+", "deviceCodeName": "flourite", "deviceCode": "PR" }
     ],
-    "version": "1.0.0"
+    "version": "1.0.1"
 }
