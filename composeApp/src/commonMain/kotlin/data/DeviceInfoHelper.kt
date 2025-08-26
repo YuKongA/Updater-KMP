@@ -1,7 +1,9 @@
 package data
 
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.Serializable
+import misc.RemoteDeviceListManager
 
 object DeviceInfoHelper {
     data class Android(
@@ -35,8 +37,7 @@ object DeviceInfoHelper {
      *
      */
     private val embeddedDeviceList = listOf(
-        Device("Redmi K30 4G", "phoenix", "GH"),
-        Device("POCO X2 4G", "phoenixin", "GH"),
+        Device("Redmi K30 4G / POCO X2 4G", "phoenix", "GH"),
         Device("Redmi A4 5G / POCO C75 5G", "warm", "GV"),
         Device("Redmi A5 / POCO C71", "serenity", "GW"),
         Device("Redmi K30 / K30i", "picasso", "GI"),
@@ -220,29 +221,29 @@ object DeviceInfoHelper {
         Device("REDMI Note 15 Pro+", "flourite", "PR"),
     )
 
-    // Current device list - can be updated with remote data
-    private var currentDeviceList: List<Device> = embeddedDeviceList
-    
     /**
-     * Update the current device list with remote data
+     * Current device list
+     */
+    private var currentDeviceList: List<Device> = embeddedDeviceList
+
+    /**
+     * Update the current device list with remote or embedded data based
      */
     suspend fun updateDeviceList() {
         try {
-            val updatedList = RemoteDeviceListManager.getDeviceList(embeddedDeviceList)
-            if (updatedList.isNotEmpty()) {
-                currentDeviceList = updatedList
-                rebuildMappings()
+            val source = RemoteDeviceListManager.getDeviceListSource()
+            currentDeviceList = when (source) {
+                RemoteDeviceListManager.DeviceListSource.REMOTE -> {
+                    RemoteDeviceListManager.getDeviceList(embeddedDeviceList)
+                }
+
+                RemoteDeviceListManager.DeviceListSource.EMBEDDED -> embeddedDeviceList
             }
-        } catch (e: Exception) {
-            // Keep using current list on error
+            rebuildMappings()
+        } catch (_: Exception) {
         }
     }
-    
-    /**
-     * Get the current device list (embedded + remote if available)
-     */
-    fun getCurrentDeviceList(): List<Device> = currentDeviceList
-    
+
     /**
      * Rebuild all mappings when device list is updated
      */
@@ -251,6 +252,8 @@ object DeviceInfoHelper {
         _deviceCodeNameToDeviceName = currentDeviceList.associateBy({ it.deviceCodeName }, { it.deviceName })
         _deviceNames = currentDeviceList.map { it.deviceName }
         _codeNames = currentDeviceList.map { it.deviceCodeName }
+        _deviceNamesFlow.value = _deviceNames
+        _codeNamesFlow.value = _codeNames
     }
 
     private val androidW = Android("16.0", "W")
@@ -330,21 +333,23 @@ object DeviceInfoHelper {
 
     private val carrierList = listOf(XM, DM, DC, AT, BY, CR, EN, HG, KD, MS, MT, OR, SB, SF, TF, TG, TM, VC, VF)
 
-    // Device mappings - can be updated when device list changes
     private var _deviceNameToDeviceCodeName = currentDeviceList.associateBy({ it.deviceName }, { it.deviceCodeName })
     private var _deviceCodeNameToDeviceName = currentDeviceList.associateBy({ it.deviceCodeName }, { it.deviceName })
     private var _deviceNames = currentDeviceList.map { it.deviceName }
     private var _codeNames = currentDeviceList.map { it.deviceCodeName }
-    
-    // Static mappings for regions, carriers and android versions
+
     private val regionNameToRegionCode = regionList.associateBy({ it.regionName }, { it.regionCode })
     private val regionNameToRegionCodeName = regionList.associateBy({ it.regionName }, { it.regionCodeName })
     private val carrierNameToCarrierCode = carrierList.associateBy({ it.carrierName }, { it.carrierCode })
     private val carrierNameToCarrierCodeName = carrierList.associateBy({ it.carrierName }, { it.regionAppend })
     private val androidVersionCodeToAndroidLetterCode = androidList.associateBy { it.androidVersionCode }
 
-    val deviceNames get() = _deviceNames
-    val codeNames get() = _codeNames
+    private val _deviceNamesFlow = MutableStateFlow(_deviceNames)
+    val deviceNamesFlow = _deviceNamesFlow.asStateFlow()
+
+    private val _codeNamesFlow = MutableStateFlow(_codeNames)
+    val codeNamesFlow = _codeNamesFlow.asStateFlow()
+
     val regionNames = regionList.map { it.regionName }
     val carrierNames = carrierList.map { it.carrierName }
     val androidVersions = androidList.map { it.androidVersionCode }

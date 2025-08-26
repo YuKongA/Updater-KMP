@@ -13,6 +13,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -101,7 +103,7 @@ fun BasicViews(
     systemVersion: MutableState<String>,
     updateRomInfo: MutableState<Int>,
     searchKeywords: MutableState<List<String>>,
-    searchKeywordsSelected: MutableState<Int>
+    searchKeywordsSelected: MutableState<Int>,
 ) {
     val androidVersionSelected = remember {
         mutableStateOf(DeviceInfoHelper.androidVersions.indexOf(androidVersion.value).takeIf { it >= 0 } ?: 0)
@@ -113,6 +115,9 @@ fun BasicViews(
     val carrierSelected = remember {
         mutableStateOf(DeviceInfoHelper.carrierNames.indexOf(deviceCarrier.value).takeIf { it >= 0 } ?: 0)
     }
+
+    val deviceNames by DeviceInfoHelper.deviceNamesFlow.collectAsState()
+    val codeNames by DeviceInfoHelper.codeNamesFlow.collectAsState()
 
     val deviceNameFlow = remember { MutableStateFlow(deviceName.value) }
     val codeNameFlow = remember { MutableStateFlow(codeName.value) }
@@ -147,13 +152,13 @@ fun BasicViews(
     ) {
         AutoCompleteTextField(
             text = deviceName,
-            items = DeviceInfoHelper.deviceNames,
+            items = deviceNames,
             onValueChange = deviceNameFlow,
             label = stringResource(Res.string.device_name)
         )
         AutoCompleteTextField(
             text = codeName,
-            items = DeviceInfoHelper.codeNames,
+            items = codeNames,
             onValueChange = codeNameFlow,
             label = stringResource(Res.string.code_name)
         )

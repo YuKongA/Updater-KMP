@@ -1,3 +1,8 @@
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -14,6 +19,7 @@ import androidx.compose.foundation.layout.captionBar
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
@@ -29,6 +35,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
@@ -36,6 +43,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import data.DataHelper
@@ -45,13 +54,18 @@ import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.HazeTint
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
+import kotlinx.coroutines.launch
 import misc.MessageUtils.Companion.Snackbar
+import misc.RemoteDeviceListManager
 import misc.UpdateRomInfo
 import misc.json
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import platform.prefGet
 import platform.prefRemove
+import top.yukonga.miuix.kmp.basic.BasicComponent
+import top.yukonga.miuix.kmp.basic.Button
+import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.HorizontalDivider
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
@@ -63,10 +77,13 @@ import top.yukonga.miuix.kmp.basic.PopupPositionProvider
 import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.ScrollBehavior
 import top.yukonga.miuix.kmp.basic.SmallTopAppBar
+import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TopAppBar
 import top.yukonga.miuix.kmp.basic.VerticalDivider
 import top.yukonga.miuix.kmp.basic.rememberTopAppBarState
 import top.yukonga.miuix.kmp.extra.DropdownImpl
+import top.yukonga.miuix.kmp.extra.SuperDialog
+import top.yukonga.miuix.kmp.extra.SuperDropdown
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.icons.useful.Settings
 import top.yukonga.miuix.kmp.theme.MiuixTheme
@@ -77,13 +94,20 @@ import top.yukonga.miuix.kmp.utils.platform
 import top.yukonga.miuix.kmp.utils.scrollEndHaptic
 import ui.AboutDialog
 import ui.BasicViews
-// import ui.DeviceListSettingsDialog
 import ui.InfoCardViews
 import ui.LoginCardView
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.app_name
 import updater.composeapp.generated.resources.clear_search_history
+import updater.composeapp.generated.resources.device_list_embedded
+import updater.composeapp.generated.resources.device_list_remote
 import updater.composeapp.generated.resources.device_list_settings
+import updater.composeapp.generated.resources.device_list_source
+import updater.composeapp.generated.resources.device_list_update_failed
+import updater.composeapp.generated.resources.device_list_update_now
+import updater.composeapp.generated.resources.device_list_updated
+import updater.composeapp.generated.resources.device_list_updating
+import updater.composeapp.generated.resources.device_list_version
 import updater.composeapp.generated.resources.icon
 
 @Composable
@@ -113,10 +137,7 @@ fun App(
         val searchKeywords = remember { mutableStateOf(json.decodeFromString<List<String>>(prefGet("searchKeywords") ?: "[]")) }
         val searchKeywordsSelected = remember { mutableStateOf(0) }
 
-        // Initialize device list with remote updates
-        LaunchedEffect(Unit) {
-            DeviceInfoHelper.updateDeviceList()
-        }
+        LaunchedEffect(Unit) { DeviceInfoHelper.updateDeviceList() }
 
         UpdateRomInfo(
             deviceName, codeName, deviceRegion, deviceCarrier, androidVersion, systemVersion, loginData,
@@ -144,10 +165,11 @@ fun App(
             searchKeywords.value = listOf()
             prefRemove("searchKeywords")
         }
-        
+
         val onShowDeviceSettings = {
             showDeviceSettingsDialog.value = true
         }
+        DeviceListDialog(showDeviceSettingsDialog)
 
         BoxWithConstraints(
             modifier = Modifier
@@ -222,7 +244,6 @@ private fun MenuActions(
         }
     ) {
         ListPopupColumn {
-            // Device List Settings option
             DropdownImpl(
                 text = stringResource(Res.string.device_list_settings),
                 optionSize = if (searchKeywordsState.value.isNotEmpty()) 2 else 1,
@@ -233,8 +254,7 @@ private fun MenuActions(
                 },
                 index = 0
             )
-            
-            // Clear Search History option (only show if there are search keywords)
+
             if (searchKeywordsState.value.isNotEmpty()) {
                 DropdownImpl(
                     text = stringResource(Res.string.clear_search_history),
@@ -250,7 +270,6 @@ private fun MenuActions(
         }
     }
 
-    // Always show the menu button since we now have device settings
     IconButton(
         modifier = Modifier
             .padding(end = if (platform() != Platform.IOS && platform() != Platform.Android) 10.dp else 20.dp)
@@ -480,14 +499,96 @@ private fun LandscapeAppView(
                 }
             }
         }
-        
-        // Device List Settings Dialog - temporarily disabled
-        // DeviceListSettingsDialog(
-        //     showDialog = showDeviceSettingsDialog,
-        //     onDeviceListUpdated = {
-        //         // Refresh the UI when device list is updated
-        //         // This could trigger a recomposition of the AutoCompleteTextField
-        //     }
-        // )
+    }
+}
+
+@Composable
+fun DeviceListDialog(
+    showDeviceSettingsDialog: MutableState<Boolean>,
+) {
+    val coroutinesScope = rememberCoroutineScope()
+    val version = remember { mutableStateOf(RemoteDeviceListManager.getCachedVersion() ?: "-") }
+    val source = remember { mutableStateOf(RemoteDeviceListManager.getDeviceListSource()) }
+    val updateResultMsg = remember(showDeviceSettingsDialog.value) { mutableStateOf("") }
+
+    fun refreshDeviceListInfo() {
+        version.value = RemoteDeviceListManager.getCachedVersion() ?: "-"
+        source.value = RemoteDeviceListManager.getDeviceListSource()
+    }
+
+    SuperDialog(
+        show = showDeviceSettingsDialog,
+        onDismissRequest = {
+            showDeviceSettingsDialog.value = false
+        },
+        title = stringResource(Res.string.device_list_settings),
+        insideMargin = DpSize(0.dp, 24.dp)
+    ) {
+        SuperDropdown(
+            title = stringResource(Res.string.device_list_source),
+            items = listOf(
+                stringResource(Res.string.device_list_remote),
+                stringResource(Res.string.device_list_embedded)
+            ),
+            selectedIndex = if (source.value == RemoteDeviceListManager.DeviceListSource.REMOTE) 0 else 1,
+            onSelectedIndexChange = {
+                source.value = if (it == 0) {
+                    RemoteDeviceListManager.setUpdateEnabled(true)
+                    RemoteDeviceListManager.DeviceListSource.REMOTE
+                } else {
+                    RemoteDeviceListManager.setUpdateEnabled(false)
+                    RemoteDeviceListManager.DeviceListSource.EMBEDDED
+                }
+                RemoteDeviceListManager.setDeviceListSource(source.value)
+                coroutinesScope.launch {
+                    DeviceInfoHelper.updateDeviceList()
+                    refreshDeviceListInfo()
+                }
+            },
+            insideMargin = PaddingValues(horizontal = 24.dp, vertical = 16.dp)
+        )
+        AnimatedVisibility(
+            visible = source.value == RemoteDeviceListManager.DeviceListSource.REMOTE,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
+        ) {
+            Column {
+                BasicComponent(
+                    title = stringResource(Res.string.device_list_version),
+                    rightActions = {
+                        Text(
+                            text = version.value,
+                            fontSize = MiuixTheme.textStyles.body2.fontSize,
+                            color = MiuixTheme.colorScheme.onSurfaceVariantActions,
+                            textAlign = TextAlign.End,
+                        )
+                    },
+                    insideMargin = PaddingValues(horizontal = 24.dp, vertical = 16.dp)
+                )
+                val updatingText = stringResource(Res.string.device_list_updating)
+                val updatedText = stringResource(Res.string.device_list_updated)
+                val updateFailedText = stringResource(Res.string.device_list_update_failed)
+                val updateNowText = stringResource(Res.string.device_list_update_now)
+                Button(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                    colors = ButtonDefaults.buttonColorsPrimary(),
+                    onClick = {
+                        updateResultMsg.value = updatingText
+                        coroutinesScope.launch {
+                            val result = RemoteDeviceListManager.updateDeviceList()
+                            DeviceInfoHelper.updateDeviceList()
+                            refreshDeviceListInfo()
+                            updateResultMsg.value = if (result != null && result.isNotEmpty()) updatedText else updateFailedText
+                        }
+                    },
+                    enabled = source.value == RemoteDeviceListManager.DeviceListSource.REMOTE
+                ) {
+                    Text(
+                        text = updateResultMsg.value.ifEmpty { updateNowText },
+                        color = Color.White
+                    )
+                }
+            }
+        }
     }
 }

@@ -59,5 +59,22 @@
     <string name="system_default">システムに従ってください</string>
     <string name="light_mode">ライトモード</string>
     <string name="dark_mode">ダークモード</string>
+    <string name="device_list_settings">デバイスリストの設定</string>
+    <string name="device_list_source">ソース</string>
+    <string name="device_list_remote">リモート</string>
+    <string name="device_list_embedded">内蔵</string>
+    <string name="device_list_updating">更新中...</string>
+    <string name="device_list_update_now">今すぐ更新</string>
+    <string name="device_list_updated">デバイスリストが正常に更新されました</string>
+    <string name="device_list_update_failed">デバイスリストの更新に失敗したか新しいデータがありません</string>
+    <string name="device_list_version">バージョン</string>
+    <string name="archive_size">アーカイブサイズ</string>
+    <string name="partition_count">パーティション数</string>
+    <string name="partition_list">パーティション一覧</string>
+    <string name="download_partition">パーティションをダウンロード</string>
+    <string name="download_successful">ダウンロード成功</string>
+    <string name="download_failed">ダウンロード失敗</string>
+    <string name="download_error">ダウンロードエラー</string>
+    <string name="analysis_failed">payload.bin の解析に失敗しました</string>
     <string name="opensource_info">著作権 © 2024-2025 YuKongA</string>
 </resources>
