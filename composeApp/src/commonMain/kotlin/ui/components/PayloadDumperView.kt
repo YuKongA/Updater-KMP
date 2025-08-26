@@ -33,6 +33,8 @@ import data.PayloadHelper
 import kotlinx.coroutines.launch
 import misc.MessageUtils.Companion.showMessage
 import misc.PartitionDownloadManager
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.BasicComponent
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.CircularProgressIndicator
@@ -43,13 +45,37 @@ import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.icons.useful.Save
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import ui.MessageTextView
+import updater.composeapp.generated.resources.Res
+import updater.composeapp.generated.resources.analysis
+import updater.composeapp.generated.resources.analysis_failed
+import updater.composeapp.generated.resources.archive_size
+import updater.composeapp.generated.resources.download_error
+import updater.composeapp.generated.resources.download_failed
+import updater.composeapp.generated.resources.download_partition
+import updater.composeapp.generated.resources.download_start
+import updater.composeapp.generated.resources.download_successful
+import updater.composeapp.generated.resources.partition_count
+import updater.composeapp.generated.resources.partition_list
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun PayloadDumperView(
     url: String,
     version: String,
     modifier: Modifier = Modifier
 ) {
+    // 预先获取所有需要的字符串资源
+    val analysisText = stringResource(Res.string.analysis)
+    val analysisFailedText = stringResource(Res.string.analysis_failed)
+    val downloadStartText = stringResource(Res.string.download_start)
+    val downloadSuccessfulText = stringResource(Res.string.download_successful)
+    val downloadFailedText = stringResource(Res.string.download_failed)
+    val downloadErrorText = stringResource(Res.string.download_error)
+    val archiveSizeText = stringResource(Res.string.archive_size)
+    val partitionCountText = stringResource(Res.string.partition_count)
+    val partitionListText = stringResource(Res.string.partition_list)
+    val downloadPartitionText = stringResource(Res.string.download_partition)
+
     var payloadInfo by remember { mutableStateOf<PayloadHelper.PayloadInfo?>(null) }
     var partitionList by remember { mutableStateOf<List<PayloadHelper.PartitionInfo>>(emptyList()) }
     var isLoading by remember { mutableStateOf(false) }
@@ -67,7 +93,7 @@ fun PayloadDumperView(
                 if (payloadInfo != null) {
                     partitionList = PartitionDownloadManager.getAllPartitionsInfo(payloadInfo!!)
                 } else {
-                    errorMessage = "Failed to analyze payload.bin"
+                    errorMessage = analysisFailedText
                 }
             } catch (e: Exception) {
                 errorMessage = "Error: ${e.message}"
@@ -88,7 +114,7 @@ fun PayloadDumperView(
             insideMargin = PaddingValues(16.dp)
         ) {
             Text(
-                text = "PAYLOAD",
+                text = analysisText,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(bottom = 12.dp)
@@ -117,11 +143,15 @@ fun PayloadDumperView(
                     PayloadInfoContent(
                         payloadInfo = payloadInfo!!,
                         partitionList = partitionList,
+                        archiveSizeText = archiveSizeText,
+                        partitionCountText = partitionCountText,
+                        partitionListText = partitionListText,
+                        downloadPartitionText = downloadPartitionText,
                         onPartitionDownload = { partitionName ->
                             coroutineScope.launch {
                                 try {
                                     hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    showMessage("Starting download of $partitionName partition...")
+                                    showMessage("$downloadStartText $partitionName ...")
 
                                     partitionList = partitionList.map { partition ->
                                         if (partition.partitionName == partitionName) {
@@ -146,10 +176,10 @@ fun PayloadDumperView(
                                         }
                                     ).fold(
                                         onSuccess = { filePath ->
-                                            showMessage("Successfully downloaded $partitionName to: $filePath")
+                                            showMessage("$downloadSuccessfulText: $filePath")
                                         },
                                         onFailure = { error ->
-                                            showMessage("Failed to download $partitionName: ${error.message}")
+                                            showMessage("$downloadFailedText: ${error.message}")
 
                                             partitionList = partitionList.map { partition ->
                                                 if (partition.partitionName == partitionName) {
@@ -159,7 +189,7 @@ fun PayloadDumperView(
                                         }
                                     )
                                 } catch (e: Exception) {
-                                    showMessage("Error downloading partition: ${e.message}")
+                                    showMessage("$downloadErrorText: ${e.message}")
 
                                     partitionList = partitionList.map { partition ->
                                         if (partition.partitionName == partitionName) {
@@ -180,18 +210,18 @@ fun PayloadDumperView(
 private fun PayloadInfoContent(
     payloadInfo: PayloadHelper.PayloadInfo,
     partitionList: List<PayloadHelper.PartitionInfo>,
+    archiveSizeText: String,
+    partitionCountText: String,
+    partitionListText: String,
+    downloadPartitionText: String,
     onPartitionDownload: (String) -> Unit
 ) {
     Column {
-        MessageTextView("Format Version", payloadInfo.header.fileFormatVersion.toString())
-        MessageTextView("Manifest Size", "${payloadInfo.header.manifestSize} bytes")
-        MessageTextView("Block Size", "${payloadInfo.blockSize} bytes")
-        MessageTextView("Data Offset", "${payloadInfo.dataOffset} bytes")
-        MessageTextView("Archive Size", PartitionDownloadManager.formatFileSize(payloadInfo.archiveSize))
-        MessageTextView("Partitions Count", "${partitionList.size}")
+        MessageTextView(archiveSizeText, PartitionDownloadManager.formatFileSize(payloadInfo.archiveSize))
+        MessageTextView(partitionCountText, "${partitionList.size}")
 
         Text(
-            text = "Partitions",
+            text = partitionListText,
             fontSize = 24.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(bottom = 12.dp)
@@ -204,6 +234,7 @@ private fun PayloadInfoContent(
             items(partitionList) { partition ->
                 PartitionCard(
                     partition = partition,
+                    downloadPartitionText = downloadPartitionText,
                     onDownloadClick = { onPartitionDownload(partition.partitionName) }
                 )
             }
@@ -211,16 +242,17 @@ private fun PayloadInfoContent(
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 private fun PartitionCard(
     partition: PayloadHelper.PartitionInfo,
+    downloadPartitionText: String,
     onDownloadClick: () -> Unit
 ) {
-
     BasicComponent(
         title = partition.partitionName,
-        summary = "Size: ${PartitionDownloadManager.formatFileSize(partition.size)}" +
-                "\nRaw Size: ${PartitionDownloadManager.formatFileSize(partition.rawSize)}",
+        summary = "Size: " + PartitionDownloadManager.formatFileSize(partition.size) +
+                "\nRaw Size: " + PartitionDownloadManager.formatFileSize(partition.rawSize),
         rightActions = {
             if (partition.isDownloading) {
                 CircularProgressIndicator(
@@ -232,7 +264,7 @@ private fun PartitionCard(
                 ) {
                     Icon(
                         imageVector = MiuixIcons.Useful.Save,
-                        contentDescription = "Download partition",
+                        contentDescription = downloadPartitionText,
                         tint = MiuixTheme.colorScheme.onSurface
                     )
                 }

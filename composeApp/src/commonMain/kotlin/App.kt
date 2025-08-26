@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +39,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import data.DataHelper
+import data.DeviceInfoHelper
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.HazeTint
@@ -75,11 +77,13 @@ import top.yukonga.miuix.kmp.utils.platform
 import top.yukonga.miuix.kmp.utils.scrollEndHaptic
 import ui.AboutDialog
 import ui.BasicViews
+import ui.DeviceListDialog
 import ui.InfoCardViews
 import ui.LoginCardView
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.app_name
 import updater.composeapp.generated.resources.clear_search_history
+import updater.composeapp.generated.resources.device_list_settings
 import updater.composeapp.generated.resources.icon
 
 @Composable
@@ -109,6 +113,8 @@ fun App(
         val searchKeywords = remember { mutableStateOf(json.decodeFromString<List<String>>(prefGet("searchKeywords") ?: "[]")) }
         val searchKeywordsSelected = remember { mutableStateOf(0) }
 
+        LaunchedEffect(Unit) { DeviceInfoHelper.updateDeviceList() }
+
         UpdateRomInfo(
             deviceName, codeName, deviceRegion, deviceCarrier, androidVersion, systemVersion, loginData,
             isLogin, curRomInfo, incRomInfo, curIconInfo, incIconInfo, updateRomInfoState, searchKeywords, searchKeywordsSelected
@@ -129,15 +135,20 @@ fun App(
         )
 
         val showMenuPopup = remember { mutableStateOf(false) }
+        val showDeviceSettingsDialog = remember { mutableStateOf(false) }
 
         val onClearSearchHistory = {
             searchKeywords.value = listOf()
             prefRemove("searchKeywords")
         }
 
+        val onShowDeviceSettings = {
+            showDeviceSettingsDialog.value = true
+        }
+        DeviceListDialog(showDeviceSettingsDialog)
+
         BoxWithConstraints(
-            modifier = Modifier
-                .scrollEndHaptic()
+            modifier = Modifier.scrollEndHaptic()
         ) {
             if (maxWidth < 768.dp) {
                 PortraitAppView(
@@ -148,6 +159,7 @@ fun App(
                     showMenuPopup = showMenuPopup,
                     searchKeywords = searchKeywords,
                     onClearSearchHistory = onClearSearchHistory,
+                    onShowDeviceSettings = onShowDeviceSettings,
                     isLogin = isLogin,
                     deviceName = deviceName,
                     codeName = codeName,
@@ -169,6 +181,7 @@ fun App(
                     showMenuPopup = showMenuPopup,
                     searchKeywords = searchKeywords,
                     onClearSearchHistory = onClearSearchHistory,
+                    onShowDeviceSettings = onShowDeviceSettings,
                     isLogin = isLogin,
                     deviceName = deviceName,
                     codeName = codeName,
@@ -194,7 +207,8 @@ private fun MenuActions(
     searchKeywordsState: MutableState<List<String>>,
     showMenuPopup: MutableState<Boolean>,
     focusManager: FocusManager,
-    onClearSearchHistory: () -> Unit
+    onClearSearchHistory: () -> Unit,
+    onShowDeviceSettings: () -> Unit
 ) {
     ListPopup(
         show = showMenuPopup,
@@ -206,35 +220,46 @@ private fun MenuActions(
     ) {
         ListPopupColumn {
             DropdownImpl(
-                text = stringResource(Res.string.clear_search_history),
-                optionSize = 1,
+                text = stringResource(Res.string.device_list_settings),
+                optionSize = if (searchKeywordsState.value.isNotEmpty()) 2 else 1,
                 isSelected = false,
                 onSelectedIndexChange = {
                     showMenuPopup.value = false
-                    onClearSearchHistory()
+                    onShowDeviceSettings()
                 },
                 index = 0
             )
+
+            if (searchKeywordsState.value.isNotEmpty()) {
+                DropdownImpl(
+                    text = stringResource(Res.string.clear_search_history),
+                    optionSize = 2,
+                    isSelected = false,
+                    onSelectedIndexChange = {
+                        showMenuPopup.value = false
+                        onClearSearchHistory()
+                    },
+                    index = 1
+                )
+            }
         }
     }
 
-    if (searchKeywordsState.value.isNotEmpty()) {
-        IconButton(
-            modifier = Modifier
-                .padding(end = if (platform() != Platform.IOS && platform() != Platform.Android) 10.dp else 20.dp)
-                .size(40.dp),
-            onClick = {
-                showMenuPopup.value = true
-                focusManager.clearFocus()
-            },
-            holdDownState = showMenuPopup.value
-        ) {
-            Icon(
-                imageVector = MiuixIcons.Useful.Settings,
-                tint = MiuixTheme.colorScheme.onBackground,
-                contentDescription = "Menu"
-            )
-        }
+    IconButton(
+        modifier = Modifier
+            .padding(end = if (platform() != Platform.IOS && platform() != Platform.Android) 10.dp else 20.dp)
+            .size(40.dp),
+        onClick = {
+            showMenuPopup.value = true
+            focusManager.clearFocus()
+        },
+        holdDownState = showMenuPopup.value
+    ) {
+        Icon(
+            imageVector = MiuixIcons.Useful.Settings,
+            tint = MiuixTheme.colorScheme.onBackground,
+            contentDescription = "Menu"
+        )
     }
 }
 
@@ -247,6 +272,7 @@ private fun PortraitAppView(
     showMenuPopup: MutableState<Boolean>,
     searchKeywords: MutableState<List<String>>,
     onClearSearchHistory: () -> Unit,
+    onShowDeviceSettings: () -> Unit,
     isLogin: MutableState<Int>,
     deviceName: MutableState<String>,
     codeName: MutableState<String>,
@@ -274,7 +300,8 @@ private fun PortraitAppView(
                         searchKeywordsState = searchKeywords,
                         showMenuPopup = showMenuPopup,
                         focusManager = focusManager,
-                        onClearSearchHistory = onClearSearchHistory
+                        onClearSearchHistory = onClearSearchHistory,
+                        onShowDeviceSettings = onShowDeviceSettings
                     )
                 },
                 modifier = Modifier
@@ -325,6 +352,7 @@ private fun LandscapeAppView(
     showMenuPopup: MutableState<Boolean>,
     searchKeywords: MutableState<List<String>>,
     onClearSearchHistory: () -> Unit,
+    onShowDeviceSettings: () -> Unit,
     isLogin: MutableState<Int>,
     deviceName: MutableState<String>,
     codeName: MutableState<String>,
@@ -361,7 +389,8 @@ private fun LandscapeAppView(
                             searchKeywordsState = searchKeywords,
                             showMenuPopup = showMenuPopup,
                             focusManager = focusManager,
-                            onClearSearchHistory = onClearSearchHistory
+                            onClearSearchHistory = onClearSearchHistory,
+                            onShowDeviceSettings = onShowDeviceSettings
                         )
                     },
                     defaultWindowInsetsPadding = false,

@@ -210,7 +210,6 @@ object PartitionRebuilder {
             }
 
             else -> {
-                println("Unknown operation type: ${operation.type}, treating as raw data")
                 data
             }
         }
