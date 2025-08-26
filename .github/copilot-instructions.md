@@ -236,7 +236,7 @@ actual fun showToast(message: String, duration: Long) { /* Android implementatio
 ├── LICENSE (Apache 2.0)
 ├── README.md (Basic usage instructions)
 ├── build.gradle.kts (Plugin declarations only)
-├── settings.gradle.kts (Project structure and repositories - HAS KNOWN ISSUES)
+├── settings.gradle.kts (Project structure and repositories)
 ├── gradle.properties (Gradle configuration with MPP optimizations)
 ├── gradlew / gradlew.bat (Gradle wrapper scripts)
 └── .gitignore (Comprehensive ignore rules for all platforms)
