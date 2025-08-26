@@ -54,7 +54,6 @@ fun AutoCompleteTextField(
     onValueChange: MutableStateFlow<String>,
     label: String
 ) {
-    println("AutoCompleteTextField recomposed: $items")
     val filteredList = remember(text.value, items) {
         items.filter {
             it.startsWith(text.value, ignoreCase = true)
