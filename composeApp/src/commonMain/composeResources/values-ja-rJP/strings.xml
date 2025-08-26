@@ -66,7 +66,7 @@
     <string name="device_list_updating">更新中...</string>
     <string name="device_list_update_now">今すぐ更新</string>
     <string name="device_list_updated">デバイスリストが正常に更新されました</string>
-    <string name="device_list_update_failed">デバイスリストの更新に失敗したか新しいデータがありません</string>
+    <string name="device_list_update_failed">デバイスリストの更新に失敗しました</string>
     <string name="device_list_version">バージョン</string>
     <string name="archive_size">アーカイブサイズ</string>
     <string name="partition_count">パーティション数</string>

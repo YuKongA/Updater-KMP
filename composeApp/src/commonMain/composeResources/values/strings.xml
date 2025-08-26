@@ -67,7 +67,7 @@
     <string name="device_list_updating">Updating...</string>
     <string name="device_list_update_now">Update Now</string>
     <string name="device_list_updated">Device list updated successfully</string>
-    <string name="device_list_update_failed">Failed to update device list or no new data</string>
+    <string name="device_list_update_failed">Device list update failed</string>
     <string name="device_list_version">Version</string>
     <string name="archive_size">Archive Size</string>
     <string name="partition_count">Partition Count</string>

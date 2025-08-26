@@ -66,7 +66,7 @@
     <string name="device_list_updating">Atualizando...</string>
     <string name="device_list_update_now">Atualizar agora</string>
     <string name="device_list_updated">Lista de dispositivos atualizada com sucesso</string>
-    <string name="device_list_update_failed">Falha ao atualizar a lista de dispositivos ou sem novos dados</string>
+    <string name="device_list_update_failed">Falha ao atualizar a lista de dispositivos</string>
     <string name="device_list_version">Versão</string>
     <string name="archive_size">Tamanho do Arquivo</string>
     <string name="partition_count">Número de Partições</string>
