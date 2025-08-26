@@ -46,7 +46,6 @@ import top.yukonga.miuix.kmp.icon.icons.useful.Save
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import ui.MessageTextView
 import updater.composeapp.generated.resources.Res
-import updater.composeapp.generated.resources.analysis
 import updater.composeapp.generated.resources.analysis_failed
 import updater.composeapp.generated.resources.archive_size
 import updater.composeapp.generated.resources.download_error
@@ -64,8 +63,6 @@ fun PayloadDumperView(
     version: String,
     modifier: Modifier = Modifier
 ) {
-    // 预先获取所有需要的字符串资源
-    val analysisText = stringResource(Res.string.analysis)
     val analysisFailedText = stringResource(Res.string.analysis_failed)
     val downloadStartText = stringResource(Res.string.download_start)
     val downloadSuccessfulText = stringResource(Res.string.download_successful)
@@ -114,7 +111,7 @@ fun PayloadDumperView(
             insideMargin = PaddingValues(16.dp)
         ) {
             Text(
-                text = analysisText,
+                text = "Payload",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(bottom = 12.dp)
