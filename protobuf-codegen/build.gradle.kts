@@ -7,7 +7,7 @@ plugins {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:4.31.0"
+        artifact = "com.google.protobuf:protoc:4.32.0"
     }
     plugins {
         id("pbandk") {
