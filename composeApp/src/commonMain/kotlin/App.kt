@@ -77,7 +77,7 @@ import top.yukonga.miuix.kmp.utils.platform
 import top.yukonga.miuix.kmp.utils.scrollEndHaptic
 import ui.AboutDialog
 import ui.BasicViews
-import ui.DeviceListSettingsDialog
+// import ui.DeviceListSettingsDialog
 import ui.InfoCardViews
 import ui.LoginCardView
 import updater.composeapp.generated.resources.Res
@@ -481,13 +481,13 @@ private fun LandscapeAppView(
             }
         }
         
-        // Device List Settings Dialog
-        DeviceListSettingsDialog(
-            showDialog = showDeviceSettingsDialog,
-            onDeviceListUpdated = {
-                // Refresh the UI when device list is updated
-                // This could trigger a recomposition of the AutoCompleteTextField
-            }
-        )
+        // Device List Settings Dialog - temporarily disabled
+        // DeviceListSettingsDialog(
+        //     showDialog = showDeviceSettingsDialog,
+        //     onDeviceListUpdated = {
+        //         // Refresh the UI when device list is updated
+        //         // This could trigger a recomposition of the AutoCompleteTextField
+        //     }
+        // )
     }
 }
