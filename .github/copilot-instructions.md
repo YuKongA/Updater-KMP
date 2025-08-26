@@ -2,7 +2,7 @@
 
 ## Repository Summary
 
-**Updater-KMP** is a Kotlin Multiplatform application using Compose Multiplatform that provides information about official Xiaomi ROM releases. It supports **Android**, **Desktop (JVM)**, **iOS**, **macOS**, **JS**, and **WasmJS** platforms.
+**Updater-KMP** is a Kotlin Multiplatform application using Compose Multiplatform to get Xiaomi official recovery ROM information. It supports **Android**, **Desktop (JVM)**, **iOS**, **macOS**, **JS**, and **WasmJS** platforms.
 
 The app allows users to:
 - Get detailed information about Xiaomi ROM releases (public/beta/dev versions)
