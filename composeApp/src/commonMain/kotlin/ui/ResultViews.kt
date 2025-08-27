@@ -222,7 +222,7 @@ fun InfoCardViews(
     val isFullPackage = payloadUrl.isNotEmpty() && !payloadUrl.contains("_incremental", ignoreCase = true)
 
     AnimatedVisibility(
-        visible = isFullPackage && !isPayloadDumperVisible,
+        visible = isFullPackage && !isPayloadDumperVisible && isFullPackage && (platform() == Platform.Desktop || platform() == Platform.Android || platform() == Platform.MacOS),
         enter = fadeIn() + expandVertically(),
         exit = fadeOut() + shrinkVertically()
     ) {
@@ -236,7 +236,7 @@ fun InfoCardViews(
         )
     }
     AnimatedVisibility(
-        visible = isPayloadDumperVisible && isFullPackage && (platform() == Platform.Desktop || platform() == Platform.Android),
+        visible = isPayloadDumperVisible && isFullPackage && (platform() == Platform.Desktop || platform() == Platform.Android || platform() == Platform.MacOS),
         enter = fadeIn() + expandVertically(),
         exit = fadeOut() + shrinkVertically()
     ) {

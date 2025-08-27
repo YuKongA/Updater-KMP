@@ -33,7 +33,6 @@ import data.PayloadHelper
 import kotlinx.coroutines.launch
 import misc.MessageUtils.Companion.showMessage
 import misc.PartitionDownloadManager
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.BasicComponent
 import top.yukonga.miuix.kmp.basic.Card
@@ -56,7 +55,6 @@ import updater.composeapp.generated.resources.download_successful
 import updater.composeapp.generated.resources.partition_count
 import updater.composeapp.generated.resources.partition_list
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun PayloadDumperView(
     url: String,
@@ -239,7 +237,6 @@ private fun PayloadInfoContent(
     }
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 private fun PartitionCard(
     partition: PayloadHelper.PartitionInfo,

@@ -20,7 +20,7 @@ actual object Compression {
                     }
                 }
             } catch (e: Exception) {
-                Result.failure(Exception("XZ解压失败: ${e.message}", e))
+                Result.failure(Exception("XZ decompression failed: ${e.message}", e))
             }
         }
     }
@@ -29,14 +29,17 @@ actual object Compression {
         return withContext(Dispatchers.IO) {
             try {
                 ByteArrayInputStream(compressedData).use { inputStream ->
+                    println("Starting BZ2 Decompression, input size: ${compressedData.size} bytes")
                     BZip2CompressorInputStream(inputStream).use { bzStream ->
                         val output = ByteArrayOutputStream()
                         bzStream.copyTo(output, 8192)
+                        println("BZ2 Decompression successful, output size: ${output.size()} bytes")
                         Result.success(output.toByteArray())
                     }
                 }
             } catch (e: Exception) {
-                Result.failure(Exception("bzip2解压失败: ${e.message}", e))
+                println("BZ2 Decompression error: ${e.message}")
+                Result.failure(Exception("Bzip2 decompression failed: ${e.message}", e))
             }
         }
     }

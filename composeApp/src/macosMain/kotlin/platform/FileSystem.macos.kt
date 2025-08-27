@@ -29,9 +29,18 @@ actual suspend fun saveFileWithProgress(
     onProgress: (FileSaveProgress) -> Unit
 ): Result<String> {
     try {
-        val downloadsDir = folder ?: FileSystem.getDownloadsDirectory()
-        val filePath = downloadsDir.trimEnd('/') + "/" + fileName
-        val file = fopen(filePath, "wb") ?: throw Exception("无法创建文件: $filePath")
+        val downloadsDir = FileSystem.getDownloadsDirectory()
+        val targetDir = if (folder.isNullOrBlank()) downloadsDir else "$downloadsDir/$folder"
+        val filePath = "$targetDir/$fileName"
+
+        val fileManager = NSFileManager.defaultManager
+        val exists = fileManager.fileExistsAtPath(targetDir, null)
+        if (!exists) {
+            val success = fileManager.createDirectoryAtPath(targetDir, true, null, null)
+            if (!success) throw Exception("Error: $targetDir")
+        }
+
+        val file = fopen(filePath, "wb") ?: throw Exception("Error: $filePath")
         val totalBytes = data.size.toLong()
         var bytesWritten = 0L
         val bufferSize = 8192
@@ -41,7 +50,7 @@ actual suspend fun saveFileWithProgress(
             val written = data.usePinned {
                 fwrite(it.addressOf(bytesWritten.toInt()), 1.convert(), writeSize.convert(), file)
             }
-            if (written <= 0u) throw Exception("写入失败: $filePath")
+            if (written <= 0u) throw Exception("Error: $filePath")
             bytesWritten += written.toLong()
             onProgress(
                 FileSaveProgress(

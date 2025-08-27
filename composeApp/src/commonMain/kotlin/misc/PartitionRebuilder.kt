@@ -28,11 +28,11 @@ object PartitionRebuilder {
         return try {
             val partition = payloadInfo.deltaArchiveManifest.partitions.firstOrNull {
                 it.partitionName == partitionName
-            } ?: return Result.failure(Exception("分区 '$partitionName' 未找到"))
+            } ?: return Result.failure(Exception("Error: Partition $partitionName not found"))
 
             val targetSize = partition.newPartitionInfo?.size ?: 0L
             if (targetSize <= 0) {
-                return Result.failure(Exception("分区大小无效: $targetSize"))
+                return Result.failure(Exception("Error: Invalid target size for partition $partitionName"))
             }
 
             val partitionBuffer = ByteArray(targetSize.toInt())
@@ -50,7 +50,7 @@ object PartitionRebuilder {
                     bytesProcessed = 0,
                     totalBytes = targetSize,
                     progress = 0f,
-                    currentOperationType = "初始化",
+                    currentOperationType = "Initializing",
                     isCompleted = false
                 )
             )
@@ -94,7 +94,7 @@ object PartitionRebuilder {
                             progress = ((index + 1).toFloat() / totalOperations.toFloat()).coerceIn(0f, 1f),
                             currentOperationType = operationType,
                             isCompleted = false,
-                            error = "处理操作失败: ${e.message}"
+                            error = "Error: ${e.message}"
                         )
                     )
                     return Result.failure(e)
@@ -109,7 +109,7 @@ object PartitionRebuilder {
                     bytesProcessed = targetSize,
                     totalBytes = targetSize,
                     progress = 1f,
-                    currentOperationType = "完成",
+                    currentOperationType = "Completed",
                     isCompleted = true
                 )
             )
@@ -125,9 +125,9 @@ object PartitionRebuilder {
                     bytesProcessed = 0,
                     totalBytes = 0,
                     progress = 0f,
-                    currentOperationType = "错误",
+                    currentOperationType = "Error",
                     isCompleted = false,
-                    error = "重建失败: ${e.message}"
+                    error = "Error: ${e.message}"
                 )
             )
             Result.failure(e)
@@ -153,7 +153,7 @@ object PartitionRebuilder {
                 if (sourceOffset + dataLength <= sourceData.size) {
                     sourceData.sliceArray(sourceOffset until sourceOffset + dataLength)
                 } else {
-                    throw Exception("操作数据超出范围: offset=$sourceOffset, length=$dataLength, sourceSize=${sourceData.size}")
+                    throw Exception("Error: offset=$sourceOffset, length=$dataLength, sourceSize=${sourceData.size}")
                 }
             } else {
                 byteArrayOf()
@@ -189,14 +189,14 @@ object PartitionRebuilder {
             InstallOperation.Type.REPLACE_BZ -> {
                 val result = Compression.decompressBZ2(data)
                 result.getOrElse {
-                    throw Exception("bzip2 解压失败: ${it.message}")
+                    throw Exception("Bzip2 decompression failed: ${it.message}")
                 }
             }
 
             InstallOperation.Type.REPLACE_XZ -> {
                 val result = Compression.decompressXZ(data)
                 result.getOrElse {
-                    throw Exception("XZ 解压失败: ${it.message}")
+                    throw Exception("XZ decompression failed: ${it.message}")
                 }
             }
 
@@ -238,7 +238,7 @@ object PartitionRebuilder {
             val bytesToWrite = (numBlocks * blockSize).toInt()
 
             if (startOffset + bytesToWrite > targetBuffer.size) {
-                throw Exception("写入位置超出缓冲区范围: startOffset=$startOffset, bytesToWrite=$bytesToWrite, bufferSize=${targetBuffer.size}")
+                throw Exception("Error: startOffset=$startOffset, bytesToWrite=$bytesToWrite, bufferSize=${targetBuffer.size}")
             }
 
             val actualBytesToWrite = min(bytesToWrite, processedData.size - dataOffset)

@@ -38,6 +38,19 @@ kotlin {
 
     jvm("desktop")
 
+    cocoapods {
+        version = verName
+        summary = "Get HyperOS/MIUI recovery ROM info"
+        homepage = "https://github.com/YuKongA/Updater-KMP"
+        authors = "YuKongA"
+        license = "AGPL-3.0"
+        podfile = project.file("../iosApp/Podfile")
+        framework {
+            baseName = appName + "Framework"
+            isStatic = true
+        }
+    }
+
     iosX64()
     iosArm64()
     iosSimulatorArm64()
@@ -50,18 +63,11 @@ kotlin {
         binaries.executable {
             entryPoint = "main"
         }
-    }
 
-    cocoapods {
-        version = verName
-        summary = "Get HyperOS/MIUI recovery ROM info"
-        homepage = "https://github.com/YuKongA/Updater-KMP"
-        authors = "YuKongA"
-        license = "AGPL-3.0"
-        podfile = project.file("../iosApp/Podfile")
-        framework {
-            baseName = appName + "Framework"
-            isStatic = true
+        compilations["main"].cinterops {
+            val lzma by creating {
+                defFile(project.file("src/macosMain/cinterop/lzma.def"))
+            }
         }
     }
 
