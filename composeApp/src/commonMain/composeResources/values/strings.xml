@@ -66,16 +66,8 @@
     <string name="device_list_embedded">Embedded</string>
     <string name="device_list_updating">Updating...</string>
     <string name="device_list_update_now">Update Now</string>
-    <string name="device_list_updated">Device list updated successfully</string>
-    <string name="device_list_update_failed">Device list update failed</string>
+    <string name="device_list_updated">Update successful</string>
+    <string name="device_list_update_failed">Update failed</string>
     <string name="device_list_version">Version</string>
-    <string name="archive_size">Archive Size</string>
-    <string name="partition_count">Partition Count</string>
-    <string name="partition_list">Partition List</string>
-    <string name="download_partition">Download Partition</string>
-    <string name="download_successful">Download successful</string>
-    <string name="download_failed">Download failed</string>
-    <string name="download_error">Download error</string>
-    <string name="analysis_failed">Failed to analyze payload.bin</string>
     <string name="opensource_info">Copyright © 2024-2025 YuKongA</string>
 </resources>

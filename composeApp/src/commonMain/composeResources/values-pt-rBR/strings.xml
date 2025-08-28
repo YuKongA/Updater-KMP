@@ -65,16 +65,8 @@
     <string name="device_list_embedded">Embutido</string>
     <string name="device_list_updating">Atualizando...</string>
     <string name="device_list_update_now">Atualizar agora</string>
-    <string name="device_list_updated">Lista de dispositivos atualizada com sucesso</string>
-    <string name="device_list_update_failed">Falha ao atualizar a lista de dispositivos</string>
+    <string name="device_list_updated">Atualização bem-sucedida</string>
+    <string name="device_list_update_failed">A atualização falhou</string>
     <string name="device_list_version">Versão</string>
-    <string name="archive_size">Tamanho do Arquivo</string>
-    <string name="partition_count">Número de Partições</string>
-    <string name="partition_list">Lista de Partições</string>
-    <string name="download_partition">Baixar Partição</string>
-    <string name="download_successful">Download bem-sucedido</string>
-    <string name="download_failed">Falha no download</string>
-    <string name="download_error">Erro no download</string>
-    <string name="analysis_failed">Falha ao analisar payload.bin</string>
     <string name="opensource_info">Copyright © 2024-2025 YuKongA</string>
 </resources>

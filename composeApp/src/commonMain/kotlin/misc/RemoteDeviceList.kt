@@ -13,7 +13,7 @@ import platform.prefSet
 /**
  * Manages remote device list updates
  */
-object RemoteDeviceListManager {
+object RemoteDeviceList {
 
 
     private const val DEVICE_LIST_URL = "https://raw.githubusercontent.com/YuKongA/Updater-KMP/device-list/device.json"
@@ -29,7 +29,7 @@ object RemoteDeviceListManager {
     fun getCachedDeviceList(): List<DeviceInfoHelper.Device>? {
         val cachedData = prefGet(DEVICE_LIST_CACHED_KEY) ?: return null
         return try {
-            val remoteData = json.decodeFromString<DeviceInfoHelper.RemoteDeviceList>(cachedData)
+            val remoteData = json.decodeFromString<DeviceInfoHelper.RemoteDevices>(cachedData)
             remoteData.devices
         } catch (_: Exception) {
             null
@@ -52,7 +52,7 @@ object RemoteDeviceListManager {
                 val response = client.get(DEVICE_LIST_URL)
                 val jsonContent = response.bodyAsText()
 
-                val remoteData = json.decodeFromString<DeviceInfoHelper.RemoteDeviceList>(jsonContent)
+                val remoteData = json.decodeFromString<DeviceInfoHelper.RemoteDevices>(jsonContent)
 
                 val currentVersion = getCachedVersion()
                 if (currentVersion != null && currentVersion >= remoteData.version) {
@@ -70,7 +70,6 @@ object RemoteDeviceListManager {
     }
 
     enum class DeviceListSource { REMOTE, EMBEDDED }
-
 
     fun getDeviceListSource(): DeviceListSource {
         return when (prefGet(DEVICE_LIST_SOURCE_KEY)) {

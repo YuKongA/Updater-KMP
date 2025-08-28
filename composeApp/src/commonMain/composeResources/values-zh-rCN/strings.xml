@@ -65,16 +65,8 @@
     <string name="device_list_embedded">内置</string>
     <string name="device_list_updating">正在更新...</string>
     <string name="device_list_update_now">立即更新</string>
-    <string name="device_list_updated">设备列表更新成功</string>
-    <string name="device_list_update_failed">设备列表更新失败</string>
+    <string name="device_list_updated">更新成功</string>
+    <string name="device_list_update_failed">更新失败</string>
     <string name="device_list_version">版本</string>
-    <string name="archive_size">归档大小</string>
-    <string name="partition_count">分区数量</string>
-    <string name="partition_list">分区列表</string>
-    <string name="download_partition">下载分区</string>
-    <string name="download_successful">下载成功</string>
-    <string name="download_failed">下载失败</string>
-    <string name="download_error">下载出错</string>
-    <string name="analysis_failed">解析 payload.bin 失败</string>
     <string name="opensource_info">版权所有 © 2024-2025 YuKongA</string>
 </resources>

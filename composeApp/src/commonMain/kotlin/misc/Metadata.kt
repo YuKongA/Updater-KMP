@@ -1,3 +1,5 @@
+package misc
+
 import io.ktor.client.request.get
 import io.ktor.client.request.head
 import io.ktor.client.request.header

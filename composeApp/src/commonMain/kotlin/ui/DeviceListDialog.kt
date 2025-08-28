@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import data.DeviceInfoHelper
 import kotlinx.coroutines.launch
-import misc.RemoteDeviceListManager
+import misc.RemoteDeviceList
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.BasicComponent
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
@@ -46,13 +46,13 @@ fun DeviceListDialog(
     showDeviceSettingsDialog: MutableState<Boolean>,
 ) {
     val coroutinesScope = rememberCoroutineScope()
-    val version = remember { mutableStateOf(RemoteDeviceListManager.getCachedVersion() ?: "-") }
-    val source = remember { mutableStateOf(RemoteDeviceListManager.getDeviceListSource()) }
+    val version = remember { mutableStateOf(RemoteDeviceList.getCachedVersion() ?: "-") }
+    val source = remember { mutableStateOf(RemoteDeviceList.getDeviceListSource()) }
     val updateResultMsg = remember(showDeviceSettingsDialog.value) { mutableStateOf("") }
 
     fun refreshDeviceListInfo() {
-        version.value = RemoteDeviceListManager.getCachedVersion() ?: "-"
-        source.value = RemoteDeviceListManager.getDeviceListSource()
+        version.value = RemoteDeviceList.getCachedVersion() ?: "-"
+        source.value = RemoteDeviceList.getDeviceListSource()
     }
 
     SuperDialog(
@@ -69,14 +69,14 @@ fun DeviceListDialog(
                 stringResource(Res.string.device_list_remote),
                 stringResource(Res.string.device_list_embedded)
             ),
-            selectedIndex = if (source.value == RemoteDeviceListManager.DeviceListSource.REMOTE) 0 else 1,
+            selectedIndex = if (source.value == RemoteDeviceList.DeviceListSource.REMOTE) 0 else 1,
             onSelectedIndexChange = {
                 source.value = if (it == 0) {
-                    RemoteDeviceListManager.DeviceListSource.REMOTE
+                    RemoteDeviceList.DeviceListSource.REMOTE
                 } else {
-                    RemoteDeviceListManager.DeviceListSource.EMBEDDED
+                    RemoteDeviceList.DeviceListSource.EMBEDDED
                 }
-                RemoteDeviceListManager.setDeviceListSource(source.value)
+                RemoteDeviceList.setDeviceListSource(source.value)
                 coroutinesScope.launch {
                     DeviceInfoHelper.updateDeviceList()
                     refreshDeviceListInfo()
@@ -85,7 +85,7 @@ fun DeviceListDialog(
             insideMargin = PaddingValues(horizontal = 24.dp, vertical = 16.dp)
         )
         AnimatedVisibility(
-            visible = source.value == RemoteDeviceListManager.DeviceListSource.REMOTE,
+            visible = source.value == RemoteDeviceList.DeviceListSource.REMOTE,
             enter = fadeIn() + expandVertically(),
             exit = fadeOut() + shrinkVertically()
         ) {
@@ -113,7 +113,7 @@ fun DeviceListDialog(
                     onClick = {
                         updateResultMsg.value = updatingText
                         coroutinesScope.launch {
-                            val result = RemoteDeviceListManager.updateDeviceList()
+                            val result = RemoteDeviceList.updateDeviceList()
                             DeviceInfoHelper.updateDeviceList()
                             refreshDeviceListInfo()
                             updateResultMsg.value = if (result != null && result.isNotEmpty()) updatedText else updateFailedText

@@ -17,11 +17,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -39,22 +39,16 @@ import misc.bodySmallFontSize
 import org.jetbrains.compose.resources.stringResource
 import platform.copyToClipboard
 import platform.downloadToLocal
-import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.icons.useful.Copy
 import top.yukonga.miuix.kmp.icon.icons.useful.Save
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.utils.Platform
-import top.yukonga.miuix.kmp.utils.platform
-import ui.components.PayloadDumperView
 import ui.components.TextWithIcon
 import updater.composeapp.generated.resources.Res
-import updater.composeapp.generated.resources.analysis
 import updater.composeapp.generated.resources.android_version
 import updater.composeapp.generated.resources.attention
 import updater.composeapp.generated.resources.big_version
@@ -75,12 +69,23 @@ import updater.composeapp.generated.resources.tags
 
 @Composable
 fun InfoCardViews(
-    romInfoState: MutableState<DataHelper.RomInfoData>,
-    iconInfo: MutableState<List<DataHelper.IconInfoData>>,
+    romInfoData: MutableState<DataHelper.RomInfoData>,
+    iconInfoData: MutableState<List<DataHelper.IconInfoData>>,
     updateRomInfoState: MutableState<Int>
 ) {
-    val romInfo = romInfoState.value
-    val isVisible = romInfo.type.isNotEmpty()
+    val romInfo = romInfoData.value
+    val iconInfo = iconInfoData.value
+
+    val isVisible by remember(updateRomInfoState.value, romInfoData.value) {
+        derivedStateOf {
+            romInfo.fileName.isNotEmpty()
+        }
+    }
+    val hasTimestamp by remember(romInfo) {
+        derivedStateOf {
+            romInfo.timestamp.isNotEmpty() || romInfo.fingerprint.isNotEmpty() || romInfo.securityPatchLevel.isNotEmpty()
+        }
+    }
 
     AnimatedVisibility(
         visible = isVisible,
@@ -121,7 +126,7 @@ fun InfoCardViews(
             }
 
             AnimatedVisibility(
-                visible = romInfo.timestamp.isNotEmpty()
+                visible = hasTimestamp
             ) {
                 MetadataView(
                     romInfo.fingerprint,
@@ -130,17 +135,10 @@ fun InfoCardViews(
                 )
             }
 
-            MessageTextView(
-                stringResource(Res.string.filename),
-                romInfo.fileName
-            )
-            MessageTextView(
-                stringResource(Res.string.filemd5),
-                romInfo.md5
-            )
-            MessageTextView(
-                stringResource(Res.string.filesize),
-                romInfo.fileSize
+            RomFileInfoSection(
+                fileName = romInfo.fileName,
+                md5 = romInfo.md5,
+                fileSize = romInfo.fileSize
             )
 
             Text(
@@ -209,42 +207,6 @@ fun InfoCardViews(
                 )
             }
         }
-    }
-
-    var isPayloadDumperVisible by remember(updateRomInfoState.value) { mutableStateOf(false) }
-    val payloadUrl = remember(romInfo) {
-        romInfo.official1Download.takeIf { it.isNotEmpty() }
-            ?: romInfo.official2Download.takeIf { it.isNotEmpty() }
-            ?: romInfo.cdn1Download.takeIf { it.isNotEmpty() }
-            ?: romInfo.cdn2Download
-    }
-
-    val isFullPackage = payloadUrl.isNotEmpty() && !payloadUrl.contains("_incremental", ignoreCase = true)
-
-    AnimatedVisibility(
-        visible = isFullPackage && !isPayloadDumperVisible && isFullPackage && (platform() == Platform.Desktop || platform() == Platform.Android || platform() == Platform.MacOS),
-        enter = fadeIn() + expandVertically(),
-        exit = fadeOut() + shrinkVertically()
-    ) {
-        TextButton(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
-            colors = ButtonDefaults.textButtonColorsPrimary(),
-            onClick = {
-                isPayloadDumperVisible = true
-            },
-            text = stringResource(Res.string.analysis)
-        )
-    }
-    AnimatedVisibility(
-        visible = isPayloadDumperVisible && isFullPackage && (platform() == Platform.Desktop || platform() == Platform.Android || platform() == Platform.MacOS),
-        enter = fadeIn() + expandVertically(),
-        exit = fadeOut() + shrinkVertically()
-    ) {
-        PayloadDumperView(
-            url = payloadUrl,
-            version = romInfo.version,
-            modifier = Modifier.fillMaxWidth()
-        )
     }
 }
 
@@ -388,7 +350,7 @@ fun DownloadInfoView(
 
 @Composable
 fun ChangelogView(
-    iconInfo: MutableState<List<DataHelper.IconInfoData>>,
+    iconInfo: List<DataHelper.IconInfoData>,
     changelog: String
 ) {
     val hapticFeedback = LocalHapticFeedback.current
@@ -426,13 +388,28 @@ fun ChangelogView(
                 )
             }
         }
-        iconInfo.value.forEachIndexed { index, it ->
+        iconInfo.forEachIndexed { index, it ->
             TextWithIcon(
                 changelog = it.changelog,
                 iconName = it.iconName,
                 iconLink = it.iconLink,
-                padding = if (index == iconInfo.value.size - 1) 0.dp else 16.dp
+                padding = if (index == iconInfo.size - 1) 0.dp else 16.dp
             )
         }
+    }
+}
+
+@Composable
+fun RomFileInfoSection(
+    fileName: String,
+    md5: String,
+    fileSize: String
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        MessageTextView(stringResource(Res.string.filename), fileName)
+        MessageTextView(stringResource(Res.string.filemd5), md5)
+        MessageTextView(stringResource(Res.string.filesize), fileSize)
     }
 }

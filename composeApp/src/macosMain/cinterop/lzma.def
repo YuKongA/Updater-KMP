@@ -1,3 +1,0 @@
-headers = /opt/homebrew/include/lzma.h
-compilerOpts = -I/opt/homebrew/include
-linkerOpts = -L/opt/homebrew/lib -llzma
