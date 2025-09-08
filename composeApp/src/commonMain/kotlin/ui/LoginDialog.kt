@@ -1,15 +1,22 @@
 package ui
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,16 +32,19 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import getCaptchaInfo
 import getPassword
 import kotlinx.coroutines.launch
 import login
 import logout
 import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
+import platform.loadImageFromUrl
 import platform.prefGet
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
+import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.extra.SuperCheckbox
@@ -48,6 +58,9 @@ import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.account
 import updater.composeapp.generated.resources.account_or_password_empty
 import updater.composeapp.generated.resources.cancel
+import updater.composeapp.generated.resources.captcha_invalid
+import updater.composeapp.generated.resources.captcha_required
+import updater.composeapp.generated.resources.enter_captcha
 import updater.composeapp.generated.resources.global
 import updater.composeapp.generated.resources.logging_in
 import updater.composeapp.generated.resources.login
@@ -72,10 +85,14 @@ fun LoginDialog(
     val coroutineScope = rememberCoroutineScope()
     var account by remember { mutableStateOf(getPassword().first) }
     var password by remember { mutableStateOf(getPassword().second) }
+    var captchaCode by remember { mutableStateOf("") }
 
     var global by remember { mutableStateOf(false) }
     var savePassword by remember { mutableStateOf(prefGet(PASSWORD_SAVE_KEY) ?: PASSWORD_SAVE_DISABLED) }
     val showDialog = remember { mutableStateOf(false) }
+    var showCaptcha by remember { mutableStateOf(false) }
+    var captchaImageBitmap by remember { mutableStateOf<androidx.compose.ui.graphics.ImageBitmap?>(null) }
+    var isLoadingCaptcha by remember { mutableStateOf(false) }
 
     val icon = when (isLogin.value) {
         1 -> MiuixIcons.Useful.Blocklist
@@ -89,8 +106,23 @@ fun LoginDialog(
     val messageSecurityError = stringResource(Res.string.security_error)
     val messageLogoutSuccessful = stringResource(Res.string.logout_successful)
     val messageCrashInfo = stringResource(Res.string.toast_crash_info)
+    val messageCaptchaRequired = stringResource(Res.string.captcha_required)
+    val messageCaptchaInvalid = stringResource(Res.string.captcha_invalid)
 
     val focusManager = LocalFocusManager.current
+
+    // Load captcha image when needed
+    LaunchedEffect(showCaptcha) {
+        if (showCaptcha) {
+            isLoadingCaptcha = true
+            val captchaInfo = getCaptchaInfo()
+            val captchaUrl = captchaInfo.first
+            if (captchaUrl.isNotEmpty()) {
+                captchaImageBitmap = loadImageFromUrl(captchaUrl)
+            }
+            isLoadingCaptcha = false
+        }
+    }
 
     IconButton(
         onClick = {
@@ -112,6 +144,9 @@ fun LoginDialog(
             title = stringResource(Res.string.login),
             onDismissRequest = {
                 showDialog.value = false
+                showCaptcha = false
+                captchaCode = ""
+                captchaImageBitmap = null
             }
         ) {
             Column {
@@ -179,6 +214,67 @@ fun LoginDialog(
                         )
                     }
                 }
+                
+                // Captcha section
+                if (showCaptcha) {
+                    Text(
+                        text = stringResource(Res.string.captcha_required),
+                        modifier = Modifier.padding(top = 16.dp),
+                        color = MiuixTheme.colorScheme.primary
+                    )
+                    
+                    // Captcha image
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(80.dp)
+                            .padding(vertical = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        when {
+                            isLoadingCaptcha -> {
+                                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                            }
+                            captchaImageBitmap != null -> {
+                                Image(
+                                    bitmap = captchaImageBitmap!!,
+                                    contentDescription = "Captcha",
+                                    modifier = Modifier
+                                        .height(60.dp)
+                                        .clickable {
+                                            // Reload captcha on click
+                                            coroutineScope.launch {
+                                                isLoadingCaptcha = true
+                                                val captchaInfo = getCaptchaInfo()
+                                                val captchaUrl = captchaInfo.first
+                                                if (captchaUrl.isNotEmpty()) {
+                                                    captchaImageBitmap = loadImageFromUrl(captchaUrl)
+                                                }
+                                                isLoadingCaptcha = false
+                                            }
+                                        }
+                                )
+                            }
+                            else -> {
+                                Text(
+                                    text = "Failed to load captcha",
+                                    color = MiuixTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                    }
+                    
+                    // Captcha input
+                    TextField(
+                        value = captchaCode,
+                        onValueChange = { captchaCode = it },
+                        label = stringResource(Res.string.enter_captcha),
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
+                    )
+                }
                 Row {
                     TextButton(
                         modifier = Modifier.weight(1f),
@@ -188,13 +284,32 @@ fun LoginDialog(
                             showDialog.value = false
                             showMessage(message = messageLoginIn)
                             coroutineScope.launch {
-                                val int = login(account, password, global, savePassword, isLogin)
+                                val captchaInfo = getCaptchaInfo()
+                                val int = login(account, password, global, savePassword, isLogin, captchaCode, captchaInfo.second)
                                 when (int) {
-                                    0 -> showMessage(message = messageLoginSuccess)
+                                    0 -> {
+                                        showMessage(message = messageLoginSuccess)
+                                        showCaptcha = false
+                                        captchaCode = ""
+                                        captchaImageBitmap = null
+                                    }
                                     1 -> showMessage(message = messageEmpty)
                                     2 -> showMessage(message = messageCrashInfo)
                                     3 -> showMessage(message = messageError)
                                     4 -> showMessage(message = messageSecurityError)
+                                    5 -> {
+                                        // Captcha required
+                                        showMessage(message = messageCaptchaRequired)
+                                        showCaptcha = true
+                                        showDialog.value = true
+                                    }
+                                    6 -> {
+                                        // Invalid captcha
+                                        showMessage(message = messageCaptchaInvalid)
+                                        captchaCode = ""
+                                        showCaptcha = true
+                                        showDialog.value = true
+                                    }
                                 }
                             }
                         }
@@ -206,6 +321,9 @@ fun LoginDialog(
                         colors = ButtonDefaults.textButtonColors(),
                         onClick = {
                             showDialog.value = false
+                            showCaptcha = false
+                            captchaCode = ""
+                            captchaImageBitmap = null
                         }
                     )
                 }

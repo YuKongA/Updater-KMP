@@ -68,5 +68,9 @@
     <string name="device_list_updated">更新成功</string>
     <string name="device_list_update_failed">更新に失敗しました</string>
     <string name="device_list_version">バージョン</string>
+    <string name="captcha">キャプチャ</string>
+    <string name="captcha_required">キャプチャ認証が必要です</string>
+    <string name="captcha_invalid">無効なキャプチャコード</string>
+    <string name="enter_captcha">キャプチャコードを入力</string>
     <string name="opensource_info">著作権 © 2024-2025 YuKongA</string>
 </resources>
