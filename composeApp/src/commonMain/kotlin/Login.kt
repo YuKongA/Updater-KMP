@@ -1,5 +1,6 @@
 import androidx.compose.runtime.MutableState
 import data.DataHelper
+import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.cookie
 import io.ktor.client.request.forms.FormDataContent
@@ -33,8 +34,7 @@ private const val serviceLoginUrl = "$accountUrl/pass/serviceLogin"
 private const val serviceLoginAuth2Url = "$accountUrl/pass/serviceLoginAuth2"
 private const val accountApiUrl = "https://api.account.xiaomi.com/sts"
 
-
-private val client = httpClientPlatform()
+private var globalClient: HttpClient? = null
 private var _sign: String? = ""
 
 fun isWeb(): Boolean = platform() == Platform.WasmJs || platform() == Platform.Js
@@ -56,7 +56,8 @@ suspend fun login(
     global: Boolean,
     savePassword: String,
     isLogin: MutableState<Int>,
-    captcha: String? = null,
+    captcha: String = "",
+    ticket: String = "",
 ): Int {
     if (account.isEmpty() || password.isEmpty()) return 1
     if (savePassword == "1") {
@@ -65,8 +66,16 @@ suspend fun login(
     } else {
         deletePassword()
     }
+    val client = globalClient ?: httpClientPlatform().also { globalClient = it }
     try {
+        if (ticket.isNotEmpty()) {
+            handle2FATicket(
+                client = client,
+                ticket = ticket
+            )
+        }
         val serviceLogin = serviceLogin(
+            client = client,
             account = account,
             isLogin = isLogin,
             global = global
@@ -75,6 +84,7 @@ suspend fun login(
             return serviceLogin
         } else {
             val serviceLoginAuth2 = serviceLoginAuth2(
+                client = client,
                 account = account,
                 password = password,
                 global = global,
@@ -112,6 +122,7 @@ fun logout(isLogin: MutableState<Int>): Boolean {
  * @return Login status
  */
 suspend fun serviceLogin(
+    client: HttpClient,
     account: String,
     isLogin: MutableState<Int>,
     global: Boolean
@@ -138,7 +149,7 @@ suspend fun serviceLogin(
     // 无需密码登录
     if (!ssecurity.isNullOrEmpty() && !userId.isNullOrEmpty() && !location.isNullOrEmpty()) {
         println("Login: ssecurity: $ssecurity, userId: $userId, location: $location")
-        val serviceToken = getServiceToken(location)
+        val serviceToken = getServiceToken(client, location)
         println("Login: serviceToken: $serviceToken")
         val loginInfo = DataHelper.LoginData(
             accountType = if (global) "GL" else "CN",
@@ -150,6 +161,7 @@ suspend fun serviceLogin(
         )
         println("Login: loginInfo: $loginInfo")
         prefSet("loginInfo", json.encodeToString(loginInfo))
+        closeHttpClient()
         isLogin.value = 1
         return 0
     }
@@ -180,12 +192,13 @@ suspend fun serviceLogin(
  * @return Login status
  */
 suspend fun serviceLoginAuth2(
+    client: HttpClient,
     account: String,
     password: String,
     global: Boolean,
     isLogin: MutableState<Int>,
     _sign: String,
-    captcha: String? = null,
+    captcha: String = "",
 ): Int {
     val md5Hash = md5Hash(password)
     val sid = if (global) "miuiota_intl" else "miuiromota"
@@ -201,7 +214,7 @@ suspend fun serviceLoginAuth2(
         parameter("_json", "true")
         parameter("_sign", _sign)
         parameter("_locale", if (global) "en_US" else "zh_CN")
-        captcha?.let { parameter("captcha", it) }
+        if (captcha.isNotEmpty()) parameter("captcha", captcha)
     }
     val authStr = response.body<String>().replace("&&&START&&&", "")
     println("Login: authStr: $authStr")
@@ -224,7 +237,7 @@ suspend fun serviceLoginAuth2(
     }
     // 处理缺少字段
     if (authJson.location.isNullOrEmpty()) return 4 // 4: 未返回 location
-    val serviceToken = getServiceToken(authJson.location)
+    val serviceToken = getServiceToken(client, authJson.location)
     println("Login: serviceToken: $serviceToken")
 
     val loginInfo = DataHelper.LoginData(
@@ -237,6 +250,7 @@ suspend fun serviceLoginAuth2(
     )
     println("Login: loginInfo: $loginInfo")
     prefSet("loginInfo", json.encodeToString(loginInfo))
+    closeHttpClient()
     isLogin.value = 1
     return 0
 }
@@ -247,7 +261,10 @@ suspend fun serviceLoginAuth2(
  *
  * @return serviceToken
  */
-suspend fun getServiceToken(location: String): String? {
+suspend fun getServiceToken(
+    client: HttpClient,
+    location: String
+): String? {
     val response = client.get(location) {
         cookie("sdkVersion", "accountsdk-18.8.15")
         header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
@@ -261,7 +278,11 @@ suspend fun getServiceToken(location: String): String? {
 }
 
 @OptIn(ExperimentalTime::class)
-suspend fun verifyTicket(verifyUrl: String, ticket: String): DataHelper.VerifyTicketData? {
+suspend fun verifyTicket(
+    client: HttpClient,
+    verifyUrl: String,
+    ticket: String
+): DataHelper.VerifyTicketData? {
     val path = "identity/authStart"
     val listUrl = verifyUrl.replace(path, "identity/list")
     val resp = client.get(listUrl)
@@ -306,27 +327,16 @@ suspend fun verifyTicket(verifyUrl: String, ticket: String): DataHelper.VerifyTi
 }
 
 suspend fun handle2FATicket(
-    ticket: String,
-    account: String,
-    password: String,
-    global: Boolean,
-    savePassword: String,
-    isLogin: MutableState<Int>,
+    client: HttpClient,
+    ticket: String
 ): Int {
     val notificationUrl = prefGet("notificationUrl")
     if (notificationUrl != null && ticket.isNotBlank()) {
-        val verifyData = verifyTicket(notificationUrl, ticket)
+        val verifyData = verifyTicket(client, notificationUrl, ticket)
         println("Login: verifyData: $verifyData")
         if (verifyData != null && verifyData.location != null) {
             println("Login: 2FA verify success, location: ${verifyData.location}")
-            val login = login(
-                account = account,
-                password = password,
-                global = global,
-                savePassword = savePassword,
-                isLogin = isLogin
-            )
-            return login
+            return 0
         }
     }
     return 7
@@ -373,4 +383,12 @@ fun getPassword(): Pair<String, String> {
         val password = ownDecrypt(encryptedPassword, encodedPasswordKey)
         return Pair(account, password)
     } else return Pair("", "")
+}
+
+/**
+ * Close the global HttpClient.
+ */
+fun closeHttpClient() {
+    globalClient?.close()
+    globalClient = null
 }

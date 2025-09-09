@@ -36,6 +36,7 @@ import login
 import logout
 import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
+import platform.httpClientPlatform
 import platform.prefGet
 import platform.prefRemove
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
@@ -257,13 +258,13 @@ fun LoginDialog(
                                         // 提交二次认证验证码
                                         coroutineScope.launch {
                                             isVerifying = true
-                                            val int = handle2FATicket(
-                                                ticket = ticket,
+                                            val int = login(
                                                 account = account,
                                                 password = password,
                                                 global = global,
                                                 savePassword = savePassword,
-                                                isLogin = isLogin
+                                                isLogin = isLogin,
+                                                ticket = ticket
                                             )
                                             if (int == 0) {
                                                 showMessage(messageLoginSuccess)
@@ -283,10 +284,10 @@ fun LoginDialog(
                                             val int = login(
                                                 account = account,
                                                 password = password,
-                                                captcha = ticket,
                                                 global = global,
                                                 savePassword = savePassword,
-                                                isLogin = isLogin
+                                                isLogin = isLogin,
+                                                captcha = ticket
                                             )
                                             if (int == 0) {
                                                 showMessage(messageLoginSuccess)
