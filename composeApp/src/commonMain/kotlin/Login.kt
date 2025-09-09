@@ -1,14 +1,16 @@
 import androidx.compose.runtime.MutableState
-import androidx.compose.ui.focus.FocusManager
 import data.DataHelper
 import io.ktor.client.call.body
 import io.ktor.client.request.cookie
+import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.request
+import io.ktor.http.Parameters
+import io.ktor.http.isSuccess
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
@@ -117,11 +119,11 @@ suspend fun serviceLogin(
     val sid = if (global) "miuiota_intl" else "miuiromota"
     val response1 = client.get("$serviceLoginUrl?sid=$sid&_json=true") {
         cookie("userId", account)
-        header("Content-Type", "application/x-www-form-urlencoded")
+        cookie("sdkVersion", "accountsdk-18.8.15")
+        header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
     }
-    val body1 = response1.body<String>().replace("&&&START&&&", "")
-    println("Login: body1: $body1")
-    val elem = json.parseToJsonElement(body1)
+    val body = response1.body<String>().replace("&&&START&&&", "")
+    val elem = json.parseToJsonElement(body)
     println("Login: elem: $elem")
     var ssecurity: String? = null
     var userId: String? = null
@@ -189,6 +191,8 @@ suspend fun serviceLoginAuth2(
     val sid = if (global) "miuiota_intl" else "miuiromota"
 
     val response = client.post(serviceLoginAuth2Url) {
+        cookie("sdkVersion", "accountsdk-18.8.15")
+        header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
         parameter("user", account)
         parameter("hash", md5Hash)
         parameter("sid", sid)
@@ -198,7 +202,6 @@ suspend fun serviceLoginAuth2(
         parameter("_sign", _sign)
         parameter("_locale", if (global) "en_US" else "zh_CN")
         captcha?.let { parameter("captcha", it) }
-        header("Content-Type", "application/x-www-form-urlencoded")
     }
     val authStr = response.body<String>().replace("&&&START&&&", "")
     println("Login: authStr: $authStr")
@@ -246,8 +249,9 @@ suspend fun serviceLoginAuth2(
  */
 suspend fun getServiceToken(location: String): String? {
     val response = client.get(location) {
+        cookie("sdkVersion", "accountsdk-18.8.15")
+        header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
         parameter("_userIdNeedEncrypt", true)
-        header("Content-Type", "application/x-www-form-urlencoded")
     }
     return response.headers["Set-Cookie"]
         ?.split(";")
@@ -259,51 +263,43 @@ suspend fun getServiceToken(location: String): String? {
 @OptIn(ExperimentalTime::class)
 suspend fun verifyTicket(verifyUrl: String, ticket: String): DataHelper.VerifyTicketData? {
     val path = "identity/authStart"
-    if (!verifyUrl.contains(path)) return null
-    println("Login: verifyUrl: $verifyUrl, ticket: $ticket")
-
     val listUrl = verifyUrl.replace(path, "identity/list")
-    println("Login: listUrl: $listUrl")
     val resp = client.get(listUrl)
-    val identitySession = resp.headers["Set-Cookie"]
+    if (!resp.status.isSuccess()) return null
+
+    val setCookie = resp.headers["Set-Cookie"]
+    val identitySession = setCookie
         ?.split(";")
         ?.map { it.trim() }
-        ?.firstOrNull { it.startsWith("identity_session=") }
-        ?.removePrefix("identity_session=")
-    println("Login: identitySession: $identitySession")
+        ?.firstOrNull { it.startsWith("identity_session=") }?.substringAfter("=")
+        ?: return null
 
-    val data = json.decodeFromString<DataHelper.IdentityListData>(resp.body<String>().replace("&&&START&&&", ""))
+    val apiMap = mapOf(
+        4 to "/identity/auth/verifyPhone",
+        8 to "/identity/auth/verifyEmail"
+    )
+    for (tryFlag in apiMap.keys) {
+        val apiPath = apiMap[tryFlag]
+        val apiUrl = "$accountUrl$apiPath?_dc=${Clock.System.now().toEpochMilliseconds()}"
 
-    println("Login: data: $data")
-    val flag = data.flag ?: 4
-    val options = data.options ?: listOf(flag)
-
-    for (f in options) {
-        val api = when (f) {
-            4 -> "/identity/auth/verifyPhone"
-            8 -> "/identity/auth/verifyEmail"
-            else -> continue
+        val formParams = Parameters.build {
+            append("ticket", ticket)
+            append("trust", "true")
         }
-        val formBody = "_flag=$f&ticket=$ticket&trust=true&_json=true"
-        val verifyResp = client.post("$accountUrl$api") {
-            parameter("_dc", Clock.System.now().toEpochMilliseconds())
-            setBody(formBody)
-            identitySession?.let { cookie("identity_session", it) }
-            header("Content-Type", "application/x-www-form-urlencoded")
+
+        val verifyResp = client.post(apiUrl) {
+            cookie("sdkVersion", "accountsdk-18.8.15")
+            cookie("identity_session", identitySession)
+            header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+            setBody(FormDataContent(formParams))
         }
-        println("Login: verifyResp: ${verifyResp.body<String>()}")
+        println("Login: verifyResp: $verifyResp")
         val rawResp = verifyResp.body<String>().replace("&&&START&&&", "")
         println("Login: rawResp: $rawResp")
-        val verifyData = try {
-            json.decodeFromString<DataHelper.VerifyTicketData>(rawResp)
-        } catch (_: Exception) {
-            null
-        }
-        println("Login: verifyData: $verifyData")
-        return if (verifyData != null && verifyData.code == 0) {
-            verifyData
-        } else {
-            null
+        val verifyData = json.decodeFromString<DataHelper.VerifyTicketData>(rawResp)
+
+        if (verifyData.code == 0 && !verifyData.location.isNullOrEmpty()) {
+            return verifyData
         }
     }
     return null
