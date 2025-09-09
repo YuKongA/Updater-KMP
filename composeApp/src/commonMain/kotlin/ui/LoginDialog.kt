@@ -1,6 +1,7 @@
 package ui
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,6 +29,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.seiko.imageloader.rememberImagePainter
 import getPassword
 import handle2FATicket
 import kotlinx.coroutines.launch
@@ -82,11 +84,17 @@ fun LoginDialog(
     var global by remember { mutableStateOf(false) }
     var savePassword by remember { mutableStateOf(prefGet(PASSWORD_SAVE_KEY) ?: PASSWORD_SAVE_DISABLED) }
     val showDialog = remember { mutableStateOf(false) }
+
+    var showCaptchaUrl by remember { mutableStateOf(false) }
+    var showCaptchaInput by remember { mutableStateOf(false) }
+
+    var isVerifying by remember { mutableStateOf(false) }
+
     var showNotificationUrl by remember { mutableStateOf(false) }
 
     var showTicketInput by remember { mutableStateOf(false) }
     var ticket by remember { mutableStateOf("") }
-    var isVerifyingTicket by remember { mutableStateOf(false) }
+
     var verifyError by remember { mutableStateOf("") }
 
     val icon = when (isLogin.value) {
@@ -163,29 +171,51 @@ fun LoginDialog(
                     }
                 )
 
+                AnimatedVisibility(
+                    visible = showCaptchaUrl
+                ) {
+                    val captchaUrl = "https://account.xiaomi.com" + prefGet("captchaUrl")
+                    AnimatedVisibility(
+                        visible = !showCaptchaInput
+                    ) {
+                        TextButton(
+                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                            text = "获取验证码",
+                            onClick = {
+                                showCaptchaInput = true
+                            },
+                            colors = ButtonDefaults.textButtonColorsPrimary()
+                        )
+                    }
+                    AnimatedVisibility(
+                        visible = showCaptchaInput
+                    ) {
+                        Image(
+                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                            painter = rememberImagePainter(captchaUrl),
+                            contentDescription = "Captcha"
+                        )
+                    }
+                }
 
                 AnimatedVisibility(
                     visible = showNotificationUrl
                 ) {
-                    val uriHandler = LocalUriHandler.current
-                    TextButton(
-                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                        text = "获取验证码",
-                        onClick = {
-                            val notificationUrl = prefGet("notificationUrl")
-                            notificationUrl?.let { uriHandler.openUri(it) }
-                        },
-                        colors = ButtonDefaults.textButtonColorsPrimary()
-                    )
-                    TextButton(
-                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                        text = "输入验证码",
-                        onClick = {
-                            showTicketInput = true
-                            verifyError = ""
-                        },
-                        colors = ButtonDefaults.textButtonColorsPrimary()
-                    )
+                    AnimatedVisibility(
+                        visible = !showTicketInput
+                    ) {
+                        val uriHandler = LocalUriHandler.current
+                        TextButton(
+                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                            text = "获取验证码",
+                            onClick = {
+                                val notificationUrl = prefGet("notificationUrl")
+                                notificationUrl?.let { uriHandler.openUri(it) }
+                                showTicketInput = true
+                            },
+                            colors = ButtonDefaults.textButtonColorsPrimary()
+                        )
+                    }
                 }
 
                 AnimatedVisibility(
@@ -223,7 +253,7 @@ fun LoginDialog(
                 }
 
                 AnimatedVisibility(
-                    visible = showTicketInput
+                    visible = showTicketInput || showCaptchaInput
                 ) {
                     Column(
                         modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
@@ -237,35 +267,54 @@ fun LoginDialog(
                             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
                         )
                         if (verifyError.isNotEmpty()) {
-                            Text(text = verifyError, color = Color.Red)
+                            Text(
+                                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                                text = verifyError,
+                                color = Color.Red
+                            )
                         }
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
                         ) {
                             TextButton(
                                 modifier = Modifier.weight(1f),
-                                text = if (isVerifyingTicket) "验证中..." else "提交",
-                                enabled = !isVerifyingTicket && ticket.isNotBlank(),
+                                text = if (isVerifying) "验证中..." else "提交",
+                                enabled = !isVerifying && ticket.isNotBlank(),
                                 colors = ButtonDefaults.textButtonColorsPrimary(),
                                 onClick = {
-                                    coroutineScope.launch {
-                                        isVerifyingTicket = true
-                                        handle2FATicket(
-                                            ticket = ticket,
-                                            account = account,
-                                            password = password,
-                                            global = global,
-                                            savePassword = savePassword,
-                                            isLogin = isLogin,
-                                            setVerifyError = { verifyError = it },
-                                            setTicket = { ticket = it },
-                                            setShowTicketInput = { showTicketInput = it },
-                                            setShowDialog = { showDialog.value = it },
-                                            setShowNotificationUrl = { showNotificationUrl = it },
-                                            showMessage = { showMessage(it) },
-                                            focusManager = focusManager
-                                        )
-                                        isVerifyingTicket = false
+                                    if (showTicketInput) {
+                                        coroutineScope.launch {
+                                            isVerifying = true
+                                            handle2FATicket(
+                                                ticket = ticket,
+                                                account = account,
+                                                password = password,
+                                                global = global,
+                                                savePassword = savePassword,
+                                                isLogin = isLogin,
+                                                setVerifyError = { verifyError = it },
+                                                setTicket = { ticket = it },
+                                                setShowTicketInput = { showTicketInput = it },
+                                                setShowDialog = { showDialog.value = it },
+                                                setShowNotificationUrl = { showNotificationUrl = it },
+                                                showMessage = { showMessage(it) },
+                                                focusManager = focusManager
+                                            )
+                                            isVerifying = false
+                                        }
+                                    } else if (showCaptchaInput) {
+                                        coroutineScope.launch {
+                                            isVerifying = true
+                                            login(
+                                                account = account,
+                                                password = password,
+                                                captcha = ticket,
+                                                global = global,
+                                                savePassword = savePassword,
+                                                isLogin = isLogin
+                                            )
+                                            isVerifying = false
+                                        }
                                     }
                                 }
                             )
@@ -285,7 +334,7 @@ fun LoginDialog(
                 }
 
                 AnimatedVisibility(
-                    visible = !showTicketInput
+                    visible = !showTicketInput && !showCaptchaInput
                 ) {
                     Row {
                         TextButton(
@@ -295,7 +344,13 @@ fun LoginDialog(
                             onClick = {
                                 showMessage(message = messageLoginIn)
                                 coroutineScope.launch {
-                                    val int = login(account, password, global, savePassword, isLogin)
+                                    val int = login(
+                                        account = account,
+                                        password = password,
+                                        global = global,
+                                        savePassword = savePassword,
+                                        isLogin = isLogin
+                                    )
                                     when (int) {
                                         0 -> {
                                             showMessage(message = messageLoginSuccess)
@@ -313,12 +368,12 @@ fun LoginDialog(
                                         4 -> showMessage(message = messageSecurityError)
 
                                         5 -> {
-                                            prefGet("notificationUrl")
                                             showNotificationUrl = true
-                                            showMessage("检测到二次验证，请打开并完成验证后重试")
+                                            showMessage("检测到二次验证，请点击获取验证码按钮")
                                         }
 
                                         6 -> {
+                                            showCaptchaUrl = true
                                             showMessage("需要输入验证码，请点击获取验证码按钮")
                                         }
                                     }
