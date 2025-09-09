@@ -69,6 +69,9 @@
     <string name="device_list_updated">Update successful</string>
     <string name="device_list_update_failed">Update failed</string>
     <string name="device_list_version">Version</string>
+    <string name="login_tips1">Detected two-factor authentication, please click the get verification code button</string>
+    <string name="login_tips2">Verification code is required, please click the get verification code button</string>
     <string name="verification_code_get">Get Verification Code</string>
+    <string name="verifying">Verifying...</string>
     <string name="opensource_info">Copyright © 2024-2025 YuKongA</string>
 </resources>

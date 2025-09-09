@@ -57,11 +57,11 @@ suspend fun login(
     captcha: String? = null,
 ): Int {
     if (account.isEmpty() || password.isEmpty()) return 1
-    if (savePassword != "1") deletePassword()
-
     if (savePassword == "1") {
         prefSet("savePassword", "1")
         savePassword(account, password)
+    } else {
+        deletePassword()
     }
     try {
         val serviceLogin = serviceLogin(
@@ -87,6 +87,28 @@ suspend fun login(
     }
 }
 
+/**
+ * Logout Xiaomi account.
+ *
+ * @param isLogin: Login status
+ *
+ * @return Logout status
+ */
+fun logout(isLogin: MutableState<Int>): Boolean {
+    prefRemove("loginInfo")
+    isLogin.value = 0
+    return true
+}
+
+/**
+ * Service login Xiaomi account without password.
+ *
+ * @param account: Xiaomi account
+ * @param isLogin: Login status
+ * @param global: Global or China account
+ *
+ * @return Login status
+ */
 suspend fun serviceLogin(
     account: String,
     isLogin: MutableState<Int>,
@@ -143,6 +165,18 @@ suspend fun serviceLogin(
     return 2
 }
 
+/**
+ * Service login Xiaomi account with password.
+ *
+ * @param account: Xiaomi account
+ * @param password: Password
+ * @param global: Global or China account
+ * @param isLogin: Login status
+ * @param _sign: _sign from serviceLogin
+ * @param captcha: Captcha if needed
+ *
+ * @return Login status
+ */
 suspend fun serviceLoginAuth2(
     account: String,
     password: String,
@@ -222,62 +256,6 @@ suspend fun getServiceToken(location: String): String? {
         ?.removePrefix("serviceToken=")
 }
 
-/**
- * Logout Xiaomi account.
- *
- * @param isLogin: Login status
- *
- * @return Logout status
- */
-fun logout(isLogin: MutableState<Int>): Boolean {
-    prefRemove("loginInfo")
-    isLogin.value = 0
-    return true
-}
-
-/**
- * Save Xiaomi's account & password.
- *
- * @param account: Xiaomi account
- * @param password: Password
- */
-fun savePassword(account: String, password: String) {
-    generateKey()
-    val encryptedAccount = ownEncrypt(account)
-    val encryptedPassword = ownEncrypt(password)
-    prefSet("account", encryptedAccount.first)
-    prefSet("accountIv", encryptedAccount.second)
-    prefSet("password", encryptedPassword.first)
-    prefSet("passwordIv", encryptedPassword.second)
-}
-
-/**
- * Delete Xiaomi's account & password.
- */
-fun deletePassword() {
-    prefRemove("account")
-    prefRemove("accountIv")
-    prefRemove("password")
-    prefRemove("passwordIv")
-}
-
-/**
- * Get Xiaomi's account & password.
- *
- * @return Pair of Xiaomi's account & password
- */
-fun getPassword(): Pair<String, String> {
-    if (prefGet("account") != null && prefGet("password") != null && prefGet("accountIv") != null && prefGet("passwordIv") != null) {
-        val encryptedAccount = prefGet("account").toString()
-        val encodedAccountKey = prefGet("accountIv").toString()
-        val encryptedPassword = prefGet("password").toString()
-        val encodedPasswordKey = prefGet("passwordIv").toString()
-        val account = ownDecrypt(encryptedAccount, encodedAccountKey)
-        val password = ownDecrypt(encryptedPassword, encodedPasswordKey)
-        return Pair(account, password)
-    } else return Pair("", "")
-}
-
 @OptIn(ExperimentalTime::class)
 suspend fun verifyTicket(verifyUrl: String, ticket: String): DataHelper.VerifyTicketData? {
     val path = "identity/authStart"
@@ -338,15 +316,7 @@ suspend fun handle2FATicket(
     global: Boolean,
     savePassword: String,
     isLogin: MutableState<Int>,
-    setVerifyError: (String) -> Unit,
-    setTicket: (String) -> Unit,
-    setShowTicketInput: (Boolean) -> Unit,
-    setShowDialog: (Boolean) -> Unit,
-    setShowNotificationUrl: (Boolean) -> Unit,
-    showMessage: (String) -> Unit,
-    focusManager: FocusManager
-) {
-    setVerifyError("")
+): Int {
     val notificationUrl = prefGet("notificationUrl")
     if (notificationUrl != null && ticket.isNotBlank()) {
         val verifyData = verifyTicket(notificationUrl, ticket)
@@ -360,23 +330,51 @@ suspend fun handle2FATicket(
                 savePassword = savePassword,
                 isLogin = isLogin
             )
-            if (login != 0) {
-                prefRemove("notificationUrl")
-                showMessage("二次认证通过，登录成功")
-                setShowTicketInput(false)
-                setShowDialog(false)
-                setShowNotificationUrl(false)
-                setTicket("")
-            } else {
-                setVerifyError("登录失败，请重试")
-            }
-
-        } else {
-            setVerifyError("验证失败，请检查验证码是否正确")
-            setTicket("")
-            focusManager.clearFocus()
+            return login
         }
-    } else {
-        setVerifyError("未检测到验证地址或验证码为空")
     }
+    return 7
+}
+
+/**
+ * Save Xiaomi's account & password.
+ *
+ * @param account: Xiaomi account
+ * @param password: Password
+ */
+fun savePassword(account: String, password: String) {
+    generateKey()
+    val encryptedAccount = ownEncrypt(account)
+    val encryptedPassword = ownEncrypt(password)
+    prefSet("account", encryptedAccount.first)
+    prefSet("accountIv", encryptedAccount.second)
+    prefSet("password", encryptedPassword.first)
+    prefSet("passwordIv", encryptedPassword.second)
+}
+
+/**
+ * Delete Xiaomi's account & password.
+ */
+fun deletePassword() {
+    prefRemove("account")
+    prefRemove("accountIv")
+    prefRemove("password")
+    prefRemove("passwordIv")
+}
+
+/**
+ * Get Xiaomi's account & password.
+ *
+ * @return Pair of Xiaomi's account & password
+ */
+fun getPassword(): Pair<String, String> {
+    if (prefGet("account") != null && prefGet("password") != null && prefGet("accountIv") != null && prefGet("passwordIv") != null) {
+        val encryptedAccount = prefGet("account").toString()
+        val encodedAccountKey = prefGet("accountIv").toString()
+        val encryptedPassword = prefGet("password").toString()
+        val encodedPasswordKey = prefGet("passwordIv").toString()
+        val account = ownDecrypt(encryptedAccount, encodedAccountKey)
+        val password = ownDecrypt(encryptedPassword, encodedPasswordKey)
+        return Pair(account, password)
+    } else return Pair("", "")
 }

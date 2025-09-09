@@ -21,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.input.ImeAction
@@ -42,7 +41,6 @@ import platform.prefRemove
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.extra.SuperCheckbox
@@ -61,17 +59,18 @@ import updater.composeapp.generated.resources.logging_in
 import updater.composeapp.generated.resources.login
 import updater.composeapp.generated.resources.login_error
 import updater.composeapp.generated.resources.login_successful
+import updater.composeapp.generated.resources.login_tips1
+import updater.composeapp.generated.resources.login_tips2
 import updater.composeapp.generated.resources.logout
 import updater.composeapp.generated.resources.logout_confirm
 import updater.composeapp.generated.resources.logout_successful
 import updater.composeapp.generated.resources.password
 import updater.composeapp.generated.resources.save_password
 import updater.composeapp.generated.resources.security_error
+import updater.composeapp.generated.resources.submit
 import updater.composeapp.generated.resources.toast_crash_info
-
-private const val PASSWORD_SAVE_KEY = "savePassword"
-private const val PASSWORD_SAVE_ENABLED = "1"
-private const val PASSWORD_SAVE_DISABLED = "0"
+import updater.composeapp.generated.resources.verification_code_get
+import updater.composeapp.generated.resources.verifying
 
 @Composable
 fun LoginDialog(
@@ -82,7 +81,7 @@ fun LoginDialog(
     var password by remember { mutableStateOf(getPassword().second) }
 
     var global by remember { mutableStateOf(false) }
-    var savePassword by remember { mutableStateOf(prefGet(PASSWORD_SAVE_KEY) ?: PASSWORD_SAVE_DISABLED) }
+    var savePassword by remember { mutableStateOf(prefGet("savePassword") ?: "0") }
     val showDialog = remember { mutableStateOf(false) }
 
     var showCaptchaUrl by remember { mutableStateOf(false) }
@@ -94,8 +93,6 @@ fun LoginDialog(
 
     var showTicketInput by remember { mutableStateOf(false) }
     var ticket by remember { mutableStateOf("") }
-
-    var verifyError by remember { mutableStateOf("") }
 
     val icon = when (isLogin.value) {
         1 -> MiuixIcons.Useful.Blocklist
@@ -109,9 +106,12 @@ fun LoginDialog(
     val messageSecurityError = stringResource(Res.string.security_error)
     val messageLogoutSuccessful = stringResource(Res.string.logout_successful)
     val messageCrashInfo = stringResource(Res.string.toast_crash_info)
+    val messageLoginTips1 = stringResource(Res.string.login_tips1)
+    val messageLoginTips2 = stringResource(Res.string.login_tips2)
 
     val focusManager = LocalFocusManager.current
 
+    // 主页登录按钮
     IconButton(
         onClick = {
             showDialog.value = true
@@ -122,10 +122,12 @@ fun LoginDialog(
         Icon(
             imageVector = icon,
             tint = MiuixTheme.colorScheme.onSurface,
-            contentDescription = "Login"
+            contentDescription = stringResource(Res.string.login)
         )
     }
 
+
+    // 登录对话框
     if (isLogin.value != 1) {
         SuperDialog(
             show = showDialog,
@@ -135,6 +137,7 @@ fun LoginDialog(
             }
         ) {
             Column {
+                // 账号输入框
                 TextField(
                     value = account,
                     onValueChange = { account = it },
@@ -144,6 +147,8 @@ fun LoginDialog(
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
                 )
+
+                // 密码输入框
                 var passwordVisibility by remember { mutableStateOf(false) }
                 TextField(
                     value = password,
@@ -155,6 +160,7 @@ fun LoginDialog(
                     keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                     visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
+                        // 显示 & 隐藏密码
                         IconButton(
                             modifier = Modifier.padding(end = 6.dp),
                             onClick = {
@@ -171,25 +177,28 @@ fun LoginDialog(
                     }
                 )
 
+                // 图片验证码
                 AnimatedVisibility(
                     visible = showCaptchaUrl
                 ) {
-                    val captchaUrl = "https://account.xiaomi.com" + prefGet("captchaUrl")
+                    // 获取图片验证码
                     AnimatedVisibility(
                         visible = !showCaptchaInput
                     ) {
                         TextButton(
                             modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                            text = "获取验证码",
+                            text = stringResource(Res.string.verification_code_get),
                             onClick = {
                                 showCaptchaInput = true
                             },
                             colors = ButtonDefaults.textButtonColorsPrimary()
                         )
                     }
+                    // 显示图片验证码
                     AnimatedVisibility(
                         visible = showCaptchaInput
                     ) {
+                        val captchaUrl = "https://account.xiaomi.com" + prefGet("captchaUrl")
                         Image(
                             modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                             painter = rememberImagePainter(captchaUrl),
@@ -198,16 +207,18 @@ fun LoginDialog(
                     }
                 }
 
+                // 二次认证验证码
                 AnimatedVisibility(
                     visible = showNotificationUrl
                 ) {
+                    // 跳转到网页获取二次认证验证码
                     AnimatedVisibility(
                         visible = !showTicketInput
                     ) {
                         val uriHandler = LocalUriHandler.current
                         TextButton(
                             modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                            text = "获取验证码",
+                            text = stringResource(Res.string.verification_code_get),
                             onClick = {
                                 val notificationUrl = prefGet("notificationUrl")
                                 notificationUrl?.let { uriHandler.openUri(it) }
@@ -218,8 +229,97 @@ fun LoginDialog(
                     }
                 }
 
+                // 图片验证码 & 二次认证验证码输入框
                 AnimatedVisibility(
-                    visible = !showTicketInput
+                    visible = showTicketInput || showCaptchaInput
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+                    ) {
+                        TextField(
+                            value = ticket,
+                            onValueChange = { ticket = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+                        ) {
+                            TextButton(
+                                modifier = Modifier.weight(1f),
+                                text = if (isVerifying) stringResource(Res.string.verifying) else stringResource(Res.string.submit),
+                                enabled = !isVerifying && ticket.isNotBlank(),
+                                colors = ButtonDefaults.textButtonColorsPrimary(),
+                                onClick = {
+                                    if (showTicketInput) {
+                                        // 提交二次认证验证码
+                                        coroutineScope.launch {
+                                            isVerifying = true
+                                            val int = handle2FATicket(
+                                                ticket = ticket,
+                                                account = account,
+                                                password = password,
+                                                global = global,
+                                                savePassword = savePassword,
+                                                isLogin = isLogin
+                                            )
+                                            if (int == 0) {
+                                                showMessage(messageLoginSuccess)
+                                                ticket = ""
+                                                prefRemove("notificationUrl")
+                                                showTicketInput = false
+                                                showNotificationUrl = false
+                                            } else {
+                                                showMessage(messageError)
+                                            }
+                                            isVerifying = false
+                                        }
+                                    } else if (showCaptchaInput) {
+                                        // 提交图片验证码
+                                        coroutineScope.launch {
+                                            isVerifying = true
+                                            val int = login(
+                                                account = account,
+                                                password = password,
+                                                captcha = ticket,
+                                                global = global,
+                                                savePassword = savePassword,
+                                                isLogin = isLogin
+                                            )
+                                            if (int == 0) {
+                                                showMessage(messageLoginSuccess)
+                                                ticket = ""
+                                                prefRemove("captchaUrl")
+                                                showCaptchaInput = false
+                                                showCaptchaUrl = false
+                                            } else {
+                                                showMessage(messageError)
+                                            }
+                                            isVerifying = false
+                                        }
+                                    }
+                                }
+                            )
+                            Spacer(Modifier.width(16.dp))
+                            TextButton(
+                                modifier = Modifier.weight(1f),
+                                text = stringResource(Res.string.cancel),
+                                colors = ButtonDefaults.textButtonColors(),
+                                onClick = {
+                                    showTicketInput = false
+                                    showCaptchaInput = false
+                                    ticket = ""
+                                }
+                            )
+                        }
+                    }
+                }
+
+                // 是否国际账号 & 保存密码
+                AnimatedVisibility(
+                    visible = !showTicketInput && !showCaptchaInput
                 ) {
                     Row(
                         modifier = Modifier.padding(vertical = 16.dp),
@@ -243,96 +343,16 @@ fun LoginDialog(
                         ) {
                             SuperCheckbox(
                                 title = stringResource(Res.string.save_password),
-                                checked = savePassword == PASSWORD_SAVE_ENABLED,
+                                checked = savePassword == "1",
                                 onCheckedChange = {
-                                    savePassword = if (it) PASSWORD_SAVE_ENABLED else PASSWORD_SAVE_DISABLED
+                                    savePassword = if (it) "1" else "0"
                                 }
                             )
                         }
                     }
                 }
 
-                AnimatedVisibility(
-                    visible = showTicketInput || showCaptchaInput
-                ) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
-                    ) {
-                        TextField(
-                            value = ticket,
-                            onValueChange = { ticket = it },
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
-                        )
-                        if (verifyError.isNotEmpty()) {
-                            Text(
-                                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                                text = verifyError,
-                                color = Color.Red
-                            )
-                        }
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
-                        ) {
-                            TextButton(
-                                modifier = Modifier.weight(1f),
-                                text = if (isVerifying) "验证中..." else "提交",
-                                enabled = !isVerifying && ticket.isNotBlank(),
-                                colors = ButtonDefaults.textButtonColorsPrimary(),
-                                onClick = {
-                                    if (showTicketInput) {
-                                        coroutineScope.launch {
-                                            isVerifying = true
-                                            handle2FATicket(
-                                                ticket = ticket,
-                                                account = account,
-                                                password = password,
-                                                global = global,
-                                                savePassword = savePassword,
-                                                isLogin = isLogin,
-                                                setVerifyError = { verifyError = it },
-                                                setTicket = { ticket = it },
-                                                setShowTicketInput = { showTicketInput = it },
-                                                setShowDialog = { showDialog.value = it },
-                                                setShowNotificationUrl = { showNotificationUrl = it },
-                                                showMessage = { showMessage(it) },
-                                                focusManager = focusManager
-                                            )
-                                            isVerifying = false
-                                        }
-                                    } else if (showCaptchaInput) {
-                                        coroutineScope.launch {
-                                            isVerifying = true
-                                            login(
-                                                account = account,
-                                                password = password,
-                                                captcha = ticket,
-                                                global = global,
-                                                savePassword = savePassword,
-                                                isLogin = isLogin
-                                            )
-                                            isVerifying = false
-                                        }
-                                    }
-                                }
-                            )
-                            Spacer(Modifier.width(16.dp))
-                            TextButton(
-                                modifier = Modifier.weight(1f),
-                                text = "取消",
-                                colors = ButtonDefaults.textButtonColors(),
-                                onClick = {
-                                    showTicketInput = false
-                                    ticket = ""
-                                    verifyError = ""
-                                }
-                            )
-                        }
-                    }
-                }
-
+                // 登录 & 取消
                 AnimatedVisibility(
                     visible = !showTicketInput && !showCaptchaInput
                 ) {
@@ -369,18 +389,18 @@ fun LoginDialog(
 
                                         5 -> {
                                             showNotificationUrl = true
-                                            showMessage("检测到二次验证，请点击获取验证码按钮")
+                                            showMessage(message = messageLoginTips1)
                                         }
 
                                         6 -> {
                                             showCaptchaUrl = true
-                                            showMessage("需要输入验证码，请点击获取验证码按钮")
+                                            showMessage(message = messageLoginTips2)
                                         }
                                     }
                                 }
                             }
                         )
-                        Spacer(Modifier.width(20.dp))
+                        Spacer(Modifier.width(16.dp))
                         TextButton(
                             modifier = Modifier.weight(1f),
                             text = stringResource(Res.string.cancel),
@@ -395,6 +415,7 @@ fun LoginDialog(
         }
     }
 
+    // 登出对话框
     if (isLogin.value == 1) {
         SuperDialog(
             show = showDialog,

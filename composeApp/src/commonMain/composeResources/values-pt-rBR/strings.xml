@@ -68,6 +68,9 @@
     <string name="device_list_updated">Atualização bem-sucedida</string>
     <string name="device_list_update_failed">A atualização falhou</string>
     <string name="device_list_version">Versão</string>
+    <string name="login_tips1">Detectada autenticação de dois fatores, clique no botão Obter código de verificação</string>
+    <string name="login_tips2">É necessário inserir o código de verificação, clique no botão Obter código de verificação</string>
     <string name="verification_code_get">Obter código de verificação</string>
+    <string name="verifying">Verificando...</string>
     <string name="opensource_info">Copyright © 2024-2025 YuKongA</string>
 </resources>

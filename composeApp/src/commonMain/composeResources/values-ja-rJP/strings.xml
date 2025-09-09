@@ -68,6 +68,9 @@
     <string name="device_list_updated">更新成功</string>
     <string name="device_list_update_failed">更新に失敗しました</string>
     <string name="device_list_version">バージョン</string>
+    <string name="login_tips1">二次認証が検出されました。検証コードの取得ボタンをクリックしてください</string>
+    <string name="login_tips2">検証コードの入力が必要です。検証コードの取得ボタンをクリックしてください</string>
     <string name="verification_code_get">検証コードを取得</string>
+    <string name="verifying">検証中...</string>
     <string name="opensource_info">著作権 © 2024-2025 YuKongA</string>
 </resources>
