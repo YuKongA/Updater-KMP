@@ -1,6 +1,8 @@
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.focus.FocusManager
 import data.DataHelper
 import io.ktor.client.call.body
+import io.ktor.client.request.cookie
 import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -9,6 +11,9 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.request
 import io.ktor.http.Parameters
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonPrimitive
 import misc.json
 import misc.md5Hash
 import platform.generateKey
@@ -25,6 +30,10 @@ import kotlin.time.ExperimentalTime
 
 private const val loginUrl = "https://account.xiaomi.com/pass/serviceLogin"
 private const val loginAuth2Url = "https://account.xiaomi.com/pass/serviceLoginAuth2"
+private const val callbackUrl = "https://api.account.xiaomi.com/sts"
+
+private val client = httpClientPlatform()
+private var _sign: String? = ""
 
 fun isWeb(): Boolean = platform() == Platform.WasmJs || platform() == Platform.Js
 
@@ -54,61 +63,162 @@ suspend fun login(
         savePassword(account, password)
     }
 
-    val client = httpClientPlatform()
     val sid = if (global) "miuiota_intl" else "miuiromota"
     val md5Hash = md5Hash(password)
 
     try {
-        val response1 = client.get(loginUrl)
-        val sign = response1.request.url.parameters["_sign"]?.replace("2&V1_passport&", "") ?: return 2
-
-        client.get(loginAuth2Url)
-        val response = client.post(loginAuth2Url) {
-            parameter("_json", "true")
-            parameter("_sign", sign)
-            parameter("user", account)
-            parameter("hash", md5Hash)
-            parameter("sid", sid)
+        val serviceLogin = serviceLogin(
+            account = account,
+            sid = sid,
+            isLogin = isLogin,
+            global = global
+        )
+        if (serviceLogin == 0) {
+            return serviceLogin
+        } else {
+            val serviceLoginAuth2 = serviceLoginAuth2(
+                account = account,
+                md5Hash = md5Hash,
+                sid = sid,
+                _sign = _sign!!,
+                isLogin = isLogin,
+                global = global
+            )
+            return serviceLoginAuth2
         }
-
-        val authStr = response.body<String>().replace("&&&START&&&", "")
-        val authJson = json.decodeFromString<DataHelper.AuthorizeData>(authStr)
-        val description = authJson.description
-        val ssecurity = authJson.ssecurity
-        val location = authJson.location
-        val userId = authJson.userId.toString()
-        val notificationUrl = authJson.notificationUrl
-        val accountType = if (global) "GL" else "CN"
-        val authResult = if (authJson.result == "ok") "1" else "0"
-
-        println("authStr: $authStr")
-
-        if (notificationUrl != null) {
-            prefSet("notificationUrl", notificationUrl)
-            return 5
-        }
-
-        if (description != "成功") return 3
-        if (location == null) return 4
-
-        val response2 = client.get(location) {
-            parameter("_userIdNeedEncrypt", true)
-            header("Content-Type", "application/x-www-form-urlencoded")
-        }
-        val setCookieHeader = response2.headers["Set-Cookie"]
-        val serviceToken = setCookieHeader
-            ?.split(";")
-            ?.map { it.trim() }
-            ?.firstOrNull { it.startsWith("serviceToken=") }
-
-        val loginInfo = DataHelper.LoginData(accountType, authResult, description, ssecurity, serviceToken, userId)
-        prefSet("loginInfo", json.encodeToString(loginInfo))
-
-        isLogin.value = 1
-        return 0
     } catch (_: Exception) {
         return 2
     }
+}
+
+suspend fun serviceLogin(
+    account: String,
+    sid: String,
+    isLogin: MutableState<Int>,
+    global: Boolean
+): Int {
+    val response1 = client.get("$loginUrl?sid=$sid&_json=true") {
+        header("Content-Type", "application/x-www-form-urlencoded")
+        cookie("userId", account)
+    }
+    val body1 = response1.body<String>().replace("&&&START&&&", "")
+    println("body1: $body1")
+    val elem = json.parseToJsonElement(body1)
+    println("elem: $elem")
+    var ssecurity: String? = null
+    var userId: String? = null
+    var location: String? = null
+    if (elem is JsonObject) {
+        _sign = elem["_sign"]?.jsonPrimitive?.contentOrNull
+        ssecurity = elem["ssecurity"]?.jsonPrimitive?.contentOrNull
+        userId = elem["userId"]?.jsonPrimitive?.contentOrNull
+        location = elem["location"]?.jsonPrimitive?.contentOrNull
+    }
+
+    // 无需密码登录
+    if (!ssecurity.isNullOrEmpty() && !userId.isNullOrEmpty() && !location.isNullOrEmpty()) {
+        println("ssecurity: $ssecurity, userId: $userId, location: $location")
+        val serviceToken = getServiceToken(location)
+        println("serviceToken: $serviceToken")
+        val loginInfo = DataHelper.LoginData(
+            accountType = if (global) "GL" else "CN",
+            authResult = "1",
+            description = "成功",
+            ssecurity = ssecurity,
+            serviceToken = serviceToken,
+            userId = userId
+        )
+        println("loginInfo: $loginInfo")
+        prefSet("loginInfo", json.encodeToString(loginInfo))
+        isLogin.value = 1
+        return 0
+    }
+    println("sign: $_sign")
+    _sign?.let { if (it.isNotEmpty()) return 1 }
+
+    // 回退 _sign 获取方案
+    _sign?.let {
+        if (it.isEmpty()) {
+            _sign = response1.request.url.parameters["_sign"]?.removePrefix("2&V1_passport&")
+            _sign?.let { it1 -> if (it1.isNotEmpty()) return 1 }
+        }
+    }
+    println("sign: $_sign")
+    return 2
+}
+
+suspend fun serviceLoginAuth2(
+    account: String,
+    md5Hash: String,
+    sid: String,
+    _sign: String,
+    isLogin: MutableState<Int>,
+    global: Boolean
+): Int {
+    val response = client.post(loginAuth2Url) {
+        parameter("user", account)
+        parameter("hash", md5Hash)
+        parameter("sid", sid)
+        parameter("callback", "$callbackUrl?sid=$sid")
+        parameter("qs", "%3Fsid%3D$sid%26_json%3Dtrue")
+        parameter("_json", "true")
+        parameter("_sign", _sign)
+        parameter("_locale", if (global) "en_US" else "zh_CN")
+        header("Content-Type", "application/x-www-form-urlencoded")
+    }
+    val authStr = response.body<String>().replace("&&&START&&&", "")
+    println("authStr: $authStr")
+    val authJson = json.decodeFromString<DataHelper.AuthorizeData>(authStr)
+    println("authJson: $authJson")
+
+    // 处理验证码
+    if (authJson.captchaUrl != null) {
+        return 6 // 6: 需要验证码
+    }
+    // 处理 2FA
+    if (authJson.notificationUrl != null) {
+        prefSet("notificationUrl", authJson.notificationUrl)
+        return 5 // 5: 需要二次验证
+    }
+    // 处理登录失败
+    if (authJson.result != "ok") {
+        return 3 // 3: 登录失败
+    }
+    // 处理缺少字段
+    if (authJson.location.isNullOrEmpty()) return 4 // 4: 未返回 location
+    val serviceToken = getServiceToken(authJson.location)
+    println("serviceToken: $serviceToken")
+
+    val loginInfo = DataHelper.LoginData(
+        accountType = if (global) "GL" else "CN",
+        authResult = "1",
+        description = "成功",
+        ssecurity = authJson.ssecurity,
+        serviceToken = serviceToken,
+        userId = authJson.userId.toString()
+    )
+    println("loginInfo: $loginInfo")
+    prefSet("loginInfo", json.encodeToString(loginInfo))
+    isLogin.value = 1
+    return 0
+}
+
+/** Get serviceToken from location URL.
+ *
+ * @param location: Location URL
+ *
+ * @return serviceToken
+ */
+suspend fun getServiceToken(location: String): String? {
+    val response = client.get(location) {
+        parameter("_userIdNeedEncrypt", true)
+        header("Content-Type", "application/x-www-form-urlencoded")
+    }
+    return response.headers["Set-Cookie"]
+        ?.split(";")
+        ?.map { it.trim() }
+        ?.firstOrNull { it.startsWith("serviceToken=") }
+        ?.removePrefix("serviceToken=")
 }
 
 /**
@@ -169,22 +279,23 @@ fun getPassword(): Pair<String, String> {
 
 @OptIn(ExperimentalTime::class)
 suspend fun verifyTicket(verifyUrl: String, ticket: String): DataHelper.VerifyTicketData? {
-    val client = httpClientPlatform()
     val path = "identity/authStart"
     if (!verifyUrl.contains(path)) return null
+    println("verifyUrl: $verifyUrl, ticket: $ticket")
 
     val listUrl = verifyUrl.replace(path, "identity/list")
+    println("listUrl: $listUrl")
     val resp = client.get(listUrl)
-    val setCookieHeader = resp.headers["Set-Cookie"]
-    val allCookiesString = setCookieHeader?.split(",")?.joinToString(";") {
-        it.split(";")[0].trim()
-    } ?: ""
+    val identitySession = resp.headers["Set-Cookie"]
+        ?.split(";")
+        ?.map { it.trim() }
+        ?.firstOrNull { it.startsWith("identity_session=") }
+        ?.removePrefix("identity_session=")
+    println("identitySession: $identitySession")
 
-    val data = try {
-        json.decodeFromString<DataHelper.IdentityListData>(resp.body<String>())
-    } catch (_: Exception) {
-        DataHelper.IdentityListData()
-    }
+    val data = json.decodeFromString<DataHelper.IdentityListData>(resp.body<String>().replace("&&&START&&&", ""))
+
+    println("data: $data")
     val flag = data.flag ?: 4
     val options = data.options ?: listOf(flag)
 
@@ -203,74 +314,72 @@ suspend fun verifyTicket(verifyUrl: String, ticket: String): DataHelper.VerifyTi
         val verifyResp = client.post("https://account.xiaomi.com$api") {
             parameter("_dc", Clock.System.now().toEpochMilliseconds())
             setBody(FormDataContent(formParams))
-            header("Cookie", allCookiesString)
-            header("User-Agent", "Mozilla/5.0 (KMP/Updater)")
-            header("Referer", verifyUrl)
+            identitySession?.let { cookie("identity_session", it) }
         }
+        println("verifyResp: ${verifyResp.body<String>()}")
         val rawResp = verifyResp.body<String>().replace("&&&START&&&", "")
+        println("rawResp: $rawResp")
         val verifyData = try {
             json.decodeFromString<DataHelper.VerifyTicketData>(rawResp)
         } catch (_: Exception) {
             null
         }
-        if (verifyData != null && verifyData.code == 0) {
-            return verifyData
+        println("verifyData: $verifyData")
+        return if (verifyData != null && verifyData.code == 0) {
+            verifyData
         } else {
-            return null
+            null
         }
     }
     return null
 }
 
 suspend fun handle2FATicket(
-    ticketCode: String,
+    ticket: String,
+    account: String,
+    password: String,
+    global: Boolean,
+    savePassword: String,
     isLogin: MutableState<Int>,
     setVerifyError: (String) -> Unit,
-    setTicketCode: (String) -> Unit,
+    setTicket: (String) -> Unit,
     setShowTicketInput: (Boolean) -> Unit,
     setShowDialog: (Boolean) -> Unit,
     setShowNotificationUrl: (Boolean) -> Unit,
     showMessage: (String) -> Unit,
-    focusManager: androidx.compose.ui.focus.FocusManager
+    focusManager: FocusManager
 ) {
     setVerifyError("")
     val notificationUrl = prefGet("notificationUrl")
-    if (notificationUrl != null && ticketCode.isNotBlank()) {
-        val verifyData = verifyTicket(notificationUrl, ticketCode)
+    if (notificationUrl != null && ticket.isNotBlank()) {
+        val verifyData = verifyTicket(notificationUrl, ticket)
+        println("verifyData: $verifyData")
         if (verifyData != null && verifyData.location != null) {
-            try {
-                val client = httpClientPlatform()
-                val response2 = client.get(verifyData.location) {
-                    parameter("_userIdNeedEncrypt", true)
-                    header("Content-Type", "application/x-www-form-urlencoded")
-                }
-                val setCookieHeader = response2.headers["Set-Cookie"]
-                val serviceToken = setCookieHeader
-                    ?.split(";")
-                    ?.map { it.trim() }
-                    ?.firstOrNull { it.startsWith("serviceToken=") }
-                val loginInfo = DataHelper.LoginData(
-                    authResult = "1",
-                    description = "成功",
-                    serviceToken = serviceToken
-                )
-                prefSet("loginInfo", json.encodeToString(loginInfo))
+            println("2FA verify success, location: ${verifyData.location}")
+            val login = login(
+                account = account,
+                password = password,
+                global = global,
+                savePassword = savePassword,
+                isLogin = isLogin
+            )
+            if (login != 0) {
                 prefRemove("notificationUrl")
-                isLogin.value = 1
-                showMessage("登录成功，二次验证已通过")
+                showMessage("二次认证通过，登录成功")
                 setShowTicketInput(false)
                 setShowDialog(false)
                 setShowNotificationUrl(false)
-                setTicketCode("")
-            } catch (e: Exception) {
-                setVerifyError("登录后续流程失败: ${e.message ?: "未知错误"}")
+                setTicket("")
+            } else {
+                setVerifyError("登录失败，请重试")
             }
+
         } else {
-            setVerifyError("票据验证失败，请检查 ticket 是否正确或重新完成安全验证。")
-            setTicketCode("")
+            setVerifyError("验证失败，请检查验证码是否正确或重新获取验证码")
+            setTicket("")
             focusManager.clearFocus()
         }
     } else {
-        setVerifyError("未检测到 notificationUrl 或票据为空。")
+        setVerifyError("未检测到验证地址或验证码为空")
     }
 }

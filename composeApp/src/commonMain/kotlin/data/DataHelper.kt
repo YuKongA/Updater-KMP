@@ -10,7 +10,8 @@ object DataHelper {
         val result: String? = null,
         val ssecurity: String? = null,
         val userId: Long? = null,
-        val notificationUrl: String? = null
+        val notificationUrl: String? = null,
+        val captchaUrl: String? = null,
     )
 
     @Serializable

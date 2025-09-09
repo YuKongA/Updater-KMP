@@ -85,7 +85,7 @@ fun LoginDialog(
     var showNotificationUrl by remember { mutableStateOf(false) }
 
     var showTicketInput by remember { mutableStateOf(false) }
-    var ticketCode by remember { mutableStateOf("") }
+    var ticket by remember { mutableStateOf("") }
     var isVerifyingTicket by remember { mutableStateOf(false) }
     var verifyError by remember { mutableStateOf("") }
 
@@ -164,7 +164,9 @@ fun LoginDialog(
                 )
 
 
-                if (showNotificationUrl) {
+                AnimatedVisibility(
+                    visible = showNotificationUrl
+                ) {
                     val uriHandler = LocalUriHandler.current
                     TextButton(
                         modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
@@ -227,8 +229,8 @@ fun LoginDialog(
                         modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
                     ) {
                         TextField(
-                            value = ticketCode,
-                            onValueChange = { ticketCode = it },
+                            value = ticket,
+                            onValueChange = { ticket = it },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -243,16 +245,20 @@ fun LoginDialog(
                             TextButton(
                                 modifier = Modifier.weight(1f),
                                 text = if (isVerifyingTicket) "验证中..." else "提交",
-                                enabled = !isVerifyingTicket && ticketCode.isNotBlank(),
+                                enabled = !isVerifyingTicket && ticket.isNotBlank(),
                                 colors = ButtonDefaults.textButtonColorsPrimary(),
                                 onClick = {
                                     coroutineScope.launch {
                                         isVerifyingTicket = true
                                         handle2FATicket(
-                                            ticketCode = ticketCode,
+                                            ticket = ticket,
+                                            account = account,
+                                            password = password,
+                                            global = global,
+                                            savePassword = savePassword,
                                             isLogin = isLogin,
                                             setVerifyError = { verifyError = it },
-                                            setTicketCode = { ticketCode = it },
+                                            setTicket = { ticket = it },
                                             setShowTicketInput = { showTicketInput = it },
                                             setShowDialog = { showDialog.value = it },
                                             setShowNotificationUrl = { showNotificationUrl = it },
@@ -263,14 +269,14 @@ fun LoginDialog(
                                     }
                                 }
                             )
-                            Spacer(Modifier.width(20.dp))
+                            Spacer(Modifier.width(16.dp))
                             TextButton(
                                 modifier = Modifier.weight(1f),
                                 text = "取消",
                                 colors = ButtonDefaults.textButtonColors(),
                                 onClick = {
                                     showTicketInput = false
-                                    ticketCode = ""
+                                    ticket = ""
                                     verifyError = ""
                                 }
                             )
@@ -287,13 +293,13 @@ fun LoginDialog(
                             text = stringResource(Res.string.login),
                             colors = ButtonDefaults.textButtonColorsPrimary(),
                             onClick = {
-                                showDialog.value = false
                                 showMessage(message = messageLoginIn)
                                 coroutineScope.launch {
                                     val int = login(account, password, global, savePassword, isLogin)
                                     when (int) {
                                         0 -> {
                                             showMessage(message = messageLoginSuccess)
+                                            showDialog.value = false
                                         }
 
                                         1 -> showMessage(message = messageEmpty)
@@ -310,6 +316,10 @@ fun LoginDialog(
                                             prefGet("notificationUrl")
                                             showNotificationUrl = true
                                             showMessage("检测到二次验证，请打开并完成验证后重试")
+                                        }
+
+                                        6 -> {
+                                            showMessage("需要输入验证码，请点击获取验证码按钮")
                                         }
                                     }
                                 }
@@ -352,7 +362,7 @@ fun LoginDialog(
                         showDialog.value = false
                     }
                 )
-                Spacer(Modifier.width(20.dp))
+                Spacer(Modifier.width(16.dp))
                 TextButton(
                     modifier = Modifier.weight(1f),
                     text = stringResource(Res.string.cancel),
