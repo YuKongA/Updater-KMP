@@ -68,9 +68,6 @@
     <string name="device_list_updated">更新成功</string>
     <string name="device_list_update_failed">更新失敗</string>
     <string name="device_list_version">版本</string>
-    <string name="captcha">驗證碼</string>
-    <string name="captcha_required">需要驗證碼驗證</string>
-    <string name="captcha_invalid">驗證碼錯誤</string>
-    <string name="enter_captcha">輸入驗證碼</string>
+    <string name="verification_code_get">獲取驗證碼</string>
     <string name="opensource_info">版權所有 © 2024-2025 YuKongA</string>
 </resources>

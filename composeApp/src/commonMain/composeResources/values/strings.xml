@@ -69,9 +69,6 @@
     <string name="device_list_updated">Update successful</string>
     <string name="device_list_update_failed">Update failed</string>
     <string name="device_list_version">Version</string>
-    <string name="captcha">Captcha</string>
-    <string name="captcha_required">Captcha verification required</string>
-    <string name="captcha_invalid">Invalid captcha code</string>
-    <string name="enter_captcha">Enter captcha code</string>
+    <string name="verification_code_get">Get Verification Code</string>
     <string name="opensource_info">Copyright © 2024-2025 YuKongA</string>
 </resources>

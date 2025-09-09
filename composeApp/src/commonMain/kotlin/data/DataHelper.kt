@@ -10,9 +10,7 @@ object DataHelper {
         val result: String? = null,
         val ssecurity: String? = null,
         val userId: Long? = null,
-        val captchaUrl: String? = null,
-        val ick: String? = null,
-        val callback: String? = null,
+        val notificationUrl: String? = null
     )
 
     @Serializable
@@ -73,5 +71,17 @@ object DataHelper {
         var fingerprint: String = "",
         var securityPatchLevel: String = "",
         var timestamp: String = "",
+    )
+
+    @Serializable
+    data class IdentityListData(
+        val flag: Int? = null,
+        val options: List<Int>? = null
+    )
+
+    @Serializable
+    data class VerifyTicketData(
+        val code: Int,
+        val location: String? = null
     )
 }
