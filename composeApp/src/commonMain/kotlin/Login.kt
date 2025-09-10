@@ -3,20 +3,18 @@ import data.DataHelper
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.cookie
-import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
-import io.ktor.client.request.setBody
 import io.ktor.client.statement.request
-import io.ktor.http.Parameters
 import io.ktor.http.isSuccess
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import misc.json
 import misc.md5Hash
+import misc.sha1Hash
 import platform.generateKey
 import platform.httpClientPlatform
 import platform.ownDecrypt
@@ -26,16 +24,20 @@ import platform.prefRemove
 import platform.prefSet
 import top.yukonga.miuix.kmp.utils.Platform
 import top.yukonga.miuix.kmp.utils.platform
+import kotlin.io.encoding.Base64
+import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 private const val accountUrl = "https://account.xiaomi.com"
 private const val serviceLoginUrl = "$accountUrl/pass/serviceLogin"
 private const val serviceLoginAuth2Url = "$accountUrl/pass/serviceLoginAuth2"
-private const val accountApiUrl = "https://api.account.xiaomi.com/sts"
 
 private var globalClient: HttpClient? = null
+private val agent = generateAgent()
+private val deviceId = generateDeviceId()
 private var _sign: String? = ""
+
 
 fun isWeb(): Boolean = platform() == Platform.WasmJs || platform() == Platform.Js
 
@@ -68,21 +70,7 @@ suspend fun login(
     }
     val client = globalClient ?: httpClientPlatform().also { globalClient = it }
     try {
-        if (ticket.isNotEmpty()) {
-            handle2FATicket(
-                client = client,
-                ticket = ticket
-            )
-        }
-        val serviceLogin = serviceLogin(
-            client = client,
-            account = account,
-            isLogin = isLogin,
-            global = global
-        )
-        if (serviceLogin == 0) {
-            return serviceLogin
-        } else {
+        if (captcha.isNotEmpty()) {
             val serviceLoginAuth2 = serviceLoginAuth2(
                 client = client,
                 account = account,
@@ -94,6 +82,30 @@ suspend fun login(
             )
             return serviceLoginAuth2
         }
+        if (ticket.isNotEmpty()) {
+            val handle2FATicket = handle2FATicket(
+                client = client,
+                ticket = ticket
+            )
+            if (handle2FATicket == 3) return 3
+        }
+        val serviceLogin = serviceLogin(
+            client = client,
+            account = account,
+            isLogin = isLogin,
+            global = global
+        )
+        if (serviceLogin == 0) return serviceLogin
+        val serviceLoginAuth2 = serviceLoginAuth2(
+            client = client,
+            account = account,
+            password = password,
+            global = global,
+            isLogin = isLogin,
+            _sign = _sign!!,
+            captcha = captcha,
+        )
+        return serviceLoginAuth2
     } catch (_: Exception) {
         return 2
     }
@@ -128,12 +140,25 @@ suspend fun serviceLogin(
     global: Boolean
 ): Int {
     val sid = if (global) "miuiota_intl" else "miuiromota"
-    val response1 = client.get("$serviceLoginUrl?sid=$sid&_json=true") {
+
+    println("Login: agent: $agent")
+    println("Login: deviceId: $deviceId")
+
+    val response = client.get(serviceLoginUrl) {
+        parameter("sid", sid)
+        parameter("_json", true)
+        cookie("sdkVersion", "accountsdk-18.8.15", domain = "mi.com")
+        cookie("sdkVersion", "accountsdk-18.8.15", domain = "xiaomi.com")
+        cookie("deviceId", deviceId, domain = "mi.com")
+        cookie("deviceId", deviceId, domain = "xiaomi.com")
         cookie("userId", account)
-        cookie("sdkVersion", "accountsdk-18.8.15")
-        header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+        header("User-Agent", agent)
+        header("Content-Type", "application/x-www-form-urlencoded")
     }
-    val body = response1.body<String>().replace("&&&START&&&", "")
+    response.request.headers.entries().forEach { (key, values) ->
+        println("Login: serviceLogin Header: $key = ${values.joinToString(", ")}")
+    }
+    val body = response.body<String>().replace("&&&START&&&", "")
     val elem = json.parseToJsonElement(body)
     println("Login: elem: $elem")
     var ssecurity: String? = null
@@ -148,8 +173,9 @@ suspend fun serviceLogin(
 
     // 无需密码登录
     if (!ssecurity.isNullOrEmpty() && !userId.isNullOrEmpty() && !location.isNullOrEmpty()) {
+        val authorizeData = DataHelper.AuthorizeData(ssecurity = ssecurity, userId = userId.toLong(), location = location)
         println("Login: ssecurity: $ssecurity, userId: $userId, location: $location")
-        val serviceToken = getServiceToken(client, location)
+        val serviceToken = getServiceToken(client, authorizeData)
         println("Login: serviceToken: $serviceToken")
         val loginInfo = DataHelper.LoginData(
             accountType = if (global) "GL" else "CN",
@@ -171,7 +197,7 @@ suspend fun serviceLogin(
     // 回退 _sign 获取方案
     _sign?.let {
         if (it.isEmpty()) {
-            _sign = response1.request.url.parameters["_sign"]?.removePrefix("2&V1_passport&")
+            _sign = response.request.url.parameters["_sign"]?.removePrefix("2&V1_passport&")
             _sign?.let { it1 -> if (it1.isNotEmpty()) return 1 }
         }
     }
@@ -204,17 +230,22 @@ suspend fun serviceLoginAuth2(
     val sid = if (global) "miuiota_intl" else "miuiromota"
 
     val response = client.post(serviceLoginAuth2Url) {
-        cookie("sdkVersion", "accountsdk-18.8.15")
-        header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
-        parameter("user", account)
-        parameter("hash", md5Hash)
+        cookie("sdkVersion", "accountsdk-18.8.15", domain = "mi.com")
+        cookie("sdkVersion", "accountsdk-18.8.15", domain = "xiaomi.com")
+        cookie("deviceId", deviceId, domain = "mi.com")
+        cookie("deviceId", deviceId, domain = "xiaomi.com")
+        header("User-Agent", agent)
+        header("Content-Type", "application/x-www-form-urlencoded")
         parameter("sid", sid)
-        parameter("callback", "$accountApiUrl?sid=$sid")
-        parameter("qs", "%3Fsid%3D$sid%26_json%3Dtrue")
         parameter("_json", "true")
         parameter("_sign", _sign)
+        parameter("user", account)
+        parameter("hash", md5Hash)
         parameter("_locale", if (global) "en_US" else "zh_CN")
         if (captcha.isNotEmpty()) parameter("captcha", captcha)
+    }
+    response.request.headers.entries().forEach { (key, values) ->
+        println("Login: serviceLoginAuth2 Header: $key = ${values.joinToString(", ")}")
     }
     val authStr = response.body<String>().replace("&&&START&&&", "")
     println("Login: authStr: $authStr")
@@ -226,18 +257,23 @@ suspend fun serviceLoginAuth2(
         prefSet("captchaUrl", authJson.captchaUrl)
         return 6 // 6: 需要验证码
     }
+
     // 处理 2FA
     if (authJson.notificationUrl != null) {
         prefSet("notificationUrl", authJson.notificationUrl)
         return 5 // 5: 需要二次验证
     }
+
     // 处理登录失败
     if (authJson.result != "ok") {
         return 3 // 3: 登录失败
     }
     // 处理缺少字段
-    if (authJson.location.isNullOrEmpty()) return 4 // 4: 未返回 location
-    val serviceToken = getServiceToken(client, authJson.location)
+    if (authJson.location.isNullOrEmpty()) {
+        return 4 // 4: 未返回 location
+    }
+    println("Login: authJson.location: ${authJson.location}")
+    val serviceToken = getServiceToken(client, authJson)
     println("Login: serviceToken: $serviceToken")
 
     val loginInfo = DataHelper.LoginData(
@@ -255,26 +291,63 @@ suspend fun serviceLoginAuth2(
     return 0
 }
 
-/** Get serviceToken from location URL.
+/** Get serviceToken from authorize data.
  *
- * @param location: Location URL
+ * @param authorizeData: Data from serviceLogin or serviceLoginAuth2
  *
  * @return serviceToken
  */
 suspend fun getServiceToken(
     client: HttpClient,
-    location: String
+    authorizeData: DataHelper.AuthorizeData
 ): String? {
-    val response = client.get(location) {
-        cookie("sdkVersion", "accountsdk-18.8.15")
-        header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+    val locationUrl = authorizeData.location!!
+    println("Login: locationUrl: $locationUrl")
+    val code = authorizeData.code!!
+    val ssecurity = authorizeData.ssecurity!!
+    val clientSign = generateClientSign(code, ssecurity)
+    println("Login: clientSign: $clientSign")
+    val response = client.get(locationUrl) {
+        cookie("sdkVersion", "accountsdk-18.8.15", domain = "mi.com")
+        cookie("sdkVersion", "accountsdk-18.8.15", domain = "xiaomi.com")
+        cookie("deviceId", deviceId, domain = "mi.com")
+        cookie("deviceId", deviceId, domain = "xiaomi.com")
+        header("User-Agent", agent)
+        header("Content-Type", "application/x-www-form-urlencoded")
         parameter("_userIdNeedEncrypt", true)
+        parameter("clientSign", clientSign)
+    }
+    response.request.headers.entries().forEach { (key, values) ->
+        println("Login: getServiceToken Header: $key = ${values.joinToString(", ")}")
     }
     return response.headers["Set-Cookie"]
         ?.split(";")
         ?.map { it.trim() }
         ?.firstOrNull { it.startsWith("serviceToken=") }
         ?.removePrefix("serviceToken=")
+}
+
+
+fun generateAgent(): String {
+    val agentId = (1..13)
+        .map { Random.nextInt(65, 70).toChar() }
+        .joinToString("")
+    val randomText = (1..18)
+        .map { Random.nextInt(97, 123).toChar() }
+        .joinToString("")
+    return "$randomText-$agentId APP/com.android.updater APPV/8.5.2"
+}
+
+fun generateDeviceId(): String {
+    return (1..6)
+        .map { Random.nextInt(97, 123).toChar() }
+        .joinToString("")
+}
+
+suspend fun generateClientSign(code: Int, ssecurity: String): String {
+    val input = "nonce=$code&$ssecurity"
+    val sha1Digest = sha1Hash(input).encodeToByteArray()
+    return Base64.UrlSafe.encode(sha1Digest)
 }
 
 @OptIn(ExperimentalTime::class)
@@ -285,7 +358,14 @@ suspend fun verifyTicket(
 ): DataHelper.VerifyTicketData? {
     val path = "identity/authStart"
     val listUrl = verifyUrl.replace(path, "identity/list")
-    val resp = client.get(listUrl)
+    val resp = client.get(listUrl) {
+        cookie("sdkVersion", "accountsdk-18.8.15", domain = "mi.com")
+        cookie("sdkVersion", "accountsdk-18.8.15", domain = "xiaomi.com")
+        cookie("deviceId", deviceId, domain = "mi.com")
+        cookie("deviceId", deviceId, domain = "xiaomi.com")
+        header("User-Agent", agent)
+        header("Content-Type", "application/x-www-form-urlencoded")
+    }
     if (!resp.status.isSuccess()) return null
 
     val setCookie = resp.headers["Set-Cookie"]
@@ -295,30 +375,40 @@ suspend fun verifyTicket(
         ?.firstOrNull { it.startsWith("identity_session=") }?.substringAfter("=")
         ?: return null
 
+    val data = json.decodeFromString<DataHelper.IdentityListData>(resp.body<String>().replace("&&&START&&&", ""))
+    println("Login: data: $data")
+
     val apiMap = mapOf(
         4 to "/identity/auth/verifyPhone",
         8 to "/identity/auth/verifyEmail"
     )
-    for (tryFlag in apiMap.keys) {
-        val apiPath = apiMap[tryFlag]
-        val apiUrl = "$accountUrl$apiPath?_dc=${Clock.System.now().toEpochMilliseconds()}"
+    val filteredApiMap = apiMap.filterKeys { data.options?.contains(it) == true }
 
-        val formParams = Parameters.build {
-            append("ticket", ticket)
-            append("trust", "true")
-        }
+    for ((apiInt, apiPath) in filteredApiMap) {
+        val apiUrl = "$accountUrl$apiPath"
+        println("Login: apiUrl: $apiUrl")
 
-        val verifyResp = client.post(apiUrl) {
-            cookie("sdkVersion", "accountsdk-18.8.15")
+        val response = client.post(apiUrl) {
+            cookie("sdkVersion", "accountsdk-18.8.15", domain = "mi.com")
+            cookie("sdkVersion", "accountsdk-18.8.15", domain = "xiaomi.com")
+            cookie("deviceId", deviceId, domain = "mi.com")
+            cookie("deviceId", deviceId, domain = "xiaomi.com")
             cookie("identity_session", identitySession)
-            header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
-            setBody(FormDataContent(formParams))
+            header("User-Agent", agent)
+            header("Content-Type", "application/x-www-form-urlencoded")
+            parameter("_dc", Clock.System.now().toEpochMilliseconds().toString())
+            parameter("ticket", ticket)
+            parameter("_flag", apiInt.toString())
+            parameter("trust", "true")
+            parameter("_json", "true")
         }
-        println("Login: verifyResp: $verifyResp")
-        val rawResp = verifyResp.body<String>().replace("&&&START&&&", "")
-        println("Login: rawResp: $rawResp")
-        val verifyData = json.decodeFromString<DataHelper.VerifyTicketData>(rawResp)
-
+        response.request.headers.entries().forEach { (key, values) ->
+            println("Login: getServiceToken Header: $key = ${values.joinToString(", ")}")
+        }
+        val respStr = response.body<String>().replace("&&&START&&&", "")
+        println("Login: respStr: $respStr")
+        val verifyData = json.decodeFromString<DataHelper.VerifyTicketData>(respStr)
+        println("Login: verifyData: $verifyData")
         if (verifyData.code == 0 && !verifyData.location.isNullOrEmpty()) {
             return verifyData
         }
@@ -326,6 +416,13 @@ suspend fun verifyTicket(
     return null
 }
 
+/**
+ * Handle 2FA ticket.
+ *
+ * @param ticket: Ticket from 2FA notification
+ *
+ * @return Login status
+ */
 suspend fun handle2FATicket(
     client: HttpClient,
     ticket: String
@@ -339,7 +436,7 @@ suspend fun handle2FATicket(
             return 0
         }
     }
-    return 7
+    return 3
 }
 
 /**

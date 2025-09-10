@@ -30,13 +30,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.rememberImagePainter
 import getPassword
-import handle2FATicket
 import kotlinx.coroutines.launch
 import login
 import logout
 import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
-import platform.httpClientPlatform
 import platform.prefGet
 import platform.prefRemove
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
@@ -88,12 +86,11 @@ fun LoginDialog(
     var showCaptchaUrl by remember { mutableStateOf(false) }
     var showCaptchaInput by remember { mutableStateOf(false) }
 
-    var isVerifying by remember { mutableStateOf(false) }
-
-    var showNotificationUrl by remember { mutableStateOf(false) }
-
+    var showTicketUrl by remember { mutableStateOf(false) }
     var showTicketInput by remember { mutableStateOf(false) }
+
     var ticket by remember { mutableStateOf("") }
+    var isVerifying by remember { mutableStateOf(false) }
 
     val icon = when (isLogin.value) {
         1 -> MiuixIcons.Useful.Blocklist
@@ -210,7 +207,7 @@ fun LoginDialog(
 
                 // 二次认证验证码
                 AnimatedVisibility(
-                    visible = showNotificationUrl
+                    visible = showTicketUrl
                 ) {
                     // 跳转到网页获取二次认证验证码
                     AnimatedVisibility(
@@ -271,7 +268,7 @@ fun LoginDialog(
                                                 ticket = ""
                                                 prefRemove("notificationUrl")
                                                 showTicketInput = false
-                                                showNotificationUrl = false
+                                                showTicketUrl = false
                                             } else {
                                                 showMessage(messageError)
                                             }
@@ -318,9 +315,9 @@ fun LoginDialog(
                     }
                 }
 
-                // 是否国际账号 & 保存密码
+                // 国际账号 & 保存密码
                 AnimatedVisibility(
-                    visible = !showTicketInput && !showCaptchaInput
+                    visible = !showTicketUrl && !showCaptchaUrl && !showTicketInput && !showCaptchaInput
                 ) {
                     Row(
                         modifier = Modifier.padding(vertical = 16.dp),
@@ -355,7 +352,7 @@ fun LoginDialog(
 
                 // 登录 & 取消
                 AnimatedVisibility(
-                    visible = !showTicketInput && !showCaptchaInput
+                    visible = !showTicketUrl && !showCaptchaUrl && !showTicketInput && !showCaptchaInput
                 ) {
                     Row {
                         TextButton(
@@ -389,7 +386,7 @@ fun LoginDialog(
                                         4 -> showMessage(message = messageSecurityError)
 
                                         5 -> {
-                                            showNotificationUrl = true
+                                            showTicketUrl = true
                                             showMessage(message = messageLoginTips1)
                                         }
 
@@ -408,6 +405,11 @@ fun LoginDialog(
                             colors = ButtonDefaults.textButtonColors(),
                             onClick = {
                                 showDialog.value = false
+                                showTicketUrl = false
+                                showCaptchaUrl = false
+                                showTicketInput = false
+                                showCaptchaInput = false
+                                ticket = ""
                             }
                         )
                     }

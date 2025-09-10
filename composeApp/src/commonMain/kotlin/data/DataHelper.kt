@@ -7,6 +7,7 @@ object DataHelper {
     data class AuthorizeData(
         val description: String? = null,
         val location: String? = null,
+        val code: Int? = null,
         val result: String? = null,
         val ssecurity: String? = null,
         val userId: Long? = null,
