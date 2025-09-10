@@ -7,7 +7,10 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.request
+import io.ktor.http.Parameters
+import io.ktor.http.formUrlEncode
 import io.ktor.http.isSuccess
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
@@ -145,13 +148,11 @@ suspend fun serviceLogin(
     println("Login: deviceId: $deviceId")
 
     val response = client.get(serviceLoginUrl) {
-        parameter("sid", sid)
-        parameter("_json", true)
-        cookie("sdkVersion", "accountsdk-18.8.15")
-        cookie("deviceId", deviceId)
         cookie("userId", account)
         header("User-Agent", agent)
         header("Content-Type", "application/x-www-form-urlencoded")
+        parameter("sid", sid)
+        parameter("_json", true)
     }
     response.request.headers.entries().forEach { (key, values) ->
         println("Login: serviceLogin Header: $key = ${values.joinToString(", ")}")
@@ -228,8 +229,6 @@ suspend fun serviceLoginAuth2(
     val sid = if (global) "miuiota_intl" else "miuiromota"
 
     val response = client.post(serviceLoginAuth2Url) {
-        cookie("sdkVersion", "accountsdk-18.8.15")
-        cookie("deviceId", deviceId)
         header("User-Agent", agent)
         header("Content-Type", "application/x-www-form-urlencoded")
         parameter("sid", sid)
@@ -264,11 +263,12 @@ suspend fun serviceLoginAuth2(
     if (authJson.result != "ok") {
         return 3 // 3: 登录失败
     }
+
     // 处理缺少字段
     if (authJson.location.isNullOrEmpty()) {
         return 4 // 4: 未返回 location
     }
-    println("Login: authJson.location: ${authJson.location}")
+
     val serviceToken = getServiceToken(client, authJson)
     println("Login: serviceToken: $serviceToken")
 
@@ -304,10 +304,6 @@ suspend fun getServiceToken(
     val clientSign = generateClientSign(code, ssecurity)
     println("Login: clientSign: $clientSign")
     val response = client.get(locationUrl) {
-        cookie("sdkVersion", "accountsdk-18.8.15")
-        cookie("deviceId", deviceId)
-        header("User-Agent", agent)
-        header("Content-Type", "application/x-www-form-urlencoded")
         parameter("_userIdNeedEncrypt", true)
         parameter("clientSign", clientSign)
     }
@@ -352,22 +348,17 @@ suspend fun verifyTicket(
 ): DataHelper.VerifyTicketData? {
     val path = "identity/authStart"
     val listUrl = verifyUrl.replace(path, "identity/list")
-    val resp = client.get(listUrl) {
-        cookie("sdkVersion", "accountsdk-18.8.15")
-        cookie("deviceId", deviceId)
-        header("User-Agent", agent)
-        header("Content-Type", "application/x-www-form-urlencoded")
-    }
-    if (!resp.status.isSuccess()) return null
+    val response = client.get(listUrl)
+    if (!response.status.isSuccess()) return null
 
-    val setCookie = resp.headers["Set-Cookie"]
+    val setCookie = response.headers["Set-Cookie"]
     val identitySession = setCookie
         ?.split(";")
         ?.map { it.trim() }
         ?.firstOrNull { it.startsWith("identity_session=") }?.substringAfter("=")
         ?: return null
 
-    val data = json.decodeFromString<DataHelper.IdentityListData>(resp.body<String>().replace("&&&START&&&", ""))
+    val data = json.decodeFromString<DataHelper.IdentityListData>(response.body<String>().replace("&&&START&&&", ""))
     println("Login: data: $data")
 
     val apiMap = mapOf(
@@ -380,17 +371,17 @@ suspend fun verifyTicket(
         val apiUrl = "$accountUrl$apiPath"
         println("Login: apiUrl: $apiUrl")
 
+        val parameters = Parameters.build {
+            append("ticket", ticket)
+            append("_flag", apiInt.toString())
+            append("trust", "true")
+            append("_json", "true")
+        }.formUrlEncode()
+
         val response = client.post(apiUrl) {
-            cookie("sdkVersion", "accountsdk-18.8.15")
-            cookie("deviceId", deviceId)
             cookie("identity_session", identitySession)
-            header("User-Agent", agent)
-            header("Content-Type", "application/x-www-form-urlencoded")
             parameter("_dc", Clock.System.now().toEpochMilliseconds().toString())
-            parameter("ticket", ticket)
-            parameter("_flag", apiInt.toString())
-            parameter("trust", "true")
-            parameter("_json", "true")
+            setBody(parameters)
         }
         response.request.headers.entries().forEach { (key, values) ->
             println("Login: getServiceToken Header: $key = ${values.joinToString(", ")}")
