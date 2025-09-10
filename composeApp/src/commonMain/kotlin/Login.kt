@@ -6,7 +6,6 @@ import io.ktor.client.request.cookie
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
-import io.ktor.client.request.post
 import io.ktor.client.statement.request
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
@@ -226,19 +225,21 @@ suspend fun serviceLoginAuth2(
     _sign: String,
     captcha: String = "",
 ): Int {
-    val md5Hash = md5Hash(password)
+    val md5Hash = md5Hash(password).uppercase()
     val sid = if (global) "miuiota_intl" else "miuiromota"
 
-    val response = client.post(serviceLoginAuth2Url) {
+    val parameters = parameters {
+        append("sid", sid)
+        append("_json", "true")
+        append("_sign", _sign)
+        append("user", account)
+        append("hash", md5Hash)
+        append("_locale", if (global) "en_US" else "zh_CN")
+        if (captcha.isNotEmpty()) append("captCode", captcha)
+    }
+    val response = client.submitForm(serviceLoginAuth2Url, parameters) {
         contentType(ContentType.Application.FormUrlEncoded)
         userAgent(agent)
-        parameter("sid", sid)
-        parameter("_json", "true")
-        parameter("_sign", _sign)
-        parameter("user", account)
-        parameter("hash", md5Hash)
-        parameter("_locale", if (global) "en_US" else "zh_CN")
-        if (captcha.isNotEmpty()) parameter("captcha", captcha)
     }
     response.request.headers.entries().forEach { (key, values) ->
         println("Login: serviceLoginAuth2 Header: $key = ${values.joinToString(", ")}")
@@ -392,8 +393,6 @@ suspend fun verifyTicket(
             append("trust", "true")
             append("_json", "true")
         }
-        println("Login: parameters: $parameters")
-
         val response = client.submitForm(apiUrl, parameters) {
             cookie("identity_session", identitySession)
             parameter("_dc", Clock.System.now().toEpochMilliseconds())

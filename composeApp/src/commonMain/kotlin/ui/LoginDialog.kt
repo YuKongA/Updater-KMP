@@ -306,6 +306,8 @@ fun LoginDialog(
                                 text = stringResource(Res.string.cancel),
                                 colors = ButtonDefaults.textButtonColors(),
                                 onClick = {
+                                    showTicketUrl = false
+                                    showCaptchaUrl = false
                                     showTicketInput = false
                                     showCaptchaInput = false
                                     ticket = ""
@@ -405,11 +407,6 @@ fun LoginDialog(
                             colors = ButtonDefaults.textButtonColors(),
                             onClick = {
                                 showDialog.value = false
-                                showTicketUrl = false
-                                showCaptchaUrl = false
-                                showTicketInput = false
-                                showCaptchaInput = false
-                                ticket = ""
                             }
                         )
                     }
