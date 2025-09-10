@@ -158,7 +158,7 @@ suspend fun serviceLogin(
     response.request.headers.entries().forEach { (key, values) ->
         println("Login: serviceLogin Header: $key = ${values.joinToString(", ")}")
     }
-    val body = response.body<String>().replace("&&&START&&&", "")
+    val body = response.body<String>().removePrefix("&&&START&&&")
     val elem = json.parseToJsonElement(body)
     println("Login: elem: $elem")
     var ssecurity: String? = null
@@ -243,7 +243,7 @@ suspend fun serviceLoginAuth2(
     response.request.headers.entries().forEach { (key, values) ->
         println("Login: serviceLoginAuth2 Header: $key = ${values.joinToString(", ")}")
     }
-    val authStr = response.body<String>().replace("&&&START&&&", "")
+    val authStr = response.body<String>().removePrefix("&&&START&&&")
     println("Login: authStr: $authStr")
     val authJson = json.decodeFromString<DataHelper.AuthorizeData>(authStr)
     println("Login: authJson: $authJson")
@@ -373,7 +373,7 @@ suspend fun verifyTicket(
         ?.firstOrNull { it.startsWith("identity_session=") }?.substringAfter("=")
         ?: return null
 
-    val data = json.decodeFromString<DataHelper.IdentityListData>(response.body<String>().replace("&&&START&&&", ""))
+    val data = json.decodeFromString<DataHelper.IdentityListData>(response.body<String>().removePrefix("&&&START&&&"))
     println("Login: data: $data")
 
     val apiMap = mapOf(
@@ -401,7 +401,7 @@ suspend fun verifyTicket(
         response.request.headers.entries().forEach { (key, values) ->
             println("Login: getServiceToken Header: $key = ${values.joinToString(", ")}")
         }
-        val respStr = response.body<String>().replace("&&&START&&&", "")
+        val respStr = response.body<String>().removePrefix("&&&START&&&")
         println("Login: respStr: $respStr")
         val verifyData = json.decodeFromString<DataHelper.VerifyTicketData>(respStr)
         println("Login: verifyData: $verifyData")
