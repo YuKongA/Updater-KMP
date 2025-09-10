@@ -317,7 +317,10 @@ suspend fun getServiceToken(
         ?.removePrefix("serviceToken=")
 }
 
-
+/** Generate random User-Agent.
+ *
+ * @return User-Agent
+ */
 fun generateAgent(): String {
     val agentId = (1..13)
         .map { Random.nextInt(65, 70).toChar() }
@@ -328,12 +331,23 @@ fun generateAgent(): String {
     return "$randomText-$agentId APP/com.android.updater APPV/8.5.2"
 }
 
+/** Generate random deviceId.
+ *
+ * @return deviceId
+ */
 fun generateDeviceId(): String {
     return (1..6)
         .map { Random.nextInt(97, 123).toChar() }
         .joinToString("")
 }
 
+/** Generate clientSign for getServiceToken.
+ *
+ * @param code: Code from authorize data
+ * @param ssecurity: Ssecurity from authorize data
+ *
+ * @return clientSign
+ */
 suspend fun generateClientSign(code: Int, ssecurity: String): String {
     val input = "nonce=$code&$ssecurity"
     val sha1Digest = sha1Hash(input).encodeToByteArray()
