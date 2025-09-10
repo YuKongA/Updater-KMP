@@ -147,10 +147,8 @@ suspend fun serviceLogin(
     val response = client.get(serviceLoginUrl) {
         parameter("sid", sid)
         parameter("_json", true)
-        cookie("sdkVersion", "accountsdk-18.8.15", domain = "mi.com")
-        cookie("sdkVersion", "accountsdk-18.8.15", domain = "xiaomi.com")
-        cookie("deviceId", deviceId, domain = "mi.com")
-        cookie("deviceId", deviceId, domain = "xiaomi.com")
+        cookie("sdkVersion", "accountsdk-18.8.15")
+        cookie("deviceId", deviceId)
         cookie("userId", account)
         header("User-Agent", agent)
         header("Content-Type", "application/x-www-form-urlencoded")
@@ -230,10 +228,8 @@ suspend fun serviceLoginAuth2(
     val sid = if (global) "miuiota_intl" else "miuiromota"
 
     val response = client.post(serviceLoginAuth2Url) {
-        cookie("sdkVersion", "accountsdk-18.8.15", domain = "mi.com")
-        cookie("sdkVersion", "accountsdk-18.8.15", domain = "xiaomi.com")
-        cookie("deviceId", deviceId, domain = "mi.com")
-        cookie("deviceId", deviceId, domain = "xiaomi.com")
+        cookie("sdkVersion", "accountsdk-18.8.15")
+        cookie("deviceId", deviceId)
         header("User-Agent", agent)
         header("Content-Type", "application/x-www-form-urlencoded")
         parameter("sid", sid)
@@ -308,10 +304,8 @@ suspend fun getServiceToken(
     val clientSign = generateClientSign(code, ssecurity)
     println("Login: clientSign: $clientSign")
     val response = client.get(locationUrl) {
-        cookie("sdkVersion", "accountsdk-18.8.15", domain = "mi.com")
-        cookie("sdkVersion", "accountsdk-18.8.15", domain = "xiaomi.com")
-        cookie("deviceId", deviceId, domain = "mi.com")
-        cookie("deviceId", deviceId, domain = "xiaomi.com")
+        cookie("sdkVersion", "accountsdk-18.8.15")
+        cookie("deviceId", deviceId)
         header("User-Agent", agent)
         header("Content-Type", "application/x-www-form-urlencoded")
         parameter("_userIdNeedEncrypt", true)
@@ -359,10 +353,8 @@ suspend fun verifyTicket(
     val path = "identity/authStart"
     val listUrl = verifyUrl.replace(path, "identity/list")
     val resp = client.get(listUrl) {
-        cookie("sdkVersion", "accountsdk-18.8.15", domain = "mi.com")
-        cookie("sdkVersion", "accountsdk-18.8.15", domain = "xiaomi.com")
-        cookie("deviceId", deviceId, domain = "mi.com")
-        cookie("deviceId", deviceId, domain = "xiaomi.com")
+        cookie("sdkVersion", "accountsdk-18.8.15")
+        cookie("deviceId", deviceId)
         header("User-Agent", agent)
         header("Content-Type", "application/x-www-form-urlencoded")
     }
@@ -389,10 +381,8 @@ suspend fun verifyTicket(
         println("Login: apiUrl: $apiUrl")
 
         val response = client.post(apiUrl) {
-            cookie("sdkVersion", "accountsdk-18.8.15", domain = "mi.com")
-            cookie("sdkVersion", "accountsdk-18.8.15", domain = "xiaomi.com")
-            cookie("deviceId", deviceId, domain = "mi.com")
-            cookie("deviceId", deviceId, domain = "xiaomi.com")
+            cookie("sdkVersion", "accountsdk-18.8.15")
+            cookie("deviceId", deviceId)
             cookie("identity_session", identitySession)
             header("User-Agent", agent)
             header("Content-Type", "application/x-www-form-urlencoded")
