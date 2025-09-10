@@ -3,15 +3,16 @@ import data.DataHelper
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.cookie
+import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.get
-import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
-import io.ktor.client.request.setBody
 import io.ktor.client.statement.request
-import io.ktor.http.Parameters
-import io.ktor.http.formUrlEncode
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import io.ktor.http.parameters
+import io.ktor.http.userAgent
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
@@ -149,8 +150,8 @@ suspend fun serviceLogin(
 
     val response = client.get(serviceLoginUrl) {
         cookie("userId", account)
-        header("User-Agent", agent)
-        header("Content-Type", "application/x-www-form-urlencoded")
+        contentType(ContentType.Application.FormUrlEncoded)
+        userAgent(agent)
         parameter("sid", sid)
         parameter("_json", true)
     }
@@ -229,8 +230,8 @@ suspend fun serviceLoginAuth2(
     val sid = if (global) "miuiota_intl" else "miuiromota"
 
     val response = client.post(serviceLoginAuth2Url) {
-        header("User-Agent", agent)
-        header("Content-Type", "application/x-www-form-urlencoded")
+        contentType(ContentType.Application.FormUrlEncoded)
+        userAgent(agent)
         parameter("sid", sid)
         parameter("_json", "true")
         parameter("_sign", _sign)
@@ -381,21 +382,21 @@ suspend fun verifyTicket(
     )
     val filteredApiMap = apiMap.filterKeys { data.options?.contains(it) == true }
 
-    for ((apiInt, apiPath) in filteredApiMap) {
+    for ((apiFlag, apiPath) in filteredApiMap) {
         val apiUrl = "$accountUrl$apiPath"
         println("Login: apiUrl: $apiUrl")
 
-        val parameters = Parameters.build {
+        val parameters = parameters {
+            append("_flag", apiFlag.toString())
             append("ticket", ticket)
-            append("_flag", apiInt.toString())
             append("trust", "true")
             append("_json", "true")
-        }.formUrlEncode()
+        }
+        println("Login: parameters: $parameters")
 
-        val response = client.post(apiUrl) {
+        val response = client.submitForm(apiUrl, parameters) {
             cookie("identity_session", identitySession)
-            parameter("_dc", Clock.System.now().toEpochMilliseconds().toString())
-            setBody(parameters)
+            parameter("_dc", Clock.System.now().toEpochMilliseconds())
         }
         response.request.headers.entries().forEach { (key, values) ->
             println("Login: getServiceToken Header: $key = ${values.joinToString(", ")}")
