@@ -1,8 +1,7 @@
 import androidx.compose.runtime.MutableState
 import data.DataHelper
 import io.ktor.client.call.body
-import io.ktor.client.request.forms.FormDataContent
-import io.ktor.client.request.post
+import io.ktor.client.request.forms.submitForm
 import io.ktor.http.Parameters
 import io.ktor.utils.io.InternalAPI
 import kotlinx.serialization.json.Json
@@ -111,9 +110,7 @@ suspend fun getRecoveryRomInfo(
     }
     val recoveryUrl = if (accountType != "CN") INTL_RECOVERY_URL else CN_RECOVERY_URL
     try {
-        val response = client.post(recoveryUrl) {
-            body = FormDataContent(parameters)
-        }
+        val response = client.submitForm(recoveryUrl, parameters)
         val requestedEncryptedText = response.body<String>()
         client.close()
         return miuiDecrypt(requestedEncryptedText, securityKey)

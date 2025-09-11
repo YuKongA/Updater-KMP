@@ -89,17 +89,11 @@ suspend fun login(
                 ticket = ticket
             )
             if (!handle2FATicket) return 3
-            val serviceLogin = serviceLogin(
-                client = client,
-                account = account,
-                global = global
-            )
-            return serviceLogin
         }
         val serviceLogin = serviceLogin(
             client = client,
-            account = account,
-            global = global
+            global = global,
+            isLogin = isLogin
         )
         if (serviceLogin == 0) return serviceLogin
         val serviceLoginAuth2 = serviceLoginAuth2(
@@ -139,15 +133,14 @@ fun logout(isLogin: MutableState<Int>): Boolean {
  */
 suspend fun serviceLogin(
     client: HttpClient,
-    account: String,
-    global: Boolean
+    global: Boolean,
+    isLogin: MutableState<Int>,
 ): Int {
     val sid = if (global) "miuiota_intl" else "miuiromota"
 
     val response = client.get(serviceLoginUrl) {
         contentType(ContentType.Application.FormUrlEncoded)
         userAgent(userAgent)
-        header("Cookie", "userId=$account")
         parameter("sid", sid)
         parameter("_json", true)
     }
@@ -158,21 +151,23 @@ suspend fun serviceLogin(
         println("Login: serviceLogin Header: $key = ${values.joinToString(", ")}")
     }
     val body = response.body<String>().removePrefix("&&&START&&&")
-    val elem = json.parseToJsonElement(body)
-    println("Login: elem: $elem")
+    val element = json.parseToJsonElement(body)
+    println("Login: elem: $element")
+    var location: String? = null
+    var code: String? = null
     var ssecurity: String? = null
     var userId: String? = null
-    var location: String? = null
-    if (elem is JsonObject) {
-        _sign = elem["_sign"]?.jsonPrimitive?.contentOrNull
-        ssecurity = elem["ssecurity"]?.jsonPrimitive?.contentOrNull
-        userId = elem["userId"]?.jsonPrimitive?.contentOrNull
-        location = elem["location"]?.jsonPrimitive?.contentOrNull
+    if (element is JsonObject) {
+        _sign = element["_sign"]?.jsonPrimitive?.contentOrNull
+        location = element["location"]?.jsonPrimitive?.contentOrNull
+        code = element["code"]?.jsonPrimitive?.contentOrNull
+        ssecurity = element["ssecurity"]?.jsonPrimitive?.contentOrNull
+        userId = element["userId"]?.jsonPrimitive?.contentOrNull
     }
 
     // 无需密码登录
-    if (!ssecurity.isNullOrEmpty() && !userId.isNullOrEmpty() && !location.isNullOrEmpty()) {
-        val authorizeData = DataHelper.AuthorizeData(ssecurity = ssecurity, userId = userId.toLong(), location = location)
+    if (!location.isNullOrEmpty() && !code.isNullOrEmpty() && !ssecurity.isNullOrEmpty() && !userId.isNullOrEmpty()) {
+        val authorizeData = DataHelper.AuthorizeData(location = location, code = code.toInt(), ssecurity = ssecurity, userId = userId.toLong())
         println("Login: ssecurity: $ssecurity, userId: $userId, location: $location")
         val serviceToken = getServiceToken(client, authorizeData)
         println("Login: serviceToken: $serviceToken")
@@ -187,6 +182,7 @@ suspend fun serviceLogin(
         println("Login: loginInfo: $loginInfo")
         prefSet("loginInfo", json.encodeToString(loginInfo))
         closeHttpClient()
+        isLogin.value = 1
         return 0
     }
     println("Login: sign: $_sign")
@@ -380,33 +376,32 @@ suspend fun getServiceToken(
     client: HttpClient,
     authorizeData: DataHelper.AuthorizeData
 ): String? {
-    val locationUrl = authorizeData.location!!
-    println("Login: locationUrl: $locationUrl")
+    println("Login: authorizeData: $authorizeData")
     val code = authorizeData.code!!
     val ssecurity = authorizeData.ssecurity!!
     val clientSign = generateClientSign(code, ssecurity)
     println("Login: clientSign: $clientSign")
+    val locationUrl = authorizeData.location!!
     val response = client.get(locationUrl) {
         parameter("_userIdNeedEncrypt", true)
         parameter("clientSign", clientSign)
     }
+    println("Login: getServiceToken Set-Cookie: ${response.headers["Set-Cookie"]}")
     response.request.headers.entries().forEach { (key, values) ->
-        println("Login: getServiceToken Header: $key = ${values.joinToString(", ")}")
+        println("Login: getServiceToken Request Header: $key = ${values.joinToString(", ")}")
     }
-    val serviceToken = response.headers["Set-Cookie"]
+    val serviceToken = response.request.headers["Cookie"]
         ?.split(";")
         ?.map { it.trim() }
         ?.firstOrNull { it.startsWith("serviceToken=") }
         ?.removePrefix("serviceToken=")
-        ?: ""
-    return serviceToken.ifEmpty {
-        response.request.headers["Cookie"]
+        ?: response.headers["Set-Cookie"]
             ?.split(";")
             ?.map { it.trim() }
             ?.firstOrNull { it.startsWith("serviceToken=") }
             ?.removePrefix("serviceToken=")
-            ?: ""
-    }
+        ?: ""
+    return serviceToken
 }
 
 /** Generate random User-Agent.
@@ -431,7 +426,7 @@ fun generateUserAgent(): String {
  * @return clientSign
  */
 suspend fun generateClientSign(code: Int, ssecurity: String): String {
-    val input = "nonce=$code&$ssecurity"
+    val input = "code=$code&$ssecurity"
     val sha1Digest = sha1Hash(input).encodeToByteArray()
     return Base64.UrlSafe.encode(sha1Digest)
 }
