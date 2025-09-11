@@ -70,6 +70,7 @@
     <string name="device_list_version">版本</string>
     <string name="login_tips1">检测到二次认证，请点击获取验证码按钮</string>
     <string name="login_tips2">需要输入验证码，请点击获取验证码按钮</string>
+    <string name="verification_code">验证码</string>
     <string name="verification_code_get">获取验证码</string>
     <string name="verifying">验证中...</string>
     <string name="opensource_info">版权所有 © 2024-2025 YuKongA</string>
