@@ -1,6 +1,7 @@
 import androidx.compose.runtime.MutableState
 import data.DataHelper
 import io.ktor.client.call.body
+import io.ktor.client.request.cookie
 import io.ktor.client.request.forms.submitForm
 import io.ktor.http.Parameters
 import io.ktor.utils.io.InternalAPI
@@ -22,6 +23,7 @@ var security = ""
 var securityKey = "miuiotavalided11".encodeToByteArray()
 var serviceToken = ""
 var userId = ""
+var cUserId = ""
 
 /**
  * Generate JSON data for recovery ROM info request.
@@ -97,6 +99,7 @@ suspend fun getRecoveryRomInfo(
             securityKey = Base64.Mime.decode(security)
             serviceToken = loginInfo?.serviceToken.toString()
             userId = loginInfo?.userId.toString()
+            cUserId = loginInfo?.cUserId.toString()
         } else setDefaultRequestInfo()
     } else setDefaultRequestInfo()
 
@@ -110,7 +113,13 @@ suspend fun getRecoveryRomInfo(
     }
     val recoveryUrl = if (accountType != "CN") INTL_RECOVERY_URL else CN_RECOVERY_URL
     try {
-        val response = client.submitForm(recoveryUrl, parameters)
+        val response = client.submitForm(recoveryUrl, parameters) {
+            if (serviceToken.isNotEmpty() && cUserId.isNotEmpty()) {
+                cookie("serviceToken", serviceToken)
+                cookie("uid", cUserId)
+                cookie("s", "1")
+            }
+        }
         val requestedEncryptedText = response.body<String>()
         client.close()
         return miuiDecrypt(requestedEncryptedText, securityKey)

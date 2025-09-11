@@ -157,16 +157,18 @@ suspend fun serviceLogin(
     var code: String? = null
     var ssecurity: String? = null
     var userId: String? = null
+    var cUserId: String? = null
     if (element is JsonObject) {
         _sign = element["_sign"]?.jsonPrimitive?.contentOrNull
         location = element["location"]?.jsonPrimitive?.contentOrNull
         code = element["code"]?.jsonPrimitive?.contentOrNull
         ssecurity = element["ssecurity"]?.jsonPrimitive?.contentOrNull
         userId = element["userId"]?.jsonPrimitive?.contentOrNull
+        cUserId = element["cUserId"]?.jsonPrimitive?.contentOrNull
     }
 
     // 无需密码登录
-    if (!location.isNullOrEmpty() && !code.isNullOrEmpty() && !ssecurity.isNullOrEmpty() && !userId.isNullOrEmpty()) {
+    if (!location.isNullOrEmpty() && !code.isNullOrEmpty() && !ssecurity.isNullOrEmpty() && !userId.isNullOrEmpty() && !cUserId.isNullOrEmpty()) {
         val authorizeData = DataHelper.AuthorizeData(location = location, code = code.toInt(), ssecurity = ssecurity, userId = userId.toLong())
         println("Login: ssecurity: $ssecurity, userId: $userId, location: $location")
         val serviceToken = getServiceToken(client, authorizeData)
@@ -177,7 +179,8 @@ suspend fun serviceLogin(
             description = "成功",
             ssecurity = ssecurity,
             serviceToken = serviceToken,
-            userId = userId
+            userId = userId,
+            cUserId = cUserId
         )
         println("Login: loginInfo: $loginInfo")
         prefSet("loginInfo", json.encodeToString(loginInfo))
@@ -265,7 +268,8 @@ suspend fun serviceLoginAuth2(
         description = "成功",
         ssecurity = authJson.ssecurity,
         serviceToken = serviceToken,
-        userId = authJson.userId.toString()
+        userId = authJson.userId.toString(),
+        cUserId = authJson.cUserId.toString()
     )
     println("Login: loginInfo: $loginInfo")
     prefSet("loginInfo", json.encodeToString(loginInfo))

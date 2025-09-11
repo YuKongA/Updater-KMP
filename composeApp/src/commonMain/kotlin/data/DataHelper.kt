@@ -11,6 +11,7 @@ object DataHelper {
         val result: String? = null,
         val ssecurity: String? = null,
         val userId: Long? = null,
+        val cUserId: String? = null,
         val notificationUrl: String? = null,
         val captchaUrl: String? = null,
     )
@@ -31,6 +32,7 @@ object DataHelper {
         val ssecurity: String? = null,
         val serviceToken: String? = null,
         val userId: String? = null,
+        val cUserId: String? = null,
     )
 
     @Serializable
