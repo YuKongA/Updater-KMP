@@ -68,7 +68,6 @@ import updater.composeapp.generated.resources.save_password
 import updater.composeapp.generated.resources.security_error
 import updater.composeapp.generated.resources.submit
 import updater.composeapp.generated.resources.toast_crash_info
-import updater.composeapp.generated.resources.verification_code
 import updater.composeapp.generated.resources.verification_code_get
 import updater.composeapp.generated.resources.verifying
 
@@ -238,7 +237,6 @@ fun LoginDialog(
                         TextField(
                             value = ticket,
                             onValueChange = { ticket = it },
-                            label = stringResource(Res.string.verification_code),
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -271,7 +269,6 @@ fun LoginDialog(
                                                 prefRemove("notificationUrl")
                                                 showTicketInput = false
                                                 showTicketUrl = false
-                                                showDialog.value = false
                                             } else {
                                                 showMessage(messageError)
                                             }
@@ -295,7 +292,6 @@ fun LoginDialog(
                                                 prefRemove("captchaUrl")
                                                 showCaptchaInput = false
                                                 showCaptchaUrl = false
-                                                showDialog.value = false
                                             } else {
                                                 showMessage(messageError)
                                             }
