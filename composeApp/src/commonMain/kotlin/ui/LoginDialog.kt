@@ -185,7 +185,7 @@ fun LoginDialog(
                         visible = !showCaptchaInput
                     ) {
                         TextButton(
-                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
                             text = stringResource(Res.string.verification_code_get),
                             onClick = {
                                 showCaptchaInput = true
@@ -216,7 +216,7 @@ fun LoginDialog(
                     ) {
                         val uriHandler = LocalUriHandler.current
                         TextButton(
-                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
                             text = stringResource(Res.string.verification_code_get),
                             onClick = {
                                 val notificationUrl = prefGet("notificationUrl")
@@ -358,7 +358,7 @@ fun LoginDialog(
 
                 // 登录 & 取消
                 AnimatedVisibility(
-                    visible = !showTicketUrl && !showCaptchaUrl && !showTicketInput && !showCaptchaInput
+                    visible = !showTicketInput && !showCaptchaInput
                 ) {
                     Row {
                         TextButton(
