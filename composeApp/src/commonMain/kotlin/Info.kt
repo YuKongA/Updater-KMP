@@ -19,7 +19,7 @@ val INTL_RECOVERY_URL =
     if (isWeb()) "https://updater.yukonga.top/intl-updates/miotaV3.php" else "https://update.intl.miui.com/updates/miotaV3.php"
 var accountType = "CN"
 var port = "1"
-var security = ""
+var ssecurity = ""
 var securityKey = "miuiotavalided11".encodeToByteArray()
 var serviceToken = ""
 var userId = ""
@@ -95,15 +95,15 @@ suspend fun getRecoveryRomInfo(
         if (authResult != "3") {
             accountType = loginInfo?.accountType.toString().ifEmpty { "CN" }
             port = "2"
-            security = loginInfo?.ssecurity.toString()
-            securityKey = Base64.Mime.decode(security)
+            ssecurity = loginInfo?.ssecurity.toString()
+            securityKey = Base64.Mime.decode(ssecurity)
             serviceToken = loginInfo?.serviceToken.toString()
             userId = loginInfo?.userId.toString()
             cUserId = loginInfo?.cUserId.toString()
         } else setDefaultRequestInfo()
     } else setDefaultRequestInfo()
 
-    val jsonData = generateJson(branch, codeNameExt, regionCode, romVersion, androidVersion, userId, security, serviceToken)
+    val jsonData = generateJson(branch, codeNameExt, regionCode, romVersion, androidVersion, userId, ssecurity, serviceToken)
     val encryptedText = miuiEncrypt(jsonData, securityKey)
     val client = httpClientPlatform()
     val parameters = Parameters.build {
@@ -121,6 +121,7 @@ suspend fun getRecoveryRomInfo(
             }
         }
         val requestedEncryptedText = response.body<String>()
+        println("Requested encrypted text: $requestedEncryptedText")
         client.close()
         return miuiDecrypt(requestedEncryptedText, securityKey)
     } catch (e: Exception) {
@@ -135,7 +136,7 @@ suspend fun getRecoveryRomInfo(
 fun setDefaultRequestInfo() {
     accountType = "CN"
     port = "1"
-    security = ""
+    ssecurity = ""
     securityKey = "miuiotavalided11".encodeToByteArray()
     serviceToken = ""
     userId = ""

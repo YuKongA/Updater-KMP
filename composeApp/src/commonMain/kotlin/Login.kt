@@ -17,7 +17,6 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import misc.json
 import misc.md5Hash
-import misc.sha1Hash
 import platform.generateKey
 import platform.httpClientPlatform
 import platform.ownDecrypt
@@ -27,7 +26,6 @@ import platform.prefRemove
 import platform.prefSet
 import top.yukonga.miuix.kmp.utils.Platform
 import top.yukonga.miuix.kmp.utils.platform
-import kotlin.io.encoding.Base64
 import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -169,9 +167,8 @@ suspend fun serviceLogin(
 
     // 无需密码登录
     if (!location.isNullOrEmpty() && !code.isNullOrEmpty() && !ssecurity.isNullOrEmpty() && !userId.isNullOrEmpty() && !cUserId.isNullOrEmpty()) {
-        val authorizeData = DataHelper.AuthorizeData(location = location, code = code.toInt(), ssecurity = ssecurity, userId = userId.toLong())
         println("Login: ssecurity: $ssecurity, userId: $userId, location: $location")
-        val serviceToken = getServiceToken(client, authorizeData)
+        val serviceToken = getServiceToken(client, location)
         println("Login: serviceToken: $serviceToken")
         val loginInfo = DataHelper.LoginData(
             accountType = if (global) "GL" else "CN",
@@ -259,7 +256,7 @@ suspend fun serviceLoginAuth2(
         return 4 // 4: 未返回 location
     }
 
-    val serviceToken = getServiceToken(client, authJson)
+    val serviceToken = getServiceToken(client, authJson.location)
     println("Login: serviceToken: $serviceToken")
 
     val loginInfo = DataHelper.LoginData(
@@ -370,25 +367,18 @@ suspend fun verifyTicket(
 }
 
 
-/** Get serviceToken from authorize data.
+/** Get serviceToken from location URL.
  *
- * @param authorizeData: Data from serviceLogin or serviceLoginAuth2
+ * @param location: Location URL
  *
  * @return serviceToken
  */
 suspend fun getServiceToken(
     client: HttpClient,
-    authorizeData: DataHelper.AuthorizeData
+    location: String
 ): String? {
-    println("Login: authorizeData: $authorizeData")
-    val code = authorizeData.code!!
-    val ssecurity = authorizeData.ssecurity!!
-    val clientSign = generateClientSign(code, ssecurity)
-    println("Login: clientSign: $clientSign")
-    val locationUrl = authorizeData.location!!
-    val response = client.get(locationUrl) {
+    val response = client.get(location) {
         parameter("_userIdNeedEncrypt", true)
-        parameter("clientSign", clientSign)
     }
     println("Login: getServiceToken Set-Cookie: ${response.headers["Set-Cookie"]}")
     response.request.headers.entries().forEach { (key, values) ->
@@ -420,19 +410,6 @@ fun generateUserAgent(): String {
         .map { Random.nextInt(97, 123).toChar() }
         .joinToString("")
     return "$randomText-$agentId APP/com.android.updater APPV/8.5.2"
-}
-
-/** Generate clientSign for getServiceToken.
- *
- * @param code: Code from authorize data
- * @param ssecurity: Ssecurity from authorize data
- *
- * @return clientSign
- */
-suspend fun generateClientSign(code: Int, ssecurity: String): String {
-    val input = "code=$code&$ssecurity"
-    val sha1Digest = sha1Hash(input).encodeToByteArray()
-    return Base64.UrlSafe.encode(sha1Digest)
 }
 
 /**
