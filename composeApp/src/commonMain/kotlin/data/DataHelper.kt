@@ -83,7 +83,7 @@ object DataHelper {
 
     @Serializable
     data class VerifyTicketData(
-        val code: Int,
-        val location: String? = null
+        val code: Int? = null,
+        val location: String? = null,
     )
 }
