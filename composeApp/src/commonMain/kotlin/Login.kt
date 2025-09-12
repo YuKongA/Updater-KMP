@@ -128,7 +128,9 @@ suspend fun serviceLoginAuth2(
         append("_locale", if (global) "en_US" else "zh_CN")
         if (captcha.isNotEmpty()) append("captCode", captcha)
     }
-    val response = client.submitForm(serviceLoginAuth2Url, parameters) {
+    val response = client.config {
+        followRedirects = false
+    }.submitForm(serviceLoginAuth2Url, parameters) {
         contentType(ContentType.Application.FormUrlEncoded)
         compress("gzip")
         userAgent(userAgent)
