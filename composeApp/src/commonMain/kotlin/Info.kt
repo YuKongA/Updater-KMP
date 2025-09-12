@@ -1,10 +1,8 @@
 import androidx.compose.runtime.MutableState
 import data.DataHelper
 import io.ktor.client.call.body
-import io.ktor.client.plugins.compression.compress
+import io.ktor.client.request.cookie
 import io.ktor.client.request.forms.submitForm
-import io.ktor.client.request.header
-import io.ktor.client.statement.request
 import io.ktor.http.Parameters
 import io.ktor.utils.io.InternalAPI
 import kotlinx.serialization.json.Json
@@ -13,8 +11,12 @@ import platform.httpClientPlatform
 import platform.miuiDecrypt
 import platform.miuiEncrypt
 import platform.prefGet
+import top.yukonga.miuix.kmp.utils.Platform
+import top.yukonga.miuix.kmp.utils.platform
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
+
+fun isWeb(): Boolean = platform() == Platform.WasmJs || platform() == Platform.Js
 
 val CN_RECOVERY_URL = if (isWeb()) "https://updater.yukonga.top/updates/miotaV3.php" else "https://update.miui.com/updates/miotaV3.php"
 val INTL_RECOVERY_URL =
@@ -108,7 +110,6 @@ suspend fun getRecoveryRomInfo(
     val jsonData = generateJson(branch, codeNameExt, regionCode, romVersion, androidVersion, userId, ssecurity, serviceToken)
     val encryptedText = miuiEncrypt(jsonData, securityKey)
     val client = httpClientPlatform()
-    println("Requesting encryptedText: $encryptedText")
     val parameters = Parameters.build {
         append("q", encryptedText)
         append("t", serviceToken)
@@ -117,19 +118,13 @@ suspend fun getRecoveryRomInfo(
     val recoveryUrl = if (accountType != "CN") INTL_RECOVERY_URL else CN_RECOVERY_URL
     try {
         val response = client.submitForm(recoveryUrl, parameters) {
-            compress("gzip")
             if (serviceToken.isNotEmpty() && cUserId.isNotEmpty()) {
-                header("Cookie", "serviceToken=$serviceToken; uid=$cUserId; s=1")
+                cookie("serviceToken", serviceToken)
+                cookie("uid", cUserId)
+                cookie("s", "1")
             }
         }
-        response.request.headers.entries().forEach { (key, values) ->
-            println("Login: getRecoveryRomInfo Request Header: $key = ${values.joinToString(", ")}")
-        }
-        response.headers.entries().forEach { (key, values) ->
-            println("Login: getRecoveryRomInfo Header: $key = ${values.joinToString(", ")}")
-        }
         val requestedEncryptedText = response.body<String>()
-        println("Requested encrypted text: $requestedEncryptedText")
         client.close()
         return miuiDecrypt(requestedEncryptedText, securityKey)
     } catch (e: Exception) {

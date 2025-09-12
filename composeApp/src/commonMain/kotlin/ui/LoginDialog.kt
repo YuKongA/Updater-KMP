@@ -1,5 +1,6 @@
 package ui
 
+import Login
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -31,8 +32,6 @@ import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.rememberImagePainter
 import getPassword
 import kotlinx.coroutines.launch
-import login
-import logout
 import misc.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
 import platform.prefGet
@@ -198,6 +197,7 @@ fun LoginDialog(
                         visible = showCaptchaInput
                     ) {
                         val captchaUrl = "https://account.xiaomi.com" + prefGet("captchaUrl")
+                        println("Captcha URL: $captchaUrl")
                         Image(
                             modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                             painter = rememberImagePainter(captchaUrl),
@@ -257,7 +257,7 @@ fun LoginDialog(
                                         // 提交二次认证验证码
                                         coroutineScope.launch {
                                             isVerifying = true
-                                            val int = login(
+                                            val int = Login().login(
                                                 account = account,
                                                 password = password,
                                                 global = global,
@@ -281,7 +281,7 @@ fun LoginDialog(
                                         // 提交图片验证码
                                         coroutineScope.launch {
                                             isVerifying = true
-                                            val int = login(
+                                            val int = Login().login(
                                                 account = account,
                                                 password = password,
                                                 global = global,
@@ -368,7 +368,7 @@ fun LoginDialog(
                             onClick = {
                                 showMessage(message = messageLoginIn)
                                 coroutineScope.launch {
-                                    val int = login(
+                                    val int = Login().login(
                                         account = account,
                                         password = password,
                                         global = global,
@@ -436,7 +436,7 @@ fun LoginDialog(
                     colors = ButtonDefaults.textButtonColorsPrimary(),
                     onClick = {
                         coroutineScope.launch {
-                            val boolean = logout(isLogin)
+                            val boolean = Login().logout(isLogin)
                             if (boolean) showMessage(message = messageLogoutSuccessful)
                         }
                         showDialog.value = false

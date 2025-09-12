@@ -76,16 +76,4 @@ object DataHelper {
         var securityPatchLevel: String = "",
         var timestamp: String = "",
     )
-
-    @Serializable
-    data class IdentityListData(
-        val flag: Int? = null,
-        val options: List<Int>? = null
-    )
-
-    @Serializable
-    data class VerifyTicketData(
-        val code: Int? = null,
-        val location: String? = null,
-    )
 }
