@@ -10,7 +10,6 @@ import data.DeviceInfoHelper
 import data.RomInfoHelper
 import dev.whyoleg.cryptography.DelicateCryptographyApi
 import dev.whyoleg.cryptography.algorithms.MD5
-import dev.whyoleg.cryptography.algorithms.SHA1
 import getRecoveryRomInfo
 import isWeb
 import kotlinx.coroutines.CoroutineScope
@@ -342,15 +341,6 @@ fun downloadUrl(romVersion: String?, romFilename: String?): String {
 suspend fun md5Hash(input: String): String {
     val md = provider().get(MD5)
     return md.hasher().hash(input.encodeToByteArray()).joinToString("") {
-        val hex = (it.toInt() and 0xFF).toString(16).uppercase()
-        if (hex.length == 1) "0$hex" else hex
-    }
-}
-
-@OptIn(DelicateCryptographyApi::class)
-suspend fun sha1Hash(input: String): String {
-    val sha1 = provider().get(SHA1)
-    return sha1.hasher().hash(input.encodeToByteArray()).joinToString("") {
         val hex = (it.toInt() and 0xFF).toString(16).uppercase()
         if (hex.length == 1) "0$hex" else hex
     }
