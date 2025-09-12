@@ -97,7 +97,7 @@ fun App(
         val codeName = remember { mutableStateOf(prefGet("codeName") ?: "") }
         val deviceRegion = remember { mutableStateOf(prefGet("deviceRegion") ?: "Default (CN)") }
         val deviceCarrier = remember { mutableStateOf(prefGet("deviceCarrier") ?: "Default (Xiaomi)") }
-        val androidVersion = remember { mutableStateOf(prefGet("androidVersion") ?: "15.0") }
+        val androidVersion = remember { mutableStateOf(prefGet("androidVersion") ?: "16.0") }
         val systemVersion = remember { mutableStateOf(prefGet("systemVersion") ?: "") }
 
         val loginData = prefGet("loginInfo")?.let { json.decodeFromString<DataHelper.LoginData>(it) }
