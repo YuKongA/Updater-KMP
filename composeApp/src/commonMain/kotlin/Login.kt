@@ -13,9 +13,6 @@ import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import io.ktor.http.parameters
 import io.ktor.http.userAgent
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.jsonPrimitive
 import misc.json
 import misc.md5Hash
 import platform.generateKey
@@ -32,12 +29,10 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 private const val accountUrl = "https://account.xiaomi.com"
-private const val serviceLoginUrl = "$accountUrl/pass/serviceLogin"
 private const val serviceLoginAuth2Url = "$accountUrl/pass/serviceLoginAuth2"
 
 private var globalClient: HttpClient? = null
 private val userAgent = generateUserAgent()
-private var _sign: String? = ""
 
 fun isWeb(): Boolean = platform() == Platform.WasmJs || platform() == Platform.Js
 
@@ -70,18 +65,6 @@ suspend fun login(
     }
     val client = globalClient ?: httpClientPlatform().also { globalClient = it }
     try {
-        if (captcha.isNotEmpty()) {
-            val serviceLoginAuth2 = serviceLoginAuth2(
-                client = client,
-                account = account,
-                password = password,
-                global = global,
-                isLogin = isLogin,
-                _sign = _sign!!,
-                captcha = captcha,
-            )
-            return serviceLoginAuth2
-        }
         if (ticket.isNotEmpty()) {
             val handle2FATicket = handle2FATicket(
                 client = client,
@@ -89,19 +72,12 @@ suspend fun login(
             )
             if (!handle2FATicket) return 3
         }
-        val serviceLogin = serviceLogin(
-            client = client,
-            global = global,
-            isLogin = isLogin
-        )
-        if (serviceLogin == 0) return serviceLogin
         val serviceLoginAuth2 = serviceLoginAuth2(
             client = client,
             account = account,
             password = password,
             global = global,
             isLogin = isLogin,
-            _sign = _sign!!,
             captcha = captcha,
         )
         return serviceLoginAuth2
@@ -124,81 +100,11 @@ fun logout(isLogin: MutableState<Int>): Boolean {
 }
 
 /**
- * Service login Xiaomi account without password.
- *
- * @param global: Global or China account
- *
- * @return Login status
- */
-suspend fun serviceLogin(
-    client: HttpClient,
-    global: Boolean,
-    isLogin: MutableState<Int>,
-): Int {
-    val sid = if (global) "miuiota_intl" else "miuiromota"
-
-    val response = client.get(serviceLoginUrl) {
-        contentType(ContentType.Application.FormUrlEncoded)
-        compress("gzip")
-        userAgent(userAgent)
-        parameter("sid", sid)
-        parameter("_json", true)
-    }
-    response.request.headers.entries().forEach { (key, values) ->
-        println("Login: serviceLogin Request Header: $key = ${values.joinToString(", ")}")
-    }
-    response.headers.entries().forEach { (key, values) ->
-        println("Login: serviceLogin Header: $key = ${values.joinToString(", ")}")
-    }
-    val body = response.body<String>().removePrefix("&&&START&&&")
-    val element = json.parseToJsonElement(body)
-    println("Login: elem: $element")
-    var location: String? = null
-    var code: String? = null
-    var ssecurity: String? = null
-    var userId: String? = null
-    var cUserId: String? = null
-    if (element is JsonObject) {
-        _sign = element["_sign"]?.jsonPrimitive?.contentOrNull
-        location = element["location"]?.jsonPrimitive?.contentOrNull
-        code = element["code"]?.jsonPrimitive?.contentOrNull
-        ssecurity = element["ssecurity"]?.jsonPrimitive?.contentOrNull
-        userId = element["userId"]?.jsonPrimitive?.contentOrNull
-        cUserId = element["cUserId"]?.jsonPrimitive?.contentOrNull
-    }
-
-    // 无需密码登录
-    if (!location.isNullOrEmpty() && !code.isNullOrEmpty() && !ssecurity.isNullOrEmpty() && !userId.isNullOrEmpty() && !cUserId.isNullOrEmpty()) {
-        println("Login: ssecurity: $ssecurity, userId: $userId, location: $location")
-        val serviceToken = getServiceToken(client, location)
-        println("Login: serviceToken: $serviceToken")
-        val loginInfo = DataHelper.LoginData(
-            accountType = if (global) "GL" else "CN",
-            authResult = "1",
-            description = "成功",
-            ssecurity = ssecurity,
-            serviceToken = serviceToken,
-            userId = userId,
-            cUserId = cUserId
-        )
-        println("Login: loginInfo: $loginInfo")
-        prefSet("loginInfo", json.encodeToString(loginInfo))
-        closeHttpClient()
-        isLogin.value = 1
-        return 0
-    }
-    println("Login: sign: $_sign")
-    _sign?.let { if (it.isNotEmpty()) return 1 }
-    return 2
-}
-
-/**
  * Service login Xiaomi account with password.
  *
  * @param password: Password
  * @param global: Global or China account
  * @param isLogin: Login status
- * @param _sign: _sign from serviceLogin
  * @param captcha: Captcha if needed
  *
  * @return Login status
@@ -209,7 +115,6 @@ suspend fun serviceLoginAuth2(
     password: String,
     global: Boolean,
     isLogin: MutableState<Int>,
-    _sign: String,
     captcha: String = "",
 ): Int {
     val md5Hash = md5Hash(password).uppercase()
@@ -218,7 +123,6 @@ suspend fun serviceLoginAuth2(
     val parameters = parameters {
         append("sid", sid)
         append("_json", "true")
-        append("_sign", _sign)
         append("user", account)
         append("hash", md5Hash)
         append("_locale", if (global) "en_US" else "zh_CN")
@@ -262,6 +166,10 @@ suspend fun serviceLoginAuth2(
     val serviceToken = getServiceToken(client, authJson.location)
     println("Login: serviceToken: $serviceToken")
 
+    if (serviceToken == "") {
+        return 4 // 4: 未返回 serviceToken
+    }
+
     val loginInfo = DataHelper.LoginData(
         accountType = if (global) "GL" else "CN",
         authResult = "1",
@@ -293,7 +201,6 @@ suspend fun handle2FATicket(
     val notificationUrl = prefGet("notificationUrl")
     if (notificationUrl != null && ticket.isNotBlank()) {
         val verifyData = verifyTicket(client, notificationUrl, ticket)
-        println("Login: verifyData: $verifyData")
         if (verifyData != null && verifyData.location != null) {
             println("Login: 2FA verify success, location: ${verifyData.location}")
             val response = client.get(verifyData.location) {
@@ -383,7 +290,7 @@ suspend fun verifyTicket(
 suspend fun getServiceToken(
     client: HttpClient,
     location: String
-): String? {
+): String {
     val response = client.get(location) {
         compress("gzip")
         parameter("_userIdNeedEncrypt", true)
@@ -392,16 +299,11 @@ suspend fun getServiceToken(
     response.request.headers.entries().forEach { (key, values) ->
         println("Login: getServiceToken Request Header: $key = ${values.joinToString(", ")}")
     }
-    val serviceToken = response.request.headers["Cookie"]
+    val serviceToken = response.headers["Set-Cookie"]
         ?.split(";")
         ?.map { it.trim() }
         ?.firstOrNull { it.startsWith("serviceToken=") }
         ?.removePrefix("serviceToken=")
-        ?: response.headers["Set-Cookie"]
-            ?.split(";")
-            ?.map { it.trim() }
-            ?.firstOrNull { it.startsWith("serviceToken=") }
-            ?.removePrefix("serviceToken=")
         ?: ""
     return serviceToken
 }
