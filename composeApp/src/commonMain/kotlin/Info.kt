@@ -1,8 +1,10 @@
 import androidx.compose.runtime.MutableState
 import data.DataHelper
 import io.ktor.client.call.body
-import io.ktor.client.request.cookie
+import io.ktor.client.plugins.compression.compress
 import io.ktor.client.request.forms.submitForm
+import io.ktor.client.request.header
+import io.ktor.client.statement.request
 import io.ktor.http.Parameters
 import io.ktor.utils.io.InternalAPI
 import kotlinx.serialization.json.Json
@@ -106,6 +108,7 @@ suspend fun getRecoveryRomInfo(
     val jsonData = generateJson(branch, codeNameExt, regionCode, romVersion, androidVersion, userId, ssecurity, serviceToken)
     val encryptedText = miuiEncrypt(jsonData, securityKey)
     val client = httpClientPlatform()
+    println("Requesting encryptedText: $encryptedText")
     val parameters = Parameters.build {
         append("q", encryptedText)
         append("t", serviceToken)
@@ -114,11 +117,16 @@ suspend fun getRecoveryRomInfo(
     val recoveryUrl = if (accountType != "CN") INTL_RECOVERY_URL else CN_RECOVERY_URL
     try {
         val response = client.submitForm(recoveryUrl, parameters) {
+            compress("gzip")
             if (serviceToken.isNotEmpty() && cUserId.isNotEmpty()) {
-                cookie("serviceToken", serviceToken)
-                cookie("uid", cUserId)
-                cookie("s", "1")
+                header("Cookie", "serviceToken=$serviceToken; uid=$cUserId; s=1")
             }
+        }
+        response.request.headers.entries().forEach { (key, values) ->
+            println("Login: getRecoveryRomInfo Request Header: $key = ${values.joinToString(", ")}")
+        }
+        response.headers.entries().forEach { (key, values) ->
+            println("Login: getRecoveryRomInfo Header: $key = ${values.joinToString(", ")}")
         }
         val requestedEncryptedText = response.body<String>()
         println("Requested encrypted text: $requestedEncryptedText")

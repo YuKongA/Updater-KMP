@@ -2,6 +2,7 @@ import androidx.compose.runtime.MutableState
 import data.DataHelper
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.compression.compress
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -138,6 +139,7 @@ suspend fun serviceLogin(
 
     val response = client.get(serviceLoginUrl) {
         contentType(ContentType.Application.FormUrlEncoded)
+        compress("gzip")
         userAgent(userAgent)
         parameter("sid", sid)
         parameter("_json", true)
@@ -224,6 +226,7 @@ suspend fun serviceLoginAuth2(
     }
     val response = client.submitForm(serviceLoginAuth2Url, parameters) {
         contentType(ContentType.Application.FormUrlEncoded)
+        compress("gzip")
         userAgent(userAgent)
     }
     response.request.headers.entries().forEach { (key, values) ->
@@ -295,6 +298,7 @@ suspend fun handle2FATicket(
             println("Login: 2FA verify success, location: ${verifyData.location}")
             val response = client.get(verifyData.location) {
                 contentType(ContentType.Application.FormUrlEncoded)
+                compress("gzip")
                 userAgent(userAgent)
             }
             response.request.headers.entries().forEach { (key, values) ->
@@ -317,7 +321,9 @@ suspend fun verifyTicket(
 ): DataHelper.VerifyTicketData? {
     val path = "identity/authStart"
     val listUrl = verifyUrl.replace(path, "identity/list")
-    val response = client.get(listUrl)
+    val response = client.get(listUrl) {
+        compress("gzip")
+    }
     if (!response.status.isSuccess()) return null
 
     val identitySession = response.headers["Set-Cookie"]
@@ -346,6 +352,7 @@ suspend fun verifyTicket(
             append("_json", "true")
         }
         val response = client.submitForm(apiUrl, parameters) {
+            compress("gzip")
             header("cookie", "identity_session=$identitySession")
             parameter("_dc", Clock.System.now().toEpochMilliseconds())
         }
@@ -378,6 +385,7 @@ suspend fun getServiceToken(
     location: String
 ): String? {
     val response = client.get(location) {
+        compress("gzip")
         parameter("_userIdNeedEncrypt", true)
     }
     println("Login: getServiceToken Set-Cookie: ${response.headers["Set-Cookie"]}")
