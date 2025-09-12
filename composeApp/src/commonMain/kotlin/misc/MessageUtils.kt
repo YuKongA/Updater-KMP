@@ -36,7 +36,6 @@ class MessageUtils {
             } else {
                 snackbarCoroutineJob?.cancel()
                 snackbarMessage.value = message
-                println("Snackbar message set to: ${snackbarMessage.value}")
                 snackbarDuration.value = duration
                 isSnackbarVisible.value = true
                 snackbarKey.value++

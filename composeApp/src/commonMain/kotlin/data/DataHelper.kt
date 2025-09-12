@@ -7,9 +7,13 @@ object DataHelper {
     data class AuthorizeData(
         val description: String? = null,
         val location: String? = null,
+        val code: Int? = null,
         val result: String? = null,
         val ssecurity: String? = null,
         val userId: Long? = null,
+        val cUserId: String? = null,
+        val notificationUrl: String? = null,
+        val captchaUrl: String? = null,
     )
 
     @Serializable
@@ -28,6 +32,7 @@ object DataHelper {
         val ssecurity: String? = null,
         val serviceToken: String? = null,
         val userId: String? = null,
+        val cUserId: String? = null,
     )
 
     @Serializable

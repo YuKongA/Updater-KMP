@@ -1,6 +1,6 @@
 [versions]
-android-gradle-plugin = "8.12.1"
-androidx-activity-compose = "1.10.1"
+android-gradle-plugin = "8.12.3"
+androidx-activity-compose = "1.11.0"
 compose-plugin = "1.8.2"
 cryptography = "0.5.0"
 haze = "1.6.10"
@@ -9,7 +9,7 @@ jna = "5.17.0"
 kotlin = "2.2.20"
 kotlinx-serialization-json = "1.9.0"
 kotlinx-datetime = "0.7.1"
-ktor-client = "3.2.3"
+ktor-client = "3.3.0"
 miuix = "0.5.1"
 
 [libraries]

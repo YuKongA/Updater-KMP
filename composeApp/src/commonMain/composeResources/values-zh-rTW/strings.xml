@@ -68,5 +68,10 @@
     <string name="device_list_updated">更新成功</string>
     <string name="device_list_update_failed">更新失敗</string>
     <string name="device_list_version">版本</string>
+    <string name="login_tips1">檢測到二次認證，請點擊獲取驗證碼按鈕</string>
+    <string name="login_tips2">需要輸入驗證碼，請點擊獲取驗證碼按鈕</string>
+    <string name="verification_code">驗證碼</string>
+    <string name="verification_code_get">獲取驗證碼</string>
+    <string name="verifying">驗證中...</string>
     <string name="opensource_info">版權所有 © 2024-2025 YuKongA</string>
 </resources>

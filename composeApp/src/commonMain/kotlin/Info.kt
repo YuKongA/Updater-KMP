@@ -1,8 +1,8 @@
 import androidx.compose.runtime.MutableState
 import data.DataHelper
 import io.ktor.client.call.body
-import io.ktor.client.request.forms.FormDataContent
-import io.ktor.client.request.post
+import io.ktor.client.request.cookie
+import io.ktor.client.request.forms.submitForm
 import io.ktor.http.Parameters
 import io.ktor.utils.io.InternalAPI
 import kotlinx.serialization.json.Json
@@ -11,18 +11,23 @@ import platform.httpClientPlatform
 import platform.miuiDecrypt
 import platform.miuiEncrypt
 import platform.prefGet
+import top.yukonga.miuix.kmp.utils.Platform
+import top.yukonga.miuix.kmp.utils.platform
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
+
+fun isWeb(): Boolean = platform() == Platform.WasmJs || platform() == Platform.Js
 
 val CN_RECOVERY_URL = if (isWeb()) "https://updater.yukonga.top/updates/miotaV3.php" else "https://update.miui.com/updates/miotaV3.php"
 val INTL_RECOVERY_URL =
     if (isWeb()) "https://updater.yukonga.top/intl-updates/miotaV3.php" else "https://update.intl.miui.com/updates/miotaV3.php"
 var accountType = "CN"
 var port = "1"
-var security = ""
+var ssecurity = ""
 var securityKey = "miuiotavalided11".encodeToByteArray()
 var serviceToken = ""
 var userId = ""
+var cUserId = ""
 
 /**
  * Generate JSON data for recovery ROM info request.
@@ -94,14 +99,15 @@ suspend fun getRecoveryRomInfo(
         if (authResult != "3") {
             accountType = loginInfo?.accountType.toString().ifEmpty { "CN" }
             port = "2"
-            security = loginInfo?.ssecurity.toString()
-            securityKey = Base64.Mime.decode(security)
+            ssecurity = loginInfo?.ssecurity.toString()
+            securityKey = Base64.Mime.decode(ssecurity)
             serviceToken = loginInfo?.serviceToken.toString()
             userId = loginInfo?.userId.toString()
+            cUserId = loginInfo?.cUserId.toString()
         } else setDefaultRequestInfo()
     } else setDefaultRequestInfo()
 
-    val jsonData = generateJson(branch, codeNameExt, regionCode, romVersion, androidVersion, userId, security, serviceToken)
+    val jsonData = generateJson(branch, codeNameExt, regionCode, romVersion, androidVersion, userId, ssecurity, serviceToken)
     val encryptedText = miuiEncrypt(jsonData, securityKey)
     val client = httpClientPlatform()
     val parameters = Parameters.build {
@@ -111,8 +117,12 @@ suspend fun getRecoveryRomInfo(
     }
     val recoveryUrl = if (accountType != "CN") INTL_RECOVERY_URL else CN_RECOVERY_URL
     try {
-        val response = client.post(recoveryUrl) {
-            body = FormDataContent(parameters)
+        val response = client.submitForm(recoveryUrl, parameters) {
+            if (serviceToken.isNotEmpty() && cUserId.isNotEmpty()) {
+                cookie("serviceToken", serviceToken)
+                cookie("uid", cUserId)
+                cookie("s", "1")
+            }
         }
         val requestedEncryptedText = response.body<String>()
         client.close()
@@ -129,7 +139,7 @@ suspend fun getRecoveryRomInfo(
 fun setDefaultRequestInfo() {
     accountType = "CN"
     port = "1"
-    security = ""
+    ssecurity = ""
     securityKey = "miuiotavalided11".encodeToByteArray()
     serviceToken = ""
     userId = ""
