@@ -231,7 +231,9 @@ suspend fun verifyTicket(
     val path = "identity/authStart"
     val listUrl = verifyUrl.replace(path, "identity/list")
     val response = client.get(listUrl) {
+        contentType(ContentType.Application.FormUrlEncoded)
         compress("gzip")
+        userAgent(userAgent)
     }
     if (!response.status.isSuccess()) return null
 
@@ -261,7 +263,9 @@ suspend fun verifyTicket(
             append("_json", "true")
         }
         val response = client.submitForm(apiUrl, parameters) {
+            contentType(ContentType.Application.FormUrlEncoded)
             compress("gzip")
+            userAgent(userAgent)
             header("cookie", "identity_session=$identitySession")
             parameter("_dc", Clock.System.now().toEpochMilliseconds())
         }
@@ -294,7 +298,9 @@ suspend fun getServiceToken(
     location: String
 ): String {
     val response = client.get(location) {
+        contentType(ContentType.Application.FormUrlEncoded)
         compress("gzip")
+        userAgent(userAgent)
         parameter("_userIdNeedEncrypt", true)
     }
     println("Login: getServiceToken Set-Cookie: ${response.headers["Set-Cookie"]}")
