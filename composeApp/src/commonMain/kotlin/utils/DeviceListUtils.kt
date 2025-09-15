@@ -1,4 +1,4 @@
-package misc
+package utils
 
 import data.DeviceInfoHelper
 import io.ktor.client.request.get
@@ -11,9 +11,9 @@ import platform.prefGet
 import platform.prefSet
 
 /**
- * Manages remote device list updates
+ * Manages device list updates
  */
-object RemoteDeviceList {
+object DeviceListUtils {
 
 
     private const val DEVICE_LIST_URL = "https://raw.githubusercontent.com/YuKongA/Updater-KMP/device-list/device.json"

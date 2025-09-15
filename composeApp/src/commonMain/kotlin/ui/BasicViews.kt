@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import data.DeviceInfoHelper
 import kotlinx.coroutines.flow.MutableStateFlow
-import misc.MessageUtils.Companion.showMessage
+import utils.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Card

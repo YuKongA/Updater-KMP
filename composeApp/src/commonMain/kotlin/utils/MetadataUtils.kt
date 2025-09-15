@@ -1,4 +1,4 @@
-package misc
+package utils
 
 import io.ktor.client.request.get
 import io.ktor.client.request.head
@@ -7,22 +7,22 @@ import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.HttpHeaders
 import io.ktor.utils.io.readAvailable
 import kotlinx.coroutines.withTimeout
-import misc.ZipFileUtil.locateCentralDirectory
-import misc.ZipFileUtil.locateLocalFileHeader
-import misc.ZipFileUtil.locateLocalFileOffset
 import platform.httpClientPlatform
+import utils.ZipFileUtils.locateCentralDirectory
+import utils.ZipFileUtils.locateLocalFileHeader
+import utils.ZipFileUtils.locateLocalFileOffset
 import kotlin.math.min
 
-private const val METADATA_PATH = "META-INF/com/android/metadata"
-private const val CHUNK_SIZE = 1024
-private const val END_BYTES_SIZE = 4096
-private const val LOCAL_HEADER_SIZE = 256
-private const val TIMEOUT_MS = 20000L
 
-class Metadata private constructor() {
-
+class MetadataUtils private constructor() {
     companion object {
-        private val instance by lazy { Metadata() }
+
+        private const val METADATA_PATH = "META-INF/com/android/metadata"
+        private const val CHUNK_SIZE = 1024
+        private const val END_BYTES_SIZE = 4096
+        private const val LOCAL_HEADER_SIZE = 256
+        private const val TIMEOUT_MS = 20000L
+        private val instance by lazy { MetadataUtils() }
 
         suspend fun getMetadata(url: String): String = instance.fetchMetadata(url)
 
@@ -168,12 +168,12 @@ class Metadata private constructor() {
             -1
         }
     }
-}
 
-private fun ByteArray.getUncompressedSize(): Int {
-    if (this.size < 22 + 4) return -1
-    return (this[22].toInt() and 0xff) or
-            ((this[23].toInt() and 0xff) shl 8) or
-            ((this[24].toInt() and 0xff) shl 16) or
-            ((this[25].toInt() and 0xff) shl 24)
+    private fun ByteArray.getUncompressedSize(): Int {
+        if (this.size < 22 + 4) return -1
+        return (this[22].toInt() and 0xff) or
+                ((this[23].toInt() and 0xff) shl 8) or
+                ((this[24].toInt() and 0xff) shl 16) or
+                ((this[25].toInt() and 0xff) shl 24)
+    }
 }

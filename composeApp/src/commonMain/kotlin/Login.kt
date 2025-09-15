@@ -1,5 +1,7 @@
 import androidx.compose.runtime.MutableState
 import data.DataHelper
+import dev.whyoleg.cryptography.DelicateCryptographyApi
+import dev.whyoleg.cryptography.algorithms.MD5
 import io.ktor.client.plugins.cookies.AcceptAllCookiesStorage
 import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.plugins.cookies.get
@@ -17,20 +19,15 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
-import misc.json
-import misc.md5Hash
-import platform.generateKey
 import platform.httpClientPlatform
-import platform.ownDecrypt
-import platform.ownEncrypt
 import platform.prefGet
 import platform.prefRemove
 import platform.prefSet
+import platform.provider
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 class Login() {
-
     private val client = httpClientPlatform().config {
         install(HttpCookies) {
             storage = AcceptAllCookiesStorage()
@@ -66,9 +63,9 @@ class Login() {
         if (account.isEmpty() || password.isEmpty()) return 1
         if (savePassword == "1") {
             prefSet("savePassword", "1")
-            savePassword(account, password)
+            Password().savePassword(account, password)
         } else {
-            deletePassword()
+            Password().deletePassword()
         }
         try {
             if (ticket.isNotEmpty()) {
@@ -168,7 +165,7 @@ class Login() {
             userId = userId,
             cUserId = cUserId
         )
-        prefSet("loginInfo", json.encodeToString(loginInfo))
+        prefSet("loginInfo", Json.encodeToString(loginInfo))
         isLogin.value = 1
         return 0
     }
@@ -244,47 +241,21 @@ class Login() {
     private fun removeResponsePrefix(response: String): String {
         return response.removePrefix("&&&START&&&")
     }
-}
 
-/**
- * Save Xiaomi's account & password.
- *
- * @param account: Xiaomi account
- * @param password: Password
- */
-fun savePassword(account: String, password: String) {
-    generateKey()
-    val encryptedAccount = ownEncrypt(account)
-    val encryptedPassword = ownEncrypt(password)
-    prefSet("account", encryptedAccount.first)
-    prefSet("accountIv", encryptedAccount.second)
-    prefSet("password", encryptedPassword.first)
-    prefSet("passwordIv", encryptedPassword.second)
-}
 
-/**
- * Delete Xiaomi's account & password.
- */
-fun deletePassword() {
-    prefRemove("account")
-    prefRemove("accountIv")
-    prefRemove("password")
-    prefRemove("passwordIv")
-}
-
-/**
- * Get Xiaomi's account & password.
- *
- * @return Pair of Xiaomi's account & password
- */
-fun getPassword(): Pair<String, String> {
-    if (prefGet("account") != null && prefGet("password") != null && prefGet("accountIv") != null && prefGet("passwordIv") != null) {
-        val encryptedAccount = prefGet("account").toString()
-        val encodedAccountKey = prefGet("accountIv").toString()
-        val encryptedPassword = prefGet("password").toString()
-        val encodedPasswordKey = prefGet("passwordIv").toString()
-        val account = ownDecrypt(encryptedAccount, encodedAccountKey)
-        val password = ownDecrypt(encryptedPassword, encodedPasswordKey)
-        return Pair(account, password)
-    } else return Pair("", "")
+    /**
+     * Generate MD5 hash.
+     *
+     * @param input: Input string
+     *
+     * @return MD5 hash
+     */
+    @OptIn(DelicateCryptographyApi::class)
+    suspend fun md5Hash(input: String): String {
+        val md = provider().get(MD5)
+        return md.hasher().hash(input.encodeToByteArray()).joinToString("") {
+            val hex = (it.toInt() and 0xFF).toString(16).uppercase()
+            if (hex.length == 1) "0$hex" else hex
+        }
+    }
 }

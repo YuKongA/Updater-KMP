@@ -1,10 +1,10 @@
-package misc
+package utils
 
 import data.FileInfoHelper
 import okio.ByteString
 import okio.ByteString.Companion.toByteString
 
-object ZipFileUtil {
+object ZipFileUtils {
     private const val CENSIG = 0x02014b50L         // "PK\001\002" - Central directory file header signature
     private const val LOCSIG = 0x04034b50L         // "PK\003\004" - Local file header signature
     private const val ENDSIG = 0x06054b50L         // "PK\005\006" - End of central directory record signature

@@ -34,25 +34,25 @@ body {
 }
 
 #loading::after {
-    content: '.';
+    content: '';
     animation: ellipsis 1.5s infinite;
 }
 
 @keyframes ellipsis {
     0% {
-        content: '.';
+        content: '';
     }
 
     33% {
-        content: '..';
+        content: '.';
     }
 
     66% {
-        content: '...';
+        content: '..';
     }
 
     100% {
-        content: '.';
+        content: '...';
     }
 }
 

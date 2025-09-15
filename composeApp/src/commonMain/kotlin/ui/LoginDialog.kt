@@ -1,6 +1,7 @@
 package ui
 
 import Login
+import Password
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -30,9 +31,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.rememberImagePainter
-import getPassword
 import kotlinx.coroutines.launch
-import misc.MessageUtils.Companion.showMessage
+import utils.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
 import platform.prefGet
 import platform.prefRemove
@@ -76,8 +76,8 @@ fun LoginDialog(
     isLogin: MutableState<Int>
 ) {
     val coroutineScope = rememberCoroutineScope()
-    var account by remember { mutableStateOf(getPassword().first) }
-    var password by remember { mutableStateOf(getPassword().second) }
+    var account by remember { mutableStateOf(Password().getPassword().first) }
+    var password by remember { mutableStateOf(Password().getPassword().second) }
 
     var global by remember { mutableStateOf(false) }
     var savePassword by remember { mutableStateOf(prefGet("savePassword") ?: "0") }

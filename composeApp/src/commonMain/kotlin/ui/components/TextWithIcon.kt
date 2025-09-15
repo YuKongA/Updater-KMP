@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seiko.imageloader.rememberImagePainter
-import misc.bodyFontSize
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 
@@ -52,12 +51,12 @@ fun TextWithIcon(
                     Text(
                         modifier = Modifier.padding(horizontal = 6.dp),
                         text = iconName,
-                        fontSize = bodyFontSize,
+                        fontSize = 16.sp,
                     )
                 } else if (content.isNotEmpty() && content != " ") {
                     Text(
                         text = iconName,
-                        fontSize = bodyFontSize,
+                        fontSize = 16.sp,
                     )
                 }
             }

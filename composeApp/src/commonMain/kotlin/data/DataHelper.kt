@@ -4,19 +4,6 @@ import kotlinx.serialization.Serializable
 
 object DataHelper {
     @Serializable
-    data class AuthorizeData(
-        val description: String? = null,
-        val location: String? = null,
-        val code: Int? = null,
-        val result: String? = null,
-        val ssecurity: String? = null,
-        val userId: Long? = null,
-        val cUserId: String? = null,
-        val notificationUrl: String? = null,
-        val captchaUrl: String? = null,
-    )
-
-    @Serializable
     data class IconInfoData(
         val changelog: String,
         val iconName: String,

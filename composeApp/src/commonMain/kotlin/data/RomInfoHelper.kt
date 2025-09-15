@@ -1,10 +1,14 @@
 package data
 
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 
+@OptIn(ExperimentalSerializationApi::class)
 object RomInfoHelper {
     @Serializable
+    @JsonIgnoreUnknownKeys
     data class RomInfo(
         @SerialName("AuthResult") val authResult: Int? = null,
         @SerialName("CurrentRom") val currentRom: Rom? = null,
@@ -17,6 +21,7 @@ object RomInfoHelper {
     )
 
     @Serializable
+    @JsonIgnoreUnknownKeys
     data class Rom(
         val bigversion: String? = null,
         val branch: String? = null,

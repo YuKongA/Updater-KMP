@@ -33,9 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import data.DataHelper
 import kotlinx.coroutines.launch
-import misc.MessageUtils.Companion.showMessage
-import misc.bodyFontSize
-import misc.bodySmallFontSize
 import org.jetbrains.compose.resources.stringResource
 import platform.copyToClipboard
 import platform.downloadToLocal
@@ -66,6 +63,7 @@ import updater.composeapp.generated.resources.fingerprint
 import updater.composeapp.generated.resources.security_patch_level
 import updater.composeapp.generated.resources.system_version
 import updater.composeapp.generated.resources.tags
+import utils.MessageUtils.Companion.showMessage
 
 @Composable
 fun InfoCardViews(
@@ -144,7 +142,7 @@ fun InfoCardViews(
             Text(
                 text = stringResource(Res.string.download),
                 color = MiuixTheme.colorScheme.onSecondaryVariant,
-                fontSize = bodySmallFontSize
+                fontSize = 13.sp,
             )
 
             if (romInfo.official1Download.isNotEmpty()) {
@@ -262,7 +260,7 @@ fun MessageTextView(
         Text(
             text = title,
             color = MiuixTheme.colorScheme.onSecondaryVariant,
-            fontSize = bodySmallFontSize
+            fontSize = 13.sp,
         )
         AnimatedContent(
             targetState = content.value,
@@ -272,7 +270,7 @@ fun MessageTextView(
         ) {
             Text(
                 text = it,
-                fontSize = bodyFontSize,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.combinedClickable(
                     onClick = {},
@@ -309,7 +307,7 @@ fun DownloadInfoView(
     ) {
         Text(
             text = title,
-            fontSize = bodyFontSize,
+            fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center
         )

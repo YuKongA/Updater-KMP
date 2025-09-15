@@ -3,7 +3,7 @@ package data
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.Serializable
-import misc.RemoteDeviceList
+import utils.DeviceListUtils
 
 object DeviceInfoHelper {
     @Serializable
@@ -58,7 +58,7 @@ object DeviceInfoHelper {
      * Update the current device list with remote or embedded data based
      */
     suspend fun updateDeviceList() {
-        currentDeviceList = RemoteDeviceList.getDeviceList(embeddedDeviceList)
+        currentDeviceList = DeviceListUtils.getDeviceList(embeddedDeviceList)
         rebuildMappings()
     }
 
