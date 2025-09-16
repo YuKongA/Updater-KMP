@@ -155,6 +155,7 @@ fun App(
                     hazeStyle = hazeStyle,
                     scrollBehavior = scrollBehavior,
                     focusManager = focusManager,
+                    isDarkTheme = isDarkTheme,
                     showMenuPopup = showMenuPopup,
                     searchKeywords = searchKeywords,
                     onClearSearchHistory = onClearSearchHistory,
@@ -177,6 +178,7 @@ fun App(
                 LandscapeAppView(
                     scrollBehavior = scrollBehavior,
                     focusManager = focusManager,
+                    isDarkTheme = isDarkTheme,
                     showMenuPopup = showMenuPopup,
                     searchKeywords = searchKeywords,
                     onClearSearchHistory = onClearSearchHistory,
@@ -268,6 +270,7 @@ private fun PortraitAppView(
     hazeStyle: HazeStyle,
     scrollBehavior: ScrollBehavior,
     focusManager: FocusManager,
+    isDarkTheme: Boolean,
     showMenuPopup: MutableState<Boolean>,
     searchKeywords: MutableState<List<String>>,
     onClearSearchHistory: () -> Unit,
@@ -328,7 +331,7 @@ private fun PortraitAppView(
                         .navigationBarsPadding()
                 ) {
                     Column {
-                        LoginCardView(isLogin)
+                        LoginCardView(isLogin, isDarkTheme)
                         BasicViews(
                             deviceName, codeName, androidVersion, deviceRegion, deviceCarrier, systemVersion,
                             updateRomInfoState, searchKeywords, searchKeywordsSelected
@@ -348,6 +351,7 @@ private fun PortraitAppView(
 private fun LandscapeAppView(
     scrollBehavior: ScrollBehavior,
     focusManager: FocusManager,
+    isDarkTheme: Boolean,
     showMenuPopup: MutableState<Boolean>,
     searchKeywords: MutableState<List<String>>,
     onClearSearchHistory: () -> Unit,
@@ -409,7 +413,7 @@ private fun LandscapeAppView(
                     overscrollEffect = null
                 ) {
                     item {
-                        LoginCardView(isLogin)
+                        LoginCardView(isLogin, isDarkTheme)
                         BasicViews(
                             deviceName, codeName, androidVersion, deviceRegion, deviceCarrier, systemVersion,
                             updateRomInfoState, searchKeywords, searchKeywordsSelected

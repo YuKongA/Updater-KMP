@@ -32,7 +32,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.rememberImagePainter
 import kotlinx.coroutines.launch
-import utils.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
 import platform.prefGet
 import platform.prefRemove
@@ -70,18 +69,21 @@ import updater.composeapp.generated.resources.toast_crash_info
 import updater.composeapp.generated.resources.verification_code
 import updater.composeapp.generated.resources.verification_code_get
 import updater.composeapp.generated.resources.verifying
+import utils.MessageUtils.Companion.showMessage
 
 @Composable
 fun LoginDialog(
+    showDialog: MutableState<Boolean>,
     isLogin: MutableState<Int>
 ) {
+    val focusManager = LocalFocusManager.current
     val coroutineScope = rememberCoroutineScope()
+
     var account by remember { mutableStateOf(Password().getPassword().first) }
     var password by remember { mutableStateOf(Password().getPassword().second) }
 
     var global by remember { mutableStateOf(false) }
     var savePassword by remember { mutableStateOf(prefGet("savePassword") ?: "0") }
-    val showDialog = remember { mutableStateOf(false) }
 
     var showCaptchaUrl by remember { mutableStateOf(false) }
     var showCaptchaInput by remember { mutableStateOf(false) }
@@ -107,8 +109,6 @@ fun LoginDialog(
     val messageLoginTips1 = stringResource(Res.string.login_tips1)
     val messageLoginTips2 = stringResource(Res.string.login_tips2)
 
-    val focusManager = LocalFocusManager.current
-
     // 主页登录按钮
     IconButton(
         onClick = {
@@ -123,7 +123,6 @@ fun LoginDialog(
             contentDescription = stringResource(Res.string.login)
         )
     }
-
 
     // 登录对话框
     if (isLogin.value != 1) {

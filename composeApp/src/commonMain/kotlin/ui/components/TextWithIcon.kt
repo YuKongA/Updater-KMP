@@ -1,10 +1,6 @@
 package ui.components
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,12 +28,7 @@ fun TextWithIcon(
 ) {
     val imagePainter = rememberImagePainter(iconLink)
 
-    AnimatedContent(
-        targetState = changelog,
-        transitionSpec = {
-            fadeIn(animationSpec = tween(1500)) togetherWith fadeOut(animationSpec = tween(300))
-        }
-    ) { content ->
+    AnimatedContent(targetState = changelog) {
         Column {
             Row(
                 modifier = Modifier.padding(bottom = 8.dp),
@@ -53,19 +45,21 @@ fun TextWithIcon(
                         text = iconName,
                         fontSize = 16.sp,
                     )
-                } else if (content.isNotEmpty() && content != " ") {
+                } else if (it.isNotEmpty() && it != " ") {
                     Text(
                         text = iconName,
                         fontSize = 16.sp,
                     )
                 }
             }
-            if (content.isNotEmpty() && content != " ") {
-                Text(
-                    text = content,
-                    color = MiuixTheme.colorScheme.onSecondaryVariant,
-                    fontSize = 14.5.sp
-                )
+            if (it.isNotEmpty() && it != " ") {
+                SelectionContainer {
+                    Text(
+                        text = it,
+                        color = MiuixTheme.colorScheme.onSecondaryVariant,
+                        fontSize = 14.5.sp
+                    )
+                }
                 Spacer(modifier = Modifier.height(padding))
             }
         }

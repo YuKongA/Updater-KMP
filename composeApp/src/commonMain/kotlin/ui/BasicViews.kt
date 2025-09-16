@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import data.DeviceInfoHelper
 import kotlinx.coroutines.flow.MutableStateFlow
-import utils.MessageUtils.Companion.showMessage
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Card
@@ -48,6 +47,7 @@ import updater.composeapp.generated.resources.search_history
 import updater.composeapp.generated.resources.submit
 import updater.composeapp.generated.resources.system_version
 import updater.composeapp.generated.resources.toast_no_info
+import utils.MessageUtils.Companion.showMessage
 
 @Composable
 private fun SearchHistoryView(

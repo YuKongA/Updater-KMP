@@ -2,24 +2,21 @@ package ui
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -197,12 +194,14 @@ fun InfoCardViews(
                     fontSize = 24.sp,
                     fontWeight = FontWeight.SemiBold,
                 )
-                Text(
-                    text = romInfo.gentleNotice,
-                    color = MiuixTheme.colorScheme.onSecondaryVariant,
-                    fontSize = 14.5.sp,
-                    modifier = Modifier.padding(top = 12.dp)
-                )
+                SelectionContainer {
+                    Text(
+                        text = romInfo.gentleNotice,
+                        color = MiuixTheme.colorScheme.onSecondaryVariant,
+                        fontSize = 14.5.sp,
+                        modifier = Modifier.padding(top = 12.dp)
+                    )
+                }
             }
         }
     }
@@ -214,9 +213,7 @@ fun MetadataView(
     securityPatchLevel: String,
     buildTime: String,
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
+    Column {
         MessageTextView(stringResource(Res.string.fingerprint), fingerprint)
         MessageTextView(stringResource(Res.string.security_patch_level), securityPatchLevel)
         MessageTextView(stringResource(Res.string.build_time), buildTime)
@@ -231,15 +228,11 @@ fun BaseMessageView(
     codebase: String,
     branch: String
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        MessageTextView(stringResource(Res.string.code_name), device)
-        MessageTextView(stringResource(Res.string.system_version), version)
-        MessageTextView(stringResource(Res.string.big_version), bigVersion)
-        MessageTextView(stringResource(Res.string.android_version), codebase)
-        MessageTextView(stringResource(Res.string.branch), branch)
-    }
+    MessageTextView(stringResource(Res.string.code_name), device)
+    MessageTextView(stringResource(Res.string.system_version), version)
+    MessageTextView(stringResource(Res.string.big_version), bigVersion)
+    MessageTextView(stringResource(Res.string.android_version), codebase)
+    MessageTextView(stringResource(Res.string.branch), branch)
 }
 
 @Composable
@@ -247,13 +240,6 @@ fun MessageTextView(
     title: String,
     text: String
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val clipboard = LocalClipboard.current
-    val hapticFeedback = LocalHapticFeedback.current
-    val content = remember { mutableStateOf("") }
-    val messageCopySuccessful = stringResource(Res.string.copy_successful)
-    content.value = text
-
     Column(
         modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
     ) {
@@ -262,27 +248,14 @@ fun MessageTextView(
             color = MiuixTheme.colorScheme.onSecondaryVariant,
             fontSize = 13.sp,
         )
-        AnimatedContent(
-            targetState = content.value,
-            transitionSpec = {
-                fadeIn(animationSpec = tween(1500)) togetherWith fadeOut(animationSpec = tween(300))
-            }
-        ) {
-            Text(
-                text = it,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.combinedClickable(
-                    onClick = {},
-                    onLongClick = {
-                        coroutineScope.launch {
-                            clipboard.copyToClipboard(it)
-                        }
-                        showMessage(messageCopySuccessful)
-                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                    }
+        AnimatedContent(targetState = text) {
+            SelectionContainer {
+                Text(
+                    text = it,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
                 )
-            )
+            }
         }
     }
 }
@@ -319,7 +292,7 @@ fun DownloadInfoView(
                             clipboard.copyToClipboard(url)
                         }
                         showMessage(messageCopySuccessful)
-                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                        hapticFeedback.performHapticFeedback(HapticFeedbackType.Confirm)
                     }
                 ) {
                     Icon(
@@ -332,7 +305,7 @@ fun DownloadInfoView(
                     onClick = {
                         downloadToLocal(url, fileName)
                         showMessage(messageDownloadStart)
-                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                        hapticFeedback.performHapticFeedback(HapticFeedbackType.Confirm)
                     }
                 ) {
                     Icon(
@@ -353,9 +326,7 @@ fun ChangelogView(
 ) {
     val hapticFeedback = LocalHapticFeedback.current
     val clipboard = LocalClipboard.current
-
     val coroutineScope = rememberCoroutineScope()
-
     val messageCopySuccessful = stringResource(Res.string.copy_successful)
 
     Column {
@@ -403,9 +374,7 @@ fun RomFileInfoSection(
     md5: String,
     fileSize: String
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
+    Column {
         MessageTextView(stringResource(Res.string.filename), fileName)
         MessageTextView(stringResource(Res.string.filemd5), md5)
         MessageTextView(stringResource(Res.string.filesize), fileSize)

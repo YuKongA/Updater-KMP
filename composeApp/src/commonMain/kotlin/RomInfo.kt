@@ -219,7 +219,8 @@ class RomInfo {
                 codeName.value + carrierCodeName
             }
         }
-        val systemVersionExt = systemVersion.value.uppercase().replace("^OS1".toRegex(), "V816").replace("AUTO$".toRegex(), deviceCode)
+        val systemVersionExt =
+            systemVersion.value.uppercase().replace("^OS1".toRegex(), "V816").replace("AUTO$".toRegex(), deviceCode)
         val branchExt = if (systemVersion.value.uppercase().endsWith(".DEV")) "X" else "F"
 
         val messageIng = stringResource(Res.string.toast_ing)
@@ -238,7 +239,8 @@ class RomInfo {
                 coroutineScope.launch {
                     showMessage(message = messageIng)
 
-                    val romInfo = getRecoveryRomInfo(branchExt, codeNameExt, regionCode, systemVersionExt, androidVersion.value, isLogin)
+                    val romInfo =
+                        getRecoveryRomInfo(branchExt, codeNameExt, regionCode, systemVersionExt, androidVersion.value, isLogin)
 
                     if (romInfo.isNotEmpty()) {
 
@@ -258,7 +260,14 @@ class RomInfo {
                             val curRomDownload =
                                 if (recoveryRomInfo.currentRom.md5 != recoveryRomInfo.latestRom?.md5) {
                                     val romInfoCurrent =
-                                        getRecoveryRomInfo("", codeNameExt, regionCode, systemVersionExt, androidVersion.value, isLogin)
+                                        getRecoveryRomInfo(
+                                            "",
+                                            codeNameExt,
+                                            regionCode,
+                                            systemVersionExt,
+                                            androidVersion.value,
+                                            isLogin
+                                        )
                                     val recoveryRomInfoCurrent =
                                         if (romInfoCurrent.isNotEmpty()) {
                                             Json.decodeFromString<RomInfoHelper.RomInfo>(romInfoCurrent)
@@ -266,7 +275,10 @@ class RomInfo {
                                             Json.decodeFromString<RomInfoHelper.RomInfo>(romInfoCurrent)
                                         }
                                     if (recoveryRomInfoCurrent.latestRom?.filename != null) {
-                                        downloadUrl(recoveryRomInfoCurrent.currentRom?.version!!, recoveryRomInfoCurrent.latestRom.filename)
+                                        downloadUrl(
+                                            recoveryRomInfoCurrent.currentRom?.version!!,
+                                            recoveryRomInfoCurrent.latestRom.filename
+                                        )
                                     } else {
                                         noUltimateLink = true
                                         showMessage(messageNoUltimateLink)
@@ -299,7 +311,13 @@ class RomInfo {
                             )
 
                             if (recoveryRomInfo.incrementRom?.bigversion != null) {
-                                handleRomInfo(recoveryRomInfo, recoveryRomInfo.incrementRom, incRomInfo, incIconInfo, coroutineScope)
+                                handleRomInfo(
+                                    recoveryRomInfo,
+                                    recoveryRomInfo.incrementRom,
+                                    incRomInfo,
+                                    incIconInfo,
+                                    coroutineScope
+                                )
                             } else if (recoveryRomInfo.crossRom?.bigversion != null) {
                                 handleRomInfo(recoveryRomInfo, recoveryRomInfo.crossRom, incRomInfo, incIconInfo, coroutineScope)
                             } else {
@@ -380,7 +398,7 @@ class RomInfo {
             val gentleNotice = gentle.toString().trimEnd().split("\n").drop(1).joinToString("\n")
 
             val iconNames = changelogGroups.map { it.split("\n").first() }
-            val iconMainLink = recoveryRomInfo.fileMirror!!.icon
+            val iconMainLink = recoveryRomInfo.fileMirror?.icon ?: ""
             val iconNameLink = recoveryRomInfo.icon ?: mapOf()
             val iconLinks = iconLink(iconNames, iconMainLink, iconNameLink)
             iconInfoData.value = iconNames.mapIndexed { index, iconName ->
@@ -403,7 +421,10 @@ class RomInfo {
                 "https://superota.d.miui.com" + (officialDownload ?: downloadUrl(romInfo.version, romInfo.filename))
             }
             val cdn1Download =
-                "https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com" + downloadUrl(romInfo.version, romInfo.filename)
+                "https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com" + downloadUrl(
+                    romInfo.version,
+                    romInfo.filename
+                )
             val cdn2Download = "https://cdnorg.d.miui.com" + downloadUrl(romInfo.version, romInfo.filename)
 
             romInfoData.value = DataHelper.RomInfoData(
@@ -509,13 +530,10 @@ class RomInfo {
      */
     fun iconLink(iconNames: List<String>, iconMainLink: String, iconNameLink: Map<String, String>): MutableMap<String, String> {
         val iconMap = mutableMapOf<String, String>()
-        if (iconNameLink.isNotEmpty()) {
+        if (iconMainLink.isNotEmpty() && iconNameLink.isNotEmpty()) {
             for (name in iconNames) {
-                val icon = iconNameLink[name]
-                if (icon != null) {
-                    val realLink = iconMainLink + icon
-                    iconMap[name] = realLink
-                }
+                val realLink = iconMainLink + iconNameLink[name]
+                iconMap[name] = realLink
             }
         }
         return iconMap
