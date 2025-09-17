@@ -8,7 +8,6 @@ import androidx.compose.ui.text.platform.Font
 import androidx.compose.ui.window.ComposeViewport
 import kotlinx.browser.window
 import kotlinx.coroutines.await
-import org.jetbrains.skiko.wasm.onWasmReady
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
 
@@ -16,28 +15,25 @@ private const val MiSanVF = "./MiSans VF.woff2"
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
-    onWasmReady {
-        ComposeViewport(
-            viewportContainerId = "composeApplication"
-        ) {
-            val fontFamilyResolver = LocalFontFamilyResolver.current
-            val fontsLoaded = remember { mutableStateOf(false) }
+    ComposeViewport(
+        viewportContainerId = "composeApplication"
+    ) {
+        val fontFamilyResolver = LocalFontFamilyResolver.current
+        val fontsLoaded = remember { mutableStateOf(false) }
 
-            if (fontsLoaded.value) {
-                hideLoading()
-                App()
-            }
+        if (fontsLoaded.value) {
+            hideLoading()
+            App()
+        }
 
-            LaunchedEffect(Unit) {
-                val miSanVFBytes = loadRes(MiSanVF).toByteArray()
-                val fontFamily = FontFamily(Font("MiSans VF", miSanVFBytes))
-                fontFamilyResolver.preload(fontFamily)
-                fontsLoaded.value = true
-            }
+        LaunchedEffect(Unit) {
+            val miSanVFBytes = loadRes(MiSanVF).toByteArray()
+            val fontFamily = FontFamily(Font("MiSans VF", miSanVFBytes))
+            fontFamilyResolver.preload(fontFamily)
+            fontsLoaded.value = true
         }
     }
 }
-
 
 suspend fun loadRes(url: String): ArrayBuffer {
     return window.fetch(url).await().arrayBuffer().await()
@@ -48,6 +44,15 @@ fun ArrayBuffer.toByteArray(): ByteArray {
     return jsInt8ArrayToKotlinByteArray(source)
 }
 
+@OptIn(ExperimentalWasmJsInterop::class)
+@JsFun(
+    """
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('composeApplication').style.display = 'block';
+        }
+    """
+)
 external fun hideLoading()
 
 external fun jsInt8ArrayToKotlinByteArray(x: Int8Array): ByteArray

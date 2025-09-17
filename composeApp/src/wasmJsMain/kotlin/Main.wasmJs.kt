@@ -38,6 +38,7 @@ fun main() {
     }
 }
 
+@OptIn(ExperimentalWasmJsInterop::class)
 suspend fun loadRes(url: String): ArrayBuffer {
     return window.fetch(url).await<Response>().arrayBuffer().await()
 }
@@ -47,7 +48,7 @@ fun ArrayBuffer.toByteArray(): ByteArray {
     return jsInt8ArrayToKotlinByteArray(source)
 }
 
-
+@OptIn(ExperimentalWasmJsInterop::class)
 @JsFun(
     """
         function hideLoading() {
@@ -58,6 +59,7 @@ fun ArrayBuffer.toByteArray(): ByteArray {
 )
 external fun hideLoading()
 
+@OptIn(ExperimentalWasmJsInterop::class)
 @JsFun(
     """ (src, size, dstAddr) => {
         const mem8 = new Int8Array(wasmExports.memory.buffer, dstAddr, size);
@@ -69,7 +71,6 @@ external fun jsExportInt8ArrayToWasm(src: Int8Array, size: Int, dstAddr: Int)
 
 internal fun jsInt8ArrayToKotlinByteArray(x: Int8Array): ByteArray {
     val size = x.length
-
     @OptIn(UnsafeWasmMemoryApi::class)
     return withScopedMemoryAllocator { allocator ->
         val memBuffer = allocator.allocate(size)

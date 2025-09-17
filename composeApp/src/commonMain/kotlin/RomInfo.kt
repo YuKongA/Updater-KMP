@@ -9,7 +9,6 @@ import io.ktor.client.call.body
 import io.ktor.client.request.cookie
 import io.ktor.client.request.forms.submitForm
 import io.ktor.http.Parameters
-import io.ktor.utils.io.InternalAPI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
@@ -22,8 +21,6 @@ import platform.miuiDecrypt
 import platform.miuiEncrypt
 import platform.prefGet
 import platform.prefSet
-import top.yukonga.miuix.kmp.utils.Platform
-import top.yukonga.miuix.kmp.utils.platform
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.toast_crash_info
 import updater.composeapp.generated.resources.toast_ing
@@ -34,11 +31,8 @@ import updater.composeapp.generated.resources.toast_wrong_info
 import utils.MessageUtils.Companion.showMessage
 import utils.MetadataUtils
 import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
-
-fun isWeb(): Boolean = platform() == Platform.WasmJs || platform() == Platform.Js
 
 class RomInfo {
     private val CN_RECOVERY_URL =
@@ -120,7 +114,6 @@ class RomInfo {
      *
      * @return Recovery ROM info
      */
-    @OptIn(ExperimentalEncodingApi::class, InternalAPI::class)
     suspend fun getRecoveryRomInfo(
         branch: String,
         codeNameExt: String,

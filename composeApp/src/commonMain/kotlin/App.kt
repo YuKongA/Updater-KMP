@@ -479,3 +479,5 @@ private fun LandscapeAppView(
         }
     }
 }
+
+fun isWeb(): Boolean = platform() == Platform.WasmJs || platform() == Platform.Js
