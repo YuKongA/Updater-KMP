@@ -68,6 +68,7 @@
     <string name="device_list_update_now">Update Now</string>
     <string name="device_list_updated">Update successful</string>
     <string name="device_list_update_failed">Update failed</string>
+    <string name="device_list_no_updates">No updates</string>
     <string name="device_list_version">Version</string>
     <string name="login_tips1">Detected two-factor authentication, please click the get verification code button</string>
     <string name="login_tips2">Verification code is required, please click the get verification code button</string>

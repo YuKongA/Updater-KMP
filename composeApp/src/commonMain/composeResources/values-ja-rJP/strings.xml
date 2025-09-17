@@ -67,6 +67,7 @@
     <string name="device_list_update_now">今すぐ更新</string>
     <string name="device_list_updated">更新成功</string>
     <string name="device_list_update_failed">更新に失敗しました</string>
+    <string name="device_list_no_updates">更新なし</string>
     <string name="device_list_version">バージョン</string>
     <string name="login_tips1">二次認証が検出されました。検証コードの取得ボタンをクリックしてください</string>
     <string name="login_tips2">検証コードの入力が必要です。検証コードの取得ボタンをクリックしてください</string>

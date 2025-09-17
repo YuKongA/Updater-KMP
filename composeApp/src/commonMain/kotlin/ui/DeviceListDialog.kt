@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +32,7 @@ import top.yukonga.miuix.kmp.theme.MiuixTheme
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.cancel
 import updater.composeapp.generated.resources.device_list_embedded
+import updater.composeapp.generated.resources.device_list_no_updates
 import updater.composeapp.generated.resources.device_list_remote
 import updater.composeapp.generated.resources.device_list_settings
 import updater.composeapp.generated.resources.device_list_source
@@ -48,7 +50,13 @@ fun DeviceListDialog(
     val coroutinesScope = rememberCoroutineScope()
     val version = remember { mutableStateOf(DeviceListUtils.getCachedVersion() ?: "-") }
     val source = remember { mutableStateOf(DeviceListUtils.getDeviceListSource()) }
-    val updateResultMsg = remember(showDeviceSettingsDialog.value) { mutableStateOf("") }
+    val updateResultMsg = remember { mutableStateOf("") }
+
+    LaunchedEffect(showDeviceSettingsDialog.value) {
+        if (showDeviceSettingsDialog.value) {
+            updateResultMsg.value = ""
+        }
+    }
 
     fun refreshDeviceListInfo() {
         version.value = DeviceListUtils.getCachedVersion() ?: "-"
@@ -106,6 +114,7 @@ fun DeviceListDialog(
                 val updatedText = stringResource(Res.string.device_list_updated)
                 val updateFailedText = stringResource(Res.string.device_list_update_failed)
                 val updateNowText = stringResource(Res.string.device_list_update_now)
+                val updateNoUpdates = stringResource(Res.string.device_list_no_updates)
                 TextButton(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 16.dp),
                     text = updateResultMsg.value.ifEmpty { updateNowText },
@@ -114,9 +123,15 @@ fun DeviceListDialog(
                         updateResultMsg.value = updatingText
                         coroutinesScope.launch {
                             val result = DeviceListUtils.updateDeviceList()
-                            DeviceInfoHelper.updateDeviceList()
-                            refreshDeviceListInfo()
-                            updateResultMsg.value = if (result != null && result.isNotEmpty()) updatedText else updateFailedText
+                            if (result == 0) {
+                                DeviceInfoHelper.updateDeviceList()
+                                refreshDeviceListInfo()
+                            }
+                            updateResultMsg.value = when (result) {
+                                0 -> updatedText
+                                1 -> updateNoUpdates
+                                else -> updateFailedText
+                            }
                         }
                     },
                     enabled = updateResultMsg.value.isEmpty()

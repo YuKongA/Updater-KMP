@@ -45,27 +45,27 @@ object DeviceListUtils {
      * Fetch and cache device list from remote source
      * Returns updated device list or null if update failed
      */
-    suspend fun updateDeviceList(): List<DeviceInfoHelper.Device>? {
+    suspend fun updateDeviceList(): Int {
         return try {
-            withContext(Dispatchers.Main) {
+            withContext(Dispatchers.Default) {
                 val client = httpClientPlatform()
                 val response = client.get(DEVICE_LIST_URL)
                 val jsonContent = response.bodyAsText()
-
                 val remoteData = json.decodeFromString<DeviceInfoHelper.RemoteDevices>(jsonContent)
 
                 val currentVersion = getCachedVersion()
-                if (currentVersion != null && currentVersion >= remoteData.version) {
-                    return@withContext getCachedDeviceList()
+                val currentData = getCachedDeviceList()
+                if (currentVersion != null && currentData != null && currentVersion >= remoteData.version) {
+                    return@withContext 1
                 }
 
                 prefSet(DEVICE_LIST_VERSION_KEY, remoteData.version)
                 prefSet(DEVICE_LIST_CACHED_KEY, jsonContent)
 
-                remoteData.devices
+                0
             }
         } catch (_: Exception) {
-            getCachedDeviceList()
+            2
         }
     }
 
@@ -86,16 +86,12 @@ object DeviceListUtils {
     /**
      * Get device list based on the selected source
      */
-    suspend fun getDeviceList(embeddedList: List<DeviceInfoHelper.Device>): List<DeviceInfoHelper.Device> {
+    fun getDeviceList(embeddedList: List<DeviceInfoHelper.Device>): List<DeviceInfoHelper.Device> {
         return when (getDeviceListSource()) {
             DeviceListSource.REMOTE -> {
                 val cachedList = getCachedDeviceList()
                 if (!cachedList.isNullOrEmpty()) {
                     return cachedList
-                }
-                val remoteList = updateDeviceList()
-                if (!remoteList.isNullOrEmpty()) {
-                    return remoteList
                 }
                 embeddedList
             }

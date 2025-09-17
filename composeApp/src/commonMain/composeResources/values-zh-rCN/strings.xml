@@ -67,6 +67,7 @@
     <string name="device_list_update_now">立即更新</string>
     <string name="device_list_updated">更新成功</string>
     <string name="device_list_update_failed">更新失败</string>
+    <string name="device_list_no_updates">无可用更新</string>
     <string name="device_list_version">版本</string>
     <string name="login_tips1">检测到二次认证，请点击获取验证码按钮</string>
     <string name="login_tips2">需要输入验证码，请点击获取验证码按钮</string>
