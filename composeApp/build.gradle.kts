@@ -113,22 +113,12 @@ kotlin {
             implementation(libs.cryptography.provider.jdk)
             implementation(libs.ktor.client.cio)
         }
-        iosMain.dependencies {
+        appleMain.dependencies {
             // Added
             implementation(libs.cryptography.provider.apple)
             implementation(libs.ktor.client.darwin)
         }
-        macosMain.dependencies {
-            // Added
-            implementation(libs.cryptography.provider.apple)
-            implementation(libs.ktor.client.darwin)
-        }
-        jsMain.dependencies {
-            // Added
-            implementation(libs.cryptography.provider.webcrypto)
-            implementation(libs.ktor.client.js)
-        }
-        wasmJsMain.dependencies {
+        webMain.dependencies {
             // Added
             implementation(libs.cryptography.provider.webcrypto)
             implementation(libs.ktor.client.js)
