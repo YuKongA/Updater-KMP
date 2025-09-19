@@ -15,9 +15,8 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.jetbrains.compose)
     alias(libs.plugins.compose.hotReload)
-    alias(libs.plugins.kotlin.cocoapods)
+    alias(libs.plugins.jetbrains.compose)
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.serialization)
 }
@@ -39,9 +38,20 @@ kotlin {
 
     jvm("desktop")
 
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
+    fun iosTargets(config: KotlinNativeTarget.() -> Unit) {
+        iosX64(config)
+        iosArm64(config)
+        iosSimulatorArm64(config)
+    }
+    iosTargets {
+        binaries.framework {
+            baseName = "shared"
+            isStatic = true
+        }
+        compilerOptions {
+            freeCompilerArgs.add("-Xbinary=preCodegenInlineThreshold=40")
+        }
+    }
 
     fun macosTargets(config: KotlinNativeTarget.() -> Unit) {
         macosX64(config)
@@ -51,25 +61,15 @@ kotlin {
         binaries.executable {
             entryPoint = "main"
         }
-    }
-
-    cocoapods {
-        version = verName
-        summary = "Get HyperOS/MIUI recovery ROM info"
-        homepage = "https://github.com/YuKongA/Updater-KMP"
-        authors = "YuKongA"
-        license = "AGPL-3.0"
-        podfile = project.file("../iosApp/Podfile")
-        framework {
-            baseName = appName + "Framework"
-            isStatic = true
+        compilerOptions {
+            freeCompilerArgs.add("-Xbinary=preCodegenInlineThreshold=40")
         }
     }
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
+        outputModuleName = "updater"
         browser {
-            outputModuleName = "updater"
             commonWebpackConfig {
                 outputFileName = "updater.js"
             }
@@ -78,11 +78,15 @@ kotlin {
     }
 
     js(IR) {
+        outputModuleName = "updater"
         browser {
-            outputModuleName = "updater"
             commonWebpackConfig {
                 outputFileName = "updater.js"
             }
+        }
+        compilerOptions {
+            freeCompilerArgs.add("-Xes-long-as-bigint")
+            freeCompilerArgs.add("-XXLanguage:+JsAllowLongInExportedDeclarations")
         }
         binaries.executable()
     }
