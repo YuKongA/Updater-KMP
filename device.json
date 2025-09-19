@@ -182,7 +182,9 @@
         { "deviceName": "REDMI 15 / Note 15R / POCO M7 Plus", "deviceCodeName": "spring", "deviceCode": "OU" },
         { "deviceName": "REDMI Note 15", "deviceCodeName": "kunzite", "deviceCode": "PQ" },
         { "deviceName": "REDMI Note 15 Pro", "deviceCodeName": "lapis", "deviceCode": "PP" },
-        { "deviceName": "REDMI Note 15 Pro+", "deviceCodeName": "flourite", "deviceCode": "PR" }
+        { "deviceName": "REDMI Note 15 Pro+", "deviceCodeName": "flourite", "deviceCode": "PR" },
+        { "deviceName": "Xiaomi Pad 8", "deviceCodeName": "yupei", "deviceCode": "PZ" },
+        { "deviceName": "Xiaomi Pad 8 Pro", "deviceCodeName": "piano", "deviceCode": "PY" },
     ],
-    "version": "1.0.3"
+    "version": "1.0.4"
 }
