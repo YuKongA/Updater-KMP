@@ -108,6 +108,9 @@ fun App(
         val curIconInfo: MutableState<List<DataHelper.IconInfoData>> = remember { mutableStateOf(listOf()) }
         val incIconInfo: MutableState<List<DataHelper.IconInfoData>> = remember { mutableStateOf(listOf()) }
 
+        val curImageInfo: MutableState<List<DataHelper.ImageInfoData>> = remember { mutableStateOf(listOf()) }
+        val incImageInfo: MutableState<List<DataHelper.ImageInfoData>> = remember { mutableStateOf(listOf()) }
+
         val updateRomInfoState = remember { mutableStateOf(0) }
         val searchKeywords = remember { mutableStateOf(Json.decodeFromString<List<String>>(prefGet("searchKeywords") ?: "[]")) }
         val searchKeywordsSelected = remember { mutableStateOf(0) }
@@ -115,8 +118,23 @@ fun App(
         LaunchedEffect(Unit) { DeviceInfoHelper.updateDeviceList() }
 
         RomInfo().UpdateRomInfo(
-            deviceName, codeName, deviceRegion, deviceCarrier, androidVersion, systemVersion, loginData,
-            isLogin, curRomInfo, incRomInfo, curIconInfo, incIconInfo, updateRomInfoState, searchKeywords, searchKeywordsSelected
+            deviceName,
+            codeName,
+            deviceRegion,
+            deviceCarrier,
+            androidVersion,
+            systemVersion,
+            loginData,
+            isLogin,
+            curRomInfo,
+            incRomInfo,
+            curIconInfo,
+            incIconInfo,
+            curImageInfo,
+            incImageInfo,
+            updateRomInfoState,
+            searchKeywords,
+            searchKeywordsSelected
         )
 
         val scrollBehavior = MiuixScrollBehavior(rememberTopAppBarState())
@@ -171,8 +189,10 @@ fun App(
                     searchKeywordsSelected = searchKeywordsSelected,
                     curRomInfo = curRomInfo,
                     curIconInfo = curIconInfo,
+                    curImageInfo = curImageInfo,
                     incRomInfo = incRomInfo,
-                    incIconInfo = incIconInfo
+                    incIconInfo = incIconInfo,
+                    incImageInfo = incImageInfo
                 )
             } else {
                 LandscapeAppView(
@@ -194,8 +214,10 @@ fun App(
                     searchKeywordsSelected = searchKeywordsSelected,
                     curRomInfo = curRomInfo,
                     curIconInfo = curIconInfo,
+                    curImageInfo = curImageInfo,
                     incRomInfo = incRomInfo,
-                    incIconInfo = incIconInfo
+                    incIconInfo = incIconInfo,
+                    incImageInfo = incImageInfo
                 )
             }
         }
@@ -286,8 +308,10 @@ private fun PortraitAppView(
     searchKeywordsSelected: MutableState<Int>,
     curRomInfo: MutableState<DataHelper.RomInfoData>,
     curIconInfo: MutableState<List<DataHelper.IconInfoData>>,
+    curImageInfo: MutableState<List<DataHelper.ImageInfoData>>,
     incRomInfo: MutableState<DataHelper.RomInfoData>,
-    incIconInfo: MutableState<List<DataHelper.IconInfoData>>
+    incIconInfo: MutableState<List<DataHelper.IconInfoData>>,
+    incImageInfo: MutableState<List<DataHelper.ImageInfoData>>
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -337,8 +361,8 @@ private fun PortraitAppView(
                             updateRomInfoState, searchKeywords, searchKeywordsSelected
                         )
                         Column(modifier = Modifier.padding(horizontal = 12.dp)) {
-                            InfoCardViews(curRomInfo, curIconInfo, updateRomInfoState)
-                            InfoCardViews(incRomInfo, incIconInfo, updateRomInfoState)
+                            InfoCardViews(curRomInfo, curIconInfo, curImageInfo, updateRomInfoState)
+                            InfoCardViews(incRomInfo, incIconInfo, incImageInfo, updateRomInfoState)
                         }
                     }
                 }
@@ -367,8 +391,10 @@ private fun LandscapeAppView(
     searchKeywordsSelected: MutableState<Int>,
     curRomInfo: MutableState<DataHelper.RomInfoData>,
     curIconInfo: MutableState<List<DataHelper.IconInfoData>>,
+    curImageInfo: MutableState<List<DataHelper.ImageInfoData>>,
     incRomInfo: MutableState<DataHelper.RomInfoData>,
-    incIconInfo: MutableState<List<DataHelper.IconInfoData>>
+    incIconInfo: MutableState<List<DataHelper.IconInfoData>>,
+    incImageInfo: MutableState<List<DataHelper.ImageInfoData>>
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -464,8 +490,8 @@ private fun LandscapeAppView(
                         Column(
                             modifier = Modifier.padding(top = 12.dp)
                         ) {
-                            InfoCardViews(curRomInfo, curIconInfo, updateRomInfoState)
-                            InfoCardViews(incRomInfo, incIconInfo, updateRomInfoState)
+                            InfoCardViews(curRomInfo, curIconInfo, curImageInfo, updateRomInfoState)
+                            InfoCardViews(incRomInfo, incIconInfo, incImageInfo, updateRomInfoState)
                         }
                         Spacer(
                             Modifier.height(

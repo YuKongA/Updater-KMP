@@ -97,7 +97,8 @@ class RomInfo {
             security = security,
             token = token,
             unlock = "0",
-            v = "MIUI-$romVersion"
+            v = "MIUI-$romVersion",
+            options = DataHelper.Options(av = "9.1.0")
         )
         return Json.encodeToString(data)
     }
@@ -155,7 +156,8 @@ class RomInfo {
             }
             val requestedEncryptedText = response.body<String>()
             client.close()
-            return miuiDecrypt(requestedEncryptedText, securityKey)
+            val decrypted = miuiDecrypt(requestedEncryptedText, securityKey)
+            return decrypted
         } catch (e: Exception) {
             e.printStackTrace()
             return ""
@@ -193,6 +195,8 @@ class RomInfo {
         incRomInfo: MutableState<DataHelper.RomInfoData>,
         curIconInfo: MutableState<List<DataHelper.IconInfoData>>,
         incIconInfo: MutableState<List<DataHelper.IconInfoData>>,
+        curImageInfo: MutableState<List<DataHelper.ImageInfoData>>,
+        incImageInfo: MutableState<List<DataHelper.ImageInfoData>>,
         updateRomInfo: MutableState<Int>,
         searchKeywords: MutableState<List<String>>,
         searchKeywordsSelected: MutableState<Int>,
@@ -230,10 +234,19 @@ class RomInfo {
         if (updateRomInfo.value != 0) {
             LaunchedEffect(updateRomInfo.value) {
                 coroutineScope.launch {
+                    clearRomInfo(curRomInfo, curIconInfo, curImageInfo)
+                    clearRomInfo(incRomInfo, incIconInfo, incImageInfo)
+
                     showMessage(message = messageIng)
 
-                    val romInfo =
-                        getRecoveryRomInfo(branchExt, codeNameExt, regionCode, systemVersionExt, androidVersion.value, isLogin)
+                    val romInfo = getRecoveryRomInfo(
+                        branchExt,
+                        codeNameExt,
+                        regionCode,
+                        systemVersionExt,
+                        androidVersion.value,
+                        isLogin
+                    )
 
                     if (romInfo.isNotEmpty()) {
 
@@ -286,6 +299,7 @@ class RomInfo {
                                 recoveryRomInfo.currentRom,
                                 curRomInfo,
                                 curIconInfo,
+                                curImageInfo,
                                 coroutineScope,
                                 curRomDownload,
                                 noUltimateLink
@@ -309,12 +323,18 @@ class RomInfo {
                                     recoveryRomInfo.incrementRom,
                                     incRomInfo,
                                     incIconInfo,
+                                    incImageInfo,
                                     coroutineScope
                                 )
                             } else if (recoveryRomInfo.crossRom?.bigversion != null) {
-                                handleRomInfo(recoveryRomInfo, recoveryRomInfo.crossRom, incRomInfo, incIconInfo, coroutineScope)
-                            } else {
-                                clearRomInfo(incRomInfo)
+                                handleRomInfo(
+                                    recoveryRomInfo,
+                                    recoveryRomInfo.crossRom,
+                                    incRomInfo,
+                                    incIconInfo,
+                                    incImageInfo,
+                                    coroutineScope
+                                )
                             }
 
                             if (noUltimateLink) {
@@ -324,33 +344,31 @@ class RomInfo {
                             }
 
                         } else if (recoveryRomInfo.incrementRom?.bigversion != null) {
-
-                            handleRomInfo(recoveryRomInfo, recoveryRomInfo.incrementRom, curRomInfo, curIconInfo, coroutineScope)
-                            clearRomInfo(incRomInfo)
+                            handleRomInfo(
+                                recoveryRomInfo,
+                                recoveryRomInfo.incrementRom,
+                                curRomInfo,
+                                curIconInfo,
+                                curImageInfo,
+                                coroutineScope
+                            )
                             showMessage(messageWrongResult)
-
                         } else if (recoveryRomInfo.crossRom?.bigversion != null) {
-
-                            handleRomInfo(recoveryRomInfo, recoveryRomInfo.crossRom, curRomInfo, curIconInfo, coroutineScope)
-                            clearRomInfo(incRomInfo)
+                            handleRomInfo(
+                                recoveryRomInfo,
+                                recoveryRomInfo.crossRom,
+                                curRomInfo,
+                                curIconInfo,
+                                curImageInfo,
+                                coroutineScope
+                            )
                             showMessage(messageWrongResult)
-
                         } else {
-
-                            clearRomInfo(curRomInfo)
-                            clearRomInfo(incRomInfo)
                             showMessage(messageNoResult)
-
                         }
-
                         searchKeywordsSelected.value = 0
-
                     } else {
-
-                        clearRomInfo(curRomInfo)
-                        clearRomInfo(incRomInfo)
                         showMessage(messageCrashResult, 5000L)
-
                     }
                 }
             }
@@ -373,6 +391,7 @@ class RomInfo {
         romInfo: RomInfoHelper.Rom?,
         romInfoData: MutableState<DataHelper.RomInfoData>,
         iconInfoData: MutableState<List<DataHelper.IconInfoData>>,
+        imageInfoData: MutableState<List<DataHelper.ImageInfoData>>,
         coroutineScope: CoroutineScope,
         officialDownload: String? = null,
         noUltimateLink: Boolean = false,
@@ -390,16 +409,30 @@ class RomInfo {
             formattedGentleNotice?.forEach { gentle.append(it) }
             val gentleNotice = gentle.toString().trimEnd().split("\n").drop(1).joinToString("\n")
 
-            val iconNames = changelogGroups.map { it.split("\n").first() }
-            val iconMainLink = recoveryRomInfo.fileMirror?.icon ?: ""
-            val iconNameLink = recoveryRomInfo.icon ?: mapOf()
-            val iconLinks = iconLink(iconNames, iconMainLink, iconNameLink)
-            iconInfoData.value = iconNames.mapIndexed { index, iconName ->
-                DataHelper.IconInfoData(
-                    iconName = iconName,
-                    iconLink = if (isWeb()) "" else iconLinks[iconName] ?: "",
-                    changelog = changelog[index]
-                )
+            if (romInfo.osbigversion!!.toFloat() >= 3.0) {
+                val imageNames = changelogGroups.map { it.split("\n").first() }
+                val imageMainLink = recoveryRomInfo.fileMirror?.image ?: ""
+                val imageNameLink = recoveryRomInfo.log?.moduleImg ?: mapOf()
+                val imageLinks = imageLink(imageNames, imageMainLink, imageNameLink)
+                imageInfoData.value = imageNames.mapIndexed { index, imageName ->
+                    DataHelper.ImageInfoData(
+                        imageName = imageName,
+                        imageLink = if (isWeb()) "" else imageLinks[imageName] ?: "",
+                        changelog = changelog[index]
+                    )
+                }
+            } else {
+                val iconNames = changelogGroups.map { it.split("\n").first() }
+                val iconMainLink = recoveryRomInfo.fileMirror?.icon ?: ""
+                val iconNameLink = recoveryRomInfo.icon ?: mapOf()
+                val iconLinks = iconLink(iconNames, iconMainLink, iconNameLink)
+                iconInfoData.value = iconNames.mapIndexed { index, iconName ->
+                    DataHelper.IconInfoData(
+                        iconName = iconName,
+                        iconLink = if (isWeb()) "" else iconLinks[iconName] ?: "",
+                        changelog = changelog[index]
+                    )
+                }
             }
 
             val bigVersion = when {
@@ -462,8 +495,14 @@ class RomInfo {
      *
      * @param romInfoData: Data used to display ROM info
      */
-    fun clearRomInfo(romInfoData: MutableState<DataHelper.RomInfoData>) {
+    fun clearRomInfo(
+        romInfoData: MutableState<DataHelper.RomInfoData>,
+        iconInfoData: MutableState<List<DataHelper.IconInfoData>>,
+        imageInfoData: MutableState<List<DataHelper.ImageInfoData>>
+    ) {
         romInfoData.value = DataHelper.RomInfoData()
+        iconInfoData.value = listOf()
+        imageInfoData.value = listOf()
     }
 
     /**
@@ -505,7 +544,6 @@ class RomInfo {
         } else {
             if (updatedKeywords.size >= 8) updatedKeywords.removeAt(updatedKeywords.size - 1)
         }
-
         updatedKeywords.add(0, newKeyword)
         searchKeywords.value = updatedKeywords
         prefSet("searchKeywords", Json.encodeToString(updatedKeywords))
@@ -523,13 +561,51 @@ class RomInfo {
      */
     fun iconLink(iconNames: List<String>, iconMainLink: String, iconNameLink: Map<String, String>): MutableMap<String, String> {
         val iconMap = mutableMapOf<String, String>()
-        if (iconMainLink.isNotEmpty() && iconNameLink.isNotEmpty()) {
+        val safeIconMainLink = if (iconMainLink.startsWith("http://")) {
+            "https://" + iconMainLink.removePrefix("http://")
+        } else {
+            iconMainLink
+        }
+        if (safeIconMainLink.isNotEmpty() && iconNameLink.isNotEmpty()) {
             for (name in iconNames) {
-                val realLink = iconMainLink + iconNameLink[name]
+                val realLink = safeIconMainLink + iconNameLink[name]
                 iconMap[name] = realLink
             }
         }
         return iconMap
+    }
+
+    /**
+     * Generate maps with links with corresponding names and images.
+     *
+     * @param imageNames: Image names included in the changelog
+     * @param imageMainLink: Main link to get the image
+     * @param imageNameLink: Links that correspond to each image name
+     *
+     * @return Links to images with corresponding names
+     */
+    fun imageLink(
+        imageNames: List<String>,
+        imageMainLink: String,
+        imageNameLink: Map<String, Map<String, String>>
+    ): MutableMap<String, String> {
+        val imageMap = mutableMapOf<String, String>()
+        val safeImageMainLink = if (imageMainLink.startsWith("http://")) {
+            "https://" + imageMainLink.removePrefix("http://")
+        } else {
+            imageMainLink
+        }
+        if (safeImageMainLink.isNotEmpty() && imageNameLink.isNotEmpty()) {
+            for (name in imageNames) {
+                val realLink = if ((imageNameLink[name]?.get("pt") ?: "") == "") {
+                    ""
+                } else {
+                    safeImageMainLink + imageNameLink[name]?.get("pt")
+                }
+                imageMap[name] = realLink
+            }
+        }
+        return imageMap
     }
 
     /**

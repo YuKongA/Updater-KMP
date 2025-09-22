@@ -6,6 +6,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -28,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.seiko.imageloader.rememberImagePainter
 import data.DataHelper
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -42,6 +44,7 @@ import top.yukonga.miuix.kmp.icon.icons.useful.Copy
 import top.yukonga.miuix.kmp.icon.icons.useful.Save
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import ui.components.TextWithIcon
+import ui.components.TextWithImage
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.android_version
 import updater.composeapp.generated.resources.attention
@@ -66,10 +69,12 @@ import utils.MessageUtils.Companion.showMessage
 fun InfoCardViews(
     romInfoData: MutableState<DataHelper.RomInfoData>,
     iconInfoData: MutableState<List<DataHelper.IconInfoData>>,
+    imageInfoData: MutableState<List<DataHelper.ImageInfoData>>,
     updateRomInfoState: MutableState<Int>
 ) {
     val romInfo = romInfoData.value
     val iconInfo = iconInfoData.value
+    val imageInfo = imageInfoData.value
 
     val isVisible by remember(updateRomInfoState.value, romInfoData.value) {
         derivedStateOf {
@@ -183,6 +188,7 @@ fun InfoCardViews(
             if (romInfo.changelog.isNotEmpty()) {
                 ChangelogView(
                     iconInfo,
+                    imageInfo,
                     romInfo.changelog
                 )
             }
@@ -322,6 +328,7 @@ fun DownloadInfoView(
 @Composable
 fun ChangelogView(
     iconInfo: List<DataHelper.IconInfoData>,
+    imageInfo: List<DataHelper.ImageInfoData>,
     changelog: String
 ) {
     val hapticFeedback = LocalHapticFeedback.current
@@ -357,13 +364,25 @@ fun ChangelogView(
                 )
             }
         }
-        iconInfo.forEachIndexed { index, it ->
-            TextWithIcon(
-                changelog = it.changelog,
-                iconName = it.iconName,
-                iconLink = it.iconLink,
-                padding = if (index == iconInfo.size - 1) 0.dp else 16.dp
-            )
+        if (iconInfo.isNotEmpty()) {
+            iconInfo.forEachIndexed { index, it ->
+                TextWithIcon(
+                    changelog = it.changelog,
+                    iconName = it.iconName,
+                    iconLink = it.iconLink,
+                    padding = if (index == iconInfo.size - 1) 0.dp else 16.dp
+                )
+            }
+        }
+        if (imageInfo.isNotEmpty()) {
+            imageInfo.forEachIndexed { index, it ->
+                TextWithImage(
+                    changelog = it.changelog,
+                    imageName = it.imageName,
+                    imageLink = it.imageLink,
+                    padding = if (index == imageInfo.size - 1) 0.dp else 16.dp
+                )
+            }
         }
     }
 }

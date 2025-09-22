@@ -198,8 +198,8 @@ fun LoginDialog(
                         val captchaUrl = "https://account.xiaomi.com" + prefGet("captchaUrl")
                         println("Captcha URL: $captchaUrl")
                         Image(
-                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                             painter = rememberImagePainter(captchaUrl),
+                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                             contentDescription = "Captcha"
                         )
                     }

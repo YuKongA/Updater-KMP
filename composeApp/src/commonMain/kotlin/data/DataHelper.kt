@@ -5,11 +5,17 @@ import kotlinx.serialization.Serializable
 object DataHelper {
     @Serializable
     data class IconInfoData(
-        val changelog: String,
-        val iconName: String,
-        val iconLink: String,
+        val changelog: String = "",
+        val iconName: String = "",
+        val iconLink: String = "",
     )
 
+    @Serializable
+    data class ImageInfoData(
+        val changelog: String = "",
+        val imageName: String = "",
+        val imageLink: String = "",
+    )
 
     @Serializable
     data class LoginData(
@@ -38,6 +44,12 @@ object DataHelper {
         val token: String,
         val v: String,
         val unlock: String,
+        val options: Options,
+    )
+
+    @Serializable
+    data class Options(
+        val av: String,
     )
 
     @Serializable

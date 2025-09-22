@@ -18,6 +18,8 @@ object RomInfoHelper {
         @SerialName("Icon") val icon: Map<String, String>? = null,
         @SerialName("FileMirror") val fileMirror: FileMirror? = null,
         @SerialName("GentleNotice") val gentleNotice: GentleNotice? = null,
+        @SerialName("HeadImages") val headImages: Map<String, String>? = null,
+        @SerialName("Log") val log: Log? = null
     )
 
     @Serializable
@@ -56,5 +58,10 @@ object RomInfoHelper {
     @Serializable
     data class GentleNotice(
         val text: String,
+    )
+
+    @Serializable
+    data class Log(
+        val moduleImg: Map<String, Map<String, String>>
     )
 }
