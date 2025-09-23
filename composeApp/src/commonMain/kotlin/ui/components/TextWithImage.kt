@@ -4,13 +4,15 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -29,20 +31,22 @@ fun TextWithImage(
 ) {
     AnimatedContent(targetState = changelog) {
         Column {
-            Text(
-                modifier = Modifier.padding(bottom = 12.dp),
-                text = imageName,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium
-            )
             if (it.isNotEmpty() && it != " ") {
+                Text(
+                    modifier = Modifier.padding(bottom = 8.dp),
+                    text = imageName,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
+                )
                 if (imageLink.isNotEmpty()) {
                     Image(
                         painter = rememberImagePainter(imageLink),
                         modifier = Modifier
-                            .padding(bottom = 12.dp)
-                            .fillMaxWidth()
-                            .clip(G2RoundedCornerShape(10.dp)),
+                            .padding(bottom = 8.dp)
+                            .clip(G2RoundedCornerShape(10.dp))
+                            .width(512.dp),
+                        alignment = Alignment.TopStart,
+                        contentScale = ContentScale.Fit,
                         contentDescription = imageName,
                     )
                 }

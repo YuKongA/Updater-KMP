@@ -22,7 +22,6 @@ import platform.useToast
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 class MessageUtils {
-
     companion object {
         private val snackbarMessage = mutableStateOf("")
         private var snackbarDuration = mutableStateOf(1000L)

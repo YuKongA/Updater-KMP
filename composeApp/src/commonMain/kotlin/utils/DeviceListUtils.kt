@@ -14,14 +14,11 @@ import platform.prefSet
  * Manages device list updates
  */
 object DeviceListUtils {
-
-
     private const val DEVICE_LIST_URL = "https://raw.githubusercontent.com/YuKongA/Updater-KMP/device-list/device.json"
     private const val DEVICE_LIST_CACHED_KEY = "deviceListCached"
     private const val DEVICE_LIST_VERSION_KEY = "deviceListVersion"
     private const val DEVICE_LIST_SOURCE_KEY = "deviceListSource"
     private val json = Json { ignoreUnknownKeys = true }
-
 
     /**
      * Get cached device list, or null if no cached data exists
@@ -42,6 +39,13 @@ object DeviceListUtils {
     fun getCachedVersion(): String? = prefGet(DEVICE_LIST_VERSION_KEY)
 
     /**
+     * Clean JSON string by removing trailing commas
+     */
+    private fun cleanJson(json: String): String {
+        return json.replace(Regex(""",\s*([}\]])"""), "$1")
+    }
+
+    /**
      * Fetch and cache device list from remote source
      * Returns updated device list or null if update failed
      */
@@ -50,7 +54,7 @@ object DeviceListUtils {
             withContext(Dispatchers.Default) {
                 val client = httpClientPlatform()
                 val response = client.get(DEVICE_LIST_URL)
-                val jsonContent = response.bodyAsText()
+                val jsonContent = cleanJson(response.bodyAsText())
                 val remoteData = json.decodeFromString<DeviceInfoHelper.RemoteDevices>(jsonContent)
 
                 val currentVersion = getCachedVersion()

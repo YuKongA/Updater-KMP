@@ -16,7 +16,6 @@ import kotlin.math.min
 
 class MetadataUtils private constructor() {
     companion object {
-
         private const val METADATA_PATH = "META-INF/com/android/metadata"
         private const val CHUNK_SIZE = 1024
         private const val END_BYTES_SIZE = 4096

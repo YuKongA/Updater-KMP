@@ -37,12 +37,13 @@ fun TextWithIcon(
             ) {
                 if (iconLink.isNotEmpty()) {
                     Image(
-                        modifier = Modifier.size(24.dp),
+                        modifier = Modifier
+                            .padding(end = 6.dp)
+                            .size(24.dp),
                         painter = imagePainter,
                         contentDescription = iconName,
                     )
                     Text(
-                        modifier = Modifier.padding(horizontal = 6.dp),
                         text = iconName,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium
@@ -51,6 +52,7 @@ fun TextWithIcon(
                     Text(
                         text = iconName,
                         fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
                     )
                 }
             }
