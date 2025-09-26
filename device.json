@@ -186,8 +186,8 @@
         { "deviceName": "Xiaomi Pad 8", "deviceCodeName": "yupei", "deviceCode": "PZ" },
         { "deviceName": "Xiaomi Pad 8 Pro", "deviceCodeName": "piano", "deviceCode": "PY" },
         { "deviceName": "Xiaomi 17", "deviceCodeName": "pudding", "deviceCode": "PC" },
-        { "deviceName": "Xiaomi 17 Pro", "deviceCodeName": "popsicle", "deviceCode": "PB" },
-        { "deviceName": "Xiaomi 17 Pro Max", "deviceCodeName": "pandora", "deviceCode": "PK" }
+        { "deviceName": "Xiaomi 17 Pro", "deviceCodeName": "pandora", "deviceCode": "BL" },
+        { "deviceName": "Xiaomi 17 Pro Max", "deviceCodeName": "popsicle", "deviceCode": "PB" }
     ],
     "version": "1.0.5"
 }
