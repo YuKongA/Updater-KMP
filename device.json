@@ -161,6 +161,7 @@
         { "deviceName": "Redmi Pad Pro 5G / POCO Pad 5G", "deviceCodeName": "ruan", "deviceCode": "FS" },
         { "deviceName": "REDMI Pad 2 4G", "deviceCodeName": "koto", "deviceCode": "OW" },
         { "deviceName": "REDMI Pad 2", "deviceCodeName": "taiko", "deviceCode": "OV" },
+        { "deviceName": "REDMI Pad 2 Pro", "deviceCodeName": "flute", "deviceCode": "PW" },
         { "deviceName": "REDMI K Pad / Xiaomi Pad Mini", "deviceCodeName": "turner", "deviceCode": "AO" },
         { "deviceName": "Redmi 13 / Redmi Note 13R / POCO M6 Plus", "deviceCodeName": "breeze", "deviceCode": "NU" },
         { "deviceName": "Xiaomi 14T Pro / Redmi K70 Ultra", "deviceCodeName": "rothko", "deviceCode": "NN" },
@@ -170,6 +171,8 @@
         { "deviceName": "Xiaomi 15 Pro", "deviceCodeName": "haotian", "deviceCode": "OB" },
         { "deviceName": "Xiaomi 15S Pro", "deviceCodeName": "dijun", "deviceCode": "OD" },
         { "deviceName": "Xiaomi 15 Ultra", "deviceCodeName": "xuanyuan", "deviceCode": "OA" },
+        { "deviceName": "Xiaomi 15T", "deviceCodeName": "goya", "deviceCode": "OE" },
+        { "deviceName": "Xiaomi 15T Pro", "deviceCodeName": "klimt", "deviceCode": "OS" },
         { "deviceName": "Xiaomi Pad 7", "deviceCodeName": "uke", "deviceCode": "OZ" },
         { "deviceName": "Xiaomi Pad 7 Pro", "deviceCodeName": "muyu", "deviceCode": "OY" },
         { "deviceName": "Xiaomi Pad 7S Pro", "deviceCodeName": "violin", "deviceCode": "OT" },
@@ -177,17 +180,18 @@
         { "deviceName": "Xiaomi Civi 5 Pro", "deviceCodeName": "luming", "deviceCode": "OI" },
         { "deviceName": "Xiaomi MIX Flip 2", "deviceCodeName": "bixi", "deviceCode": "OH" },
         { "deviceName": "REDMI 15C / POCO C85", "deviceCodeName": "dew", "deviceCode": "BN" },
+        { "deviceName": "REDMI 15C 5G / REDMI 15R 5G", "deviceCodeName": "tornado", "deviceCode": "PO" },
         { "deviceName": "REDMI 15 4G / POCO M7 4G", "deviceCodeName": "creek", "deviceCode": "BO" },
         { "deviceName": "Xiaomi Yu7 后排移动控制屏", "deviceCodeName": "konghou", "deviceCode": "BP" },
         { "deviceName": "REDMI 15 / Note 15R / POCO M7 Plus", "deviceCodeName": "spring", "deviceCode": "OU" },
+        { "deviceName": "Xiaomi 17", "deviceCodeName": "pudding", "deviceCode": "PC" },
+        { "deviceName": "Xiaomi 17 Pro", "deviceCodeName": "pandora", "deviceCode": "BL" },
+        { "deviceName": "Xiaomi 17 Pro Max", "deviceCodeName": "popsicle", "deviceCode": "PB" },
         { "deviceName": "REDMI Note 15", "deviceCodeName": "kunzite", "deviceCode": "PQ" },
         { "deviceName": "REDMI Note 15 Pro", "deviceCodeName": "lapis", "deviceCode": "PP" },
         { "deviceName": "REDMI Note 15 Pro+", "deviceCodeName": "flourite", "deviceCode": "PR" },
         { "deviceName": "Xiaomi Pad 8", "deviceCodeName": "yupei", "deviceCode": "PZ" },
-        { "deviceName": "Xiaomi Pad 8 Pro", "deviceCodeName": "piano", "deviceCode": "PY" },
-        { "deviceName": "Xiaomi 17", "deviceCodeName": "pudding", "deviceCode": "PC" },
-        { "deviceName": "Xiaomi 17 Pro", "deviceCodeName": "pandora", "deviceCode": "BL" },
-        { "deviceName": "Xiaomi 17 Pro Max", "deviceCodeName": "popsicle", "deviceCode": "PB" }
+        { "deviceName": "Xiaomi Pad 8 Pro", "deviceCodeName": "piano", "deviceCode": "PY" }
     ],
-    "version": "1.0.5"
+    "version": "1.0.6"
 }
