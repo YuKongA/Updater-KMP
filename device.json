@@ -184,7 +184,10 @@
         { "deviceName": "REDMI Note 15 Pro", "deviceCodeName": "lapis", "deviceCode": "PP" },
         { "deviceName": "REDMI Note 15 Pro+", "deviceCodeName": "flourite", "deviceCode": "PR" },
         { "deviceName": "Xiaomi Pad 8", "deviceCodeName": "yupei", "deviceCode": "PZ" },
-        { "deviceName": "Xiaomi Pad 8 Pro", "deviceCodeName": "piano", "deviceCode": "PY" }
+        { "deviceName": "Xiaomi Pad 8 Pro", "deviceCodeName": "piano", "deviceCode": "PY" },
+        { "deviceName": "Xiaomi 17", "deviceCodeName": "pudding", "deviceCode": "PC" },
+        { "deviceName": "Xiaomi 17 Pro", "deviceCodeName": "pandora", "deviceCode": "BL" },
+        { "deviceName": "Xiaomi 17 Pro Max", "deviceCodeName": "popsicle", "deviceCode": "PB" }
     ],
-    "version": "1.0.4"
+    "version": "1.0.5"
 }
