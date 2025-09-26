@@ -173,9 +173,6 @@
         { "deviceName": "Xiaomi 15 Ultra", "deviceCodeName": "xuanyuan", "deviceCode": "OA" },
         { "deviceName": "Xiaomi 15T", "deviceCodeName": "goya", "deviceCode": "OE" },
         { "deviceName": "Xiaomi 15T Pro", "deviceCodeName": "klimt", "deviceCode": "OS" },
-        { "deviceName": "Xiaomi 17", "deviceCodeName": "pudding", "deviceCode": "PC" },
-        { "deviceName": "Xiaomi 17 Pro", "deviceCodeName": "pandora", "deviceCode": "BL" },
-        { "deviceName": "Xiaomi 17 Pro Max", "deviceCodeName": "popsicle", "deviceCode": "PB" },
         { "deviceName": "Xiaomi Pad 7", "deviceCodeName": "uke", "deviceCode": "OZ" },
         { "deviceName": "Xiaomi Pad 7 Pro", "deviceCodeName": "muyu", "deviceCode": "OY" },
         { "deviceName": "Xiaomi Pad 7S Pro", "deviceCodeName": "violin", "deviceCode": "OT" },
@@ -193,5 +190,5 @@
         { "deviceName": "Xiaomi Pad 8", "deviceCodeName": "yupei", "deviceCode": "PZ" },
         { "deviceName": "Xiaomi Pad 8 Pro", "deviceCodeName": "piano", "deviceCode": "PY" }
     ],
-    "version": "1.0.5"
+    "version": "1.0.6"
 }
