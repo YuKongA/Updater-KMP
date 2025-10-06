@@ -16,6 +16,7 @@ class Password {
         generateKey()
         val encryptedAccount = ownEncrypt(account)
         val encryptedPassword = ownEncrypt(password)
+        prefSet("savePassword", "1")
         prefSet("account", encryptedAccount.first)
         prefSet("accountIv", encryptedAccount.second)
         prefSet("password", encryptedPassword.first)
@@ -26,6 +27,7 @@ class Password {
      * Delete Xiaomi's account & password.
      */
     fun deletePassword() {
+        prefRemove("savePassword")
         prefRemove("account")
         prefRemove("accountIv")
         prefRemove("password")

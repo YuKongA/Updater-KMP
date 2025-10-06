@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
@@ -24,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -218,6 +220,7 @@ fun LoginDialog(
                         val options = Json.decodeFromString<List<Int>>(optionsStr)
                         Column {
                             if (options.contains(4)) {
+                                LocalUriHandler.current
                                 TextButton(
                                     modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                                     text = stringResource(Res.string.send_phone_code),
@@ -240,7 +243,7 @@ fun LoginDialog(
                             }
                             if (options.contains(8)) {
                                 TextButton(
-                                    modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+                                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                                     text = stringResource(Res.string.send_email_code),
                                     onClick = {
                                         coroutineScope.launch {
@@ -259,6 +262,7 @@ fun LoginDialog(
                                     colors = ButtonDefaults.textButtonColorsPrimary()
                                 )
                             }
+                            Spacer(Modifier.height(16.dp))
                         }
                     }
                 }

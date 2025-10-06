@@ -35,16 +35,15 @@
     <string name="save_password">パスワードを保存</string>
     <string name="cancel">キャンセル</string>
     <string name="logging_in">ログイン中…</string>
+    <string name="logged_in">ログイン済み</string>
+    <string name="login_error">ログイン認証に失敗しました！</string>
+    <string name="login_expired">ログイン期限切れ</string>
+    <string name="login_expired_desc">再ログインをお勧めします</string>
     <string name="login_successful">ログイン成功</string>
     <string name="account_or_password_empty">アカウントまたはパスワードが空です！</string>
     <string name="no_account">アカウントがありません</string>
     <string name="login_desc">v1 インターフェースを使用</string>
     <string name="using_v2">v2 インターフェースを使用</string>
-    <string name="logged_in">ログイン済み</string>
-    <string name="login_expired">ログイン期限切れ</string>
-    <string name="login_expired_desc">再ログインをお勧めします</string>
-    <string name="send_email_code">メールコードを送信</string>
-    <string name="send_phone_code">電話コードを送信</string>
     <string name="copy_successful">コピー成功</string>
     <string name="download_start">ダウンロード開始</string>
     <string name="security_error">セキュリティキーの取得に失敗しました</string>
@@ -52,7 +51,6 @@
     <string name="logout_confirm">ログアウトしてもよろしいですか?</string>
     <string name="confirm">確認</string>
     <string name="logout_successful">ログアウト成功</string>
-    <string name="login_error">ログイン認証に失敗しました！</string>
     <string name="region_code">地域コード</string>
     <string name="carrier_code">キャリアコード</string>
     <string name="global">グローバルアカウント</string>
@@ -73,8 +71,9 @@
     <string name="device_list_version">バージョン</string>
     <string name="login_tips1">二次認証が検出されました。検証コードの取得ボタンをクリックしてください</string>
     <string name="login_tips2">検証コードの入力が必要です。検証コードの取得ボタンをクリックしてください</string>
-    <string name="verification_code">検証コード</string>
-    <string name="verification_code_get">検証コードを取得</string>
+    <string name="verification_code">検証コード</string>L
+    <string name="send_email_code">メールコードを送信</string>
+    <string name="send_phone_code">電話コードを送信</string>
     <string name="verifying">検証中...</string>
     <string name="opensource_info">著作権 © 2024-2025 YuKongA</string>
 </resources>
