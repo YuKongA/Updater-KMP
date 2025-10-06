@@ -55,6 +55,7 @@ class Login() {
      *
      * @return Login status
      */
+    @OptIn(ExperimentalTime::class)
     suspend fun login(
         account: String,
         password: String,
@@ -73,8 +74,8 @@ class Login() {
         }
         try {
             if (flag != null && ticket.isEmpty()) {
-                val send2FACode = send2FATicket()
-                if (!send2FACode) return 3 // 3: 登录失败
+                val send2FACode = send2FATicket(flag = flag)
+                if (send2FACode != 0) return 3 // 3: 登录失败
             }
             if (flag != null && ticket.isNotEmpty()) {
                 val verify2FATicket = verify2FATicket(flag = flag, ticket = ticket)
@@ -141,6 +142,7 @@ class Login() {
         val ssecurity = content["ssecurity"]?.jsonPrimitive?.content
         val captchaUrl = content["captchaUrl"]?.jsonPrimitive?.content
         val notificationUrl = content["notificationUrl"]?.jsonPrimitive?.content
+        println(notificationUrl)
         val result = content["result"]?.jsonPrimitive?.content
 
         if (captchaUrl != null && captchaUrl != "null") {
@@ -148,11 +150,11 @@ class Login() {
             return 6 // 6: 需要验证码
         }
 
-        if (!notificationUrl.isNullOrEmpty()) {
+        if (notificationUrl != null && notificationUrl != "null") {
             val context = getQueryParam(notificationUrl, "context")
             if (context.isNullOrEmpty()) return 3 // 3: 登录失败
             prefSet("2FAContext", context)
-            val response = client.get(notificationUrl.replace("identity/authStart", "identity/list"))
+            val response = client.get(notificationUrl.replace("fe/service/identity/authStart", "identity/list"))
             val identitySession = requireNotNull(response.setCookie().find { it.name == "identity_session" }?.value)
             prefSet("identity_session", identitySession)
             val listJson = Json.decodeFromString<JsonObject>(removeResponsePrefix(response.bodyAsText()))
@@ -163,17 +165,22 @@ class Login() {
             return 5 // 5: 需要二次验证
         }
 
+        println(content)
+        println("ssecurity: $ssecurity")
+        println("result: $result")
+
         if ((result != null && result != "ok") || ssecurity.isNullOrBlank()) {
             return 3 // 3: 登录失败
         }
 
         val location = requireNotNull(content["location"]?.jsonPrimitive?.content)
-        val finalResponse = client.get("$location&_userIdNeedEncrypt=true")
-        if (!finalResponse.status.isSuccess()) return 2
+        val response2 = client.get("$location&_userIdNeedEncrypt=true")
+        if (!response2.status.isSuccess()) return 2 // 2: 网络错误
 
         val userId = requireNotNull(content["userId"]?.jsonPrimitive?.content)
         val cUserId = requireNotNull(content["cUserId"]?.jsonPrimitive?.content)
-        val serviceToken = requireNotNull(finalResponse.setCookie().find { it.name == "serviceToken" }?.value)
+        val serviceToken =
+            requireNotNull(response2.setCookie().find { it.name == "serviceToken" && it.value.isNotBlank() }?.value)
         if (serviceToken == "") return 4 // 4: 未返回 serviceToken
 
         val loginInfo = DataHelper.LoginData(
@@ -191,13 +198,17 @@ class Login() {
     }
 
     /**
-     * Send 2FA ticket(email).
+     * Send 2FA ticket(phone or email).
      *
      * @return Send status
      */
     @OptIn(ExperimentalTime::class)
-    suspend fun send2FATicket(): Boolean {
-        val sendTicketUrl = "https://account.xiaomi.com/identity/auth/sendEmailTicket"
+    suspend fun send2FATicket(flag: Int): Int {
+        val sendTicketUrl = if (flag == 4) {
+            "https://account.xiaomi.com/identity/auth/sendPhoneTicket"
+        } else {
+            "https://account.xiaomi.com/identity/auth/sendEmailTicket"
+        }
         val parameters = parameters {
             append("retry", "0")
             append("icode", "")
@@ -208,8 +219,9 @@ class Login() {
             header("cookie", "identity_session=${prefGet("identity_session") ?: ""}")
         }
         val sendTicketText = response.bodyAsText()
+        println(sendTicketText)
         val sendTicketJson = Json.decodeFromString<JsonObject>(removeResponsePrefix(sendTicketText))
-        return sendTicketJson["code"]?.jsonPrimitive?.intOrNull == 0
+        return sendTicketJson["code"]?.jsonPrimitive?.intOrNull ?: 3 // 3: 登录失败
     }
 
     /**
@@ -236,6 +248,7 @@ class Login() {
             header("cookie", "identity_session=${prefGet("identity_session") ?: ""}")
         }
         val verifyBody = Json.decodeFromString<JsonObject>(removeResponsePrefix(verifyResponse.bodyAsText()))
+        println(verifyBody)
         if (verifyBody["code"]?.jsonPrimitive?.int == 0) {
             val location = requireNotNull(verifyBody["location"]?.jsonPrimitive?.content)
             client.get(location)

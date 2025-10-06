@@ -24,8 +24,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -68,7 +68,6 @@ import updater.composeapp.generated.resources.password
 import updater.composeapp.generated.resources.save_password
 import updater.composeapp.generated.resources.security_error
 import updater.composeapp.generated.resources.send_email_code
-import updater.composeapp.generated.resources.send_phone_code
 import updater.composeapp.generated.resources.submit
 import updater.composeapp.generated.resources.toast_crash_info
 import updater.composeapp.generated.resources.verification_code
@@ -117,6 +116,18 @@ fun LoginDialog(
     // 主页登录按钮
     IconButton(
         onClick = {
+            prefRemove("captchaUrl")
+            prefRemove("2FAContext")
+            prefRemove("2FAOptions")
+            prefRemove("2FAFlag")
+            prefRemove("2FADc")
+            prefRemove("identity_session")
+
+            showTicketInput = false
+            showTicketUrl = false
+            showCaptchaInput = false
+            showCaptchaUrl = false
+
             showDialog.value = true
             focusManager.clearFocus()
         },
@@ -196,14 +207,15 @@ fun LoginDialog(
                             colors = ButtonDefaults.textButtonColorsPrimary()
                         )
                     }
+                    val captchaImg = rememberImagePainter("https://account.xiaomi.com" + prefGet("captchaUrl"))
                     // 显示图片验证码
                     AnimatedVisibility(
                         visible = showCaptchaInput
                     ) {
-                        val captchaUrl = "https://account.xiaomi.com" + prefGet("captchaUrl")
                         Image(
-                            painter = rememberImagePainter(captchaUrl),
-                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                            painter = captchaImg,
+                            modifier = Modifier.width(512.dp).padding(top = 16.dp),
+                            contentScale = ContentScale.FillWidth,
                             contentDescription = "Captcha"
                         )
                     }
@@ -218,29 +230,11 @@ fun LoginDialog(
                     ) {
                         val optionsStr = prefGet("2FAOptions") ?: "[]"
                         val options = Json.decodeFromString<List<Int>>(optionsStr)
+                        if (options.isEmpty() || ((options.contains(4) && !options.contains(8)))) {
+                            showMessage(message = messageSecurityError)
+                            showDialog.value = false
+                        }
                         Column {
-                            if (options.contains(4)) {
-                                LocalUriHandler.current
-                                TextButton(
-                                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                                    text = stringResource(Res.string.send_phone_code),
-                                    onClick = {
-                                        coroutineScope.launch {
-                                            Login().login(
-                                                account = account,
-                                                password = password,
-                                                global = global,
-                                                savePassword = savePassword,
-                                                isLogin = isLogin,
-                                                flag = 4,
-                                            )
-                                            prefSet("2FAFlag", "4")
-                                        }
-                                        showTicketInput = true
-                                    },
-                                    colors = ButtonDefaults.textButtonColorsPrimary()
-                                )
-                            }
                             if (options.contains(8)) {
                                 TextButton(
                                     modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
@@ -255,9 +249,9 @@ fun LoginDialog(
                                                 isLogin = isLogin,
                                                 flag = 8,
                                             )
+                                            showTicketInput = true
                                             prefSet("2FAFlag", "8")
                                         }
-                                        showTicketInput = true
                                     },
                                     colors = ButtonDefaults.textButtonColorsPrimary()
                                 )
@@ -306,21 +300,20 @@ fun LoginDialog(
                                                 ticket = ticket
                                             )
                                             if (int == 0) {
-                                                showMessage(messageLoginSuccess)
+                                                showMessage(message = messageLoginSuccess)
                                                 ticket = ""
                                                 prefRemove("2FAContext")
                                                 prefRemove("2FAOptions")
                                                 prefRemove("2FAFlag")
                                                 prefRemove("identity_session")
                                                 showTicketInput = false
-                                                showTicketUrl = false
                                                 showDialog.value = false
                                             } else {
-                                                showMessage(messageError)
+                                                showMessage(message = messageError)
                                             }
                                             isVerifying = false
                                         }
-                                    } else if (showCaptchaInput) {
+                                    } else if (showCaptchaUrl) {
                                         // 提交图片验证码
                                         coroutineScope.launch {
                                             isVerifying = true
@@ -333,14 +326,13 @@ fun LoginDialog(
                                                 captcha = ticket
                                             )
                                             if (int == 0) {
-                                                showMessage(messageLoginSuccess)
+                                                showMessage(message = messageLoginSuccess)
                                                 ticket = ""
                                                 prefRemove("captchaUrl")
-                                                showCaptchaInput = false
                                                 showCaptchaUrl = false
                                                 showDialog.value = false
                                             } else {
-                                                showMessage(messageError)
+                                                showMessage(message = messageError)
                                             }
                                             isVerifying = false
                                         }
@@ -462,7 +454,7 @@ fun LoginDialog(
         }
     }
 
-    // 登出对话框
+// 登出对话框
     if (isLogin.value == 1) {
         SuperDialog(
             show = showDialog,
