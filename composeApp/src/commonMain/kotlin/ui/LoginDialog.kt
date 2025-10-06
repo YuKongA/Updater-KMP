@@ -24,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -32,9 +31,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.rememberImagePainter
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.stringResource
 import platform.prefGet
 import platform.prefRemove
+import platform.prefSet
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
@@ -64,6 +65,8 @@ import updater.composeapp.generated.resources.logout_successful
 import updater.composeapp.generated.resources.password
 import updater.composeapp.generated.resources.save_password
 import updater.composeapp.generated.resources.security_error
+import updater.composeapp.generated.resources.send_email_code
+import updater.composeapp.generated.resources.send_phone_code
 import updater.composeapp.generated.resources.submit
 import updater.composeapp.generated.resources.toast_crash_info
 import updater.composeapp.generated.resources.verification_code
@@ -196,7 +199,6 @@ fun LoginDialog(
                         visible = showCaptchaInput
                     ) {
                         val captchaUrl = "https://account.xiaomi.com" + prefGet("captchaUrl")
-                        println("Captcha URL: $captchaUrl")
                         Image(
                             painter = rememberImagePainter(captchaUrl),
                             modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
@@ -205,25 +207,59 @@ fun LoginDialog(
                     }
                 }
 
-                // 二次认证验证码
+                // 发送二次认证验证码
                 AnimatedVisibility(
                     visible = showTicketUrl
                 ) {
-                    // 跳转到网页获取二次认证验证码
                     AnimatedVisibility(
                         visible = !showTicketInput
                     ) {
-                        val uriHandler = LocalUriHandler.current
-                        TextButton(
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
-                            text = stringResource(Res.string.verification_code_get),
-                            onClick = {
-                                val notificationUrl = prefGet("notificationUrl")
-                                notificationUrl?.let { uriHandler.openUri(it) }
-                                showTicketInput = true
-                            },
-                            colors = ButtonDefaults.textButtonColorsPrimary()
-                        )
+                        val optionsStr = prefGet("2FAOptions") ?: "[]"
+                        val options = Json.decodeFromString<List<Int>>(optionsStr)
+                        Column {
+                            if (options.contains(4)) {
+                                TextButton(
+                                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                                    text = stringResource(Res.string.send_phone_code),
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            Login().login(
+                                                account = account,
+                                                password = password,
+                                                global = global,
+                                                savePassword = savePassword,
+                                                isLogin = isLogin,
+                                                flag = 4,
+                                            )
+                                            prefSet("2FAFlag", "4")
+                                        }
+                                        showTicketInput = true
+                                    },
+                                    colors = ButtonDefaults.textButtonColorsPrimary()
+                                )
+                            }
+                            if (options.contains(8)) {
+                                TextButton(
+                                    modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+                                    text = stringResource(Res.string.send_email_code),
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            Login().login(
+                                                account = account,
+                                                password = password,
+                                                global = global,
+                                                savePassword = savePassword,
+                                                isLogin = isLogin,
+                                                flag = 8,
+                                            )
+                                            prefSet("2FAFlag", "8")
+                                        }
+                                        showTicketInput = true
+                                    },
+                                    colors = ButtonDefaults.textButtonColorsPrimary()
+                                )
+                            }
+                        }
                     }
                 }
 
@@ -262,12 +298,16 @@ fun LoginDialog(
                                                 global = global,
                                                 savePassword = savePassword,
                                                 isLogin = isLogin,
+                                                flag = prefGet("2FAFlag")?.toInt(),
                                                 ticket = ticket
                                             )
                                             if (int == 0) {
                                                 showMessage(messageLoginSuccess)
                                                 ticket = ""
-                                                prefRemove("notificationUrl")
+                                                prefRemove("2FAContext")
+                                                prefRemove("2FAOptions")
+                                                prefRemove("2FAFlag")
+                                                prefRemove("identity_session")
                                                 showTicketInput = false
                                                 showTicketUrl = false
                                                 showDialog.value = false

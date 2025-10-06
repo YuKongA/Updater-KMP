@@ -37,6 +37,8 @@
     <string name="logging_in">登入中…</string>
     <string name="login_expired">登入已過期</string>
     <string name="login_expired_desc">建議重新登入</string>
+    <string name="send_email_code">發送郵箱驗證碼</string>
+    <string name="send_phone_code">發送手機驗證碼</string>
     <string name="login_successful">登入成功</string>
     <string name="account_or_password_empty">帳號或密碼為空！</string>
     <string name="no_account">未登入</string>

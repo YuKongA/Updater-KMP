@@ -44,6 +44,8 @@
     <string name="logged_in">Logged in</string>
     <string name="login_expired">Login expired</string>
     <string name="login_expired_desc">Recommended to login again</string>
+    <string name="send_email_code">Send email code</string>
+    <string name="send_phone_code">Send phone code</string>
     <string name="copy_successful">Copy successful</string>
     <string name="download_start">Start download</string>
     <string name="security_error">Failed to get security key</string>

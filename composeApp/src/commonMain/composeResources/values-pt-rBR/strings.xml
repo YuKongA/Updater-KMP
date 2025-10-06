@@ -43,6 +43,8 @@
     <string name="logged_in">Logado</string>
     <string name="login_expired">Login expirado</string>
     <string name="login_expired_desc">Recomendado fazer login novamente</string>
+    <string name="send_email_code">Enviar código de e-mail</string>
+    <string name="send_phone_code">Enviar código de telefone</string>
     <string name="copy_successful">Cópia bem-sucedida</string>
     <string name="download_start">Iniciar download</string>
     <string name="security_error">Falha ao obter chave de segurança</string>
