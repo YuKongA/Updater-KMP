@@ -4,10 +4,10 @@ import dev.whyoleg.cryptography.DelicateCryptographyApi
 import dev.whyoleg.cryptography.algorithms.MD5
 import io.ktor.client.plugins.cookies.AcceptAllCookiesStorage
 import io.ktor.client.plugins.cookies.HttpCookies
-import io.ktor.client.plugins.cookies.get
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
@@ -17,6 +17,7 @@ import io.ktor.http.userAgent
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.int
+import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
 import platform.httpClientPlatform
@@ -44,13 +45,17 @@ class Login() {
      * Login Xiaomi account.
      *
      * @param account: Xiaomi account
-     * @param password: Password
+     * @param password: Xiaomi password
      * @param global: Global or China account
      * @param savePassword: Save password or not
      * @param isLogin: Login status
+     * @param captcha: Captcha if needed
+     * @param flag: 2FA flag if needed, 4 for phone, 8 for email
+     * @param ticket: 2FA ticket if needed
      *
      * @return Login status
      */
+    @OptIn(ExperimentalTime::class)
     suspend fun login(
         account: String,
         password: String,
@@ -58,30 +63,32 @@ class Login() {
         savePassword: String,
         isLogin: MutableState<Int>,
         captcha: String = "",
+        flag: Int? = null,
         ticket: String = "",
     ): Int {
-        if (account.isEmpty() || password.isEmpty()) return 1
+        if (account.isEmpty() || password.isEmpty()) return 1 // 1: 输入为空
         if (savePassword == "1") {
-            prefSet("savePassword", "1")
             Password().savePassword(account, password)
         } else {
             Password().deletePassword()
         }
         try {
-            if (ticket.isNotEmpty()) {
-                val verify2FATicket = verify2FATicket(ticket = ticket)
-                if (!verify2FATicket) return 3
+            if (flag != null && ticket.isEmpty()) {
+                return send2FATicket(flag = flag)
             }
-            val serviceLoginAuth2 = serviceLoginAuth2(
+            if (flag != null && ticket.isNotEmpty()) {
+                val verify2FATicket = verify2FATicket(flag = flag, ticket = ticket)
+                if (!verify2FATicket) return 3 // 3: 登录失败
+            }
+            return serviceLoginAuth2(
                 account = account,
                 password = password,
                 global = global,
                 isLogin = isLogin,
                 captcha = captcha,
             )
-            return serviceLoginAuth2
         } catch (_: Exception) {
-            return 2
+            return 2 // 2: 网络错误
         }
     }
 
@@ -101,7 +108,8 @@ class Login() {
     /**
      * Service login Xiaomi account with password.
      *
-     * @param password: Password
+     * @param account: Xiaomi account
+     * @param password: Xiaomi password
      * @param global: Global or China account
      * @param isLogin: Login status
      * @param captcha: Captcha if needed
@@ -127,7 +135,7 @@ class Login() {
             if (captcha.isNotEmpty()) append("captCode", captcha)
         }
         val response = client.submitForm(serviceLoginAuth2Url, parameters)
-        if (!response.status.isSuccess()) return 2
+        if (!response.status.isSuccess()) return 2 // 2: 网络错误
 
         val content = Json.decodeFromString<JsonObject>(removeResponsePrefix(response.bodyAsText()))
         val ssecurity = content["ssecurity"]?.jsonPrimitive?.content
@@ -139,23 +147,36 @@ class Login() {
             prefSet("captchaUrl", captchaUrl)
             return 6 // 6: 需要验证码
         }
+
         if (notificationUrl != null && notificationUrl != "null") {
-            prefSet("notificationUrl", notificationUrl)
+            val context = getQueryParam(notificationUrl, "context")
+            if (context.isNullOrEmpty()) return 3 // 3: 登录失败
+            prefSet("2FAContext", context)
+            val response = client.get(notificationUrl.replace("fe/service/identity/authStart", "identity/list"))
+            val identitySession = requireNotNull(response.setCookie().find { it.name == "identity_session" }?.value)
+            prefSet("identity_session", identitySession)
+            val listJson = Json.decodeFromString<JsonObject>(removeResponsePrefix(response.bodyAsText()))
+            val options = listJson["options"]?.jsonArray?.mapNotNull { it.jsonPrimitive.intOrNull } ?: emptyList()
+            if (options.isEmpty()) return 3 // 3: 登录失败
+            if (options.contains(4)) prefSet("notificationUrl", notificationUrl)
+            prefSet("2FAOptions", Json.encodeToString(options))
             return 5 // 5: 需要二次验证
         }
+
         if ((result != null && result != "ok") || ssecurity.isNullOrBlank()) {
             return 3 // 3: 登录失败
         }
 
         val location = requireNotNull(content["location"]?.jsonPrimitive?.content)
-        val finalResponse = client.get("$location&_userIdNeedEncrypt=true")
-        if (!finalResponse.status.isSuccess()) return 2
+        val response2 = client.get("$location&_userIdNeedEncrypt=true")
+        if (!response2.status.isSuccess()) return 2 // 2: 网络错误
+
         val userId = requireNotNull(content["userId"]?.jsonPrimitive?.content)
         val cUserId = requireNotNull(content["cUserId"]?.jsonPrimitive?.content)
-        val serviceToken = requireNotNull(
-            finalResponse.setCookie().last { it.name == "serviceToken" && it.value.isNotBlank() }.value
-        )
+        val serviceToken =
+            requireNotNull(response2.setCookie().find { it.name == "serviceToken" && it.value.isNotBlank() }?.value)
         if (serviceToken == "") return 4 // 4: 未返回 serviceToken
+
         val loginInfo = DataHelper.LoginData(
             accountType = if (global) "GL" else "CN",
             authResult = "1",
@@ -167,68 +188,73 @@ class Login() {
         )
         prefSet("loginInfo", Json.encodeToString(loginInfo))
         isLogin.value = 1
-        return 0
+        return 0 // 0: 登录成功
     }
 
+    /**
+     * Send 2FA ticket(phone or email).
+     *
+     * @return Send status
+     */
+    @OptIn(ExperimentalTime::class)
+    suspend fun send2FATicket(flag: Int): Int {
+        val sendTicketUrl = if (flag == 4) {
+            "https://account.xiaomi.com/identity/auth/sendPhoneTicket"
+        } else {
+            "https://account.xiaomi.com/identity/auth/sendEmailTicket"
+        }
+        val parameters = parameters {
+            append("retry", "0")
+            append("icode", "")
+            append("_json", "true")
+        }
+        val response = client.submitForm(sendTicketUrl, parameters) {
+            parameter("_dc", Clock.System.now().toEpochMilliseconds())
+            header("cookie", "identity_session=${prefGet("identity_session") ?: ""}")
+        }
+        val sendTicketText = response.bodyAsText()
+        val sendTicketJson = Json.decodeFromString<JsonObject>(removeResponsePrefix(sendTicketText))
+        return sendTicketJson["code"]?.jsonPrimitive?.intOrNull ?: 3 // 3: 登录失败
+    }
 
     /**
-     * Verify 2FA ticket.
+     * Verify 2FA ticket(phone or email).
      *
+     * @param flag: 4 for phone, 8 for email
      * @param ticket: 2FA ticket
      *
      * @return Handle 2FA ticket status
      */
     @OptIn(ExperimentalTime::class)
-    suspend fun verify2FATicket(
-        ticket: String
-    ): Boolean {
-        val notificationUrl = prefGet("notificationUrl")
-        if (notificationUrl != null && ticket.isNotBlank()) {
-            val path = "identity/authStart"
-            val identitiesResponse = client.get(notificationUrl.replace(path, "identity/list"))
-            val identitiesBody = Json.decodeFromString<JsonObject>(removeResponsePrefix(identitiesResponse.bodyAsText()))
-            val flag = identitiesBody["flag"]?.jsonPrimitive?.int
-            val options = identitiesBody["options"]?.jsonArray
-            require(identitiesResponse.setCookie()["identity_session"]?.value.isNullOrBlank().not())
-            require(options?.any { it.jsonPrimitive.int == flag } == true)
+    suspend fun verify2FATicket(flag: Int, ticket: String): Boolean {
+        val apiPath = if (flag == 4) "/identity/auth/verifyPhone" else "/identity/auth/verifyEmail"
+        val apiUrl = "$accountUrl$apiPath"
 
-            val apiMap = mapOf(
-                4 to "/identity/auth/verifyPhone",
-                8 to "/identity/auth/verifyEmail"
-            )
-
-            for ((apiFlag, apiPath) in apiMap) {
-                val apiUrl = "$accountUrl$apiPath"
-
-                val parameters = parameters {
-                    append("_flag", apiFlag.toString())
-                    append("ticket", ticket)
-                    append("trust", "true")
-                    append("_json", "true")
-                }
-                val verifyResponse = client.submitForm(apiUrl, parameters) {
-                    parameter("_dc", Clock.System.now().toEpochMilliseconds())
-                }
-
-                val verifyBody = Json.decodeFromString<JsonObject>(removeResponsePrefix(verifyResponse.bodyAsText()))
-                if (verifyBody["code"]?.jsonPrimitive?.int == 0) {
-                    val location = requireNotNull(verifyBody["location"]?.jsonPrimitive?.content)
-                    client.get(location)
-                    return true
-                }
-            }
+        val parameters = parameters {
+            append("_flag", flag.toString())
+            append("ticket", ticket)
+            append("trust", "true")
+            append("_json", "true")
+        }
+        val verifyResponse = client.submitForm(apiUrl, parameters) {
+            parameter("_dc", Clock.System.now().toEpochMilliseconds())
+            header("cookie", "identity_session=${prefGet("identity_session") ?: ""}")
+        }
+        val verifyBody = Json.decodeFromString<JsonObject>(removeResponsePrefix(verifyResponse.bodyAsText()))
+        if (verifyBody["code"]?.jsonPrimitive?.int == 0) {
+            val location = requireNotNull(verifyBody["location"]?.jsonPrimitive?.content)
+            client.get(location)
+            return true
         }
         return false
     }
 
-    /** Generate random User-Agent.
+    /** Generate User-Agent(Xiaomi 17 Pro).
      *
      * @return User-Agent
      */
     fun generateUserAgent(): String {
-        val agentId = (1..13).map { ('A'..'E').random() }.joinToString("")
-        val randomText = (1..18).map { ('a'..'z').random() }.joinToString("")
-        return "$randomText-$agentId APP/com.android.updater APPV/9.1.0"
+        return "Dalvik/2.1.0 (Linux; U; Android 16; 25098PN5AC Build/BP2A.250605.031.A3)"
     }
 
     /**
@@ -242,6 +268,21 @@ class Login() {
         return response.removePrefix("&&&START&&&")
     }
 
+    /**
+     * Get query parameter from URL.
+     *
+     * @param url: URL string
+     * @param key: Query parameter key
+     *
+     * @return Query parameter value or null if not found
+     */
+    fun getQueryParam(url: String, key: String): String? {
+        val query = url.substringAfter('?', "")
+        return query.split('&')
+            .map { it.split('=') }
+            .firstOrNull { it.size == 2 && it[0] == key }
+            ?.get(1)
+    }
 
     /**
      * Generate MD5 hash.

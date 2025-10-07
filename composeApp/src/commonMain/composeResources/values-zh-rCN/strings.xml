@@ -35,6 +35,8 @@
     <string name="save_password">保存密码</string>
     <string name="cancel">取消</string>
     <string name="logging_in">正在登录…</string>
+    <string name="logged_in">已登录</string>
+    <string name="login_error">登录验证失败！</string>
     <string name="login_expired">登录已过期</string>
     <string name="login_expired_desc">建议重新登录</string>
     <string name="login_successful">登录成功</string>
@@ -42,7 +44,6 @@
     <string name="no_account">未登录</string>
     <string name="login_desc">正在使用 v1 接口</string>
     <string name="using_v2">正在使用 v2 接口</string>
-    <string name="logged_in">已登录</string>
     <string name="copy_successful">复制成功</string>
     <string name="download_start">开始下载</string>
     <string name="security_error">获取密钥失败</string>
@@ -53,7 +54,6 @@
     <string name="region_code">区域代号</string>
     <string name="carrier_code">运营商代号</string>
     <string name="global">全球账号</string>
-    <string name="login_error">登录验证失败！</string>
     <string name="extension_settings">扩展设置</string>
     <string name="dark_theme">显示模式</string>
     <string name="system_default">跟随系统</string>
@@ -72,7 +72,9 @@
     <string name="login_tips1">检测到二次认证，请点击获取验证码按钮</string>
     <string name="login_tips2">需要输入验证码，请点击获取验证码按钮</string>
     <string name="verification_code">验证码</string>
-    <string name="verification_code_get">获取验证码</string>
+    <string name="send_email_code">发送邮箱验证码</string>
+    <string name="send_phone_code">发送手机验证码</string>
+    <string name="send_code_error">发送验证码失败，请尝试其他验证方式</string>
     <string name="verifying">验证中...</string>
     <string name="opensource_info">版权所有 © 2024-2025 YuKongA</string>
 </resources>

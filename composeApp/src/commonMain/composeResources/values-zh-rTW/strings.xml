@@ -35,6 +35,8 @@
     <string name="save_password">儲存密碼</string>
     <string name="cancel">取消</string>
     <string name="logging_in">登入中…</string>
+    <string name="logged_in">已登入</string>
+    <string name="login_error">登入驗證失敗!</string>
     <string name="login_expired">登入已過期</string>
     <string name="login_expired_desc">建議重新登入</string>
     <string name="login_successful">登入成功</string>
@@ -42,7 +44,6 @@
     <string name="no_account">未登入</string>
     <string name="login_desc">正在使用 v1 埠</string>
     <string name="using_v2">正在使用 v2 埠</string>
-    <string name="logged_in">已登入</string>
     <string name="copy_successful">複製成功</string>
     <string name="download_start">開始下載</string>
     <string name="security_error">取得金鑰失敗</string>
@@ -53,7 +54,6 @@
     <string name="region_code">區域代號</string>
     <string name="carrier_code">營運商代號</string>
     <string name="global">全球帳號</string>
-    <string name="login_error">登入驗證失敗!</string>
     <string name="extension_settings">擴展設定</string>
     <string name="dark_theme">顯示模式</string>
     <string name="system_default">跟隨系統</string>
@@ -72,7 +72,9 @@
     <string name="login_tips1">檢測到二次認證，請點擊獲取驗證碼按鈕</string>
     <string name="login_tips2">需要輸入驗證碼，請點擊獲取驗證碼按鈕</string>
     <string name="verification_code">驗證碼</string>
-    <string name="verification_code_get">獲取驗證碼</string>
+    <string name="send_email_code">發送郵箱驗證碼</string>
+    <string name="send_phone_code">發送手機驗證碼</string>
+    <string name="send_code_error">發送驗證碼失敗，請嘗試其他驗證方式</string>
     <string name="verifying">驗證中...</string>
     <string name="opensource_info">版權所有 © 2024-2025 YuKongA</string>
 </resources>

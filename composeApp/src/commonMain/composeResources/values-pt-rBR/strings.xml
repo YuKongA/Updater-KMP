@@ -35,14 +35,15 @@
     <string name="save_password">Salvar senha</string>
     <string name="cancel">Cancelar</string>
     <string name="logging_in">Entrando…</string>
+    <string name="logged_in">Logado</string>
+    <string name="login_error">Falha na verificação de login!</string>
+    <string name="login_expired">Login expirado</string>
+    <string name="login_expired_desc">Recomendado fazer login novamente</string>
     <string name="login_successful">Login bem-sucedido</string>
     <string name="account_or_password_empty">Conta ou Senha vazia!</string>
     <string name="no_account">Sem conta</string>
     <string name="login_desc">Usando interface v1</string>
     <string name="using_v2">Usando interface v2</string>
-    <string name="logged_in">Logado</string>
-    <string name="login_expired">Login expirado</string>
-    <string name="login_expired_desc">Recomendado fazer login novamente</string>
     <string name="copy_successful">Cópia bem-sucedida</string>
     <string name="download_start">Iniciar download</string>
     <string name="security_error">Falha ao obter chave de segurança</string>
@@ -50,7 +51,6 @@
     <string name="logout_confirm">Tem certeza de que deseja sair?</string>
     <string name="confirm">Confirmar</string>
     <string name="logout_successful">Logout bem-sucedido</string>
-    <string name="login_error">Falha na verificação de login!</string>
     <string name="region_code">Código de Regiões</string>
     <string name="carrier_code">Código da Operadora</string>
     <string name="global">Conta global</string>
@@ -72,7 +72,9 @@
     <string name="login_tips1">Detectada autenticação de dois fatores, clique no botão Obter código de verificação</string>
     <string name="login_tips2">É necessário inserir o código de verificação, clique no botão Obter código de verificação</string>
     <string name="verification_code_get">Obter código de verificação</string>
-    <string name="verification_code">Código de verificação</string>
+    <string name="send_email_code">Enviar código de e-mail</string>
+    <string name="send_phone_code">Enviar código de telefone</string>
+    <string name="send_code_error">Falha ao enviar o código de verificação, tente outros métodos de verificação</string>
     <string name="verifying">Verificando...</string>
     <string name="opensource_info">Copyright © 2024-2025 YuKongA</string>
 </resources>
