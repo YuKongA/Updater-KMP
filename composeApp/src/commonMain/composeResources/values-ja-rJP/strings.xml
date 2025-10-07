@@ -74,6 +74,7 @@
     <string name="verification_code">検証コード</string>L
     <string name="send_email_code">メールコードを送信</string>
     <string name="send_phone_code">電話コードを送信</string>
+    <string name="send_code_error">検証コードの送信に失敗しました。別の検証方法を試してください</string>
     <string name="verifying">検証中...</string>
     <string name="opensource_info">著作権 © 2024-2025 YuKongA</string>
 </resources>

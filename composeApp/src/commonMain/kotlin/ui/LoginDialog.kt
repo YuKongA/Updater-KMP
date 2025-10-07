@@ -67,7 +67,9 @@ import updater.composeapp.generated.resources.logout_successful
 import updater.composeapp.generated.resources.password
 import updater.composeapp.generated.resources.save_password
 import updater.composeapp.generated.resources.security_error
+import updater.composeapp.generated.resources.send_code_error
 import updater.composeapp.generated.resources.send_email_code
+import updater.composeapp.generated.resources.send_phone_code
 import updater.composeapp.generated.resources.submit
 import updater.composeapp.generated.resources.toast_crash_info
 import updater.composeapp.generated.resources.verification_code
@@ -112,24 +114,25 @@ fun LoginDialog(
     val messageCrashInfo = stringResource(Res.string.toast_crash_info)
     val messageLoginTips1 = stringResource(Res.string.login_tips1)
     val messageLoginTips2 = stringResource(Res.string.login_tips2)
+    val messageSendCodeError = stringResource(Res.string.send_code_error)
 
     // 主页登录按钮
     IconButton(
         onClick = {
             prefRemove("captchaUrl")
+            prefRemove("identity_session")
             prefRemove("2FAContext")
             prefRemove("2FAOptions")
             prefRemove("2FAFlag")
-            prefRemove("2FADc")
-            prefRemove("identity_session")
 
             showTicketInput = false
             showTicketUrl = false
             showCaptchaInput = false
             showCaptchaUrl = false
 
-            showDialog.value = true
             focusManager.clearFocus()
+
+            showDialog.value = true
         },
         holdDownState = showDialog.value
     ) {
@@ -225,39 +228,70 @@ fun LoginDialog(
                 AnimatedVisibility(
                     visible = showTicketUrl
                 ) {
-                    AnimatedVisibility(
-                        visible = !showTicketInput
-                    ) {
-                        val optionsStr = prefGet("2FAOptions") ?: "[]"
-                        val options = Json.decodeFromString<List<Int>>(optionsStr)
-                        if (options.isEmpty() || ((options.contains(4) && !options.contains(8)))) {
-                            showMessage(message = messageSecurityError)
-                            showDialog.value = false
-                        }
-                        Column {
-                            if (options.contains(8)) {
-                                TextButton(
-                                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                                    text = stringResource(Res.string.send_email_code),
-                                    onClick = {
-                                        coroutineScope.launch {
-                                            Login().login(
-                                                account = account,
-                                                password = password,
-                                                global = global,
-                                                savePassword = savePassword,
-                                                isLogin = isLogin,
-                                                flag = 8,
-                                            )
-                                            showTicketInput = true
-                                            prefSet("2FAFlag", "8")
+                    val optionsStr = prefGet("2FAOptions") ?: "[]"
+                    var options by remember { mutableStateOf(Json.decodeFromString<MutableList<Int>>(optionsStr)) }
+                    if (options.isEmpty()) {
+                        showDialog.value = false
+                        showMessage(message = messageError)
+                    }
+                    Column {
+                        AnimatedVisibility(
+                            visible = !showTicketInput && options.contains(4)
+                        ) {
+                            TextButton(
+                                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                                text = stringResource(Res.string.send_phone_code),
+                                onClick = {
+                                    coroutineScope.launch {
+                                        val int = Login().login(
+                                            account = account,
+                                            password = password,
+                                            global = global,
+                                            savePassword = savePassword,
+                                            isLogin = isLogin,
+                                            flag = 4,
+                                        )
+                                        if (int != 0) {
+                                            options = options.toMutableList().apply { remove(4) }
+                                            if (options.isNotEmpty()) showMessage(message = messageSendCodeError)
+                                            return@launch
                                         }
-                                    },
-                                    colors = ButtonDefaults.textButtonColorsPrimary()
-                                )
-                            }
-                            Spacer(Modifier.height(16.dp))
+                                        showTicketInput = true
+                                        prefSet("2FAFlag", "4")
+                                    }
+                                },
+                                colors = ButtonDefaults.textButtonColorsPrimary()
+                            )
                         }
+                        AnimatedVisibility(
+                            visible = !showTicketInput && options.contains(8)
+                        ) {
+                            TextButton(
+                                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                                text = stringResource(Res.string.send_email_code),
+                                onClick = {
+                                    coroutineScope.launch {
+                                        val int = Login().login(
+                                            account = account,
+                                            password = password,
+                                            global = global,
+                                            savePassword = savePassword,
+                                            isLogin = isLogin,
+                                            flag = 8,
+                                        )
+                                        if (int != 0) {
+                                            options = options.toMutableList().apply { remove(8) }
+                                            if (options.isNotEmpty()) showMessage(message = messageSendCodeError)
+                                            return@launch
+                                        }
+                                        showTicketInput = true
+                                        prefSet("2FAFlag", "8")
+                                    }
+                                },
+                                colors = ButtonDefaults.textButtonColorsPrimary()
+                            )
+                        }
+                        Spacer(Modifier.height(16.dp))
                     }
                 }
 
@@ -302,11 +336,6 @@ fun LoginDialog(
                                             if (int == 0) {
                                                 showMessage(message = messageLoginSuccess)
                                                 ticket = ""
-                                                prefRemove("2FAContext")
-                                                prefRemove("2FAOptions")
-                                                prefRemove("2FAFlag")
-                                                prefRemove("identity_session")
-                                                showTicketInput = false
                                                 showDialog.value = false
                                             } else {
                                                 showMessage(message = messageError)
@@ -328,8 +357,6 @@ fun LoginDialog(
                                             if (int == 0) {
                                                 showMessage(message = messageLoginSuccess)
                                                 ticket = ""
-                                                prefRemove("captchaUrl")
-                                                showCaptchaUrl = false
                                                 showDialog.value = false
                                             } else {
                                                 showMessage(message = messageError)
@@ -454,7 +481,7 @@ fun LoginDialog(
         }
     }
 
-// 登出对话框
+    // 登出对话框
     if (isLogin.value == 1) {
         SuperDialog(
             show = showDialog,

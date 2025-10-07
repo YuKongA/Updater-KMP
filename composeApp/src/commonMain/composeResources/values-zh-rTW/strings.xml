@@ -74,6 +74,7 @@
     <string name="verification_code">驗證碼</string>
     <string name="send_email_code">發送郵箱驗證碼</string>
     <string name="send_phone_code">發送手機驗證碼</string>
+    <string name="send_code_error">發送驗證碼失敗，請嘗試其他驗證方式</string>
     <string name="verifying">驗證中...</string>
     <string name="opensource_info">版權所有 © 2024-2025 YuKongA</string>
 </resources>

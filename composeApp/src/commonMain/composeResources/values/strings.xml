@@ -75,6 +75,7 @@
     <string name="verification_code">Verification Code</string>
     <string name="send_email_code">Send email code</string>
     <string name="send_phone_code">Send phone code</string>
+    <string name="send_code_error">Failed to send verification code, please try other verification methods</string>
     <string name="verifying">Verifying...</string>
     <string name="opensource_info">Copyright © 2024-2025 YuKongA</string>
 </resources>
