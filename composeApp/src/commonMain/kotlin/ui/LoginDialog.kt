@@ -257,6 +257,7 @@ fun LoginDialog(
                                             return@launch
                                         }
                                         showTicketInput = true
+                                        showTicketUrl = false
                                         prefSet("2FAFlag", "4")
                                     }
                                 },
@@ -285,6 +286,7 @@ fun LoginDialog(
                                             return@launch
                                         }
                                         showTicketInput = true
+                                        showTicketUrl = false
                                         prefSet("2FAFlag", "8")
                                     }
                                 },
