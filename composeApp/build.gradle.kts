@@ -288,6 +288,10 @@ tasks.named("generateComposeResClass").configure {
     dependsOn(generateVersionInfo)
 }
 
+tasks.named<JavaExec>("hotRunDesktop") {
+    jvmArgs("-Dapp.mode=hot")
+}
+
 afterEvaluate {
     project.extensions.getByType<KotlinMultiplatformExtension>().targets
         .withType<KotlinNativeTarget>()

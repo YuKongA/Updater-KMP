@@ -10,7 +10,6 @@
     <string name="system_version">System Version</string>
     <string name="android_version">Android Version</string>
     <string name="submit">Submit</string>
-    <string name="analysis">Payload Analysis</string>
     <string name="search_history">Search History</string>
     <string name="clear_search_history">Clear Search History</string>
     <string name="big_version">Major Version</string>
@@ -64,7 +63,7 @@
     <string name="device_list_source">Source</string>
     <string name="device_list_remote">Remote</string>
     <string name="device_list_embedded">Embedded</string>
-    <string name="device_list_updating">Updating...</string>
+    <string name="device_list_updating">Updating…</string>
     <string name="device_list_update_now">Update Now</string>
     <string name="device_list_updated">Update successful</string>
     <string name="device_list_update_failed">Update failed</string>
@@ -75,7 +74,7 @@
     <string name="verification_code">Verification Code</string>
     <string name="send_email_code">Send email code</string>
     <string name="send_phone_code">Send phone code</string>
-    <string name="send_code_error">Failed to send verification code, please try other verification methods</string>
-    <string name="verifying">Verifying...</string>
+    <string name="send_code_error">Failed to send verification code, please try other verification methods!</string>
+    <string name="verifying">Verifying…</string>
     <string name="opensource_info">Copyright © 2024-2025 YuKongA</string>
 </resources>

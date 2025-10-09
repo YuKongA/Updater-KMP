@@ -9,7 +9,6 @@
     <string name="system_version">系統版本</string>
     <string name="android_version">安卓版本</string>
     <string name="submit">提交</string>
-    <string name="analysis">解析 Payload</string>
     <string name="search_history">查詢歷史</string>
     <string name="clear_search_history">清空查詢歷史</string>
     <string name="big_version">主要版本</string>
@@ -63,7 +62,7 @@
     <string name="device_list_source">來源</string>
     <string name="device_list_remote">遠端</string>
     <string name="device_list_embedded">內建</string>
-    <string name="device_list_updating">正在更新...</string>
+    <string name="device_list_updating">正在更新…</string>
     <string name="device_list_update_now">立即更新</string>
     <string name="device_list_updated">更新成功</string>
     <string name="device_list_update_failed">更新失敗</string>
@@ -74,7 +73,7 @@
     <string name="verification_code">驗證碼</string>
     <string name="send_email_code">發送郵箱驗證碼</string>
     <string name="send_phone_code">發送手機驗證碼</string>
-    <string name="send_code_error">發送驗證碼失敗，請嘗試其他驗證方式</string>
-    <string name="verifying">驗證中...</string>
+    <string name="send_code_error">發送驗證碼失敗，請嘗試其他驗證方式！</string>
+    <string name="verifying">驗證中…</string>
     <string name="opensource_info">版權所有 © 2024-2025 YuKongA</string>
 </resources>
