@@ -19,7 +19,6 @@ object RomInfoHelper {
         @SerialName("FileMirror") val fileMirror: FileMirror? = null,
         @SerialName("GentleNotice") val gentleNotice: GentleNotice? = null,
         @SerialName("HeadImages") val headImages: Map<String, String>? = null,
-        @SerialName("Log") val log: Log? = null
     )
 
     @Serializable
@@ -28,7 +27,7 @@ object RomInfoHelper {
     data class Rom(
         val bigversion: String? = null,
         val branch: String? = null,
-        val changelog: HashMap<String, Changelog>? = null,
+        val changelog: HashMap<String, List<ChangelogItem>>? = null,
         val codebase: String? = null,
         val device: String? = null,
         val filename: String? = null,
@@ -43,8 +42,16 @@ object RomInfoHelper {
     )
 
     @Serializable
-    data class Changelog(
-        val txt: List<String>,
+    data class ChangelogItem(
+        val txt: String,
+        val image: List<ChangelogImage>? = null
+    )
+
+    @Serializable
+    data class ChangelogImage(
+        val path: String,
+        val h: String,
+        val w: String
     )
 
     @Serializable
@@ -58,10 +65,5 @@ object RomInfoHelper {
     @Serializable
     data class GentleNotice(
         val text: String,
-    )
-
-    @Serializable
-    data class Log(
-        val moduleImg: Map<String, Map<String, String>>
     )
 }

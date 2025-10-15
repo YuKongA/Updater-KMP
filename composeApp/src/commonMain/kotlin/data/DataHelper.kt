@@ -12,9 +12,11 @@ object DataHelper {
 
     @Serializable
     data class ImageInfoData(
-        val changelog: String = "",
-        val imageName: String = "",
-        val imageLink: String = "",
+        val title: String,
+        val text: String,
+        val imageUrl: String? = null,
+        val imageWidth: Int? = null,
+        val imageHeight: Int? = null
     )
 
     @Serializable

@@ -98,7 +98,7 @@ class RomInfo {
             token = token,
             unlock = "0",
             v = "MIUI-$romVersion",
-            options = DataHelper.Options(av = "9.1.0")
+            options = DataHelper.Options(av = "9.1.3")
         )
         return Json.encodeToString(data)
     }
@@ -382,6 +382,7 @@ class RomInfo {
      * @param romInfo: Current ROM info
      * @param romInfoData: Data used to display ROM info
      * @param iconInfoData: Data used to display changelog icons
+     * @param imageInfoData: Data used to display changelog images (now List<ImageInfoData>)
      * @param coroutineScope: Coroutine scope
      * @param officialDownload: Official download URL
      * @param noUltimateLink: No ultimate download link
@@ -398,9 +399,15 @@ class RomInfo {
     ) {
         if (romInfo?.bigversion != null) {
             val log = StringBuilder()
-            romInfo.changelog?.forEach { log.append(it.key).append("\n").append(it.value.txt.joinToString("\n")).append("\n\n") }
-            val changelogGroups = log.toString().trimEnd().split("\n\n")
-            val changelog = changelogGroups.map { it.split("\n").drop(1).joinToString("\n") }
+            romInfo.changelog?.forEach { (category, items) ->
+                log.append(category).append("\n")
+                items.forEach { item ->
+                    if (item.txt.isNotBlank()) {
+                        log.append(item.txt.trim()).append("\n")
+                    }
+                }
+                log.append("\n")
+            }
 
             val gentle = StringBuilder()
             val formattedGentleNotice = recoveryRomInfo.gentleNotice?.text?.replace("<li>", "\n· ")
@@ -409,30 +416,47 @@ class RomInfo {
             formattedGentleNotice?.forEach { gentle.append(it) }
             val gentleNotice = gentle.toString().trimEnd().split("\n").drop(1).joinToString("\n")
 
-            if (romInfo.osbigversion!!.toFloat() >= 3.0) {
-                val imageNames = changelogGroups.map { it.split("\n").first() }
-                val imageMainLink = recoveryRomInfo.fileMirror?.image ?: ""
-                val imageNameLink = recoveryRomInfo.log?.moduleImg ?: mapOf()
-                val imageLinks = imageLink(imageNames, imageMainLink, imageNameLink)
-                imageInfoData.value = imageNames.mapIndexed { index, imageName ->
-                    DataHelper.ImageInfoData(
-                        imageName = imageName,
-                        imageLink = if (isWeb()) "" else imageLinks[imageName] ?: "",
-                        changelog = changelog[index]
-                    )
+            val isNewChangelog = romInfo.osbigversion?.toFloatOrNull()?.let { it >= 3.0 } ?: false
+            if (isNewChangelog) {
+                iconInfoData.value = emptyList()
+
+                val imageBaseUrl = recoveryRomInfo.fileMirror?.image?.let {
+                    if (it.startsWith("http://")) "https://" + it.removePrefix("http://") else it
+                } ?: ""
+
+                val flatChangelogList = mutableListOf<DataHelper.ImageInfoData>()
+                romInfo.changelog?.forEach { (categoryTitle, items) ->
+                    items.forEach { item ->
+                        val image = item.image?.firstOrNull()
+                        flatChangelogList.add(
+                            DataHelper.ImageInfoData(
+                                title = categoryTitle,
+                                text = item.txt,
+                                imageUrl = image?.path?.let { if (isWeb()) "" else imageBaseUrl + it },
+                                imageWidth = image?.w?.toIntOrNull(),
+                                imageHeight = image?.h?.toIntOrNull()
+                            )
+                        )
+                    }
                 }
+                imageInfoData.value = flatChangelogList
+
             } else {
-                val iconNames = changelogGroups.map { it.split("\n").first() }
+                imageInfoData.value = emptyList()
+
                 val iconMainLink = recoveryRomInfo.fileMirror?.icon ?: ""
                 val iconNameLink = recoveryRomInfo.icon ?: mapOf()
+                val iconNames = romInfo.changelog?.keys?.toList() ?: emptyList()
                 val iconLinks = iconLink(iconNames, iconMainLink, iconNameLink)
-                iconInfoData.value = iconNames.mapIndexed { index, iconName ->
+
+                iconInfoData.value = romInfo.changelog?.map { (category, items) ->
+                    val changelogText = items.mapNotNull { it.txt.trim().takeIf { txt -> txt.isNotBlank() } }.joinToString("\n")
                     DataHelper.IconInfoData(
-                        iconName = iconName,
-                        iconLink = if (isWeb()) "" else iconLinks[iconName] ?: "",
-                        changelog = changelog[index]
+                        iconName = category,
+                        iconLink = if (isWeb()) "" else iconLinks[category] ?: "",
+                        changelog = changelogText
                     )
-                }
+                } ?: emptyList()
             }
 
             val bigVersion = when {
@@ -552,6 +576,7 @@ class RomInfo {
 
     /**
      * Generate maps with links with corresponding names and icons.
+     * (This function is for older MIUI changelogs)
      *
      * @param iconNames: Icon names included in the changelog
      * @param iconMainLink: Main link to get the icon
@@ -568,44 +593,10 @@ class RomInfo {
         }
         if (safeIconMainLink.isNotEmpty() && iconNameLink.isNotEmpty()) {
             for (name in iconNames) {
-                val realLink = safeIconMainLink + iconNameLink[name]
-                iconMap[name] = realLink
+                iconNameLink[name]?.let { iconMap[name] = safeIconMainLink + it }
             }
         }
         return iconMap
-    }
-
-    /**
-     * Generate maps with links with corresponding names and images.
-     *
-     * @param imageNames: Image names included in the changelog
-     * @param imageMainLink: Main link to get the image
-     * @param imageNameLink: Links that correspond to each image name
-     *
-     * @return Links to images with corresponding names
-     */
-    fun imageLink(
-        imageNames: List<String>,
-        imageMainLink: String,
-        imageNameLink: Map<String, Map<String, String>>
-    ): MutableMap<String, String> {
-        val imageMap = mutableMapOf<String, String>()
-        val safeImageMainLink = if (imageMainLink.startsWith("http://")) {
-            "https://" + imageMainLink.removePrefix("http://")
-        } else {
-            imageMainLink
-        }
-        if (safeImageMainLink.isNotEmpty() && imageNameLink.isNotEmpty()) {
-            for (name in imageNames) {
-                val realLink = if ((imageNameLink[name]?.get("pt") ?: "") == "") {
-                    ""
-                } else {
-                    safeImageMainLink + imageNameLink[name]?.get("pt")
-                }
-                imageMap[name] = realLink
-            }
-        }
-        return imageMap
     }
 
     /**

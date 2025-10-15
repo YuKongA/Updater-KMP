@@ -6,11 +6,15 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.Image 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer 
+import androidx.compose.foundation.layout.aspectRatio 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.runtime.Composable
@@ -21,13 +25,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip 
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.ContentScale 
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.seiko.imageloader.rememberImagePainter 
 import data.DataHelper
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -41,8 +48,8 @@ import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.icons.useful.Copy
 import top.yukonga.miuix.kmp.icon.icons.useful.Save
 import top.yukonga.miuix.kmp.theme.MiuixTheme
+import top.yukonga.miuix.kmp.utils.G2RoundedCornerShape
 import ui.components.TextWithIcon
-import ui.components.TextWithImage
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.android_version
 import updater.composeapp.generated.resources.attention
@@ -373,13 +380,52 @@ fun ChangelogView(
             }
         }
         if (imageInfo.isNotEmpty()) {
-            imageInfo.forEachIndexed { index, it ->
-                TextWithImage(
-                    changelog = it.changelog,
-                    imageName = it.imageName,
-                    imageLink = it.imageLink,
-                    padding = if (index == imageInfo.size - 1) 0.dp else 16.dp
-                )
+            val titlesInOrder = imageInfo.map { it.title }.distinct()
+            val groupedInfo = imageInfo.groupBy { it.title }
+
+            titlesInOrder.forEachIndexed { categoryIndex, title ->
+                Column {
+                    Text(
+                        modifier = Modifier.padding(bottom = 8.dp),
+                        text = title,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+
+                    SelectionContainer {
+                        Column {
+                            groupedInfo[title]?.forEach { line ->
+                                if (line.text.isNotBlank()) {
+                                    Text(
+                                        text = line.text,
+                                        color = MiuixTheme.colorScheme.onSecondaryVariant,
+                                        fontSize = 14.5.sp,
+                                        lineHeight = 22.sp
+                                    )
+                                }
+
+                                if (line.imageUrl != null && line.imageWidth != null && line.imageHeight != null && line.imageHeight > 0) {
+                                    val aspectRatio = line.imageWidth.toFloat() / line.imageHeight.toFloat()
+                                    Image(
+                                        painter = rememberImagePainter(line.imageUrl),
+                                        modifier = Modifier
+                                            .padding(top = 4.dp, bottom = 8.dp)
+                                            .fillMaxWidth()
+                                            .aspectRatio(aspectRatio)
+                                            .clip(G2RoundedCornerShape(10.dp)),
+                                        alignment = Alignment.Center,
+                                        contentScale = ContentScale.FillWidth,
+                                        contentDescription = line.text,
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (categoryIndex < titlesInOrder.size - 1) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
         }
     }
