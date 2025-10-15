@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.seiko.imageloader.rememberImagePainter 
 import data.DataHelper
@@ -395,16 +396,15 @@ fun ChangelogView(
                     SelectionContainer {
                         Column {
                             groupedInfo[title]?.forEach { line ->
-                                if (line.text.isNotBlank()) {
+                                if (line.changelog.isNotBlank()) {
                                     Text(
-                                        text = line.text,
+                                        text = line.changelog,
                                         color = MiuixTheme.colorScheme.onSecondaryVariant,
-                                        fontSize = 14.5.sp,
-                                        lineHeight = 22.sp
+                                        fontSize = 14.5.sp
                                     )
                                 }
 
-                                if (line.imageUrl != null && line.imageWidth != null && line.imageHeight != null && line.imageHeight > 0) {
+                                if (line.imageWidth != null && line.imageHeight != null && line.imageHeight > 0) {
                                     val aspectRatio = line.imageWidth.toFloat() / line.imageHeight.toFloat()
                                     Image(
                                         painter = rememberImagePainter(line.imageUrl),
@@ -415,7 +415,7 @@ fun ChangelogView(
                                             .clip(G2RoundedCornerShape(10.dp)),
                                         alignment = Alignment.Center,
                                         contentScale = ContentScale.FillWidth,
-                                        contentDescription = line.text,
+                                        contentDescription = line.changelog,
                                     )
                                 }
                             }

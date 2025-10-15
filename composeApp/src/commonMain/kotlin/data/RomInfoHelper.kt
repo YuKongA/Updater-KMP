@@ -18,7 +18,6 @@ object RomInfoHelper {
         @SerialName("Icon") val icon: Map<String, String>? = null,
         @SerialName("FileMirror") val fileMirror: FileMirror? = null,
         @SerialName("GentleNotice") val gentleNotice: GentleNotice? = null,
-        @SerialName("HeadImages") val headImages: Map<String, String>? = null,
     )
 
     @Serializable

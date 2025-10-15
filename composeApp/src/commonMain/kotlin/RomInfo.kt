@@ -400,15 +400,19 @@ class RomInfo {
         if (romInfo?.bigversion != null) {
             val log = StringBuilder()
             romInfo.changelog?.forEach { (category, items) ->
-                log.append(category).append("\n")
+                if (category.isNotBlank()) {
+                    log.append(category).append("\n")
+                }
                 items.forEach { item ->
-                    if (item.txt.isNotBlank()) {
-                        log.append(item.txt.trim()).append("\n")
+                    val text = item.txt.trimEnd()
+                    if (text.isNotBlank()) {
+                        log.append(text).append("\n")
                     }
                 }
                 log.append("\n")
             }
-
+            val changelogGroups = log.toString().trimEnd().split("\n\n")
+            val changelog = changelogGroups.map { group -> group.lines().drop(1).joinToString("\n") }
             val gentle = StringBuilder()
             val formattedGentleNotice = recoveryRomInfo.gentleNotice?.text?.replace("<li>", "\n· ")
                 ?.replace("</li>", "")?.replace("<p>", "\n")?.replace("</p>", "")?.replace("&nbsp;", " ")
@@ -416,47 +420,34 @@ class RomInfo {
             formattedGentleNotice?.forEach { gentle.append(it) }
             val gentleNotice = gentle.toString().trimEnd().split("\n").drop(1).joinToString("\n")
 
-            val isNewChangelog = romInfo.osbigversion?.toFloatOrNull()?.let { it >= 3.0 } ?: false
-            if (isNewChangelog) {
-                iconInfoData.value = emptyList()
-
-                val imageBaseUrl = recoveryRomInfo.fileMirror?.image?.let {
-                    if (it.startsWith("http://")) "https://" + it.removePrefix("http://") else it
-                } ?: ""
-
-                val flatChangelogList = mutableListOf<DataHelper.ImageInfoData>()
-                romInfo.changelog?.forEach { (categoryTitle, items) ->
-                    items.forEach { item ->
-                        val image = item.image?.firstOrNull()
-                        flatChangelogList.add(
+            if (romInfo.osbigversion!!.toFloat() >= 3.0) {
+                val imageMainLink = recoveryRomInfo.fileMirror?.image ?: ""
+                imageInfoData.value =
+                    romInfo.changelog?.flatMap { (categoryTitle, items) ->
+                        items.map { item ->
+                            val image = item.image?.firstOrNull()
                             DataHelper.ImageInfoData(
                                 title = categoryTitle,
-                                text = item.txt,
-                                imageUrl = image?.path?.let { if (isWeb()) "" else imageBaseUrl + it },
+                                // 没搞懂，可能要得研究一下怎么换行
+                                changelog = item.txt,
+                                imageUrl = imageLink(imageMainLink, image?.path),
                                 imageWidth = image?.w?.toIntOrNull(),
                                 imageHeight = image?.h?.toIntOrNull()
                             )
-                        )
-                    }
-                }
-                imageInfoData.value = flatChangelogList
-
+                        }
+                    } ?: listOf()
             } else {
-                imageInfoData.value = emptyList()
-
+                val iconNames = changelogGroups.map { it.split("\n").first() }
                 val iconMainLink = recoveryRomInfo.fileMirror?.icon ?: ""
                 val iconNameLink = recoveryRomInfo.icon ?: mapOf()
-                val iconNames = romInfo.changelog?.keys?.toList() ?: emptyList()
                 val iconLinks = iconLink(iconNames, iconMainLink, iconNameLink)
-
-                iconInfoData.value = romInfo.changelog?.map { (category, items) ->
-                    val changelogText = items.mapNotNull { it.txt.trim().takeIf { txt -> txt.isNotBlank() } }.joinToString("\n")
+                iconInfoData.value = iconNames.mapIndexed { index, iconName ->
                     DataHelper.IconInfoData(
-                        iconName = category,
-                        iconLink = if (isWeb()) "" else iconLinks[category] ?: "",
-                        changelog = changelogText
+                        iconName = iconName,
+                        iconLink = if (isWeb()) "" else iconLinks[iconName] ?: "",
+                        changelog = changelog[index]
                     )
-                } ?: emptyList()
+                }
             }
 
             val bigVersion = when {
@@ -576,7 +567,6 @@ class RomInfo {
 
     /**
      * Generate maps with links with corresponding names and icons.
-     * (This function is for older MIUI changelogs)
      *
      * @param iconNames: Icon names included in the changelog
      * @param iconMainLink: Main link to get the icon
@@ -597,6 +587,25 @@ class RomInfo {
             }
         }
         return iconMap
+    }
+
+    /**
+     * Returns the full image URL.
+     *
+     * - On web platform (`isWeb()`) returns an empty string (web uses different resource loading).
+     * - Upgrades links starting with `http://` to `https://`.
+     * - Safely handles `null` for `mirrorImage` and `path`.
+     *
+     * @param mirrorImage main mirror or base URL, may be null
+     * @param path relative image path, may be null
+     * @return full image URL (empty on web platform)
+     */
+    fun imageLink(mirrorImage: String?, path: String?): String {
+        if (isWeb()) return ""
+        val base = mirrorImage?.let {
+            if (it.startsWith("http://")) "https://" + it.removePrefix("http://") else it
+        } ?: ""
+        return base + (path ?: "")
     }
 
     /**
