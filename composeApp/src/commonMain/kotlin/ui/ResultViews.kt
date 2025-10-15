@@ -33,7 +33,6 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.seiko.imageloader.rememberImagePainter 
 import data.DataHelper
@@ -385,46 +384,57 @@ fun ChangelogView(
             val groupedInfo = imageInfo.groupBy { it.title }
 
             titlesInOrder.forEachIndexed { categoryIndex, title ->
-                Column {
-                    Text(
-                        modifier = Modifier.padding(bottom = 8.dp),
-                        text = title,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-
-                    SelectionContainer {
-                        Column {
-                            groupedInfo[title]?.forEach { line ->
-                                if (line.changelog.isNotBlank()) {
-                                    Text(
-                                        text = line.changelog,
-                                        color = MiuixTheme.colorScheme.onSecondaryVariant,
-                                        fontSize = 14.5.sp
-                                    )
-                                }
-
-                                if (line.imageWidth != null && line.imageHeight != null && line.imageHeight > 0) {
-                                    val aspectRatio = line.imageWidth.toFloat() / line.imageHeight.toFloat()
-                                    Image(
-                                        painter = rememberImagePainter(line.imageUrl),
-                                        modifier = Modifier
-                                            .padding(top = 4.dp, bottom = 8.dp)
-                                            .fillMaxWidth()
-                                            .aspectRatio(aspectRatio)
-                                            .clip(G2RoundedCornerShape(10.dp)),
-                                        alignment = Alignment.Center,
-                                        contentScale = ContentScale.FillWidth,
-                                        contentDescription = line.changelog,
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
+                TextWithImage(
+                    title = title,
+                    lines = groupedInfo[title] ?: emptyList(),
+                )
 
                 if (categoryIndex < titlesInOrder.size - 1) {
                     Spacer(modifier = Modifier.height(16.dp))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun TextWithImage(
+    title: String,
+    lines: List<DataHelper.ImageInfoData>
+) {
+    Column {
+        Text(
+            modifier = Modifier.padding(bottom = 8.dp),
+            text = title,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium
+        )
+
+        SelectionContainer {
+            Column {
+                lines.forEach { line ->
+                    if (line.changelog.isNotBlank()) {
+                        Text(
+                            text = line.changelog,
+                            color = MiuixTheme.colorScheme.onSecondaryVariant,
+                            fontSize = 14.5.sp
+                        )
+                    }
+
+                    if (line.imageWidth != null && line.imageHeight != null && line.imageHeight > 0) {
+                        val aspectRatio = line.imageWidth.toFloat() / line.imageHeight.toFloat()
+                        Image(
+                            painter = rememberImagePainter(line.imageUrl),
+                            modifier = Modifier
+                                .padding(top = 4.dp, bottom = 8.dp)
+                                .fillMaxWidth()
+                                .aspectRatio(aspectRatio)
+                                .clip(G2RoundedCornerShape(10.dp)),
+                            alignment = Alignment.Center,
+                            contentScale = ContentScale.FillWidth,
+                            contentDescription = line.changelog,
+                        )
+                    }
                 }
             }
         }
