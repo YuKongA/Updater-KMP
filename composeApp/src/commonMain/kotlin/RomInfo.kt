@@ -87,7 +87,7 @@ class RomInfo {
         token: String
     ): String {
         return buildJsonObject {
-            put("b", branch)
+            if (branch.isNotEmpty()) put("b", branch)
             put("c", androidVersion)
             put("d", codeNameExt)
             put("f", "1")

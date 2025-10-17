@@ -42,7 +42,7 @@ object RomInfoHelper {
         val bigversion: String? = null,
         val branch: String? = null,
         @Serializable(with = ChangelogSerializer::class)
-        val changelog: HashMap<String, List<ChangelogItem>>? = null,
+        val changelog: LinkedHashMap<String, List<ChangelogItem>>? = null,
         val codebase: String? = null,
         val device: String? = null,
         val filename: String? = null,
@@ -82,21 +82,19 @@ object RomInfoHelper {
         val text: String,
     )
 
-    object ChangelogSerializer : KSerializer<HashMap<String, List<ChangelogItem>>> {
+    object ChangelogSerializer : KSerializer<LinkedHashMap<String, List<ChangelogItem>>> {
         override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Changelog")
 
-        override fun deserialize(decoder: Decoder): HashMap<String, List<ChangelogItem>> {
+        override fun deserialize(decoder: Decoder): LinkedHashMap<String, List<ChangelogItem>> {
             val jsonElement = decoder.decodeSerializableValue(JsonElement.serializer())
-            val result = HashMap<String, List<ChangelogItem>>()
+            val result = LinkedHashMap<String, List<ChangelogItem>>()
 
             if (jsonElement !is JsonObject) return result
 
             jsonElement.forEach { (key, value) ->
-                val items = when {
-                    // 情况 1: { "txt": ["item1", "item2"] } - 旧格式
-                    value is JsonObject && value.containsKey("txt") -> {
-                        val txtElement = value["txt"]
-                        when (txtElement) {
+                val items = when (value) {
+                    is JsonObject if value.containsKey("txt") -> {
+                        when (val txtElement = value["txt"]) {
                             is JsonArray -> {
                                 txtElement.mapNotNull {
                                     (it as? JsonPrimitive)?.content?.let { text ->
@@ -108,12 +106,12 @@ object RomInfoHelper {
                             else -> emptyList()
                         }
                     }
-                    // 情况 2: [{ "txt": "item1", "image": [...] }, ...] - 新格式
-                    value is JsonArray -> {
+
+                    is JsonArray -> {
                         value.mapNotNull { element ->
                             try {
                                 Json.decodeFromJsonElement<ChangelogItem>(element)
-                            } catch (e: Exception) {
+                            } catch (_: Exception) {
                                 null
                             }
                         }
@@ -129,7 +127,7 @@ object RomInfoHelper {
             return result
         }
 
-        override fun serialize(encoder: Encoder, value: HashMap<String, List<ChangelogItem>>) {
+        override fun serialize(encoder: Encoder, value: LinkedHashMap<String, List<ChangelogItem>>) {
             val jsonObject = buildJsonObject {
                 value.forEach { (key, items) ->
                     putJsonArray(key) {
