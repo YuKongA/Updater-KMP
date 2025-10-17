@@ -31,30 +31,6 @@ object DataHelper {
     )
 
     @Serializable
-    data class RequestData(
-        val b: String,
-        val c: String,
-        val d: String,
-        val f: String,
-        val id: String,
-        val l: String,
-        val ov: String,
-        val p: String,
-        val pn: String,
-        val r: String,
-        val security: String,
-        val token: String,
-        val v: String,
-        val unlock: String,
-        val options: Options,
-    )
-
-    @Serializable
-    data class Options(
-        val av: String,
-    )
-
-    @Serializable
     data class RomInfoData(
         var type: String = "",
         var device: String = "",
