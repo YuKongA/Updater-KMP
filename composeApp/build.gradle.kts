@@ -23,7 +23,7 @@ plugins {
 
 val appName = "Updater"
 val pkgName = "top.yukonga.updater.kmp"
-val verName = "1.6.0"
+val verName = "1.6.1"
 val verCode = getVersionCode()
 val generatedSrcDir = layout.buildDirectory.dir("generated").get().asFile.resolve("updater")
 
