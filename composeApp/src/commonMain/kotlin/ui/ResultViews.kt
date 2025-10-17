@@ -6,13 +6,19 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
@@ -21,13 +27,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.seiko.imageloader.rememberImagePainter
 import data.DataHelper
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -41,8 +57,7 @@ import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.icons.useful.Copy
 import top.yukonga.miuix.kmp.icon.icons.useful.Save
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import ui.components.TextWithIcon
-import ui.components.TextWithImage
+import top.yukonga.miuix.kmp.utils.G2RoundedCornerShape
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.android_version
 import updater.composeapp.generated.resources.attention
@@ -61,6 +76,7 @@ import updater.composeapp.generated.resources.fingerprint
 import updater.composeapp.generated.resources.security_patch_level
 import updater.composeapp.generated.resources.system_version
 import updater.composeapp.generated.resources.tags
+import utils.LinkUtils
 import utils.MessageUtils.Companion.showMessage
 
 @Composable
@@ -373,13 +389,110 @@ fun ChangelogView(
             }
         }
         if (imageInfo.isNotEmpty()) {
-            imageInfo.forEachIndexed { index, it ->
+            val titlesInOrder = imageInfo.map { it.title }.distinct()
+            val groupedInfo = imageInfo.groupBy { it.title }
+
+            titlesInOrder.forEachIndexed { categoryIndex, title ->
                 TextWithImage(
-                    changelog = it.changelog,
-                    imageName = it.imageName,
-                    imageLink = it.imageLink,
-                    padding = if (index == imageInfo.size - 1) 0.dp else 16.dp
+                    title = title,
+                    lines = groupedInfo[title] ?: emptyList(),
                 )
+
+                if (categoryIndex < titlesInOrder.size - 1) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun TextWithIcon(
+    changelog: String,
+    iconName: String,
+    iconLink: String,
+    padding: Dp
+) {
+    val imagePainter = rememberImagePainter(iconLink)
+
+    AnimatedContent(targetState = changelog) {
+        Column {
+            Row(
+                modifier = Modifier.padding(bottom = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (iconLink.isNotEmpty()) {
+                    Image(
+                        modifier = Modifier
+                            .padding(end = 6.dp)
+                            .size(24.dp),
+                        painter = imagePainter,
+                        contentDescription = iconName,
+                    )
+                    Text(
+                        text = iconName,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                } else if (it.isNotEmpty() && it != " ") {
+                    Text(
+                        text = iconName,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+            if (it.isNotEmpty() && it != " ") {
+                SelectionContainer {
+                    Text(
+                        text = it,
+                        color = MiuixTheme.colorScheme.onSecondaryVariant,
+                        fontSize = 14.5.sp
+                    )
+                }
+                Spacer(modifier = Modifier.height(padding))
+            }
+        }
+    }
+}
+
+@Composable
+fun TextWithImage(
+    title: String,
+    lines: List<DataHelper.ImageInfoData>
+) {
+    Column {
+        Text(
+            modifier = Modifier.padding(bottom = 8.dp),
+            text = title,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium
+        )
+
+        SelectionContainer {
+            Column {
+                lines.forEach { line ->
+                    if (line.changelog.isNotEmpty()) {
+                        ChangelogText(
+                            text = line.changelog,
+                        )
+                    }
+
+                    if (line.imageUrl != "" && line.imageWidth != null && line.imageHeight != null && line.imageHeight > 0) {
+                        val aspectRatio = line.imageWidth.toFloat() / line.imageHeight.toFloat()
+                        Image(
+                            painter = rememberImagePainter(line.imageUrl),
+                            modifier = Modifier
+                                .padding(top = 4.dp, bottom = 8.dp)
+                                .fillMaxWidth()
+                                .aspectRatio(aspectRatio)
+                                .clip(G2RoundedCornerShape(10.dp)),
+                            alignment = Alignment.Center,
+                            contentScale = ContentScale.FillWidth,
+                            contentDescription = line.changelog,
+                        )
+                    }
+                }
             }
         }
     }
@@ -396,4 +509,53 @@ fun RomFileInfoSection(
         MessageTextView(stringResource(Res.string.filemd5), md5)
         MessageTextView(stringResource(Res.string.filesize), fileSize)
     }
+}
+
+@Composable
+fun ChangelogText(
+    text: String
+) {
+    val links = remember(text) { LinkUtils.extractLinks(text) }
+    val uriHandler = LocalUriHandler.current
+    val primary = MiuixTheme.colorScheme.primary
+
+    val annotatedString = remember(text, links) {
+        buildAnnotatedString {
+            append(text)
+            links.forEach { (url, range) ->
+                addStyle(
+                    style = SpanStyle(
+                        color = primary,
+                        textDecoration = TextDecoration.Underline
+                    ),
+                    start = range.first,
+                    end = range.last + 1
+                )
+                addLink(
+                    url = LinkAnnotation.Url(
+                        url = url,
+                        styles = TextLinkStyles(
+                            style = SpanStyle(
+                                color = primary,
+                                textDecoration = TextDecoration.Underline
+                            )
+                        ),
+                        linkInteractionListener = {
+                            uriHandler.openUri(url)
+                        }
+                    ),
+                    start = range.first,
+                    end = range.last + 1
+                )
+            }
+        }
+    }
+
+    Text(
+        text = annotatedString,
+        style = LocalTextStyle.current.copy(
+            color = MiuixTheme.colorScheme.onSecondaryVariant,
+            fontSize = 14.5.sp
+        )
+    )
 }

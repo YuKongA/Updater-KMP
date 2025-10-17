@@ -12,9 +12,11 @@ object DataHelper {
 
     @Serializable
     data class ImageInfoData(
+        val title: String = "",
         val changelog: String = "",
-        val imageName: String = "",
-        val imageLink: String = "",
+        val imageUrl: String = "",
+        val imageWidth: Int? = null,
+        val imageHeight: Int? = null
     )
 
     @Serializable
@@ -26,30 +28,6 @@ object DataHelper {
         val serviceToken: String? = null,
         val userId: String? = null,
         val cUserId: String? = null,
-    )
-
-    @Serializable
-    data class RequestData(
-        val b: String,
-        val c: String,
-        val d: String,
-        val f: String,
-        val id: String,
-        val l: String,
-        val ov: String,
-        val p: String,
-        val pn: String,
-        val r: String,
-        val security: String,
-        val token: String,
-        val v: String,
-        val unlock: String,
-        val options: Options,
-    )
-
-    @Serializable
-    data class Options(
-        val av: String,
     )
 
     @Serializable

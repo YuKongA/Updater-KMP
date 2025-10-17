@@ -15,6 +15,9 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonObject
 import org.jetbrains.compose.resources.stringResource
 import platform.httpClientPlatform
 import platform.miuiDecrypt
@@ -83,24 +86,28 @@ class RomInfo {
         security: String,
         token: String
     ): String {
-        val data = DataHelper.RequestData(
-            b = branch,
-            c = androidVersion,
-            d = codeNameExt,
-            f = "1",
-            id = userId,
-            l = if (!codeNameExt.contains("_global")) "zh_CN" else "en_US",
-            ov = romVersion,
-            p = codeNameExt,
-            pn = codeNameExt,
-            r = regionCode,
-            security = security,
-            token = token,
-            unlock = "0",
-            v = "MIUI-$romVersion",
-            options = DataHelper.Options(av = "9.1.0")
-        )
-        return Json.encodeToString(data)
+        return buildJsonObject {
+            put("b", branch)
+            put("c", androidVersion)
+            put("d", codeNameExt)
+            put("f", "1")
+            put("id", userId)
+            put("l", if (!codeNameExt.contains("_global")) "zh_CN" else "en_US")
+            put("ov", romVersion)
+            put("p", codeNameExt)
+            put("pn", codeNameExt)
+            put("r", regionCode)
+            put("security", security)
+            put("token", token)
+            put("unlock", "0")
+            put("v", "MIUI-$romVersion")
+
+            if ((androidVersion.toFloatOrNull() ?: 0f) >= 15.0f) {
+                putJsonObject("options") {
+                    put("av", "9.1.3")
+                }
+            }
+        }.toString()
     }
 
     /**
@@ -382,6 +389,7 @@ class RomInfo {
      * @param romInfo: Current ROM info
      * @param romInfoData: Data used to display ROM info
      * @param iconInfoData: Data used to display changelog icons
+     * @param imageInfoData: Data used to display changelog images (now List<ImageInfoData>)
      * @param coroutineScope: Coroutine scope
      * @param officialDownload: Official download URL
      * @param noUltimateLink: No ultimate download link
@@ -398,10 +406,20 @@ class RomInfo {
     ) {
         if (romInfo?.bigversion != null) {
             val log = StringBuilder()
-            romInfo.changelog?.forEach { log.append(it.key).append("\n").append(it.value.txt.joinToString("\n")).append("\n\n") }
+            romInfo.changelog?.forEach { (category, items) ->
+                if (category.isNotEmpty()) {
+                    log.append(category).append("\n")
+                }
+                items.forEach { item ->
+                    val text = item.txt.trimEnd()
+                    if (text.isNotEmpty()) {
+                        log.append(text).append("\n")
+                    }
+                }
+                log.append("\n")
+            }
             val changelogGroups = log.toString().trimEnd().split("\n\n")
-            val changelog = changelogGroups.map { it.split("\n").drop(1).joinToString("\n") }
-
+            val changelog = changelogGroups.map { group -> group.lines().drop(1).joinToString("\n") }
             val gentle = StringBuilder()
             val formattedGentleNotice = recoveryRomInfo.gentleNotice?.text?.replace("<li>", "\n· ")
                 ?.replace("</li>", "")?.replace("<p>", "\n")?.replace("</p>", "")?.replace("&nbsp;", " ")
@@ -409,18 +427,21 @@ class RomInfo {
             formattedGentleNotice?.forEach { gentle.append(it) }
             val gentleNotice = gentle.toString().trimEnd().split("\n").drop(1).joinToString("\n")
 
-            if (romInfo.osbigversion!!.toFloat() >= 3.0) {
-                val imageNames = changelogGroups.map { it.split("\n").first() }
+            if (!romInfo.osbigversion.isNullOrEmpty() && romInfo.osbigversion.toFloat() >= 3.0f) {
                 val imageMainLink = recoveryRomInfo.fileMirror?.image ?: ""
-                val imageNameLink = recoveryRomInfo.log?.moduleImg ?: mapOf()
-                val imageLinks = imageLink(imageNames, imageMainLink, imageNameLink)
-                imageInfoData.value = imageNames.mapIndexed { index, imageName ->
-                    DataHelper.ImageInfoData(
-                        imageName = imageName,
-                        imageLink = if (isWeb()) "" else imageLinks[imageName] ?: "",
-                        changelog = changelog[index]
-                    )
-                }
+                imageInfoData.value =
+                    romInfo.changelog?.flatMap { (categoryTitle, items) ->
+                        items.map { item ->
+                            val image = item.image?.firstOrNull()
+                            DataHelper.ImageInfoData(
+                                title = categoryTitle,
+                                changelog = item.txt,
+                                imageUrl = imageLink(imageMainLink, image?.path),
+                                imageWidth = image?.w?.toIntOrNull(),
+                                imageHeight = image?.h?.toIntOrNull()
+                            )
+                        }
+                    } ?: listOf()
             } else {
                 val iconNames = changelogGroups.map { it.split("\n").first() }
                 val iconMainLink = recoveryRomInfo.fileMirror?.icon ?: ""
@@ -429,14 +450,14 @@ class RomInfo {
                 iconInfoData.value = iconNames.mapIndexed { index, iconName ->
                     DataHelper.IconInfoData(
                         iconName = iconName,
-                        iconLink = if (isWeb()) "" else iconLinks[iconName] ?: "",
+                        iconLink = iconLinks[iconName] ?: "",
                         changelog = changelog[index]
                     )
                 }
             }
 
             val bigVersion = when {
-                romInfo.osbigversion != ".0" && romInfo.osbigversion != "0.0" && romInfo.osbigversion != "" -> "HyperOS " + romInfo.osbigversion
+                !romInfo.osbigversion.isNullOrEmpty() && romInfo.osbigversion != ".0" && romInfo.osbigversion != "0.0" -> "HyperOS " + romInfo.osbigversion
                 romInfo.bigversion.contains("816") -> romInfo.bigversion.replace("816", "HyperOS 1.0")
                 else -> "MIUI ${romInfo.bigversion}"
             }
@@ -560,52 +581,28 @@ class RomInfo {
      * @return Links to icons with corresponding names
      */
     fun iconLink(iconNames: List<String>, iconMainLink: String, iconNameLink: Map<String, String>): MutableMap<String, String> {
+        if (isWeb()) return mutableMapOf()
         val iconMap = mutableMapOf<String, String>()
-        val safeIconMainLink = if (iconMainLink.startsWith("http://")) {
-            "https://" + iconMainLink.removePrefix("http://")
-        } else {
-            iconMainLink
-        }
+        val safeIconMainLink = iconMainLink.replace("http://", "https://")
         if (safeIconMainLink.isNotEmpty() && iconNameLink.isNotEmpty()) {
             for (name in iconNames) {
-                val realLink = safeIconMainLink + iconNameLink[name]
-                iconMap[name] = realLink
+                iconNameLink[name]?.let { iconMap[name] = safeIconMainLink + it }
             }
         }
         return iconMap
     }
 
     /**
-     * Generate maps with links with corresponding names and images.
+     * Returns the full image URL.
      *
-     * @param imageNames: Image names included in the changelog
-     * @param imageMainLink: Main link to get the image
-     * @param imageNameLink: Links that correspond to each image name
-     *
-     * @return Links to images with corresponding names
+     * @param mirrorImage main mirror or base URL, may be null
+     * @param path relative image path, may be null
+     * @return full image URL
      */
-    fun imageLink(
-        imageNames: List<String>,
-        imageMainLink: String,
-        imageNameLink: Map<String, Map<String, String>>
-    ): MutableMap<String, String> {
-        val imageMap = mutableMapOf<String, String>()
-        val safeImageMainLink = if (imageMainLink.startsWith("http://")) {
-            "https://" + imageMainLink.removePrefix("http://")
-        } else {
-            imageMainLink
-        }
-        if (safeImageMainLink.isNotEmpty() && imageNameLink.isNotEmpty()) {
-            for (name in imageNames) {
-                val realLink = if ((imageNameLink[name]?.get("pt") ?: "") == "") {
-                    ""
-                } else {
-                    safeImageMainLink + imageNameLink[name]?.get("pt")
-                }
-                imageMap[name] = realLink
-            }
-        }
-        return imageMap
+    fun imageLink(mirrorImage: String, path: String?): String {
+        if (isWeb()) return ""
+        val base = mirrorImage.replace("http://", "https://")
+        return base + (path ?: "")
     }
 
     /**
