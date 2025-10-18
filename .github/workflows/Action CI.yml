@@ -32,7 +32,7 @@ jobs:
             artifact-path: composeApp/build/compose/binaries/main-release/app/Updater
             artifact-pathEx: composeApp/build/outputs/apk/release
             artifact-name: Updater-linux-x64-bin
-            artifact-nameEx: Updater-android-aarch64-apk
+            artifact-nameEx: Updater-android-universal-apk
             jdk-distribution: zulu
           - os: ubuntu-24.04-arm
             platform: linux arm64
@@ -45,7 +45,7 @@ jobs:
             build-command: ./gradlew createReleaseDistributable
             artifact-path: composeApp/build/compose/binaries/main-release/app/Updater
             artifact-name: Updater-windows-x64-exe
-            jdk-distribution: jetbrains
+            jdk-distribution: zulu
 
     steps:
       - name: Checkout sources
