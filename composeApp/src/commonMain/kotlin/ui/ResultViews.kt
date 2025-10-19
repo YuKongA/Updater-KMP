@@ -209,18 +209,29 @@ fun InfoCardViews(
 
             if (romInfo.gentleNotice.isNotEmpty()) {
                 Text(
-                    modifier = Modifier.padding(top = 16.dp),
+                    modifier = Modifier.padding(top = 16.dp, bottom = 10.dp),
                     text = stringResource(Res.string.attention),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.SemiBold,
                 )
                 SelectionContainer {
-                    Text(
-                        text = romInfo.gentleNotice,
-                        color = MiuixTheme.colorScheme.onSecondaryVariant,
-                        fontSize = 14.5.sp,
-                        modifier = Modifier.padding(top = 12.dp)
-                    )
+                    val gentleLines = remember(romInfo.gentleNotice) { romInfo.gentleNotice.lines() }
+                    val textColor = MiuixTheme.colorScheme.onSecondaryVariant
+
+                    Column {
+                        gentleLines.forEachIndexed { idx, line ->
+                            if (line.isNotBlank()) {
+                                Text(
+                                    text = line,
+                                    color = textColor,
+                                    fontSize = 14.5.sp,
+                                    modifier = Modifier.padding(vertical = if (idx == 0) 6.dp else 4.dp)
+                                )
+                            } else {
+                                Spacer(modifier = Modifier.height(4.dp))
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -352,7 +363,7 @@ fun ChangelogView(
 
     Column {
         Row(
-            modifier = Modifier.padding(vertical = 6.dp),
+            modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -379,26 +390,25 @@ fun ChangelogView(
             }
         }
         if (iconInfo.isNotEmpty()) {
+            val lastIndex = iconInfo.size - 1
             iconInfo.forEachIndexed { index, it ->
                 TextWithIcon(
                     changelog = it.changelog,
                     iconName = it.iconName,
                     iconLink = it.iconLink,
-                    padding = if (index == iconInfo.size - 1) 0.dp else 16.dp
+                    padding = if (index == lastIndex) 0.dp else 16.dp
                 )
             }
         }
         if (imageInfo.isNotEmpty()) {
-            val titlesInOrder = imageInfo.map { it.title }.distinct()
-            val groupedInfo = imageInfo.groupBy { it.title }
-
-            titlesInOrder.forEachIndexed { categoryIndex, title ->
+            val groupedEntries = imageInfo.groupBy { it.title }.entries.toList()
+            groupedEntries.forEachIndexed { categoryIndex, entry ->
                 TextWithImage(
-                    title = title,
-                    lines = groupedInfo[title] ?: emptyList(),
+                    title = entry.key,
+                    lines = entry.value,
                 )
 
-                if (categoryIndex < titlesInOrder.size - 1) {
+                if (categoryIndex < groupedEntries.size - 1) {
                     Spacer(modifier = Modifier.height(16.dp))
                 }
             }
@@ -418,7 +428,7 @@ fun TextWithIcon(
     AnimatedContent(targetState = changelog) {
         Column {
             Row(
-                modifier = Modifier.padding(bottom = 8.dp),
+                modifier = Modifier.padding(vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (iconLink.isNotEmpty()) {
@@ -442,13 +452,23 @@ fun TextWithIcon(
                     )
                 }
             }
-            if (it.isNotEmpty() && it != " ") {
+            if (it.isNotBlank()) {
+                val lines = remember(it) { it.lines() }
                 SelectionContainer {
-                    Text(
-                        text = it,
-                        color = MiuixTheme.colorScheme.onSecondaryVariant,
-                        fontSize = 14.5.sp
-                    )
+                    Column {
+                        lines.forEach { line ->
+                            if (line.isNotBlank()) {
+                                Text(
+                                    modifier = Modifier.padding(vertical = 6.dp),
+                                    text = line,
+                                    color = MiuixTheme.colorScheme.onSecondaryVariant,
+                                    fontSize = 14.5.sp
+                                )
+                            } else {
+                                Spacer(modifier = Modifier.height(4.dp))
+                            }
+                        }
+                    }
                 }
                 Spacer(modifier = Modifier.height(padding))
             }
@@ -463,7 +483,7 @@ fun TextWithImage(
 ) {
     Column {
         Text(
-            modifier = Modifier.padding(bottom = 8.dp),
+            modifier = Modifier.padding(vertical = 6.dp),
             text = title,
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium
@@ -552,6 +572,7 @@ fun ChangelogText(
     }
 
     Text(
+        modifier = Modifier.padding(vertical = 6.dp),
         text = annotatedString,
         style = LocalTextStyle.current.copy(
             color = MiuixTheme.colorScheme.onSecondaryVariant,
