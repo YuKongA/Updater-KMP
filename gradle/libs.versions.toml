@@ -2,7 +2,7 @@
 android-gradle-plugin = "8.13.0"
 androidx-activity-compose = "1.11.0"
 compose-hotReload = "1.0.0-rc02"
-compose-plugin = "1.9.1"
+compose-plugin = "1.9.2"
 cryptography = "0.5.0"
 haze = "1.6.10"
 image-loader = "1.10.0"
