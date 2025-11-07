@@ -30,9 +30,7 @@ import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.basic.TextField
-import top.yukonga.miuix.kmp.extra.DropDownMode
 import top.yukonga.miuix.kmp.extra.SpinnerEntry
-import top.yukonga.miuix.kmp.extra.SpinnerMode
 import top.yukonga.miuix.kmp.extra.SuperDropdown
 import top.yukonga.miuix.kmp.extra.SuperSpinner
 import top.yukonga.miuix.kmp.theme.MiuixTheme
@@ -78,7 +76,6 @@ private fun SearchHistoryView(
                 title = stringResource(Res.string.search_history),
                 items = spinnerOptions,
                 selectedIndex = searchKeywordsSelected.value,
-                mode = SpinnerMode.AlwaysOnRight,
                 showValue = false,
                 onSelectedIndexChange = { index ->
                     onHistorySelect(searchKeywords.value[index])
@@ -198,7 +195,6 @@ fun BasicViews(
                 onClick = {
                     focusManager.clearFocus()
                 },
-                mode = DropDownMode.AlwaysOnRight,
                 maxHeight = 280.dp
             )
             SuperDropdown(
@@ -212,7 +208,6 @@ fun BasicViews(
                 onClick = {
                     focusManager.clearFocus()
                 },
-                mode = DropDownMode.AlwaysOnRight,
                 maxHeight = 280.dp
             )
             SuperDropdown(
@@ -226,7 +221,6 @@ fun BasicViews(
                 onClick = {
                     focusManager.clearFocus()
                 },
-                mode = DropDownMode.AlwaysOnRight,
                 maxHeight = 280.dp
             )
         }

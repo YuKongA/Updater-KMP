@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
@@ -57,7 +58,6 @@ import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.icons.useful.Copy
 import top.yukonga.miuix.kmp.icon.icons.useful.Save
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.utils.G2RoundedCornerShape
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.android_version
 import updater.composeapp.generated.resources.attention
@@ -506,7 +506,7 @@ fun TextWithImage(
                                 .padding(top = 4.dp, bottom = 8.dp)
                                 .fillMaxWidth()
                                 .aspectRatio(aspectRatio)
-                                .clip(G2RoundedCornerShape(10.dp)),
+                                .clip(RoundedCornerShape(10.dp)),
                             alignment = Alignment.Center,
                             contentScale = ContentScale.FillWidth,
                             contentDescription = line.changelog,

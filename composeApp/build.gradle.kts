@@ -39,7 +39,6 @@ kotlin {
     jvm("desktop")
 
     fun iosTargets(config: KotlinNativeTarget.() -> Unit) {
-        iosX64(config)
         iosArm64(config)
         iosSimulatorArm64(config)
     }
@@ -53,11 +52,7 @@ kotlin {
         }
     }
 
-    fun macosTargets(config: KotlinNativeTarget.() -> Unit) {
-        macosX64(config)
-        macosArm64(config)
-    }
-    macosTargets {
+    macosArm64 {
         binaries.executable {
             entryPoint = "main"
         }
@@ -224,7 +219,7 @@ compose.desktop {
         }
     }
     nativeApplication {
-        targets(kotlin.targets.getByName("macosArm64"), kotlin.targets.getByName("macosX64"))
+        targets(kotlin.targets.getByName("macosArm64"))
         distributions {
             targetFormats(TargetFormat.Dmg)
             packageName = appName
@@ -295,7 +290,7 @@ tasks.named<JavaExec>("hotRunDesktop") {
 afterEvaluate {
     project.extensions.getByType<KotlinMultiplatformExtension>().targets
         .withType<KotlinNativeTarget>()
-        .filter { it.konanTarget == KonanTarget.MACOS_ARM64 || it.konanTarget == KonanTarget.MACOS_X64 }
+        .filter { it.konanTarget == KonanTarget.MACOS_ARM64 }
         .forEach { target ->
             val targetName = target.targetName.uppercaseFirstChar()
             val buildTypes = mapOf(
@@ -311,7 +306,7 @@ afterEvaluate {
                         val copyTask = tasks.register<Copy>(taskName) {
                             from({
                                 (executable.compilation.associatedCompilations + executable.compilation).flatMap { compilation ->
-                                    compilation.allKotlinSourceSets.map { it -> it.resources }
+                                    compilation.allKotlinSourceSets.map { it.resources }
                                 }
                             })
                             into(executable.outputDirectory.resolve("compose-resources"))
