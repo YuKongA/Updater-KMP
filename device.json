@@ -161,7 +161,8 @@
         { "deviceName": "Redmi Pad Pro 5G / POCO Pad 5G", "deviceCodeName": "ruan", "deviceCode": "FS" },
         { "deviceName": "REDMI Pad 2 4G", "deviceCodeName": "koto", "deviceCode": "OW" },
         { "deviceName": "REDMI Pad 2", "deviceCodeName": "taiko", "deviceCode": "OV" },
-        { "deviceName": "REDMI Pad 2 Pro", "deviceCodeName": "flute", "deviceCode": "PW" },
+        { "deviceName": "REDMI Pad 2 Pro / POCO Pad M1", "deviceCodeName": "flute", "deviceCode": "PW" },
+        { "deviceName": "REDMI Pad 2 Pro 5G", "deviceCodeName": "organ", "deviceCode": "PX" },
         { "deviceName": "REDMI K Pad / Xiaomi Pad Mini", "deviceCodeName": "turner", "deviceCode": "AO" },
         { "deviceName": "Redmi 13 / Redmi Note 13R / POCO M6 Plus", "deviceCodeName": "breeze", "deviceCode": "NU" },
         { "deviceName": "Xiaomi 14T Pro / Redmi K70 Ultra", "deviceCodeName": "rothko", "deviceCode": "NN" },
@@ -173,7 +174,7 @@
         { "deviceName": "Xiaomi 15 Ultra", "deviceCodeName": "xuanyuan", "deviceCode": "OA" },
         { "deviceName": "Xiaomi 15T", "deviceCodeName": "goya", "deviceCode": "OE" },
         { "deviceName": "Xiaomi 15T Pro", "deviceCodeName": "klimt", "deviceCode": "OS" },
-        { "deviceName": "Xiaomi Pad 7", "deviceCodeName": "uke", "deviceCode": "OZ" },
+        { "deviceName": "Xiaomi Pad 7 / POCO Pad X1", "deviceCodeName": "uke", "deviceCode": "OZ" },
         { "deviceName": "Xiaomi Pad 7 Pro", "deviceCodeName": "muyu", "deviceCode": "OY" },
         { "deviceName": "Xiaomi Pad 7S Pro", "deviceCodeName": "violin", "deviceCode": "OT" },
         { "deviceName": "Xiaomi Pad 7 Ultra", "deviceCodeName": "jinghu", "deviceCode": "OX" },
@@ -195,5 +196,5 @@
         { "deviceName": "Xiaomi Pad 8", "deviceCodeName": "yupei", "deviceCode": "PZ" },
         { "deviceName": "Xiaomi Pad 8 Pro", "deviceCodeName": "piano", "deviceCode": "PY" }
     ],
-    "version": "1.0.7"
+    "version": "1.0.8"
 }
