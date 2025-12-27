@@ -79,14 +79,14 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
       - name: Upload Updater ${{ matrix.platform }} artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.artifact-name }}
           path: ${{ matrix.artifact-path }}
 
       - name: Upload Updater ${{ matrix.platformEx }} artifact
         if: matrix.platformEx == 'android aarch64'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.artifact-nameEx }}
           path: ${{ matrix.artifact-pathEx }}
