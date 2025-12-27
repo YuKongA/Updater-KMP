@@ -85,7 +85,6 @@ fun AutoCompleteTextField(
             },
             singleLine = true,
             label = label,
-            backgroundColor = MiuixTheme.colorScheme.surface,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = {
                 focusManager.clearFocus()

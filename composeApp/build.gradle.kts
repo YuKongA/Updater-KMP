@@ -27,10 +27,6 @@ val verName = "1.6.1"
 val verCode = getVersionCode()
 val generatedSrcDir = layout.buildDirectory.dir("generated").get().asFile.resolve("updater")
 
-java {
-    toolchain.languageVersion = JavaLanguageVersion.of(21)
-}
-
 kotlin {
     jvmToolchain(21)
 
@@ -46,18 +42,16 @@ kotlin {
         binaries.framework {
             baseName = "shared"
             isStatic = true
-        }
-        compilerOptions {
-            freeCompilerArgs.add("-Xbinary=preCodegenInlineThreshold=40")
+            binaryOption("smallBinary", "true")
+            binaryOption("preCodegenInlineThreshold", "40")
         }
     }
 
     macosArm64 {
         binaries.executable {
             entryPoint = "main"
-        }
-        compilerOptions {
-            freeCompilerArgs.add("-Xbinary=preCodegenInlineThreshold=40")
+            binaryOption("smallBinary", "true")
+            binaryOption("preCodegenInlineThreshold", "40")
         }
     }
 
@@ -135,10 +129,15 @@ kotlin {
 
 android {
     namespace = pkgName
+    compileSdk = 36
+    compileSdkMinor = 1
+    buildToolsVersion = "36.1.0"
     defaultConfig {
         applicationId = pkgName
         versionCode = verCode
         versionName = verName
+        targetSdk = 36
+        minSdk = 26
     }
     val properties = Properties()
     runCatching { properties.load(project.rootProject.file("local.properties").inputStream()) }
@@ -155,7 +154,6 @@ android {
                 keyPassword = pwd
                 enableV2Signing = true
                 enableV3Signing = true
-                enableV4Signing = true
             }
         }
     }
@@ -325,7 +323,7 @@ tasks.withType<AbstractNativeMacApplicationPackageAppDirTask>().configureEach {
         val appDir = destinationDir.resolve("$packageName.app")
         val resourcesDir = appDir.resolve("Contents/Resources")
         val currentMacosTarget = kotlin.targets.withType<KotlinNativeTarget>()
-            .find { it.konanTarget == KonanTarget.MACOS_ARM64 || it.konanTarget == KonanTarget.MACOS_X64 }?.targetName
+            .find { it.konanTarget == KonanTarget.MACOS_ARM64 }?.targetName
         val composeResourcesDir = project.rootDir
             .resolve("composeApp/build/bin/$currentMacosTarget/releaseExecutable/compose-resources")
         if (composeResourcesDir.exists()) {

@@ -33,7 +33,6 @@ import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.extra.SpinnerEntry
 import top.yukonga.miuix.kmp.extra.SuperDropdown
 import top.yukonga.miuix.kmp.extra.SuperSpinner
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 import ui.components.AutoCompleteTextField
 import updater.composeapp.generated.resources.Res
 import updater.composeapp.generated.resources.android_version
@@ -169,7 +168,6 @@ fun BasicViews(
             onValueChange = { systemVersion.value = it },
             label = stringResource(Res.string.system_version),
             singleLine = true,
-            backgroundColor = MiuixTheme.colorScheme.surface,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(onSearch = {
                 focusManager.clearFocus()
