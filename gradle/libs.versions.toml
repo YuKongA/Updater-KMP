@@ -1,7 +1,7 @@
 [versions]
-android-gradle-plugin = "8.13.0"
-androidx-activity-compose = "1.11.0"
-compose-hotReload = "1.0.0-rc03"
+android-gradle-plugin = "8.13.2"
+androidx-activity-compose = "1.12.2"
+compose-hotReload = "1.0.0"
 compose-plugin = "1.9.3"
 cryptography = "0.5.0"
 haze = "1.7.1"
@@ -11,7 +11,7 @@ kotlin = "2.2.21"
 kotlinx-serialization-json = "1.9.0"
 kotlinx-datetime = "0.7.1"
 ktor-client = "3.3.3"
-miuix = "0.6.1"
+miuix = "0.7.2"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }

@@ -37,7 +37,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.lerp
 import data.DataHelper
 import data.DeviceInfoHelper
 import dev.chrisbanes.haze.HazeState
@@ -139,16 +138,11 @@ fun App(
 
         val scrollBehavior = MiuixScrollBehavior(rememberTopAppBarState())
         val focusManager = LocalFocusManager.current
-        val hazeState = remember { HazeState() }
 
+        val hazeState = remember { HazeState() }
         val hazeStyle = HazeStyle(
-            backgroundColor = MiuixTheme.colorScheme.background,
-            tint = HazeTint(
-                MiuixTheme.colorScheme.background.copy(
-                    if (scrollBehavior.state.collapsedFraction <= 0f) 1f
-                    else lerp(1f, 0.67f, (scrollBehavior.state.collapsedFraction))
-                )
-            )
+            backgroundColor = MiuixTheme.colorScheme.surface,
+            tint = HazeTint(MiuixTheme.colorScheme.surface.copy(0.8f))
         )
 
         val showMenuPopup = remember { mutableStateOf(false) }
