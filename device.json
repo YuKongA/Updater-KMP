@@ -188,6 +188,7 @@
         { "deviceName": "Xiaomi 17", "deviceCodeName": "pudding", "deviceCode": "PC" },
         { "deviceName": "Xiaomi 17 Pro", "deviceCodeName": "pandora", "deviceCode": "BL" },
         { "deviceName": "Xiaomi 17 Pro Max", "deviceCodeName": "popsicle", "deviceCode": "PB" },
+        { "deviceName": "Xiaomi 17 Ultra", "deviceCodeName": "nezha", "deviceCode": "PA" },
         { "deviceName": "REDMI K90", "deviceCodeName": "annibale", "deviceCode": "PK" },
         { "deviceName": "REDMI K90 Pro Max", "deviceCodeName": "myron", "deviceCode": "PM" },
         { "deviceName": "REDMI Note 15", "deviceCodeName": "kunzite", "deviceCode": "PQ" },
@@ -196,5 +197,5 @@
         { "deviceName": "Xiaomi Pad 8", "deviceCodeName": "yupei", "deviceCode": "PZ" },
         { "deviceName": "Xiaomi Pad 8 Pro", "deviceCodeName": "piano", "deviceCode": "PY" }
     ],
-    "version": "1.0.8"
+    "version": "1.0.9"
 }
