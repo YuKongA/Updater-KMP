@@ -1,16 +1,17 @@
 [versions]
-android-gradle-plugin = "8.13.2"
-androidx-activity-compose = "1.12.2"
+android-gradle-plugin = "9.0.0"
+androidx-activity-compose = "1.12.3"
 compose-hotReload = "1.0.0"
-compose-plugin = "1.9.3"
+compose-plugin = "1.10.0"
 cryptography = "0.5.0"
 haze = "1.7.1"
 image-loader = "1.10.0"
 jna = "5.18.1"
-kotlin = "2.2.21"
-kotlinx-serialization-json = "1.9.0"
+kotlin = "2.3.0"
+kotlinx-serialization-json = "1.10.0"
 kotlinx-datetime = "0.7.1"
-ktor-client = "3.3.3"
+ktor-client = "3.4.0"
+material3 = "1.9.0"
 miuix = "0.7.2"
 
 [libraries]
@@ -29,10 +30,14 @@ ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor-cl
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor-client" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor-client" }
 ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor-client" }
+material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
 miuix = { module = "top.yukonga.miuix.kmp:miuix", version.ref = "miuix" }
+ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-plugin" }
+components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-plugin" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
+android-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "android-gradle-plugin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 compose-hotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "compose-hotReload" }
 jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
