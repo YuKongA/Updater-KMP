@@ -21,7 +21,7 @@ jobs:
           - os: macos-latest
             platform: macos arm64
             build-command: ./gradlew packageDmgNativeReleaseMacosArm64
-            artifact-path: composeApp/build/compose/binaries/main/native-macosArm64-release-dmg
+            artifact-path: macos/build/compose/binaries/main/native-macosArm64-release-dmg
             artifact-name: Updater-darwin-arm64-dmg
             jdk-distribution: zulu
           - os: ubuntu-latest
@@ -29,21 +29,21 @@ jobs:
             platformEx: android aarch64
             build-command: ./gradlew createReleaseDistributable
             build-commandEx: ./gradlew assembleDebug && ./gradlew assembleRelease
-            artifact-path: composeApp/build/compose/binaries/main-release/app/Updater
-            artifact-pathEx: composeApp/build/outputs/apk/release
+            artifact-path: desktop/build/compose/binaries/main-release/app/Updater
+            artifact-pathEx: android/build/outputs/apk/release
             artifact-name: Updater-linux-x64-bin
             artifact-nameEx: Updater-android-universal-apk
             jdk-distribution: zulu
           - os: ubuntu-24.04-arm
             platform: linux arm64
             build-command: ./gradlew createReleaseDistributable
-            artifact-path: composeApp/build/compose/binaries/main-release/app/Updater
+            artifact-path: desktop/build/compose/binaries/main-release/app/Updater
             artifact-name: Updater-linux-arm64-bin
             jdk-distribution: zulu
           - os: windows-latest
             platform: windows x64
             build-command: ./gradlew createReleaseDistributable
-            artifact-path: composeApp/build/compose/binaries/main-release/app/Updater
+            artifact-path: desktop/build/compose/binaries/main-release/app/Updater
             artifact-name: Updater-windows-x64-exe
             jdk-distribution: zulu
 
@@ -104,8 +104,8 @@ jobs:
             ```
         run: |
           if [ ! -z "${{ secrets.BOT_TOKEN }}" ]; then
-            export RELEASE=$(find ./composeApp/build/outputs/apk/release -name "*.apk")
-            export DEBUG=$(find ./composeApp/build/outputs/apk/debug -name "*.apk")
+            export RELEASE=$(find ./android/build/outputs/apk/release -name "*.apk")
+            export DEBUG=$(find ./android/build/outputs/apk/debug -name "*.apk")
             ESCAPED=`python3 -c 'import json,os,urllib.parse; print(urllib.parse.quote(json.dumps(os.environ["COMMIT_MESSAGE"])))'`
             curl -v "https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup?chat_id=${CHANNEL_ID}&media=%5B%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2Frelease%22%7D%2C%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2Fdebug%22%2C%22parse_mode%22%3A%22MarkdownV2%22%2C%22caption%22%3A${ESCAPED}%7D%5D" -F release="@$RELEASE" -F debug="@$DEBUG"
           fi
