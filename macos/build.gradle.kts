@@ -28,7 +28,7 @@ kotlin {
     }
 
     sourceSets {
-        macosArm64Main.dependencies {
+        macosMain.dependencies {
             implementation(project(":shared"))
         }
     }

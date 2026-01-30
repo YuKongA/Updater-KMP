@@ -189,6 +189,7 @@ fabric.properties
 
 ### Kotlin ###
 /.kotlin
+kotlin-js-store
 # Compiled class file
 
 # Log file

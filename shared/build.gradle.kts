@@ -71,7 +71,6 @@ kotlin {
         commonMain.dependencies {
             api(libs.ui)
             api(libs.components.resources)
-            implementation(libs.material3)
             // Added
             implementation(libs.cryptography.core)
             implementation(libs.image.loader)
@@ -93,16 +92,6 @@ kotlin {
             implementation(libs.cryptography.provider.apple)
             implementation(libs.ktor.client.darwin)
         }
-        jsMain.dependencies {
-            // Added
-            implementation(libs.cryptography.provider.webcrypto)
-            implementation(libs.ktor.client.js)
-        }
-        wasmJsMain.dependencies {
-            // Added
-            implementation(libs.cryptography.provider.webcrypto)
-            implementation(libs.ktor.client.js)
-        }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             // Added
@@ -111,8 +100,12 @@ kotlin {
             implementation(libs.jna)
             implementation(libs.jna.platform)
         }
+        webMain.dependencies {
+            // Added
+            implementation(libs.cryptography.provider.webcrypto)
+            implementation(libs.ktor.client.js)
+        }
     }
-
 }
 
 compose.resources {
