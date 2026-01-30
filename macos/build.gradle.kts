@@ -3,6 +3,7 @@ import org.gradle.kotlin.dsl.support.uppercaseFirstChar
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.tasks.AbstractNativeMacApplicationPackageAppDirTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.mpp.Executable
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import org.jetbrains.kotlin.konan.target.KonanTarget
@@ -62,7 +63,7 @@ afterEvaluate {
             )
             buildTypes.forEach { (buildType, executable) ->
                 val buildTypeName = buildType.name.lowercase().uppercaseFirstChar()
-                target.binaries.withType<org.jetbrains.kotlin.gradle.plugin.mpp.Executable>()
+                target.binaries.withType<Executable>()
                     .filter { it.buildType == buildType }
                     .forEach {
                         val taskName = "copy${buildTypeName}ComposeResourcesFor${targetName}"

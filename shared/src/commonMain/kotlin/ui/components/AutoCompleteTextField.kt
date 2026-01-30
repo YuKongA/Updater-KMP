@@ -39,12 +39,12 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.MutableStateFlow
-import top.yukonga.miuix.kmp.basic.ListPopup
+import top.yukonga.miuix.kmp.basic.DropdownColors
+import top.yukonga.miuix.kmp.basic.DropdownDefaults
 import top.yukonga.miuix.kmp.basic.PopupPositionProvider
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextField
-import top.yukonga.miuix.kmp.extra.DropdownColors
-import top.yukonga.miuix.kmp.extra.DropdownDefaults
+import top.yukonga.miuix.kmp.extra.SuperListPopup
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import kotlin.math.min
 
@@ -94,14 +94,14 @@ fun AutoCompleteTextField(
                 isFocused = focusState.isFocused
             }
         )
-        ListPopup(
+        SuperListPopup(
             show = showPopup,
             onDismissRequest = {
                 focusManager.clearFocus()
                 showPopup.value = false
             },
             popupPositionProvider = AutoCompletePositionProvider,
-            alignment = PopupPositionProvider.Align.TopLeft,
+            alignment = PopupPositionProvider.Align.TopStart,
             enableWindowDim = false,
             maxHeight = 280.dp
         ) {

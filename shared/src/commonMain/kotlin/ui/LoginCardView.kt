@@ -23,8 +23,8 @@ import top.yukonga.miuix.kmp.basic.CardDefaults
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.icons.useful.Confirm
-import top.yukonga.miuix.kmp.icon.icons.useful.Info
+import top.yukonga.miuix.kmp.icon.extended.Info
+import top.yukonga.miuix.kmp.icon.extended.Ok
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.utils.PressFeedbackType
 import updater.shared.generated.resources.Res
@@ -50,7 +50,7 @@ fun LoginCardView(
         0 -> stringResource(Res.string.login_desc)
         else -> stringResource(Res.string.login_expired_desc)
     }
-    val icon = if (isLogin.value == 1) MiuixIcons.Useful.Confirm else MiuixIcons.Useful.Info
+    val icon = if (isLogin.value == 1) MiuixIcons.Ok else MiuixIcons.Info
     val color = when {
         isDarkTheme && isLogin.value == 1 -> Color(0xFF1A3825)
         isDarkTheme && isLogin.value != 1 -> Color(0xFF310808)

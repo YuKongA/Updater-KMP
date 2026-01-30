@@ -5,6 +5,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -57,7 +58,7 @@ private fun SearchHistoryView(
         enter = fadeIn() + expandVertically(),
         exit = fadeOut() + shrinkVertically()
     ) {
-        val localFocusManager = LocalFocusManager.current
+        val focusManager = LocalFocusManager.current
         val spinnerOptions = searchKeywords.value.map { keyword ->
             val parts = keyword.split("-")
             SpinnerEntry(
@@ -80,10 +81,10 @@ private fun SearchHistoryView(
                     onHistorySelect(searchKeywords.value[index])
                     searchKeywordsSelected.value = index
                 },
-                onClick = {
-                    localFocusManager.clearFocus()
-                },
-                maxHeight = 280.dp
+                maxHeight = 280.dp,
+                modifier = Modifier.clickable {
+                    focusManager.clearFocus()
+                }
             )
         }
     }
@@ -190,10 +191,10 @@ fun BasicViews(
                     androidVersionSelected.value = index
                     androidVersion.value = DeviceInfoHelper.androidVersions[index]
                 },
-                onClick = {
+                maxHeight = 280.dp,
+                modifier = Modifier.clickable {
                     focusManager.clearFocus()
-                },
-                maxHeight = 280.dp
+                }
             )
             SuperDropdown(
                 title = stringResource(Res.string.region_code),
@@ -203,10 +204,10 @@ fun BasicViews(
                     regionSelected.value = index
                     deviceRegion.value = DeviceInfoHelper.regionNames[index]
                 },
-                onClick = {
+                maxHeight = 280.dp,
+                modifier = Modifier.clickable {
                     focusManager.clearFocus()
-                },
-                maxHeight = 280.dp
+                }
             )
             SuperDropdown(
                 title = stringResource(Res.string.carrier_code),
@@ -216,10 +217,10 @@ fun BasicViews(
                     carrierSelected.value = index
                     deviceCarrier.value = DeviceInfoHelper.carrierNames[index]
                 },
-                onClick = {
+                maxHeight = 280.dp,
+                modifier = Modifier.clickable {
                     focusManager.clearFocus()
-                },
-                maxHeight = 280.dp
+                }
             )
         }
         SearchHistoryView(

@@ -46,9 +46,9 @@ import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.extra.SuperCheckbox
 import top.yukonga.miuix.kmp.extra.SuperDialog
 import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.icons.useful.Blocklist
-import top.yukonga.miuix.kmp.icon.icons.useful.RemoveBlocklist
-import top.yukonga.miuix.kmp.icon.icons.useful.Rename
+import top.yukonga.miuix.kmp.icon.extended.Blocklist
+import top.yukonga.miuix.kmp.icon.extended.RemoveContact
+import top.yukonga.miuix.kmp.icon.extended.Rename
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import updater.shared.generated.resources.Res
 import updater.shared.generated.resources.account
@@ -101,8 +101,8 @@ fun LoginDialog(
     var isVerifying by remember { mutableStateOf(false) }
 
     val icon = when (isLogin.value) {
-        1 -> MiuixIcons.Useful.Blocklist
-        else -> MiuixIcons.Useful.RemoveBlocklist
+        1 -> MiuixIcons.Blocklist
+        else -> MiuixIcons.RemoveContact
     }
 
     val messageLoginIn = stringResource(Res.string.logging_in)
@@ -184,7 +184,7 @@ fun LoginDialog(
                             },
                             content = {
                                 Icon(
-                                    imageVector = MiuixIcons.Useful.Rename,
+                                    imageVector = MiuixIcons.Rename,
                                     tint = if (passwordVisibility) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.onSecondaryContainer,
                                     contentDescription = null
                                 )

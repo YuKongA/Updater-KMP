@@ -79,6 +79,7 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.ktor.client.core)
             implementation(libs.miuix)
+            implementation(libs.miuix.icons)
             implementation(libs.haze)
         }
         androidMain.dependencies {

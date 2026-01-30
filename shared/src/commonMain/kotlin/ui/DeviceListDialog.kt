@@ -100,7 +100,7 @@ fun DeviceListDialog(
             Column {
                 BasicComponent(
                     title = stringResource(Res.string.device_list_version),
-                    rightActions = {
+                    endActions = {
                         Text(
                             text = version.value,
                             fontSize = MiuixTheme.textStyles.body2.fontSize,

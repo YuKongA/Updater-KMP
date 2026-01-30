@@ -55,8 +55,8 @@ import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.icons.useful.Copy
-import top.yukonga.miuix.kmp.icon.icons.useful.Save
+import top.yukonga.miuix.kmp.icon.extended.Copy
+import top.yukonga.miuix.kmp.icon.extended.Download
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import updater.shared.generated.resources.Res
 import updater.shared.generated.resources.android_version
@@ -327,7 +327,7 @@ fun DownloadInfoView(
                     }
                 ) {
                     Icon(
-                        imageVector = MiuixIcons.Useful.Copy,
+                        imageVector = MiuixIcons.Copy,
                         contentDescription = null,
                         tint = MiuixTheme.colorScheme.onSurface
                     )
@@ -340,7 +340,7 @@ fun DownloadInfoView(
                     }
                 ) {
                     Icon(
-                        imageVector = MiuixIcons.Useful.Save,
+                        imageVector = MiuixIcons.Download,
                         contentDescription = null,
                         tint = MiuixTheme.colorScheme.onSurface
                     )
@@ -383,7 +383,7 @@ fun ChangelogView(
                 }
             ) {
                 Icon(
-                    imageVector = MiuixIcons.Useful.Copy,
+                    imageVector = MiuixIcons.Copy,
                     contentDescription = null,
                     tint = MiuixTheme.colorScheme.onSurface
                 )

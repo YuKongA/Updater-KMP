@@ -49,10 +49,10 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import platform.prefGet
 import platform.prefRemove
+import top.yukonga.miuix.kmp.basic.DropdownImpl
 import top.yukonga.miuix.kmp.basic.HorizontalDivider
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.ListPopup
 import top.yukonga.miuix.kmp.basic.ListPopupColumn
 import top.yukonga.miuix.kmp.basic.ListPopupDefaults
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
@@ -63,12 +63,11 @@ import top.yukonga.miuix.kmp.basic.SmallTopAppBar
 import top.yukonga.miuix.kmp.basic.TopAppBar
 import top.yukonga.miuix.kmp.basic.VerticalDivider
 import top.yukonga.miuix.kmp.basic.rememberTopAppBarState
-import top.yukonga.miuix.kmp.extra.DropdownImpl
+import top.yukonga.miuix.kmp.extra.SuperListPopup
 import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.icons.useful.Settings
+import top.yukonga.miuix.kmp.icon.extended.Settings
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.utils.Platform
-import top.yukonga.miuix.kmp.utils.getWindowSize
 import top.yukonga.miuix.kmp.utils.overScrollVertical
 import top.yukonga.miuix.kmp.utils.platform
 import top.yukonga.miuix.kmp.utils.scrollEndHaptic
@@ -227,10 +226,10 @@ private fun MenuActions(
     onClearSearchHistory: () -> Unit,
     onShowDeviceSettings: () -> Unit
 ) {
-    ListPopup(
+    SuperListPopup(
         show = showMenuPopup,
         popupPositionProvider = ListPopupDefaults.ContextMenuPositionProvider,
-        alignment = PopupPositionProvider.Align.TopRight,
+        alignment = PopupPositionProvider.Align.TopEnd,
         onDismissRequest = {
             showMenuPopup.value = false
         }
@@ -273,7 +272,7 @@ private fun MenuActions(
         holdDownState = showMenuPopup.value
     ) {
         Icon(
-            imageVector = MiuixIcons.Useful.Settings,
+            imageVector = MiuixIcons.Settings,
             tint = MiuixTheme.colorScheme.onBackground,
             contentDescription = "Menu"
         )
@@ -335,7 +334,7 @@ private fun PortraitAppView(
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
-                .height(getWindowSize().height.dp)
+                .fillMaxHeight()
                 .hazeSource(state = hazeState)
                 .overScrollVertical()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)

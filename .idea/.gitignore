@@ -1,0 +1,11 @@
+# 默认忽略的文件
+/shelf/
+/workspace.xml
+/artifacts
+/AndroidProjectSystem.xml
+/copilot*
+/deviceManager.xml
+/deploymentTargetSelector.xml
+/kotlinc.xml
+/migrations.xml
+/markdown.xml
