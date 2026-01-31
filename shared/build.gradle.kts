@@ -48,7 +48,6 @@ kotlin {
             isStatic = true
             binaryOption("bundleId", pkgName)
             binaryOption("smallBinary", "true")
-            binaryOption("preCodegenInlineThreshold", "40")
         }
     }
 

@@ -22,8 +22,8 @@ kotlin {
     macosArm64 {
         binaries.executable {
             entryPoint = "main"
+            binaryOption("bundleId", pkgName)
             binaryOption("smallBinary", "true")
-            binaryOption("preCodegenInlineThreshold", "40")
         }
     }
 
