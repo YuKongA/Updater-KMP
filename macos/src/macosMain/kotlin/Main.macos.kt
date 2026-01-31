@@ -55,8 +55,10 @@ fun main() {
         title = "Updater",
         size = DpSize(1200.dp, 800.dp),
     ) {
-        val isDarkTheme by isDarkThemeState.collectAsState()
-        App(isDarkTheme)
+        ResourceEnvironmentFix {
+            val isDarkTheme by isDarkThemeState.collectAsState()
+            App(isDarkTheme)
+        }
     }
 
     NSApp?.run()
