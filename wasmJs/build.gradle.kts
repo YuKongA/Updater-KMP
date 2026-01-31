@@ -9,10 +9,10 @@ plugins {
 kotlin {
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        outputModuleName = "updater"
+        outputModuleName = ProjectConfig.APP_NAME
         browser {
             commonWebpackConfig {
-                outputFileName = "updater.js"
+                outputFileName = "${ProjectConfig.APP_NAME}.js"
             }
         }
         binaries.executable()
@@ -20,7 +20,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(project(":shared"))
+            implementation(projects.shared)
         }
     }
 }

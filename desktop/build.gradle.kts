@@ -6,19 +6,15 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
 }
 
-val appName = "Updater"
-val pkgName = "top.yukonga.updater.kmp"
-val verName = "1.6.1"
-
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(ProjectConfig.JVM_VERSION)
 
     jvm("desktop")
 
     sourceSets {
         val desktopMain by getting
         desktopMain.dependencies {
-            implementation(project(":shared"))
+            implementation(projects.shared)
             implementation(compose.desktop.currentOs)
             implementation(libs.jna)
             implementation(libs.jna.platform)
@@ -38,15 +34,15 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
 
-            packageName = appName
-            packageVersion = verName
+            packageName = ProjectConfig.APP_NAME
+            packageVersion = ProjectConfig.VERSION_NAME
             description = "Get HyperOS/MIUI recovery ROM info"
-            copyright = "Copyright © 2024-2025 YuKongA"
+            copyright = "Copyright © 2024-2026 YuKongA"
             linux {
                 iconFile = file("src/desktopMain/resources/linux/Icon.png")
             }
             macOS {
-                bundleID = pkgName
+                bundleID = ProjectConfig.PACKAGE_NAME
                 jvmArgs("-Dapple.awt.application.appearance=system")
                 iconFile = file("src/desktopMain/resources/macos/Icon.icns")
             }

@@ -7,42 +7,25 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-val appName = "Updater"
-val pkgName = "top.yukonga.updater.kmp"
-val verName = "1.6.1"
-fun getGitCommitCount(): Int {
-    val process = Runtime.getRuntime().exec(arrayOf("git", "rev-list", "--count", "HEAD"))
-    return process.inputStream.bufferedReader().use { it.readText().trim().toInt() }
-}
-
-fun getVersionCode(): Int {
-    val commitCount = getGitCommitCount()
-    val major = 5
-    return major + commitCount
-}
-
-val verCode = getVersionCode()
-
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(ProjectConfig.JVM_VERSION)
 }
 
 dependencies {
-    implementation(project(":shared"))
+    implementation(projects.shared)
     implementation(libs.androidx.activity.compose)
 }
 
 android {
-    namespace = pkgName
-    compileSdk = 36
-    compileSdkMinor = 1
-    buildToolsVersion = "36.1.0"
+    namespace = ProjectConfig.PACKAGE_NAME
+    compileSdk = ProjectConfig.Android.COMPILE_SDK
+    buildToolsVersion = ProjectConfig.Android.BUILD_TOOLS_VERSION
     defaultConfig {
-        applicationId = pkgName
-        versionCode = verCode
-        versionName = verName
-        targetSdk = 36
-        minSdk = 26
+        applicationId = ProjectConfig.PACKAGE_NAME
+        versionCode = ProjectConfig.VERSION_CODE
+        versionName = ProjectConfig.VERSION_NAME
+        targetSdk = ProjectConfig.Android.TARGET_SDK
+        minSdk = ProjectConfig.Android.MIN_SDK
     }
     val properties = Properties()
     runCatching { properties.load(project.rootProject.file("local.properties").inputStream()) }
@@ -79,6 +62,6 @@ android {
 
 base {
     archivesName.set(
-        appName,
+        ProjectConfig.APP_NAME + "-v" + ProjectConfig.VERSION_NAME + "(" + ProjectConfig.VERSION_CODE + ")"
     )
 }

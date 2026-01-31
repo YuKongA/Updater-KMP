@@ -11,29 +11,15 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-val pkgName = "top.yukonga.updater.kmp"
-val verName = "1.6.1"
-fun getGitCommitCount(): Int {
-    val process = Runtime.getRuntime().exec(arrayOf("git", "rev-list", "--count", "HEAD"))
-    return process.inputStream.bufferedReader().use { it.readText().trim().toInt() }
-}
-
-fun getVersionCode(): Int {
-    val commitCount = getGitCommitCount()
-    val major = 5
-    return major + commitCount
-}
-
-val verCode = getVersionCode()
 val generatedSrcDir = layout.buildDirectory.dir("generated").get().asFile.resolve("updater")
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(ProjectConfig.JVM_VERSION)
 
     android {
         androidResources.enable = true
-        compileSdk = 36
-        namespace = "$pkgName.android"
+        compileSdk = ProjectConfig.Android.COMPILE_SDK
+        namespace = "${ProjectConfig.PACKAGE_NAME}.shared"
     }
 
     jvm("desktop")
@@ -46,7 +32,7 @@ kotlin {
         binaries.framework {
             baseName = "shared"
             isStatic = true
-            binaryOption("bundleId", pkgName)
+            binaryOption("bundleId", ProjectConfig.PACKAGE_NAME)
             binaryOption("smallBinary", "true")
         }
     }
@@ -127,8 +113,8 @@ val generateVersionInfo by tasks.registering {
             package misc
 
             object VersionInfo {
-                const val VERSION_NAME = "$verName"
-                const val VERSION_CODE = $verCode
+                const val VERSION_NAME = "${ProjectConfig.VERSION_NAME}"
+                const val VERSION_CODE = ${ProjectConfig.VERSION_CODE}
             }
             """.trimIndent()
         )
@@ -138,11 +124,11 @@ val generateVersionInfo by tasks.registering {
             val updatedContent = content
                 .replace(
                     Regex("<key>CFBundleShortVersionString</key>\\s*<string>[^<]*</string>"),
-                    "<key>CFBundleShortVersionString</key>\n\t<string>$verName</string>"
+                    "<key>CFBundleShortVersionString</key>\n\t<string>${ProjectConfig.VERSION_NAME}</string>"
                 )
                 .replace(
                     Regex("<key>CFBundleVersion</key>\\s*<string>[^<]*</string>"),
-                    "<key>CFBundleVersion</key>\n\t<string>$verCode</string>"
+                    "<key>CFBundleVersion</key>\n\t<string>${ProjectConfig.VERSION_CODE}</string>"
                 )
             iosPlist.writeText(updatedContent)
         }

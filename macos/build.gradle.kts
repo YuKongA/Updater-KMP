@@ -14,22 +14,18 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-val appName = "Updater"
-val pkgName = "top.yukonga.updater.kmp"
-val verName = "1.6.1"
-
 kotlin {
     macosArm64 {
         binaries.executable {
             entryPoint = "main"
-            binaryOption("bundleId", pkgName)
+            binaryOption("bundleId", ProjectConfig.PACKAGE_NAME)
             binaryOption("smallBinary", "true")
         }
     }
 
     sourceSets {
         macosMain.dependencies {
-            implementation(project(":shared"))
+            implementation(projects.shared)
         }
     }
 }
@@ -39,13 +35,13 @@ compose.desktop {
         targets(kotlin.targets.getByName("macosArm64"))
         distributions {
             targetFormats(TargetFormat.Dmg)
-            packageName = appName
-            packageVersion = verName
+            packageName = ProjectConfig.APP_NAME
+            packageVersion = ProjectConfig.VERSION_NAME
             description = "Get HyperOS/MIUI recovery ROM info"
-            copyright = "Copyright © 2024-2025 YuKongA"
+            copyright = "Copyright © 2024-2026 YuKongA"
             macOS {
-                bundleID = pkgName
-                iconFile = file("src/macosMain/resources/Updater.icns")
+                bundleID = ProjectConfig.PACKAGE_NAME
+                iconFile = file("src/macosMain/resources/${ProjectConfig.APP_NAME}.icns")
             }
         }
     }

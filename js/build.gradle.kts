@@ -6,10 +6,10 @@ plugins {
 
 kotlin {
     js(IR) {
-        outputModuleName = "updater"
+        outputModuleName = ProjectConfig.APP_NAME
         browser {
             commonWebpackConfig {
-                outputFileName = "updater.js"
+                outputFileName = "${ProjectConfig.APP_NAME}.js"
             }
         }
         binaries.executable()
