@@ -28,7 +28,7 @@ import platform.provider
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-class Login() {
+class Login {
     private val client = httpClientPlatform().config {
         install(HttpCookies) {
             storage = AcceptAllCookiesStorage()
@@ -74,7 +74,7 @@ class Login() {
         }
         try {
             if (flag != null && ticket.isEmpty()) {
-                return send2FATicket(flag = flag)
+                return 5
             }
             if (flag != null && ticket.isNotEmpty()) {
                 val verify2FATicket = verify2FATicket(flag = flag, ticket = ticket)
@@ -145,7 +145,7 @@ class Login() {
 
         if (captchaUrl != null && captchaUrl != "null") {
             prefSet("captchaUrl", captchaUrl)
-            return 6 // 6: 需要验证码
+            return 6 // 6: 前往浏览器完成图片验证码
         }
 
         if (notificationUrl != null && notificationUrl != "null") {
@@ -158,7 +158,7 @@ class Login() {
             val listJson = Json.decodeFromString<JsonObject>(removeResponsePrefix(response.bodyAsText()))
             val options = listJson["options"]?.jsonArray?.mapNotNull { it.jsonPrimitive.intOrNull } ?: emptyList()
             if (options.isEmpty()) return 3 // 3: 登录失败
-            if (options.contains(4)) prefSet("notificationUrl", notificationUrl)
+            prefSet("notificationUrl", notificationUrl)
             prefSet("2FAOptions", Json.encodeToString(options))
             return 5 // 5: 需要二次验证
         }
@@ -189,32 +189,6 @@ class Login() {
         prefSet("loginInfo", Json.encodeToString(loginInfo))
         isLogin.value = 1
         return 0 // 0: 登录成功
-    }
-
-    /**
-     * Send 2FA ticket(phone or email).
-     *
-     * @return Send status
-     */
-    @OptIn(ExperimentalTime::class)
-    suspend fun send2FATicket(flag: Int): Int {
-        val sendTicketUrl = if (flag == 4) {
-            "https://account.xiaomi.com/identity/auth/sendPhoneTicket"
-        } else {
-            "https://account.xiaomi.com/identity/auth/sendEmailTicket"
-        }
-        val parameters = parameters {
-            append("retry", "0")
-            append("icode", "")
-            append("_json", "true")
-        }
-        val response = client.submitForm(sendTicketUrl, parameters) {
-            parameter("_dc", Clock.System.now().toEpochMilliseconds())
-            header("cookie", "identity_session=${prefGet("identity_session") ?: ""}")
-        }
-        val sendTicketText = response.bodyAsText()
-        val sendTicketJson = Json.decodeFromString<JsonObject>(removeResponsePrefix(sendTicketText))
-        return sendTicketJson["code"]?.jsonPrimitive?.intOrNull ?: 3 // 3: 登录失败
     }
 
     /**

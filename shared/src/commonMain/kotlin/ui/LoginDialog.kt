@@ -3,13 +3,11 @@ package ui
 import Login
 import Password
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
@@ -24,14 +22,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.seiko.imageloader.rememberImagePainter
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.stringResource
@@ -67,13 +64,9 @@ import updater.shared.generated.resources.logout_successful
 import updater.shared.generated.resources.password
 import updater.shared.generated.resources.save_password
 import updater.shared.generated.resources.security_error
-import updater.shared.generated.resources.send_code_error
-import updater.shared.generated.resources.send_email_code
-import updater.shared.generated.resources.send_phone_code
 import updater.shared.generated.resources.submit
 import updater.shared.generated.resources.toast_crash_info
 import updater.shared.generated.resources.verification_code
-import updater.shared.generated.resources.verification_code_get
 import updater.shared.generated.resources.verifying
 import utils.MessageUtils.Companion.showMessage
 
@@ -83,6 +76,7 @@ fun LoginDialog(
     isLogin: MutableState<Int>
 ) {
     val focusManager = LocalFocusManager.current
+    val uriHandler = LocalUriHandler.current
     val coroutineScope = rememberCoroutineScope()
 
     var account by remember { mutableStateOf(Password().getPassword().first) }
@@ -90,9 +84,6 @@ fun LoginDialog(
 
     var global by remember { mutableStateOf(false) }
     var savePassword by remember { mutableStateOf(prefGet("savePassword") ?: "0") }
-
-    var showCaptchaUrl by remember { mutableStateOf(false) }
-    var showCaptchaInput by remember { mutableStateOf(false) }
 
     var showTicketUrl by remember { mutableStateOf(false) }
     var showTicketInput by remember { mutableStateOf(false) }
@@ -114,7 +105,6 @@ fun LoginDialog(
     val messageCrashInfo = stringResource(Res.string.toast_crash_info)
     val messageLoginTips1 = stringResource(Res.string.login_tips1)
     val messageLoginTips2 = stringResource(Res.string.login_tips2)
-    val messageSendCodeError = stringResource(Res.string.send_code_error)
 
     // 主页登录按钮
     IconButton(
@@ -127,8 +117,6 @@ fun LoginDialog(
 
             showTicketInput = false
             showTicketUrl = false
-            showCaptchaInput = false
-            showCaptchaUrl = false
 
             focusManager.clearFocus()
 
@@ -193,38 +181,7 @@ fun LoginDialog(
                     }
                 )
 
-                // 图片验证码
-                AnimatedVisibility(
-                    visible = showCaptchaUrl
-                ) {
-                    // 获取图片验证码
-                    AnimatedVisibility(
-                        visible = !showCaptchaInput
-                    ) {
-                        TextButton(
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
-                            text = stringResource(Res.string.verification_code_get),
-                            onClick = {
-                                showCaptchaInput = true
-                            },
-                            colors = ButtonDefaults.textButtonColorsPrimary()
-                        )
-                    }
-                    val captchaImg = rememberImagePainter("https://account.xiaomi.com" + prefGet("captchaUrl"))
-                    // 显示图片验证码
-                    AnimatedVisibility(
-                        visible = showCaptchaInput
-                    ) {
-                        Image(
-                            painter = captchaImg,
-                            modifier = Modifier.width(512.dp).padding(top = 16.dp),
-                            contentScale = ContentScale.FillWidth,
-                            contentDescription = "Captcha"
-                        )
-                    }
-                }
-
-                // 发送二次认证验证码
+                // 二次认证验证码（浏览器请求）
                 AnimatedVisibility(
                     visible = showTicketUrl
                 ) {
@@ -234,72 +191,11 @@ fun LoginDialog(
                         showDialog.value = false
                         showMessage(message = messageError)
                     }
-                    Column {
-                        AnimatedVisibility(
-                            visible = !showTicketInput && options.contains(4)
-                        ) {
-                            TextButton(
-                                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                                text = stringResource(Res.string.send_phone_code),
-                                onClick = {
-                                    coroutineScope.launch {
-                                        val int = Login().login(
-                                            account = account,
-                                            password = password,
-                                            global = global,
-                                            savePassword = savePassword,
-                                            isLogin = isLogin,
-                                            flag = 4,
-                                        )
-                                        if (int != 0) {
-                                            options = options.toMutableList().apply { remove(4) }
-                                            if (options.isNotEmpty()) showMessage(message = messageSendCodeError)
-                                            return@launch
-                                        }
-                                        showTicketInput = true
-                                        showTicketUrl = false
-                                        prefSet("2FAFlag", "4")
-                                    }
-                                },
-                                colors = ButtonDefaults.textButtonColorsPrimary()
-                            )
-                        }
-                        AnimatedVisibility(
-                            visible = !showTicketInput && options.contains(8)
-                        ) {
-                            TextButton(
-                                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                                text = stringResource(Res.string.send_email_code),
-                                onClick = {
-                                    coroutineScope.launch {
-                                        val int = Login().login(
-                                            account = account,
-                                            password = password,
-                                            global = global,
-                                            savePassword = savePassword,
-                                            isLogin = isLogin,
-                                            flag = 8,
-                                        )
-                                        if (int != 0) {
-                                            options = options.toMutableList().apply { remove(8) }
-                                            if (options.isNotEmpty()) showMessage(message = messageSendCodeError)
-                                            return@launch
-                                        }
-                                        showTicketInput = true
-                                        showTicketUrl = false
-                                        prefSet("2FAFlag", "8")
-                                    }
-                                },
-                                colors = ButtonDefaults.textButtonColorsPrimary()
-                            )
-                        }
-                        Spacer(Modifier.height(16.dp))
-                    }
                 }
 
-                // 图片验证码 & 二次认证验证码输入框
+                // 二次认证验证码输入框
                 AnimatedVisibility(
-                    visible = showTicketInput || showCaptchaInput
+                    visible = showTicketInput
                 ) {
                     Column(
                         modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
@@ -344,27 +240,6 @@ fun LoginDialog(
                                             }
                                             isVerifying = false
                                         }
-                                    } else if (showCaptchaUrl) {
-                                        // 提交图片验证码
-                                        coroutineScope.launch {
-                                            isVerifying = true
-                                            val int = Login().login(
-                                                account = account,
-                                                password = password,
-                                                global = global,
-                                                savePassword = savePassword,
-                                                isLogin = isLogin,
-                                                captcha = ticket
-                                            )
-                                            if (int == 0) {
-                                                showMessage(message = messageLoginSuccess)
-                                                ticket = ""
-                                                showDialog.value = false
-                                            } else {
-                                                showMessage(message = messageError)
-                                            }
-                                            isVerifying = false
-                                        }
                                     }
                                 }
                             )
@@ -375,9 +250,7 @@ fun LoginDialog(
                                 colors = ButtonDefaults.textButtonColors(),
                                 onClick = {
                                     showTicketUrl = false
-                                    showCaptchaUrl = false
                                     showTicketInput = false
-                                    showCaptchaInput = false
                                     ticket = ""
                                 }
                             )
@@ -387,7 +260,7 @@ fun LoginDialog(
 
                 // 国际账号 & 保存密码
                 AnimatedVisibility(
-                    visible = !showTicketUrl && !showCaptchaUrl && !showTicketInput && !showCaptchaInput
+                    visible = !showTicketUrl && !showTicketInput
                 ) {
                     Row(
                         modifier = Modifier.padding(vertical = 16.dp),
@@ -422,7 +295,7 @@ fun LoginDialog(
 
                 // 登录 & 取消
                 AnimatedVisibility(
-                    visible = !showTicketInput && !showCaptchaInput
+                    visible = !showTicketInput
                 ) {
                     Row {
                         TextButton(
@@ -457,12 +330,24 @@ fun LoginDialog(
 
                                         5 -> {
                                             showTicketUrl = true
+                                            showTicketInput = true
                                             showMessage(message = messageLoginTips1)
+                                            val optionsStr = prefGet("2FAOptions") ?: "[]"
+                                            val options = Json.decodeFromString<List<Int>>(optionsStr)
+                                            val flag = if (options.contains(4)) 4 else 8
+                                            prefSet("2FAFlag", flag.toString())
+                                            val url = prefGet("notificationUrl")
+                                            if (!url.isNullOrBlank()) {
+                                                uriHandler.openUri(url)
+                                            }
                                         }
 
                                         6 -> {
-                                            showCaptchaUrl = true
                                             showMessage(message = messageLoginTips2)
+                                            val url = prefGet("captchaUrl")
+                                            if (!url.isNullOrBlank()) {
+                                                uriHandler.openUri("https://account.xiaomi.com$url")
+                                            }
                                         }
                                     }
                                 }

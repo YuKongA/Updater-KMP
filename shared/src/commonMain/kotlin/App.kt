@@ -458,7 +458,7 @@ private fun LandscapeAppView(
                     .fillMaxHeight()
                     .weight(1f - 0.42f)
             ) {
-                if (curIconInfo.value.isEmpty()) {
+                if (curRomInfo.value.version.isEmpty() && incRomInfo.value.version.isEmpty()) {
                     Image(
                         painter = painterResource(Res.drawable.icon),
                         contentDescription = "Logo",
