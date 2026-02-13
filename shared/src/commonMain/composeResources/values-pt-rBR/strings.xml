@@ -68,9 +68,10 @@
     <string name="device_list_update_failed">A atualização falhou</string>
     <string name="device_list_no_updates">Nenhuma atualização disponível</string>
     <string name="device_list_version">Versão</string>
-    <string name="login_tips1">Detectada autenticação de dois fatores, clique no botão Obter código de verificação</string>
-    <string name="login_tips2">É necessário inserir o código de verificação, clique no botão Obter código de verificação</string>
+    <string name="login_tips">Detectada autenticação de dois fatores, clique no botão Obter código de verificação</string>
     <string name="verification_code_get">Obter código de verificação</string>
+    <string name="do_not_enter_in_browser">Não insira o código de verificação no navegador!</string>
+    <string name="verification_code">Código de verificação</string>
     <string name="send_email_code">Enviar código de e-mail</string>
     <string name="send_phone_code">Enviar código de telefone</string>
     <string name="send_code_error">Falha ao enviar o código de verificação, tente outros métodos de verificação!</string>

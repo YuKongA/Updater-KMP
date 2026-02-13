@@ -1,6 +1,6 @@
 [versions]
 android-gradle-plugin = "9.0.0"
-androidx-activity-compose = "1.12.3"
+androidx-activity-compose = "1.12.4"
 compose-hotReload = "1.0.0"
 compose-plugin = "1.10.1"
 cryptography = "0.5.0"
@@ -15,6 +15,8 @@ miuix = "0.8.1"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-plugin" }
+compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-plugin" }
 cryptography-core = { module = "dev.whyoleg.cryptography:cryptography-core", version.ref = "cryptography" }
 cryptography-provider-apple = { module = "dev.whyoleg.cryptography:cryptography-provider-apple", version.ref = "cryptography" }
 cryptography-provider-jdk = { module = "dev.whyoleg.cryptography:cryptography-provider-jdk", version.ref = "cryptography" }
@@ -31,8 +33,6 @@ ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "kto
 ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor-client" }
 miuix = { module = "top.yukonga.miuix.kmp:miuix", version.ref = "miuix" }
 miuix-icons = { module = "top.yukonga.miuix.kmp:miuix-icons", version.ref = "miuix" }
-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-plugin" }
-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-plugin" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }

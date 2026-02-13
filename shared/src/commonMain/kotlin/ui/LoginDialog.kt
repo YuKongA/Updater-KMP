@@ -29,6 +29,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.stringResource
@@ -59,8 +60,7 @@ import updater.shared.generated.resources.logging_in
 import updater.shared.generated.resources.login
 import updater.shared.generated.resources.login_error
 import updater.shared.generated.resources.login_successful
-import updater.shared.generated.resources.login_tips1
-import updater.shared.generated.resources.login_tips2
+import updater.shared.generated.resources.login_tips
 import updater.shared.generated.resources.logout
 import updater.shared.generated.resources.logout_confirm
 import updater.shared.generated.resources.logout_successful
@@ -111,8 +111,7 @@ fun LoginDialog(
     val messageSecurityError = stringResource(Res.string.security_error)
     val messageLogoutSuccessful = stringResource(Res.string.logout_successful)
     val messageCrashInfo = stringResource(Res.string.toast_crash_info)
-    val messageLoginTips1 = stringResource(Res.string.login_tips1)
-    val messageLoginTips2 = stringResource(Res.string.login_tips2)
+    val messageLoginTips = stringResource(Res.string.login_tips)
 
     // 主页登录按钮
     IconButton(
@@ -239,7 +238,8 @@ fun LoginDialog(
                                     ) {
                                         Text(
                                             text = stringResource(Res.string.do_not_enter_in_browser),
-                                            color = MiuixTheme.colorScheme.primary
+                                            color = MiuixTheme.colorScheme.onPrimaryVariant,
+                                            fontSize = 12.sp,
                                         )
                                     }
                                 }
@@ -398,19 +398,11 @@ fun LoginDialog(
                                         5 -> {
                                             showTicketUrl = true
                                             showTicketInput = true
-                                            showMessage(message = messageLoginTips1)
+                                            showMessage(message = messageLoginTips)
                                             val optionsStr = prefGet("2FAOptions") ?: "[]"
                                             val options = Json.decodeFromString<List<Int>>(optionsStr)
                                             val flag = if (options.contains(4)) 4 else 8
                                             prefSet("2FAFlag", flag.toString())
-                                        }
-
-                                        6 -> {
-                                            showMessage(message = messageLoginTips2)
-                                            val url = prefGet("captchaUrl")
-                                            if (!url.isNullOrBlank()) {
-                                                showTicketInput = true
-                                            }
                                         }
                                     }
                                 }

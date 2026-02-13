@@ -139,14 +139,8 @@ class Login {
 
         val content = Json.decodeFromString<JsonObject>(removeResponsePrefix(response.bodyAsText()))
         val ssecurity = content["ssecurity"]?.jsonPrimitive?.content
-        val captchaUrl = content["captchaUrl"]?.jsonPrimitive?.content
         val notificationUrl = content["notificationUrl"]?.jsonPrimitive?.content
         val result = content["result"]?.jsonPrimitive?.content
-
-        if (captchaUrl != null && captchaUrl != "null") {
-            prefSet("captchaUrl", captchaUrl)
-            return 6 // 6: 前往浏览器完成图片验证码
-        }
 
         if (notificationUrl != null && notificationUrl != "null") {
             val context = getQueryParam(notificationUrl, "context")

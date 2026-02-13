@@ -68,9 +68,10 @@
     <string name="device_list_update_failed">更新に失敗しました</string>
     <string name="device_list_no_updates">更新なし</string>
     <string name="device_list_version">バージョン</string>
-    <string name="login_tips1">二次認証が検出されました。検証コードの取得ボタンをクリックしてください</string>
-    <string name="login_tips2">検証コードの入力が必要です。検証コードの取得ボタンをクリックしてください</string>
-    <string name="verification_code">検証コード</string>L
+    <string name="login_tips">二次認証が検出されました。検証コードの取得ボタンをクリックしてください</string>
+    <string name="get_verification_code">検証コードを取得</string>
+    <string name="do_not_enter_in_browser">ブラウザに検証コードを入力しないでください！</string>
+    <string name="verification_code">検証コード</string>
     <string name="send_email_code">メールコードを送信</string>
     <string name="send_phone_code">電話コードを送信</string>
     <string name="send_code_error">検証コードの送信に失敗しました。別の検証方法を試してください！</string>

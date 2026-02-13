@@ -54,8 +54,8 @@ kotlin {
             kotlin.srcDir(generatedSrcDir.resolve("kotlin").absolutePath)
         }
         commonMain.dependencies {
-            api(libs.ui)
-            api(libs.components.resources)
+            api(libs.compose.ui)
+            api(libs.compose.components.resources)
             // Added
             implementation(libs.cryptography.core)
             implementation(libs.image.loader)
