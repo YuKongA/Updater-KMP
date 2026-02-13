@@ -38,6 +38,7 @@ import platform.prefSet
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
+import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.extra.SuperCheckbox
@@ -51,6 +52,8 @@ import updater.shared.generated.resources.Res
 import updater.shared.generated.resources.account
 import updater.shared.generated.resources.account_or_password_empty
 import updater.shared.generated.resources.cancel
+import updater.shared.generated.resources.do_not_enter_in_browser
+import updater.shared.generated.resources.get_verification_code
 import updater.shared.generated.resources.global
 import updater.shared.generated.resources.logging_in
 import updater.shared.generated.resources.login
@@ -87,9 +90,14 @@ fun LoginDialog(
 
     var showTicketUrl by remember { mutableStateOf(false) }
     var showTicketInput by remember { mutableStateOf(false) }
+    var isVerificationRequested by remember { mutableStateOf(false) }
 
     var ticket by remember { mutableStateOf("") }
     var isVerifying by remember { mutableStateOf(false) }
+
+    if (!showTicketInput) {
+        isVerificationRequested = false
+    }
 
     val icon = when (isLogin.value) {
         1 -> MiuixIcons.Blocklist
@@ -110,6 +118,7 @@ fun LoginDialog(
     IconButton(
         onClick = {
             prefRemove("captchaUrl")
+            prefRemove("notificationUrl")
             prefRemove("identity_session")
             prefRemove("2FAContext")
             prefRemove("2FAOptions")
@@ -200,60 +209,118 @@ fun LoginDialog(
                     Column(
                         modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
                     ) {
-                        TextField(
-                            value = ticket,
-                            onValueChange = { ticket = it },
-                            label = stringResource(Res.string.verification_code),
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
-                        )
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
-                        ) {
-                            TextButton(
-                                modifier = Modifier.weight(1f),
-                                text = if (isVerifying) stringResource(Res.string.verifying) else stringResource(Res.string.submit),
-                                enabled = !isVerifying && ticket.isNotBlank(),
-                                colors = ButtonDefaults.textButtonColorsPrimary(),
-                                onClick = {
-                                    if (showTicketInput) {
-                                        // 提交二次认证验证码
-                                        coroutineScope.launch {
-                                            isVerifying = true
-                                            val int = Login().login(
-                                                account = account,
-                                                password = password,
-                                                global = global,
-                                                savePassword = savePassword,
-                                                isLogin = isLogin,
-                                                flag = prefGet("2FAFlag")?.toInt(),
-                                                ticket = ticket
-                                            )
-                                            if (int == 0) {
-                                                showMessage(message = messageLoginSuccess)
-                                                ticket = ""
-                                                showDialog.value = false
-                                            } else {
-                                                showMessage(message = messageError)
-                                            }
-                                            isVerifying = false
+                        val captchaUrl = prefGet("captchaUrl")
+                        val notificationUrl = prefGet("notificationUrl")
+                        val verificationUrl = if (!captchaUrl.isNullOrBlank()) {
+                            "https://account.xiaomi.com$captchaUrl"
+                        } else if (!notificationUrl.isNullOrBlank()) {
+                            notificationUrl
+                        } else {
+                            null
+                        }
+
+                        if (verificationUrl != null) {
+                            AnimatedVisibility(
+                                visible = !isVerificationRequested
+                            ) {
+                                Column {
+                                    TextButton(
+                                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                                        text = stringResource(Res.string.get_verification_code),
+                                        colors = ButtonDefaults.textButtonColorsPrimary(),
+                                        onClick = {
+                                            uriHandler.openUri(verificationUrl)
+                                            isVerificationRequested = true
                                         }
+                                    )
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        Text(
+                                            text = stringResource(Res.string.do_not_enter_in_browser),
+                                            color = MiuixTheme.colorScheme.primary
+                                        )
                                     }
                                 }
-                            )
-                            Spacer(Modifier.width(16.dp))
-                            TextButton(
-                                modifier = Modifier.weight(1f),
-                                text = stringResource(Res.string.cancel),
-                                colors = ButtonDefaults.textButtonColors(),
-                                onClick = {
-                                    showTicketUrl = false
-                                    showTicketInput = false
-                                    ticket = ""
+                            }
+                        }
+                        AnimatedVisibility(
+                            visible = verificationUrl == null || isVerificationRequested
+                        ) {
+                            Column {
+                                TextField(
+                                    value = ticket,
+                                    onValueChange = { ticket = it },
+                                    label = stringResource(Res.string.verification_code),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    singleLine = true,
+                                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
+                                )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+                                ) {
+                                    TextButton(
+                                        modifier = Modifier.weight(1f),
+                                        text = if (isVerifying) stringResource(Res.string.verifying) else stringResource(Res.string.submit),
+                                        enabled = !isVerifying && ticket.isNotBlank(),
+                                        colors = ButtonDefaults.textButtonColorsPrimary(),
+                                        onClick = {
+                                            if (showTicketInput) {
+                                                // 提交二次认证验证码
+                                                coroutineScope.launch {
+                                                    isVerifying = true
+                                                    val int = Login().login(
+                                                        account = account,
+                                                        password = password,
+                                                        global = global,
+                                                        savePassword = savePassword,
+                                                        isLogin = isLogin,
+                                                        flag = prefGet("2FAFlag")?.toInt(),
+                                                        ticket = ticket
+                                                    )
+                                                    if (int == 0) {
+                                                        showMessage(message = messageLoginSuccess)
+                                                        ticket = ""
+                                                        showDialog.value = false
+                                                    } else {
+                                                        showMessage(message = messageError)
+                                                    }
+                                                    isVerifying = false
+                                                }
+                                            }
+                                        }
+                                    )
+                                    Spacer(Modifier.width(16.dp))
+                                    TextButton(
+                                        modifier = Modifier.weight(1f),
+                                        text = stringResource(Res.string.cancel),
+                                        colors = ButtonDefaults.textButtonColors(),
+                                        onClick = {
+                                            showTicketUrl = false
+                                            showTicketInput = false
+                                            ticket = ""
+                                        }
+                                    )
                                 }
-                            )
+                            }
+                        }
+                        if (verificationUrl != null && !isVerificationRequested) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+                            ) {
+                                TextButton(
+                                    modifier = Modifier.weight(1f),
+                                    text = stringResource(Res.string.cancel),
+                                    colors = ButtonDefaults.textButtonColors(),
+                                    onClick = {
+                                        showTicketUrl = false
+                                        showTicketInput = false
+                                        ticket = ""
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -336,17 +403,13 @@ fun LoginDialog(
                                             val options = Json.decodeFromString<List<Int>>(optionsStr)
                                             val flag = if (options.contains(4)) 4 else 8
                                             prefSet("2FAFlag", flag.toString())
-                                            val url = prefGet("notificationUrl")
-                                            if (!url.isNullOrBlank()) {
-                                                uriHandler.openUri(url)
-                                            }
                                         }
 
                                         6 -> {
                                             showMessage(message = messageLoginTips2)
                                             val url = prefGet("captchaUrl")
                                             if (!url.isNullOrBlank()) {
-                                                uriHandler.openUri("https://account.xiaomi.com$url")
+                                                showTicketInput = true
                                             }
                                         }
                                     }

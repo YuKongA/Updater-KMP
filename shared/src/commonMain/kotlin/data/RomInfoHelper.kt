@@ -33,6 +33,7 @@ object RomInfoHelper {
         @SerialName("Icon") val icon: Map<String, String>? = null,
         @SerialName("FileMirror") val fileMirror: FileMirror? = null,
         @SerialName("GentleNotice") val gentleNotice: GentleNotice? = null,
+        @SerialName("XmsUpdateInfo") val xmsUpdateInfo: XmsUpdateInfo? = null,
     )
 
     @Serializable
@@ -59,14 +60,14 @@ object RomInfoHelper {
     @Serializable
     data class ChangelogItem(
         val txt: String,
-        val image: List<ChangelogImage>? = null
+        val image: List<ChangelogImage>? = null,
     )
 
     @Serializable
     data class ChangelogImage(
         val path: String,
         val h: String,
-        val w: String
+        val w: String,
     )
 
     @Serializable
@@ -80,6 +81,13 @@ object RomInfoHelper {
     @Serializable
     data class GentleNotice(
         val text: String,
+    )
+
+    @Serializable
+    data class XmsUpdateInfo(
+        val hasXmsUpdate: Int,
+        val lstVer: String,
+        val pkgCnt: Int,
     )
 
     object ChangelogSerializer : KSerializer<LinkedHashMap<String, List<ChangelogItem>>> {
