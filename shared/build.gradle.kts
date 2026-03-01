@@ -19,6 +19,7 @@ kotlin {
     android {
         androidResources.enable = true
         compileSdk = ProjectConfig.Android.COMPILE_SDK
+        minSdk = ProjectConfig.Android.MIN_SDK
         namespace = "${ProjectConfig.PACKAGE_NAME}.shared"
     }
 
@@ -56,6 +57,8 @@ kotlin {
         commonMain.dependencies {
             api(libs.compose.ui)
             api(libs.compose.components.resources)
+            implementation(libs.androidx.lifecycle.viewmodel.compose)
+            implementation(libs.androidx.lifecycle.runtime.compose)
             // Added
             implementation(libs.cryptography.core)
             implementation(libs.image.loader)

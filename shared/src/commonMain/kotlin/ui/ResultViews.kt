@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -81,16 +80,12 @@ import utils.MessageUtils.Companion.showMessage
 
 @Composable
 fun InfoCardViews(
-    romInfoData: MutableState<DataHelper.RomInfoData>,
-    iconInfoData: MutableState<List<DataHelper.IconInfoData>>,
-    imageInfoData: MutableState<List<DataHelper.ImageInfoData>>,
-    updateRomInfoState: MutableState<Int>
+    romInfo: DataHelper.RomInfoData,
+    iconInfo: List<DataHelper.IconInfoData>,
+    imageInfo: List<DataHelper.ImageInfoData>,
+    updateRomInfoState: Int
 ) {
-    val romInfo = romInfoData.value
-    val iconInfo = iconInfoData.value
-    val imageInfo = imageInfoData.value
-
-    val isVisible by remember(updateRomInfoState.value, romInfoData.value) {
+    val isVisible by remember(updateRomInfoState, romInfo) {
         derivedStateOf {
             romInfo.fileName.isNotEmpty()
         }

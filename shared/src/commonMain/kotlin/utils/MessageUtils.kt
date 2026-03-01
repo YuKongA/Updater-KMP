@@ -49,7 +49,10 @@ class MessageUtils {
             }
             if (snackbarMessage.value.isNotEmpty()) {
                 snackCoroutineScope.launch {
-                    snackbarHostState.showSnackbar(message = snackbarMessage.value, duration = SnackbarDuration.Custom(snackbarDuration.value))
+                    snackbarHostState.showSnackbar(
+                        message = snackbarMessage.value,
+                        duration = SnackbarDuration.Custom(snackbarDuration.value)
+                    )
                     isSnackbarVisible.value = false
                 }
             }

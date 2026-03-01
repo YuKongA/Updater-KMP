@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -16,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import isWeb
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.CardDefaults
@@ -34,27 +32,29 @@ import updater.shared.generated.resources.login_expired
 import updater.shared.generated.resources.login_expired_desc
 import updater.shared.generated.resources.no_account
 import updater.shared.generated.resources.using_v2
+import utils.isWeb
 
 @Composable
 fun LoginCardView(
-    isLogin: MutableState<Int>,
-    isDarkTheme: Boolean
+    isLogin: Int,
+    isDarkTheme: Boolean,
+    onLoginChange: (Int) -> Unit
 ) {
-    val account = when (isLogin.value) {
+    val account = when (isLogin) {
         1 -> stringResource(Res.string.logged_in)
         0 -> stringResource(Res.string.no_account)
         else -> stringResource(Res.string.login_expired)
     }
-    val info = when (isLogin.value) {
+    val info = when (isLogin) {
         1 -> stringResource(Res.string.using_v2)
         0 -> stringResource(Res.string.login_desc)
         else -> stringResource(Res.string.login_expired_desc)
     }
-    val icon = if (isLogin.value == 1) MiuixIcons.Ok else MiuixIcons.Info
+    val icon = if (isLogin == 1) MiuixIcons.Ok else MiuixIcons.Info
     val color = when {
-        isDarkTheme && isLogin.value == 1 -> Color(0xFF1A3825)
-        isDarkTheme && isLogin.value != 1 -> Color(0xFF310808)
-        !isDarkTheme && isLogin.value == 1 -> Color(0xFFDFFAE4)
+        isDarkTheme && isLogin == 1 -> Color(0xFF1A3825)
+        isDarkTheme && isLogin != 1 -> Color(0xFF310808)
+        !isDarkTheme && isLogin == 1 -> Color(0xFFDFFAE4)
         else -> Color(0xFFF8E2E2)
     }
     val showDialog = remember { mutableStateOf(false) }
@@ -90,7 +90,7 @@ fun LoginCardView(
             }
             Spacer(modifier = Modifier.weight(1f))
             if (!isWeb()) {
-                LoginDialog(showDialog, isLogin)
+                LoginDialog(showDialog, isLogin, onLoginChange)
             }
         }
     }

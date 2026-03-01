@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,7 +23,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import data.DeviceInfoHelper
-import kotlinx.coroutines.flow.MutableStateFlow
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Card
@@ -49,17 +46,17 @@ import utils.MessageUtils.Companion.showMessage
 
 @Composable
 private fun SearchHistoryView(
-    searchKeywords: MutableState<List<String>>,
-    searchKeywordsSelected: MutableState<Int>,
-    onHistorySelect: (String) -> Unit
+    searchKeywords: List<String>,
+    searchKeywordsSelected: Int,
+    onHistorySelect: (Int, String) -> Unit
 ) {
     AnimatedVisibility(
-        visible = searchKeywords.value.isNotEmpty(),
+        visible = searchKeywords.isNotEmpty(),
         enter = fadeIn() + expandVertically(),
         exit = fadeOut() + shrinkVertically()
     ) {
         val focusManager = LocalFocusManager.current
-        val spinnerOptions = searchKeywords.value.map { keyword ->
+        val spinnerOptions = searchKeywords.map { keyword ->
             val parts = keyword.split("-")
             SpinnerEntry(
                 icon = null,
@@ -75,11 +72,10 @@ private fun SearchHistoryView(
             SuperSpinner(
                 title = stringResource(Res.string.search_history),
                 items = spinnerOptions,
-                selectedIndex = searchKeywordsSelected.value,
+                selectedIndex = searchKeywordsSelected,
                 showValue = false,
                 onSelectedIndexChange = { index ->
-                    onHistorySelect(searchKeywords.value[index])
-                    searchKeywordsSelected.value = index
+                    onHistorySelect(index, searchKeywords[index])
                 },
                 maxHeight = 280.dp,
                 modifier = Modifier.clickable {
@@ -92,53 +88,60 @@ private fun SearchHistoryView(
 
 @Composable
 fun BasicViews(
-    deviceName: MutableState<String>,
-    codeName: MutableState<String>,
-    androidVersion: MutableState<String>,
-    deviceRegion: MutableState<String>,
-    deviceCarrier: MutableState<String>,
-    systemVersion: MutableState<String>,
-    updateRomInfo: MutableState<Int>,
-    searchKeywords: MutableState<List<String>>,
-    searchKeywordsSelected: MutableState<Int>,
+    deviceName: String,
+    codeName: String,
+    androidVersion: String,
+    deviceRegion: String,
+    deviceCarrier: String,
+    systemVersion: String,
+    searchKeywords: List<String>,
+    searchKeywordsSelected: Int,
+    onDeviceNameChange: (String) -> Unit,
+    onCodeNameChange: (String) -> Unit,
+    onAndroidVersionChange: (String) -> Unit,
+    onDeviceRegionChange: (String) -> Unit,
+    onDeviceCarrierChange: (String) -> Unit,
+    onSystemVersionChange: (String) -> Unit,
+    onSearchKeywordsSelectedChange: (Int) -> Unit,
+    onHistorySelect: (String) -> Unit,
+    onSubmit: () -> Unit
 ) {
-    val androidVersionSelected = remember {
-        mutableStateOf(DeviceInfoHelper.androidVersions.indexOf(androidVersion.value).takeIf { it >= 0 } ?: 0)
+    val androidVersionSelected = remember(androidVersion) {
+        mutableStateOf(DeviceInfoHelper.androidVersions.indexOf(androidVersion).takeIf { it >= 0 } ?: 0)
     }
-    val regionSelected = remember {
-        mutableStateOf(DeviceInfoHelper.regionNames.indexOf(deviceRegion.value).takeIf { it >= 0 } ?: 0)
+    val regionSelected = remember(deviceRegion) {
+        mutableStateOf(DeviceInfoHelper.regionNames.indexOf(deviceRegion).takeIf { it >= 0 } ?: 0)
     }
 
-    val carrierSelected = remember {
-        mutableStateOf(DeviceInfoHelper.carrierNames.indexOf(deviceCarrier.value).takeIf { it >= 0 } ?: 0)
+    val carrierSelected = remember(deviceCarrier) {
+        mutableStateOf(DeviceInfoHelper.carrierNames.indexOf(deviceCarrier).takeIf { it >= 0 } ?: 0)
     }
 
     val deviceNames by DeviceInfoHelper.deviceNamesFlow.collectAsState()
     val codeNames by DeviceInfoHelper.codeNamesFlow.collectAsState()
 
-    val deviceNameFlow = remember { MutableStateFlow(deviceName.value) }
-    val codeNameFlow = remember { MutableStateFlow(codeName.value) }
-
     val toastNoInfo = stringResource(Res.string.toast_no_info)
 
     val focusManager = LocalFocusManager.current
-
-    LaunchedEffect(deviceNameFlow) {
-        deviceNameFlow.collect { newValue ->
-            if (deviceName.value != newValue) {
-                deviceName.value = newValue
-                val text = DeviceInfoHelper.codeName(newValue)
-                if (text.isNotEmpty()) codeName.value = text
+    val onDeviceNameInputChange = remember(deviceName, codeName) {
+        { newValue: String ->
+            if (deviceName != newValue) {
+                onDeviceNameChange(newValue)
+                val mappedCodeName = DeviceInfoHelper.codeName(newValue)
+                if (mappedCodeName.isNotEmpty() && mappedCodeName != codeName) {
+                    onCodeNameChange(mappedCodeName)
+                }
             }
         }
     }
-
-    LaunchedEffect(codeNameFlow) {
-        codeNameFlow.collect { newValue ->
-            if (codeName.value != newValue) {
-                codeName.value = newValue
-                val text = DeviceInfoHelper.deviceName(newValue)
-                if (text.isNotEmpty()) deviceName.value = text
+    val onCodeNameInputChange = remember(deviceName, codeName) {
+        { newValue: String ->
+            if (codeName != newValue) {
+                onCodeNameChange(newValue)
+                val mappedDeviceName = DeviceInfoHelper.deviceName(newValue)
+                if (mappedDeviceName.isNotEmpty() && mappedDeviceName != deviceName) {
+                    onDeviceNameChange(mappedDeviceName)
+                }
             }
         }
     }
@@ -150,13 +153,13 @@ fun BasicViews(
         AutoCompleteTextField(
             text = deviceName,
             items = deviceNames,
-            onValueChange = deviceNameFlow,
+            onValueChange = onDeviceNameInputChange,
             label = stringResource(Res.string.device_name)
         )
         AutoCompleteTextField(
             text = codeName,
             items = codeNames,
-            onValueChange = codeNameFlow,
+            onValueChange = onCodeNameInputChange,
             label = stringResource(Res.string.code_name)
         )
         TextField(
@@ -165,15 +168,15 @@ fun BasicViews(
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp)
                 .padding(bottom = 12.dp),
-            value = systemVersion.value,
-            onValueChange = { systemVersion.value = it },
+            value = systemVersion,
+            onValueChange = onSystemVersionChange,
             label = stringResource(Res.string.system_version),
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(onSearch = {
                 focusManager.clearFocus()
-                if (codeName.value != "" && androidVersion.value != "" && systemVersion.value != "") {
-                    updateRomInfo.value++
+                if (codeName != "" && androidVersion != "" && systemVersion != "") {
+                    onSubmit()
                 } else {
                     showMessage(toastNoInfo)
                 }
@@ -189,7 +192,7 @@ fun BasicViews(
                 selectedIndex = androidVersionSelected.value,
                 onSelectedIndexChange = { index ->
                     androidVersionSelected.value = index
-                    androidVersion.value = DeviceInfoHelper.androidVersions[index]
+                    onAndroidVersionChange(DeviceInfoHelper.androidVersions[index])
                 },
                 maxHeight = 280.dp,
                 modifier = Modifier.clickable {
@@ -202,7 +205,7 @@ fun BasicViews(
                 selectedIndex = regionSelected.value,
                 onSelectedIndexChange = { index ->
                     regionSelected.value = index
-                    deviceRegion.value = DeviceInfoHelper.regionNames[index]
+                    onDeviceRegionChange(DeviceInfoHelper.regionNames[index])
                 },
                 maxHeight = 280.dp,
                 modifier = Modifier.clickable {
@@ -215,7 +218,7 @@ fun BasicViews(
                 selectedIndex = carrierSelected.value,
                 onSelectedIndexChange = { index ->
                     carrierSelected.value = index
-                    deviceCarrier.value = DeviceInfoHelper.carrierNames[index]
+                    onDeviceCarrierChange(DeviceInfoHelper.carrierNames[index])
                 },
                 maxHeight = 280.dp,
                 modifier = Modifier.clickable {
@@ -226,17 +229,9 @@ fun BasicViews(
         SearchHistoryView(
             searchKeywords = searchKeywords,
             searchKeywordsSelected = searchKeywordsSelected,
-            onHistorySelect = { keyword ->
-                val parts = keyword.split("-")
-                deviceName.value = parts[0]
-                codeName.value = parts[1]
-                deviceRegion.value = parts[2]
-                deviceCarrier.value = parts[3]
-                androidVersion.value = parts[4]
-                systemVersion.value = parts[5]
-                regionSelected.value = DeviceInfoHelper.regionNames.indexOf(parts[2])
-                carrierSelected.value = DeviceInfoHelper.carrierNames.indexOf(parts[3])
-                androidVersionSelected.value = DeviceInfoHelper.androidVersions.indexOf(parts[4])
+            onHistorySelect = { index, keyword ->
+                onHistorySelect(keyword)
+                onSearchKeywordsSelectedChange(index)
             }
         )
         TextButton(
@@ -247,8 +242,8 @@ fun BasicViews(
             colors = ButtonDefaults.textButtonColorsPrimary(),
             onClick = {
                 focusManager.clearFocus()
-                if (codeName.value != "" && androidVersion.value != "" && systemVersion.value != "") {
-                    updateRomInfo.value++
+                if (codeName != "" && androidVersion != "" && systemVersion != "") {
+                    onSubmit()
                 } else {
                     showMessage(toastNoInfo)
                 }

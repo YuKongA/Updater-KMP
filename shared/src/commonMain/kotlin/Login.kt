@@ -61,7 +61,6 @@ class Login {
         password: String,
         global: Boolean,
         savePassword: String,
-        isLogin: MutableState<Int>,
         captcha: String = "",
         flag: Int? = null,
         ticket: String = "",
@@ -84,7 +83,6 @@ class Login {
                 account = account,
                 password = password,
                 global = global,
-                isLogin = isLogin,
                 captcha = captcha,
             )
         } catch (_: Exception) {
@@ -99,9 +97,8 @@ class Login {
      *
      * @return Logout status
      */
-    fun logout(isLogin: MutableState<Int>): Boolean {
+    fun logout(): Boolean {
         prefRemove("loginInfo")
-        isLogin.value = 0
         return true
     }
 
@@ -111,7 +108,6 @@ class Login {
      * @param account: Xiaomi account
      * @param password: Xiaomi password
      * @param global: Global or China account
-     * @param isLogin: Login status
      * @param captcha: Captcha if needed
      *
      * @return Login status
@@ -120,7 +116,6 @@ class Login {
         account: String,
         password: String,
         global: Boolean,
-        isLogin: MutableState<Int>,
         captcha: String = "",
     ): Int {
         val md5Hash = md5Hash(password).uppercase()
@@ -181,7 +176,6 @@ class Login {
             cUserId = cUserId
         )
         prefSet("loginInfo", Json.encodeToString(loginInfo))
-        isLogin.value = 1
         return 0 // 0: 登录成功
     }
 

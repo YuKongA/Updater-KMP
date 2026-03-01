@@ -76,7 +76,8 @@ import utils.MessageUtils.Companion.showMessage
 @Composable
 fun LoginDialog(
     showDialog: MutableState<Boolean>,
-    isLogin: MutableState<Int>
+    isLogin: Int,
+    onLoginChange: (Int) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     val uriHandler = LocalUriHandler.current
@@ -99,7 +100,7 @@ fun LoginDialog(
         isVerificationRequested = false
     }
 
-    val icon = when (isLogin.value) {
+    val icon = when (isLogin) {
         1 -> MiuixIcons.Blocklist
         else -> MiuixIcons.RemoveContact
     }
@@ -140,7 +141,7 @@ fun LoginDialog(
     }
 
     // 登录对话框
-    if (isLogin.value != 1) {
+    if (isLogin != 1) {
         SuperDialog(
             show = showDialog,
             title = stringResource(Res.string.login),
@@ -276,7 +277,6 @@ fun LoginDialog(
                                                         password = password,
                                                         global = global,
                                                         savePassword = savePassword,
-                                                        isLogin = isLogin,
                                                         flag = prefGet("2FAFlag")?.toInt(),
                                                         ticket = ticket
                                                     )
@@ -284,6 +284,7 @@ fun LoginDialog(
                                                         showMessage(message = messageLoginSuccess)
                                                         ticket = ""
                                                         showDialog.value = false
+                                                        onLoginChange(1)
                                                     } else {
                                                         showMessage(message = messageError)
                                                     }
@@ -376,13 +377,13 @@ fun LoginDialog(
                                         account = account,
                                         password = password,
                                         global = global,
-                                        savePassword = savePassword,
-                                        isLogin = isLogin
+                                        savePassword = savePassword
                                     )
                                     when (int) {
                                         0 -> {
                                             showMessage(message = messageLoginSuccess)
                                             showDialog.value = false
+                                            onLoginChange(1)
                                         }
 
                                         1 -> showMessage(message = messageEmpty)
@@ -423,8 +424,8 @@ fun LoginDialog(
         }
     }
 
-    // 登出对话框
-    if (isLogin.value == 1) {
+    // 退出登录
+    if (isLogin == 1) {
         SuperDialog(
             show = showDialog,
             title = stringResource(Res.string.logout),
@@ -440,8 +441,11 @@ fun LoginDialog(
                     colors = ButtonDefaults.textButtonColorsPrimary(),
                     onClick = {
                         coroutineScope.launch {
-                            val boolean = Login().logout(isLogin)
-                            if (boolean) showMessage(message = messageLogoutSuccessful)
+                            val boolean = Login().logout()
+                            if (boolean) {
+                                showMessage(message = messageLogoutSuccessful)
+                                onLoginChange(0)
+                            }
                         }
                         showDialog.value = false
                     }

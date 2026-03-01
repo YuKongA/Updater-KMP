@@ -25,8 +25,9 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -37,18 +38,14 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
-import data.DataHelper
-import data.DeviceInfoHelper
+import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.HazeTint
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
-import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import platform.prefGet
-import platform.prefRemove
 import top.yukonga.miuix.kmp.basic.DropdownImpl
 import top.yukonga.miuix.kmp.basic.HorizontalDivider
 import top.yukonga.miuix.kmp.basic.Icon
@@ -82,58 +79,18 @@ import updater.shared.generated.resources.clear_search_history
 import updater.shared.generated.resources.device_list_settings
 import updater.shared.generated.resources.icon
 import utils.MessageUtils.Companion.Snackbar
+import viewmodel.AppUiState
+import viewmodel.AppViewModel
 
 @Composable
 fun App(
-    isDarkTheme: Boolean = isSystemInDarkTheme()
+    isDarkTheme: Boolean = isSystemInDarkTheme(),
+    appViewModel: AppViewModel = viewModel { AppViewModel() }
 ) {
     AppTheme(
         isDarkTheme = isDarkTheme
     ) {
-        val deviceName = remember { mutableStateOf(prefGet("deviceName") ?: "") }
-        val codeName = remember { mutableStateOf(prefGet("codeName") ?: "") }
-        val deviceRegion = remember { mutableStateOf(prefGet("deviceRegion") ?: "Default (CN)") }
-        val deviceCarrier = remember { mutableStateOf(prefGet("deviceCarrier") ?: "Default (Xiaomi)") }
-        val androidVersion = remember { mutableStateOf(prefGet("androidVersion") ?: "16.0") }
-        val systemVersion = remember { mutableStateOf(prefGet("systemVersion") ?: "") }
-
-        val loginData = prefGet("loginInfo")?.let { Json.decodeFromString<DataHelper.LoginData>(it) }
-        val isLogin = remember { mutableStateOf(loginData?.authResult?.toInt() ?: 0) }
-
-        val curRomInfo = remember { mutableStateOf(DataHelper.RomInfoData()) }
-        val incRomInfo = remember { mutableStateOf(DataHelper.RomInfoData()) }
-
-        val curIconInfo: MutableState<List<DataHelper.IconInfoData>> = remember { mutableStateOf(listOf()) }
-        val incIconInfo: MutableState<List<DataHelper.IconInfoData>> = remember { mutableStateOf(listOf()) }
-
-        val curImageInfo: MutableState<List<DataHelper.ImageInfoData>> = remember { mutableStateOf(listOf()) }
-        val incImageInfo: MutableState<List<DataHelper.ImageInfoData>> = remember { mutableStateOf(listOf()) }
-
-        val updateRomInfoState = remember { mutableStateOf(0) }
-        val searchKeywords = remember { mutableStateOf(Json.decodeFromString<List<String>>(prefGet("searchKeywords") ?: "[]")) }
-        val searchKeywordsSelected = remember { mutableStateOf(0) }
-
-        LaunchedEffect(Unit) { DeviceInfoHelper.updateDeviceList() }
-
-        RomInfo().UpdateRomInfo(
-            deviceName,
-            codeName,
-            deviceRegion,
-            deviceCarrier,
-            androidVersion,
-            systemVersion,
-            loginData,
-            isLogin,
-            curRomInfo,
-            incRomInfo,
-            curIconInfo,
-            incIconInfo,
-            curImageInfo,
-            incImageInfo,
-            updateRomInfoState,
-            searchKeywords,
-            searchKeywordsSelected
-        )
+        val uiState by appViewModel.uiState.collectAsState()
 
         val scrollBehavior = MiuixScrollBehavior(rememberTopAppBarState())
         val focusManager = LocalFocusManager.current
@@ -144,18 +101,20 @@ fun App(
             tint = HazeTint(MiuixTheme.colorScheme.surface.copy(0.8f))
         )
 
-        val showMenuPopup = remember { mutableStateOf(false) }
-        val showDeviceSettingsDialog = remember { mutableStateOf(false) }
+        // Wrapper for DeviceListDialog
+        val showDeviceSettingsDialogState = remember(uiState.showDeviceSettingsDialog) {
+            object : MutableState<Boolean> {
+                override var value: Boolean
+                    get() = uiState.showDeviceSettingsDialog
+                    set(v) {
+                        appViewModel.updateShowDeviceSettingsDialog(v)
+                    }
 
-        val onClearSearchHistory = {
-            searchKeywords.value = listOf()
-            prefRemove("searchKeywords")
+                override fun component1() = value
+                override fun component2(): (Boolean) -> Unit = { value = it }
+            }
         }
-
-        val onShowDeviceSettings = {
-            showDeviceSettingsDialog.value = true
-        }
-        DeviceListDialog(showDeviceSettingsDialog)
+        DeviceListDialog(showDeviceSettingsDialogState)
 
         BoxWithConstraints(
             modifier = Modifier.scrollEndHaptic()
@@ -167,50 +126,16 @@ fun App(
                     scrollBehavior = scrollBehavior,
                     focusManager = focusManager,
                     isDarkTheme = isDarkTheme,
-                    showMenuPopup = showMenuPopup,
-                    searchKeywords = searchKeywords,
-                    onClearSearchHistory = onClearSearchHistory,
-                    onShowDeviceSettings = onShowDeviceSettings,
-                    isLogin = isLogin,
-                    deviceName = deviceName,
-                    codeName = codeName,
-                    androidVersion = androidVersion,
-                    deviceRegion = deviceRegion,
-                    deviceCarrier = deviceCarrier,
-                    systemVersion = systemVersion,
-                    updateRomInfoState = updateRomInfoState,
-                    searchKeywordsSelected = searchKeywordsSelected,
-                    curRomInfo = curRomInfo,
-                    curIconInfo = curIconInfo,
-                    curImageInfo = curImageInfo,
-                    incRomInfo = incRomInfo,
-                    incIconInfo = incIconInfo,
-                    incImageInfo = incImageInfo
+                    uiState = uiState,
+                    viewModel = appViewModel
                 )
             } else {
                 LandscapeAppView(
                     scrollBehavior = scrollBehavior,
                     focusManager = focusManager,
                     isDarkTheme = isDarkTheme,
-                    showMenuPopup = showMenuPopup,
-                    searchKeywords = searchKeywords,
-                    onClearSearchHistory = onClearSearchHistory,
-                    onShowDeviceSettings = onShowDeviceSettings,
-                    isLogin = isLogin,
-                    deviceName = deviceName,
-                    codeName = codeName,
-                    androidVersion = androidVersion,
-                    deviceRegion = deviceRegion,
-                    deviceCarrier = deviceCarrier,
-                    systemVersion = systemVersion,
-                    updateRomInfoState = updateRomInfoState,
-                    searchKeywordsSelected = searchKeywordsSelected,
-                    curRomInfo = curRomInfo,
-                    curIconInfo = curIconInfo,
-                    curImageInfo = curImageInfo,
-                    incRomInfo = incRomInfo,
-                    incIconInfo = incIconInfo,
-                    incImageInfo = incImageInfo
+                    uiState = uiState,
+                    viewModel = appViewModel
                 )
             }
         }
@@ -220,39 +145,44 @@ fun App(
 
 @Composable
 private fun MenuActions(
-    searchKeywordsState: MutableState<List<String>>,
-    showMenuPopup: MutableState<Boolean>,
+    searchKeywords: List<String>,
+    showMenuPopup: Boolean,
     focusManager: FocusManager,
     onClearSearchHistory: () -> Unit,
-    onShowDeviceSettings: () -> Unit
+    onShowDeviceSettings: () -> Unit,
+    onShowMenuPopupChange: (Boolean) -> Unit
 ) {
+    val showMenuPopupState = remember(showMenuPopup) {
+        mutableStateOf(showMenuPopup)
+    }
+
     SuperListPopup(
-        show = showMenuPopup,
+        show = showMenuPopupState,
         popupPositionProvider = ListPopupDefaults.ContextMenuPositionProvider,
         alignment = PopupPositionProvider.Align.TopEnd,
         onDismissRequest = {
-            showMenuPopup.value = false
+            onShowMenuPopupChange(false)
         }
     ) {
         ListPopupColumn {
             DropdownImpl(
                 text = stringResource(Res.string.device_list_settings),
-                optionSize = if (searchKeywordsState.value.isNotEmpty()) 2 else 1,
+                optionSize = if (searchKeywords.isNotEmpty()) 2 else 1,
                 isSelected = false,
                 onSelectedIndexChange = {
-                    showMenuPopup.value = false
+                    onShowMenuPopupChange(false)
                     onShowDeviceSettings()
                 },
                 index = 0
             )
 
-            if (searchKeywordsState.value.isNotEmpty()) {
+            if (searchKeywords.isNotEmpty()) {
                 DropdownImpl(
                     text = stringResource(Res.string.clear_search_history),
                     optionSize = 2,
                     isSelected = false,
                     onSelectedIndexChange = {
-                        showMenuPopup.value = false
+                        onShowMenuPopupChange(false)
                         onClearSearchHistory()
                     },
                     index = 1
@@ -266,10 +196,10 @@ private fun MenuActions(
             .padding(end = if (platform() != Platform.IOS && platform() != Platform.Android) 10.dp else 20.dp)
             .size(40.dp),
         onClick = {
-            showMenuPopup.value = true
+            onShowMenuPopupChange(true)
             focusManager.clearFocus()
         },
-        holdDownState = showMenuPopup.value
+        holdDownState = showMenuPopup
     ) {
         Icon(
             imageVector = MiuixIcons.Settings,
@@ -286,25 +216,8 @@ private fun PortraitAppView(
     scrollBehavior: ScrollBehavior,
     focusManager: FocusManager,
     isDarkTheme: Boolean,
-    showMenuPopup: MutableState<Boolean>,
-    searchKeywords: MutableState<List<String>>,
-    onClearSearchHistory: () -> Unit,
-    onShowDeviceSettings: () -> Unit,
-    isLogin: MutableState<Int>,
-    deviceName: MutableState<String>,
-    codeName: MutableState<String>,
-    androidVersion: MutableState<String>,
-    deviceRegion: MutableState<String>,
-    deviceCarrier: MutableState<String>,
-    systemVersion: MutableState<String>,
-    updateRomInfoState: MutableState<Int>,
-    searchKeywordsSelected: MutableState<Int>,
-    curRomInfo: MutableState<DataHelper.RomInfoData>,
-    curIconInfo: MutableState<List<DataHelper.IconInfoData>>,
-    curImageInfo: MutableState<List<DataHelper.ImageInfoData>>,
-    incRomInfo: MutableState<DataHelper.RomInfoData>,
-    incIconInfo: MutableState<List<DataHelper.IconInfoData>>,
-    incImageInfo: MutableState<List<DataHelper.ImageInfoData>>
+    uiState: AppUiState,
+    viewModel: AppViewModel
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -316,11 +229,12 @@ private fun PortraitAppView(
                 navigationIcon = { AboutDialog() },
                 actions = {
                     MenuActions(
-                        searchKeywordsState = searchKeywords,
-                        showMenuPopup = showMenuPopup,
+                        searchKeywords = uiState.searchKeywords,
+                        showMenuPopup = uiState.showMenuPopup,
                         focusManager = focusManager,
-                        onClearSearchHistory = onClearSearchHistory,
-                        onShowDeviceSettings = onShowDeviceSettings
+                        onClearSearchHistory = { viewModel.clearSearchHistory() },
+                        onShowDeviceSettings = { viewModel.updateShowDeviceSettingsDialog(true) },
+                        onShowMenuPopupChange = { viewModel.updateShowMenuPopup(it) }
                     )
                 },
                 modifier = Modifier
@@ -348,14 +262,29 @@ private fun PortraitAppView(
                         .navigationBarsPadding()
                 ) {
                     Column {
-                        LoginCardView(isLogin, isDarkTheme)
+                        LoginCardView(uiState.isLogin, isDarkTheme, onLoginChange = { viewModel.updateLoginState(it) })
                         BasicViews(
-                            deviceName, codeName, androidVersion, deviceRegion, deviceCarrier, systemVersion,
-                            updateRomInfoState, searchKeywords, searchKeywordsSelected
+                            deviceName = uiState.deviceName,
+                            codeName = uiState.codeName,
+                            androidVersion = uiState.androidVersion,
+                            deviceRegion = uiState.deviceRegion,
+                            deviceCarrier = uiState.deviceCarrier,
+                            systemVersion = uiState.systemVersion,
+                            searchKeywords = uiState.searchKeywords,
+                            searchKeywordsSelected = uiState.searchKeywordsSelected,
+                            onDeviceNameChange = { viewModel.updateDeviceName(it) },
+                            onCodeNameChange = { viewModel.updateCodeName(it) },
+                            onAndroidVersionChange = { viewModel.updateAndroidVersion(it) },
+                            onDeviceRegionChange = { viewModel.updateDeviceRegion(it) },
+                            onDeviceCarrierChange = { viewModel.updateDeviceCarrier(it) },
+                            onSystemVersionChange = { viewModel.updateSystemVersion(it) },
+                            onSearchKeywordsSelectedChange = { viewModel.updateSearchKeywordsSelected(it) },
+                            onHistorySelect = { viewModel.loadSearchHistory(it) },
+                            onSubmit = { viewModel.fetchRomInfo() }
                         )
                         Column(modifier = Modifier.padding(horizontal = 12.dp)) {
-                            InfoCardViews(curRomInfo, curIconInfo, curImageInfo, updateRomInfoState)
-                            InfoCardViews(incRomInfo, incIconInfo, incImageInfo, updateRomInfoState)
+                            InfoCardViews(uiState.curRomInfo, uiState.curIconInfo, uiState.curImageInfo, 0)
+                            InfoCardViews(uiState.incRomInfo, uiState.incIconInfo, uiState.incImageInfo, 0)
                         }
                     }
                 }
@@ -369,25 +298,8 @@ private fun LandscapeAppView(
     scrollBehavior: ScrollBehavior,
     focusManager: FocusManager,
     isDarkTheme: Boolean,
-    showMenuPopup: MutableState<Boolean>,
-    searchKeywords: MutableState<List<String>>,
-    onClearSearchHistory: () -> Unit,
-    onShowDeviceSettings: () -> Unit,
-    isLogin: MutableState<Int>,
-    deviceName: MutableState<String>,
-    codeName: MutableState<String>,
-    androidVersion: MutableState<String>,
-    deviceRegion: MutableState<String>,
-    deviceCarrier: MutableState<String>,
-    systemVersion: MutableState<String>,
-    updateRomInfoState: MutableState<Int>,
-    searchKeywordsSelected: MutableState<Int>,
-    curRomInfo: MutableState<DataHelper.RomInfoData>,
-    curIconInfo: MutableState<List<DataHelper.IconInfoData>>,
-    curImageInfo: MutableState<List<DataHelper.ImageInfoData>>,
-    incRomInfo: MutableState<DataHelper.RomInfoData>,
-    incIconInfo: MutableState<List<DataHelper.IconInfoData>>,
-    incImageInfo: MutableState<List<DataHelper.ImageInfoData>>
+    uiState: AppUiState,
+    viewModel: AppViewModel
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -408,11 +320,12 @@ private fun LandscapeAppView(
                     navigationIcon = { AboutDialog() },
                     actions = {
                         MenuActions(
-                            searchKeywordsState = searchKeywords,
-                            showMenuPopup = showMenuPopup,
+                            searchKeywords = uiState.searchKeywords,
+                            showMenuPopup = uiState.showMenuPopup,
                             focusManager = focusManager,
-                            onClearSearchHistory = onClearSearchHistory,
-                            onShowDeviceSettings = onShowDeviceSettings
+                            onClearSearchHistory = { viewModel.clearSearchHistory() },
+                            onShowDeviceSettings = { viewModel.updateShowDeviceSettingsDialog(true) },
+                            onShowMenuPopupChange = { viewModel.updateShowMenuPopup(it) }
                         )
                     },
                     defaultWindowInsetsPadding = false,
@@ -432,10 +345,25 @@ private fun LandscapeAppView(
                     overscrollEffect = null
                 ) {
                     item {
-                        LoginCardView(isLogin, isDarkTheme)
+                        LoginCardView(uiState.isLogin, isDarkTheme, onLoginChange = { viewModel.updateLoginState(it) })
                         BasicViews(
-                            deviceName, codeName, androidVersion, deviceRegion, deviceCarrier, systemVersion,
-                            updateRomInfoState, searchKeywords, searchKeywordsSelected
+                            deviceName = uiState.deviceName,
+                            codeName = uiState.codeName,
+                            androidVersion = uiState.androidVersion,
+                            deviceRegion = uiState.deviceRegion,
+                            deviceCarrier = uiState.deviceCarrier,
+                            systemVersion = uiState.systemVersion,
+                            searchKeywords = uiState.searchKeywords,
+                            searchKeywordsSelected = uiState.searchKeywordsSelected,
+                            onDeviceNameChange = { viewModel.updateDeviceName(it) },
+                            onCodeNameChange = { viewModel.updateCodeName(it) },
+                            onAndroidVersionChange = { viewModel.updateAndroidVersion(it) },
+                            onDeviceRegionChange = { viewModel.updateDeviceRegion(it) },
+                            onDeviceCarrierChange = { viewModel.updateDeviceCarrier(it) },
+                            onSystemVersionChange = { viewModel.updateSystemVersion(it) },
+                            onSearchKeywordsSelectedChange = { viewModel.updateSearchKeywordsSelected(it) },
+                            onHistorySelect = { viewModel.loadSearchHistory(it) },
+                            onSubmit = { viewModel.fetchRomInfo() }
                         )
                         Spacer(
                             Modifier.height(
@@ -458,7 +386,7 @@ private fun LandscapeAppView(
                     .fillMaxHeight()
                     .weight(1f - 0.42f)
             ) {
-                if (curRomInfo.value.version.isEmpty() && incRomInfo.value.version.isEmpty()) {
+                if (uiState.curRomInfo.version.isEmpty() && uiState.incRomInfo.version.isEmpty()) {
                     Image(
                         painter = painterResource(Res.drawable.icon),
                         contentDescription = "Logo",
@@ -483,8 +411,8 @@ private fun LandscapeAppView(
                         Column(
                             modifier = Modifier.padding(top = 12.dp)
                         ) {
-                            InfoCardViews(curRomInfo, curIconInfo, curImageInfo, updateRomInfoState)
-                            InfoCardViews(incRomInfo, incIconInfo, incImageInfo, updateRomInfoState)
+                            InfoCardViews(uiState.curRomInfo, uiState.curIconInfo, uiState.curImageInfo, 0)
+                            InfoCardViews(uiState.incRomInfo, uiState.incIconInfo, uiState.incImageInfo, 0)
                         }
                         Spacer(
                             Modifier.height(
@@ -498,5 +426,3 @@ private fun LandscapeAppView(
         }
     }
 }
-
-fun isWeb(): Boolean = platform() == Platform.WasmJs || platform() == Platform.Js

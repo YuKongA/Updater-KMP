@@ -16,9 +16,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,7 +35,6 @@ import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.flow.MutableStateFlow
 import top.yukonga.miuix.kmp.basic.DropdownColors
 import top.yukonga.miuix.kmp.basic.DropdownDefaults
 import top.yukonga.miuix.kmp.basic.PopupPositionProvider
@@ -50,26 +46,24 @@ import kotlin.math.min
 
 @Composable
 fun AutoCompleteTextField(
-    text: MutableState<String>,
+    text: String,
     items: List<String>,
-    onValueChange: MutableStateFlow<String>,
+    onValueChange: (String) -> Unit,
     label: String
 ) {
-    val filteredList = remember(text.value, items) {
+    val filteredList = remember(text, items) {
         items.filter {
-            it.startsWith(text.value, ignoreCase = true)
-                    || it.contains(text.value, ignoreCase = true)
-                    || it.replace(" ", "").contains(text.value, ignoreCase = true)
-        }.sortedBy { !it.startsWith(text.value, ignoreCase = true) }
+            it.startsWith(text, ignoreCase = true)
+                    || it.contains(text, ignoreCase = true)
+                    || it.replace(" ", "").contains(text, ignoreCase = true)
+        }.sortedBy { !it.startsWith(text, ignoreCase = true) }
     }
     var isFocused by remember { mutableStateOf(false) }
     val showPopup = remember { mutableStateOf(false) }
     val hapticFeedback = LocalHapticFeedback.current
     val focusManager = LocalFocusManager.current
 
-    LaunchedEffect(isFocused, onValueChange.collectAsState().value) {
-        showPopup.value = isFocused && text.value.isNotEmpty()
-    }
+    showPopup.value = isFocused && text.isNotEmpty()
 
     Box(
         modifier = Modifier
@@ -79,9 +73,9 @@ fun AutoCompleteTextField(
     ) {
         TextField(
             insideMargin = DpSize(16.dp, 20.dp),
-            value = text.value,
+            value = text,
             onValueChange = {
-                onValueChange.value = it
+                onValueChange(it)
             },
             singleLine = true,
             label = label,
@@ -113,7 +107,7 @@ fun AutoCompleteTextField(
                             optionSize = filteredList.size,
                             onSelectedIndexChange = {
                                 hapticFeedback.performHapticFeedback(LongPress)
-                                onValueChange.value = item
+                                onValueChange(item)
                                 focusManager.clearFocus()
                                 showPopup.value = false
                             },
