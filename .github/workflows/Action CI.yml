@@ -2,10 +2,10 @@ name: Action CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths-ignore:
-      - 'README.md'
-      - 'LICENSE'
+      - "README.md"
+      - "LICENSE"
 
 permissions:
   contents: read
@@ -16,7 +16,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ macos-latest, ubuntu-latest, ubuntu-24.04-arm, windows-latest ]
+        os: [macos-latest, ubuntu-latest, ubuntu-24.04-arm, windows-latest]
         include:
           - os: macos-latest
             platform: macos arm64
@@ -57,7 +57,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: ${{ matrix.jdk-distribution }}
-          java-version: '21'
+          java-version: "21"
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
@@ -91,21 +91,34 @@ jobs:
           name: ${{ matrix.artifact-nameEx }}
           path: ${{ matrix.artifact-pathEx }}
 
+      - name: Upload Updater android debug artifact
+        if: matrix.platformEx == 'android aarch64'
+        uses: actions/upload-artifact@v7
+        with:
+          name: Updater-android-debug-apk
+          path: android/build/outputs/apk/debug
+
+  post_telegram:
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && github.ref_type != 'tag' }}
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: artifacts
+
       - name: Post to Telegram ci channel
-        if: ${{ success() && matrix.platformEx == 'android aarch64' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && github.ref_type != 'tag' }}
         env:
           CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           COMMIT_MESSAGE: |+
-            New CI from Updater\-KMP
+            New CI from Updater-KMP
 
-            ```
             ${{ github.event.head_commit.message }}
-            ```
-        run: |
-          if [ ! -z "${{ secrets.BOT_TOKEN }}" ]; then
-            export RELEASE=$(find ./android/build/outputs/apk/release -name "*.apk")
-            export DEBUG=$(find ./android/build/outputs/apk/debug -name "*.apk")
-            ESCAPED=`python3 -c 'import json,os,urllib.parse; print(urllib.parse.quote(json.dumps(os.environ["COMMIT_MESSAGE"])))'`
-            curl -v "https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup?chat_id=${CHANNEL_ID}&media=%5B%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2Frelease%22%7D%2C%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2Fdebug%22%2C%22parse_mode%22%3A%22MarkdownV2%22%2C%22caption%22%3A${ESCAPED}%7D%5D" -F release="@$RELEASE" -F debug="@$DEBUG"
-          fi
+        run: bash .github/scripts/post_telegram.sh
