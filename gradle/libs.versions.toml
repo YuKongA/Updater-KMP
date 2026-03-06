@@ -12,7 +12,7 @@ kotlin = "2.3.10"
 kotlinx-serialization-json = "1.10.0"
 kotlinx-datetime = "0.7.1"
 ktor-client = "3.4.1"
-miuix = "0.8.5"
+miuix = "0.8.6"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
