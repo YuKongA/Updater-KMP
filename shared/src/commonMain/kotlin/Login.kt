@@ -1,4 +1,3 @@
-import androidx.compose.runtime.MutableState
 import data.DataHelper
 import dev.whyoleg.cryptography.DelicateCryptographyApi
 import dev.whyoleg.cryptography.algorithms.MD5
@@ -48,7 +47,6 @@ class Login {
      * @param password: Xiaomi password
      * @param global: Global or China account
      * @param savePassword: Save password or not
-     * @param isLogin: Login status
      * @param captcha: Captcha if needed
      * @param flag: 2FA flag if needed, 4 for phone, 8 for email
      * @param ticket: 2FA ticket if needed
@@ -92,8 +90,6 @@ class Login {
 
     /**
      * Logout Xiaomi account.
-     *
-     * @param isLogin: Login status
      *
      * @return Logout status
      */

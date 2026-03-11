@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -39,17 +37,19 @@ import updater.shared.generated.resources.view_source
 
 @Composable
 fun AboutDialog(
+    show: Boolean,
+    onShow: () -> Unit,
+    onDismissRequest: () -> Unit,
 ) {
-    val showDialog = remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
     IconButton(
         modifier = Modifier.padding(start = if (platform() != Platform.IOS && platform() != Platform.Android) 10.dp else 20.dp),
         onClick = {
-            showDialog.value = true
+            onShow()
             focusManager.clearFocus()
         },
-        holdDownState = showDialog.value
+        holdDownState = show
     ) {
         Image(
             painter = painterResource(Res.drawable.icon),
@@ -61,79 +61,79 @@ fun AboutDialog(
     }
 
     SuperDialog(
-        show = showDialog,
+        show = show,
         title = stringResource(Res.string.about),
         onDismissRequest = {
-            showDialog.value = false
-        }
-    ) {
-        val uriHandler = LocalUriHandler.current
-        Row(
-            modifier = Modifier.padding(bottom = 10.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(Res.drawable.icon),
-                contentDescription = "Icon",
-                modifier = Modifier.size(45.dp),
-            )
-            Column {
+            onDismissRequest()
+        },
+        content = {
+            val uriHandler = LocalUriHandler.current
+            Row(
+                modifier = Modifier.padding(bottom = 10.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(Res.drawable.icon),
+                    contentDescription = "Icon",
+                    modifier = Modifier.size(45.dp),
+                )
+                Column {
+                    Text(
+                        text = stringResource(Res.string.app_name),
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = VersionInfo.VERSION_NAME + " (" + VersionInfo.VERSION_CODE + ")",
+                    )
+                }
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = stringResource(Res.string.app_name),
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.SemiBold
+                    text = stringResource(Res.string.view_source) + " ",
                 )
                 Text(
-                    text = VersionInfo.VERSION_NAME + " (" + VersionInfo.VERSION_CODE + ")",
+                    text = AnnotatedString(
+                        text = "GitHub",
+                        spanStyle = SpanStyle(
+                            textDecoration = TextDecoration.Underline,
+                            color = MiuixTheme.colorScheme.primary
+                        )
+                    ),
+                    modifier = Modifier.clickable(
+                        onClick = {
+                            uriHandler.openUri("https://github.com/YuKongA/Updater-KMP")
+                        }
+                    )
                 )
             }
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(Res.string.view_source) + " ",
-            )
-            Text(
-                text = AnnotatedString(
-                    text = "GitHub",
-                    spanStyle = SpanStyle(
-                        textDecoration = TextDecoration.Underline,
-                        color = MiuixTheme.colorScheme.primary
-                    )
-                ),
-                modifier = Modifier.clickable(
-                    onClick = {
-                        uriHandler.openUri("https://github.com/YuKongA/Updater-KMP")
-                    }
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(Res.string.join_channel) + " ",
                 )
-            )
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(Res.string.join_channel) + " ",
-            )
-            Text(
-                text = AnnotatedString(
-                    text = "Telegram",
-                    spanStyle = SpanStyle(
-                        textDecoration = TextDecoration.Underline,
-                        color = MiuixTheme.colorScheme.primary
+                Text(
+                    text = AnnotatedString(
+                        text = "Telegram",
+                        spanStyle = SpanStyle(
+                            textDecoration = TextDecoration.Underline,
+                            color = MiuixTheme.colorScheme.primary
+                        )
+                    ),
+                    modifier = Modifier.clickable(
+                        onClick = {
+                            uriHandler.openUri("https://t.me/YuKongA13579")
+                        },
                     )
-                ),
-                modifier = Modifier.clickable(
-                    onClick = {
-                        uriHandler.openUri("https://t.me/YuKongA13579")
-                    },
                 )
+            }
+            Text(
+                modifier = Modifier.padding(top = 10.dp),
+                text = stringResource(Res.string.opensource_info)
             )
-        }
-        Text(
-            modifier = Modifier.padding(top = 10.dp),
-            text = stringResource(Res.string.opensource_info)
-        )
-    }
+        })
 }

@@ -1,7 +1,6 @@
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -25,16 +24,18 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
@@ -96,30 +97,26 @@ fun App(
         val focusManager = LocalFocusManager.current
 
         val hazeState = remember { HazeState() }
-        val hazeStyle = HazeStyle(
-            backgroundColor = MiuixTheme.colorScheme.surface,
-            tint = HazeTint(MiuixTheme.colorScheme.surface.copy(0.8f))
-        )
-
-        // Wrapper for DeviceListDialog
-        val showDeviceSettingsDialogState = remember(uiState.showDeviceSettingsDialog) {
-            object : MutableState<Boolean> {
-                override var value: Boolean
-                    get() = uiState.showDeviceSettingsDialog
-                    set(v) {
-                        appViewModel.updateShowDeviceSettingsDialog(v)
-                    }
-
-                override fun component1() = value
-                override fun component2(): (Boolean) -> Unit = { value = it }
-            }
+        val surfaceColor = MiuixTheme.colorScheme.surface
+        val hazeStyle = remember(surfaceColor) {
+            HazeStyle(
+                backgroundColor = surfaceColor,
+                tint = HazeTint(surfaceColor.copy(0.8f))
+            )
         }
-        DeviceListDialog(showDeviceSettingsDialogState)
 
-        BoxWithConstraints(
-            modifier = Modifier.scrollEndHaptic()
+        val density = LocalDensity.current
+        val isMobile = platform() == Platform.Android || platform() == Platform.IOS
+        var containerWidth by remember { mutableStateOf(if (isMobile) 0.dp else 1280.dp) }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .scrollEndHaptic()
+                .onSizeChanged { size ->
+                    containerWidth = with(density) { size.width.toDp() }
+                }
         ) {
-            if (maxWidth < 768.dp) {
+            if (containerWidth < 768.dp) {
                 PortraitAppView(
                     hazeState = hazeState,
                     hazeStyle = hazeStyle,
@@ -152,44 +149,41 @@ private fun MenuActions(
     onShowDeviceSettings: () -> Unit,
     onShowMenuPopupChange: (Boolean) -> Unit
 ) {
-    val showMenuPopupState = remember(showMenuPopup) {
-        mutableStateOf(showMenuPopup)
-    }
-
     SuperListPopup(
-        show = showMenuPopupState,
+        show = showMenuPopup,
         popupPositionProvider = ListPopupDefaults.ContextMenuPositionProvider,
         alignment = PopupPositionProvider.Align.TopEnd,
         onDismissRequest = {
             onShowMenuPopupChange(false)
-        }
-    ) {
-        ListPopupColumn {
-            DropdownImpl(
-                text = stringResource(Res.string.device_list_settings),
-                optionSize = if (searchKeywords.isNotEmpty()) 2 else 1,
-                isSelected = false,
-                onSelectedIndexChange = {
-                    onShowMenuPopupChange(false)
-                    onShowDeviceSettings()
-                },
-                index = 0
-            )
-
-            if (searchKeywords.isNotEmpty()) {
+        },
+        content = {
+            ListPopupColumn {
                 DropdownImpl(
-                    text = stringResource(Res.string.clear_search_history),
-                    optionSize = 2,
+                    text = stringResource(Res.string.device_list_settings),
+                    optionSize = if (searchKeywords.isNotEmpty()) 2 else 1,
                     isSelected = false,
                     onSelectedIndexChange = {
                         onShowMenuPopupChange(false)
-                        onClearSearchHistory()
+                        onShowDeviceSettings()
                     },
-                    index = 1
+                    index = 0
                 )
+
+                if (searchKeywords.isNotEmpty()) {
+                    DropdownImpl(
+                        text = stringResource(Res.string.clear_search_history),
+                        optionSize = 2,
+                        isSelected = false,
+                        onSelectedIndexChange = {
+                            onShowMenuPopupChange(false)
+                            onClearSearchHistory()
+                        },
+                        index = 1
+                    )
+                }
             }
         }
-    }
+    )
 
     IconButton(
         modifier = Modifier
@@ -226,7 +220,13 @@ private fun PortraitAppView(
                 color = Color.Transparent,
                 title = stringResource(Res.string.app_name),
                 scrollBehavior = scrollBehavior,
-                navigationIcon = { AboutDialog() },
+                navigationIcon = {
+                    AboutDialog(
+                        show = uiState.showAboutDialog,
+                        onShow = { viewModel.updateShowAboutDialog(true) },
+                        onDismissRequest = { viewModel.updateShowAboutDialog(false) }
+                    )
+                },
                 actions = {
                     MenuActions(
                         searchKeywords = uiState.searchKeywords,
@@ -236,13 +236,16 @@ private fun PortraitAppView(
                         onShowDeviceSettings = { viewModel.updateShowDeviceSettingsDialog(true) },
                         onShowMenuPopupChange = { viewModel.updateShowMenuPopup(it) }
                     )
+                    DeviceListDialog(
+                        show = uiState.showDeviceSettingsDialog,
+                        onDismissRequest = { viewModel.updateShowDeviceSettingsDialog(false) }
+                    )
                 },
-                modifier = Modifier
-                    .hazeEffect(hazeState) {
-                        style = hazeStyle
-                        blurRadius = 25.dp
-                        noiseFactor = 0f
-                    }
+                modifier = Modifier.hazeEffect(hazeState) {
+                    style = hazeStyle
+                    blurRadius = 25.dp
+                    noiseFactor = 0f
+                }
             )
         }
     ) { paddingValues ->
@@ -304,6 +307,10 @@ private fun LandscapeAppView(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
     ) { scaffoldPaddingValues ->
+        DeviceListDialog(
+            show = uiState.showDeviceSettingsDialog,
+            onDismissRequest = { viewModel.updateShowDeviceSettingsDialog(false) }
+        )
         Row(
             modifier = Modifier
                 .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Start))
@@ -317,7 +324,13 @@ private fun LandscapeAppView(
                 SmallTopAppBar(
                     title = stringResource(Res.string.app_name),
                     scrollBehavior = scrollBehavior,
-                    navigationIcon = { AboutDialog() },
+                    navigationIcon = {
+                        AboutDialog(
+                            show = uiState.showAboutDialog,
+                            onShow = { viewModel.updateShowAboutDialog(true) },
+                            onDismissRequest = { viewModel.updateShowAboutDialog(false) }
+                        )
+                    },
                     actions = {
                         MenuActions(
                             searchKeywords = uiState.searchKeywords,

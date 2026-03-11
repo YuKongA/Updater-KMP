@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -75,7 +74,9 @@ import utils.MessageUtils.Companion.showMessage
 
 @Composable
 fun LoginDialog(
-    showDialog: MutableState<Boolean>,
+    show: Boolean,
+    onShow: () -> Unit,
+    onDismissRequest: () -> Unit,
     isLogin: Int,
     onLoginChange: (Int) -> Unit
 ) {
@@ -129,9 +130,9 @@ fun LoginDialog(
 
             focusManager.clearFocus()
 
-            showDialog.value = true
+            onShow()
         },
-        holdDownState = showDialog.value
+        holdDownState = show
     ) {
         Icon(
             imageVector = icon,
@@ -143,157 +144,174 @@ fun LoginDialog(
     // 登录对话框
     if (isLogin != 1) {
         SuperDialog(
-            show = showDialog,
+            show = show,
             title = stringResource(Res.string.login),
             onDismissRequest = {
-                showDialog.value = false
-            }
-        ) {
-            Column {
-                // 账号输入框
-                TextField(
-                    value = account,
-                    onValueChange = { account = it },
-                    label = stringResource(Res.string.account),
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                    keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
-                )
+                onDismissRequest()
+            },
+            content = {
+                Column {
+                    // 账号输入框
+                    TextField(
+                        value = account,
+                        onValueChange = { account = it },
+                        label = stringResource(Res.string.account),
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
+                    )
 
-                // 密码输入框
-                var passwordVisibility by remember { mutableStateOf(false) }
-                TextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = stringResource(Res.string.password),
-                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                    visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-                    trailingIcon = {
-                        // 显示 & 隐藏密码
-                        IconButton(
-                            modifier = Modifier.padding(end = 6.dp),
-                            onClick = {
-                                passwordVisibility = !passwordVisibility
-                            },
-                            content = {
-                                Icon(
-                                    imageVector = MiuixIcons.Rename,
-                                    tint = if (passwordVisibility) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.onSecondaryContainer,
-                                    contentDescription = null
-                                )
-                            }
-                        )
-                    }
-                )
-
-                // 二次认证验证码（浏览器请求）
-                AnimatedVisibility(
-                    visible = showTicketUrl
-                ) {
-                    val optionsStr = prefGet("2FAOptions") ?: "[]"
-                    var options by remember { mutableStateOf(Json.decodeFromString<MutableList<Int>>(optionsStr)) }
-                    if (options.isEmpty()) {
-                        showDialog.value = false
-                        showMessage(message = messageError)
-                    }
-                }
-
-                // 二次认证验证码输入框
-                AnimatedVisibility(
-                    visible = showTicketInput
-                ) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
-                    ) {
-                        val captchaUrl = prefGet("captchaUrl")
-                        val notificationUrl = prefGet("notificationUrl")
-                        val verificationUrl = if (!captchaUrl.isNullOrBlank()) {
-                            "https://account.xiaomi.com$captchaUrl"
-                        } else if (!notificationUrl.isNullOrBlank()) {
-                            notificationUrl
-                        } else {
-                            null
+                    // 密码输入框
+                    var passwordVisibility by remember { mutableStateOf(false) }
+                    TextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = stringResource(Res.string.password),
+                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                        visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            // 显示 & 隐藏密码
+                            IconButton(
+                                modifier = Modifier.padding(end = 6.dp),
+                                onClick = {
+                                    passwordVisibility = !passwordVisibility
+                                },
+                                content = {
+                                    Icon(
+                                        imageVector = MiuixIcons.Rename,
+                                        tint = if (passwordVisibility) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.onSecondaryContainer,
+                                        contentDescription = null
+                                    )
+                                }
+                            )
                         }
+                    )
 
-                        if (verificationUrl != null) {
+                    // 二次认证验证码（浏览器请求）
+                    AnimatedVisibility(
+                        visible = showTicketUrl
+                    ) {
+                        val optionsStr = prefGet("2FAOptions") ?: "[]"
+                        var options by remember { mutableStateOf(Json.decodeFromString<MutableList<Int>>(optionsStr)) }
+                        if (options.isEmpty()) {
+                            onDismissRequest()
+                            showMessage(message = messageError)
+                        }
+                    }
+
+                    // 二次认证验证码输入框
+                    AnimatedVisibility(
+                        visible = showTicketInput
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+                        ) {
+                            val captchaUrl = prefGet("captchaUrl")
+                            val notificationUrl = prefGet("notificationUrl")
+                            val verificationUrl = if (!captchaUrl.isNullOrBlank()) {
+                                "https://account.xiaomi.com$captchaUrl"
+                            } else if (!notificationUrl.isNullOrBlank()) {
+                                notificationUrl
+                            } else {
+                                null
+                            }
+
+                            if (verificationUrl != null) {
+                                AnimatedVisibility(
+                                    visible = !isVerificationRequested
+                                ) {
+                                    Column {
+                                        TextButton(
+                                            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                                            text = stringResource(Res.string.get_verification_code),
+                                            colors = ButtonDefaults.textButtonColorsPrimary(),
+                                            onClick = {
+                                                uriHandler.openUri(verificationUrl)
+                                                isVerificationRequested = true
+                                            }
+                                        )
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.Center
+                                        ) {
+                                            Text(
+                                                text = stringResource(Res.string.do_not_enter_in_browser),
+                                                color = MiuixTheme.colorScheme.onPrimaryVariant,
+                                                fontSize = 12.sp,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
                             AnimatedVisibility(
-                                visible = !isVerificationRequested
+                                visible = verificationUrl == null || isVerificationRequested
                             ) {
                                 Column {
-                                    TextButton(
-                                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                                        text = stringResource(Res.string.get_verification_code),
-                                        colors = ButtonDefaults.textButtonColorsPrimary(),
-                                        onClick = {
-                                            uriHandler.openUri(verificationUrl)
-                                            isVerificationRequested = true
-                                        }
+                                    TextField(
+                                        value = ticket,
+                                        onValueChange = { ticket = it },
+                                        label = stringResource(Res.string.verification_code),
+                                        modifier = Modifier.fillMaxWidth(),
+                                        singleLine = true,
+                                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                                        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
                                     )
                                     Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.Center
+                                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
                                     ) {
-                                        Text(
-                                            text = stringResource(Res.string.do_not_enter_in_browser),
-                                            color = MiuixTheme.colorScheme.onPrimaryVariant,
-                                            fontSize = 12.sp,
+                                        TextButton(
+                                            modifier = Modifier.weight(1f),
+                                            text = if (isVerifying) stringResource(Res.string.verifying) else stringResource(Res.string.submit),
+                                            enabled = !isVerifying && ticket.isNotBlank(),
+                                            colors = ButtonDefaults.textButtonColorsPrimary(),
+                                            onClick = {
+                                                if (showTicketInput) {
+                                                    // 提交二次认证验证码
+                                                    coroutineScope.launch {
+                                                        isVerifying = true
+                                                        val int = Login().login(
+                                                            account = account,
+                                                            password = password,
+                                                            global = global,
+                                                            savePassword = savePassword,
+                                                            flag = prefGet("2FAFlag")?.toInt(),
+                                                            ticket = ticket
+                                                        )
+                                                        if (int == 0) {
+                                                            showMessage(message = messageLoginSuccess)
+                                                            ticket = ""
+                                                            onDismissRequest()
+                                                            onLoginChange(1)
+                                                        } else {
+                                                            showMessage(message = messageError)
+                                                        }
+                                                        isVerifying = false
+                                                    }
+                                                }
+                                            }
+                                        )
+                                        Spacer(Modifier.width(16.dp))
+                                        TextButton(
+                                            modifier = Modifier.weight(1f),
+                                            text = stringResource(Res.string.cancel),
+                                            colors = ButtonDefaults.textButtonColors(),
+                                            onClick = {
+                                                showTicketUrl = false
+                                                showTicketInput = false
+                                                ticket = ""
+                                            }
                                         )
                                     }
                                 }
                             }
-                        }
-                        AnimatedVisibility(
-                            visible = verificationUrl == null || isVerificationRequested
-                        ) {
-                            Column {
-                                TextField(
-                                    value = ticket,
-                                    onValueChange = { ticket = it },
-                                    label = stringResource(Res.string.verification_code),
-                                    modifier = Modifier.fillMaxWidth(),
-                                    singleLine = true,
-                                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
-                                )
+                            if (verificationUrl != null && !isVerificationRequested) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
                                 ) {
-                                    TextButton(
-                                        modifier = Modifier.weight(1f),
-                                        text = if (isVerifying) stringResource(Res.string.verifying) else stringResource(Res.string.submit),
-                                        enabled = !isVerifying && ticket.isNotBlank(),
-                                        colors = ButtonDefaults.textButtonColorsPrimary(),
-                                        onClick = {
-                                            if (showTicketInput) {
-                                                // 提交二次认证验证码
-                                                coroutineScope.launch {
-                                                    isVerifying = true
-                                                    val int = Login().login(
-                                                        account = account,
-                                                        password = password,
-                                                        global = global,
-                                                        savePassword = savePassword,
-                                                        flag = prefGet("2FAFlag")?.toInt(),
-                                                        ticket = ticket
-                                                    )
-                                                    if (int == 0) {
-                                                        showMessage(message = messageLoginSuccess)
-                                                        ticket = ""
-                                                        showDialog.value = false
-                                                        onLoginChange(1)
-                                                    } else {
-                                                        showMessage(message = messageError)
-                                                    }
-                                                    isVerifying = false
-                                                }
-                                            }
-                                        }
-                                    )
-                                    Spacer(Modifier.width(16.dp))
                                     TextButton(
                                         modifier = Modifier.weight(1f),
                                         text = stringResource(Res.string.cancel),
@@ -307,159 +325,142 @@ fun LoginDialog(
                                 }
                             }
                         }
-                        if (verificationUrl != null && !isVerificationRequested) {
+                    }
+
+                    // 国际账号 & 保存密码
+                    AnimatedVisibility(
+                        visible = !showTicketUrl && !showTicketInput
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(vertical = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Row(
-                                modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+                                modifier = Modifier.weight(1f),
+                                horizontalArrangement = Arrangement.Center
                             ) {
-                                TextButton(
-                                    modifier = Modifier.weight(1f),
-                                    text = stringResource(Res.string.cancel),
-                                    colors = ButtonDefaults.textButtonColors(),
-                                    onClick = {
-                                        showTicketUrl = false
-                                        showTicketInput = false
-                                        ticket = ""
+                                SuperCheckbox(
+                                    title = stringResource(Res.string.global),
+                                    checked = global,
+                                    onCheckedChange = {
+                                        global = it
+                                    }
+                                )
+                            }
+                            Row(
+                                modifier = Modifier.weight(1f),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                SuperCheckbox(
+                                    title = stringResource(Res.string.save_password),
+                                    checked = savePassword == "1",
+                                    onCheckedChange = {
+                                        savePassword = if (it) "1" else "0"
                                     }
                                 )
                             }
                         }
                     }
-                }
 
-                // 国际账号 & 保存密码
-                AnimatedVisibility(
-                    visible = !showTicketUrl && !showTicketInput
-                ) {
-                    Row(
-                        modifier = Modifier.padding(vertical = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                    // 登录 & 取消
+                    AnimatedVisibility(
+                        visible = !showTicketInput
                     ) {
-                        Row(
-                            modifier = Modifier.weight(1f),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            SuperCheckbox(
-                                title = stringResource(Res.string.global),
-                                checked = global,
-                                onCheckedChange = {
-                                    global = it
-                                }
-                            )
-                        }
-                        Row(
-                            modifier = Modifier.weight(1f),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            SuperCheckbox(
-                                title = stringResource(Res.string.save_password),
-                                checked = savePassword == "1",
-                                onCheckedChange = {
-                                    savePassword = if (it) "1" else "0"
-                                }
-                            )
-                        }
-                    }
-                }
+                        Row {
+                            TextButton(
+                                modifier = Modifier.weight(1f),
+                                text = stringResource(Res.string.login),
+                                colors = ButtonDefaults.textButtonColorsPrimary(),
+                                onClick = {
+                                    showMessage(message = messageLoginIn)
+                                    coroutineScope.launch {
+                                        val int = Login().login(
+                                            account = account,
+                                            password = password,
+                                            global = global,
+                                            savePassword = savePassword
+                                        )
+                                        when (int) {
+                                            0 -> {
+                                                showMessage(message = messageLoginSuccess)
+                                                onDismissRequest()
+                                                onLoginChange(1)
+                                            }
 
-                // 登录 & 取消
-                AnimatedVisibility(
-                    visible = !showTicketInput
-                ) {
-                    Row {
-                        TextButton(
-                            modifier = Modifier.weight(1f),
-                            text = stringResource(Res.string.login),
-                            colors = ButtonDefaults.textButtonColorsPrimary(),
-                            onClick = {
-                                showMessage(message = messageLoginIn)
-                                coroutineScope.launch {
-                                    val int = Login().login(
-                                        account = account,
-                                        password = password,
-                                        global = global,
-                                        savePassword = savePassword
-                                    )
-                                    when (int) {
-                                        0 -> {
-                                            showMessage(message = messageLoginSuccess)
-                                            showDialog.value = false
-                                            onLoginChange(1)
-                                        }
+                                            1 -> showMessage(message = messageEmpty)
+                                            2 -> showMessage(message = messageCrashInfo)
+                                            3 -> {
+                                                showMessage(message = messageError)
+                                                prefRemove("password")
+                                                prefRemove("passwordIv")
+                                            }
 
-                                        1 -> showMessage(message = messageEmpty)
-                                        2 -> showMessage(message = messageCrashInfo)
-                                        3 -> {
-                                            showMessage(message = messageError)
-                                            prefRemove("password")
-                                            prefRemove("passwordIv")
-                                        }
+                                            4 -> showMessage(message = messageSecurityError)
 
-                                        4 -> showMessage(message = messageSecurityError)
-
-                                        5 -> {
-                                            showTicketUrl = true
-                                            showTicketInput = true
-                                            showMessage(message = messageLoginTips)
-                                            val optionsStr = prefGet("2FAOptions") ?: "[]"
-                                            val options = Json.decodeFromString<List<Int>>(optionsStr)
-                                            val flag = if (options.contains(4)) 4 else 8
-                                            prefSet("2FAFlag", flag.toString())
+                                            5 -> {
+                                                showTicketUrl = true
+                                                showTicketInput = true
+                                                showMessage(message = messageLoginTips)
+                                                val optionsStr = prefGet("2FAOptions") ?: "[]"
+                                                val options = Json.decodeFromString<List<Int>>(optionsStr)
+                                                val flag = if (options.contains(4)) 4 else 8
+                                                prefSet("2FAFlag", flag.toString())
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        )
-                        Spacer(Modifier.width(16.dp))
-                        TextButton(
-                            modifier = Modifier.weight(1f),
-                            text = stringResource(Res.string.cancel),
-                            colors = ButtonDefaults.textButtonColors(),
-                            onClick = {
-                                showDialog.value = false
-                            }
-                        )
+                            )
+                            Spacer(Modifier.width(16.dp))
+                            TextButton(
+                                modifier = Modifier.weight(1f),
+                                text = stringResource(Res.string.cancel),
+                                colors = ButtonDefaults.textButtonColors(),
+                                onClick = {
+                                    onDismissRequest()
+                                }
+                            )
+                        }
                     }
                 }
-            }
-        }
+            })
     }
 
     // 退出登录
     if (isLogin == 1) {
         SuperDialog(
-            show = showDialog,
+            show = show,
             title = stringResource(Res.string.logout),
             summary = stringResource(Res.string.logout_confirm),
             onDismissRequest = {
-                showDialog.value = false
-            }
-        ) {
-            Row {
-                TextButton(
-                    modifier = Modifier.weight(1f),
-                    text = stringResource(Res.string.logout),
-                    colors = ButtonDefaults.textButtonColorsPrimary(),
-                    onClick = {
-                        coroutineScope.launch {
-                            val boolean = Login().logout()
-                            if (boolean) {
-                                showMessage(message = messageLogoutSuccessful)
-                                onLoginChange(0)
+                onDismissRequest()
+            },
+            content = {
+                Row {
+                    TextButton(
+                        modifier = Modifier.weight(1f),
+                        text = stringResource(Res.string.logout),
+                        colors = ButtonDefaults.textButtonColorsPrimary(),
+                        onClick = {
+                            coroutineScope.launch {
+                                val boolean = Login().logout()
+                                if (boolean) {
+                                    showMessage(message = messageLogoutSuccessful)
+                                    onLoginChange(0)
+                                }
                             }
+                            onDismissRequest()
                         }
-                        showDialog.value = false
-                    }
-                )
-                Spacer(Modifier.width(16.dp))
-                TextButton(
-                    modifier = Modifier.weight(1f),
-                    text = stringResource(Res.string.cancel),
-                    colors = ButtonDefaults.textButtonColors(),
-                    onClick = {
-                        showDialog.value = false
-                    }
-                )
-            }
-        }
+                    )
+                    Spacer(Modifier.width(16.dp))
+                    TextButton(
+                        modifier = Modifier.weight(1f),
+                        text = stringResource(Res.string.cancel),
+                        colors = ButtonDefaults.textButtonColors(),
+                        onClick = {
+                            onDismissRequest()
+                        }
+                    )
+                }
+            })
     }
 }

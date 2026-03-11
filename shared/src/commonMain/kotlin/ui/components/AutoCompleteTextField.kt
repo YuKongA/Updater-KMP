@@ -89,43 +89,46 @@ fun AutoCompleteTextField(
             }
         )
         SuperListPopup(
-            show = showPopup,
+            show = showPopup.value,
+            popupModifier = Modifier,
+            popupPositionProvider = AutoCompletePositionProvider,
+            alignment = PopupPositionProvider.Align.TopStart,
+            enableWindowDim = false,
             onDismissRequest = {
                 focusManager.clearFocus()
                 showPopup.value = false
             },
-            popupPositionProvider = AutoCompletePositionProvider,
-            alignment = PopupPositionProvider.Align.TopStart,
-            enableWindowDim = false,
-            maxHeight = 280.dp
-        ) {
-            AutoCompleteListPopupColumn {
-                if (filteredList.isNotEmpty()) {
-                    filteredList.forEachIndexed { index, item ->
+            maxHeight = 280.dp,
+            minWidth = 200.dp,
+            renderInRootScaffold = true,
+            content = {
+                AutoCompleteListPopupColumn {
+                    if (filteredList.isNotEmpty()) {
+                        filteredList.forEachIndexed { index, item ->
+                            AutoCompleteDropdownImpl(
+                                text = item,
+                                optionSize = filteredList.size,
+                                onSelectedIndexChange = {
+                                    hapticFeedback.performHapticFeedback(LongPress)
+                                    onValueChange(item)
+                                    focusManager.clearFocus()
+                                    showPopup.value = false
+                                },
+                                isSelected = false,
+                                index = index,
+                            )
+                        }
+                    } else {
                         AutoCompleteDropdownImpl(
-                            text = item,
-                            optionSize = filteredList.size,
-                            onSelectedIndexChange = {
-                                hapticFeedback.performHapticFeedback(LongPress)
-                                onValueChange(item)
-                                focusManager.clearFocus()
-                                showPopup.value = false
-                            },
+                            text = null,
+                            optionSize = 0,
+                            onSelectedIndexChange = {},
                             isSelected = false,
-                            index = index,
+                            index = 0,
                         )
                     }
-                } else {
-                    AutoCompleteDropdownImpl(
-                        text = null,
-                        optionSize = 0,
-                        onSelectedIndexChange = {},
-                        isSelected = false,
-                        index = 0,
-                    )
                 }
-            }
-        }
+            })
     }
 }
 

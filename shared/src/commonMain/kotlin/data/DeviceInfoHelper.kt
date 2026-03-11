@@ -57,7 +57,7 @@ object DeviceInfoHelper {
     /**
      * Update the current device list with remote or embedded data based
      */
-    suspend fun updateDeviceList() {
+    fun updateDeviceList() {
         currentDeviceList = DeviceListUtils.getDeviceList(embeddedDeviceList)
         rebuildMappings()
     }

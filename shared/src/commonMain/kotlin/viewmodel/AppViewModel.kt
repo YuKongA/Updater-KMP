@@ -51,7 +51,8 @@ data class AppUiState(
     val searchKeywords: List<String> = emptyList(),
     val searchKeywordsSelected: Int = 0,
     val showMenuPopup: Boolean = false,
-    val showDeviceSettingsDialog: Boolean = false
+    val showDeviceSettingsDialog: Boolean = false,
+    val showAboutDialog: Boolean = false
 )
 
 class AppViewModel : ViewModel() {
@@ -126,6 +127,10 @@ class AppViewModel : ViewModel() {
 
     fun updateShowDeviceSettingsDialog(show: Boolean) {
         _uiState.update { it.copy(showDeviceSettingsDialog = show) }
+    }
+
+    fun updateShowAboutDialog(show: Boolean) {
+        _uiState.update { it.copy(showAboutDialog = show) }
     }
 
     fun updateLoginState(state: Int) {

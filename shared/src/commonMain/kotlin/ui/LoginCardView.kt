@@ -90,7 +90,13 @@ fun LoginCardView(
             }
             Spacer(modifier = Modifier.weight(1f))
             if (!isWeb()) {
-                LoginDialog(showDialog, isLogin, onLoginChange)
+                LoginDialog(
+                    show = showDialog.value,
+                    onShow = { showDialog.value = true },
+                    onDismissRequest = { showDialog.value = false },
+                    isLogin = isLogin,
+                    onLoginChange = onLoginChange
+                )
             }
         }
     }
