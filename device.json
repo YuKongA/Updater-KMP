@@ -198,8 +198,8 @@
         { "deviceName": "REDMI Note 15 Pro+ / POCO M8 Pro", "deviceCodeName": "flourite", "deviceCode": "PR" },
         { "deviceName": "REDMI Turbo 5 / POCO X8 Pro", "deviceCodeName": "klee", "deviceCode": "PJ" },
         { "deviceName": "REDMI Turbo 5 Max / POCO X8 Pro Max", "deviceCodeName": "dash", "deviceCode": "PL" },
-        { "deviceName": "REDMI A7 Pro / POCO C81", "deviceCodeName": "arctic", "deviceCode": "BV" },
-        { "deviceName": "REDMI 17 5G / REDMI A7 Pro 5G / POCO C85x 5G", "deviceCodeName": "somalia", "deviceCode": "BW" },
+        { "deviceName": "REDMI A7 Pro / POCO C81 / C81 Pro", "deviceCodeName": "arctic", "deviceCode": "BV" },
+        { "deviceName": "REDMI 17 5G / 15A 5G / A7 Pro 5G / POCO C85x", "deviceCodeName": "somalia", "deviceCode": "BW" },
         { "deviceName": "Xiaomi Pad 8", "deviceCodeName": "yupei", "deviceCode": "PZ" },
         { "deviceName": "Xiaomi Pad 8 Pro", "deviceCodeName": "piano", "deviceCode": "PY" }
     ],
