@@ -1,7 +1,7 @@
 [versions]
 android-gradle-plugin = "9.1.0"
 androidx-activity-compose = "1.12.4"
-androidx-lifecycle-compose = "2.9.6"
+androidx-lifecycle-compose = "2.10.0"
 compose-hotReload = "1.0.0"
 compose-plugin = "1.10.3"
 cryptography = "0.5.0"
