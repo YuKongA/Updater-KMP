@@ -11,7 +11,7 @@ jna = "5.18.1"
 kotlin = "2.3.20"
 kotlinx-serialization-json = "1.10.0"
 kotlinx-datetime = "0.7.1"
-ktor-client = "3.4.1"
+ktor-client = "3.4.2"
 miuix = "0.8.8"
 
 [libraries]
