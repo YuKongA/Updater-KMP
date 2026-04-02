@@ -23,10 +23,8 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.extra.SuperDialog
+import top.yukonga.miuix.kmp.overlay.OverlayDialog
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.utils.Platform
-import top.yukonga.miuix.kmp.utils.platform
 import updater.shared.generated.resources.Res
 import updater.shared.generated.resources.about
 import updater.shared.generated.resources.app_name
@@ -44,7 +42,7 @@ fun AboutDialog(
     val focusManager = LocalFocusManager.current
 
     IconButton(
-        modifier = Modifier.padding(start = if (platform() != Platform.IOS && platform() != Platform.Android) 10.dp else 20.dp),
+        modifier = Modifier,
         onClick = {
             onShow()
             focusManager.clearFocus()
@@ -60,7 +58,7 @@ fun AboutDialog(
         )
     }
 
-    SuperDialog(
+    OverlayDialog(
         show = show,
         title = stringResource(Res.string.about),
         onDismissRequest = {

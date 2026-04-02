@@ -41,8 +41,8 @@ import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.basic.TextField
-import top.yukonga.miuix.kmp.extra.SuperCheckbox
-import top.yukonga.miuix.kmp.extra.SuperDialog
+import top.yukonga.miuix.kmp.preference.CheckboxPreference
+import top.yukonga.miuix.kmp.overlay.OverlayDialog
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.extended.Blocklist
 import top.yukonga.miuix.kmp.icon.extended.RemoveContact
@@ -143,7 +143,7 @@ fun LoginDialog(
 
     // 登录对话框
     if (isLogin != 1) {
-        SuperDialog(
+        OverlayDialog(
             show = show,
             title = stringResource(Res.string.login),
             onDismissRequest = {
@@ -339,7 +339,7 @@ fun LoginDialog(
                                 modifier = Modifier.weight(1f),
                                 horizontalArrangement = Arrangement.Center
                             ) {
-                                SuperCheckbox(
+                                CheckboxPreference(
                                     title = stringResource(Res.string.global),
                                     checked = global,
                                     onCheckedChange = {
@@ -351,7 +351,7 @@ fun LoginDialog(
                                 modifier = Modifier.weight(1f),
                                 horizontalArrangement = Arrangement.Center
                             ) {
-                                SuperCheckbox(
+                                CheckboxPreference(
                                     title = stringResource(Res.string.save_password),
                                     checked = savePassword == "1",
                                     onCheckedChange = {
@@ -427,7 +427,7 @@ fun LoginDialog(
 
     // 退出登录
     if (isLogin == 1) {
-        SuperDialog(
+        OverlayDialog(
             show = show,
             title = stringResource(Res.string.logout),
             summary = stringResource(Res.string.logout_confirm),

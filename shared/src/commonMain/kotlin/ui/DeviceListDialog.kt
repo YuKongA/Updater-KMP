@@ -25,8 +25,8 @@ import top.yukonga.miuix.kmp.basic.BasicComponent
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextButton
-import top.yukonga.miuix.kmp.extra.SuperDialog
-import top.yukonga.miuix.kmp.extra.SuperDropdown
+import top.yukonga.miuix.kmp.overlay.OverlayDialog
+import top.yukonga.miuix.kmp.preference.OverlayDropdownPreference
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import updater.shared.generated.resources.Res
 import updater.shared.generated.resources.cancel
@@ -63,7 +63,7 @@ fun DeviceListDialog(
         source.value = DeviceListUtils.getDeviceListSource()
     }
 
-    SuperDialog(
+    OverlayDialog(
         show = show,
         title = stringResource(Res.string.device_list_settings),
         onDismissRequest = {
@@ -71,7 +71,7 @@ fun DeviceListDialog(
         },
         insideMargin = DpSize(0.dp, 24.dp),
         content = {
-            SuperDropdown(
+            OverlayDropdownPreference(
                 title = stringResource(Res.string.device_list_source),
                 items = listOf(
                     stringResource(Res.string.device_list_remote),

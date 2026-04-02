@@ -40,7 +40,7 @@ import top.yukonga.miuix.kmp.basic.DropdownDefaults
 import top.yukonga.miuix.kmp.basic.PopupPositionProvider
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextField
-import top.yukonga.miuix.kmp.extra.SuperListPopup
+import top.yukonga.miuix.kmp.overlay.OverlayListPopup
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import kotlin.math.min
 
@@ -88,7 +88,7 @@ fun AutoCompleteTextField(
                 isFocused = focusState.isFocused
             }
         )
-        SuperListPopup(
+        OverlayListPopup(
             show = showPopup.value,
             popupModifier = Modifier,
             popupPositionProvider = AutoCompletePositionProvider,

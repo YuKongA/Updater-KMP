@@ -18,7 +18,11 @@ kotlin {
 
     android {
         androidResources.enable = true
-        compileSdk = ProjectConfig.Android.COMPILE_SDK
+        compileSdk {
+            version = release(ProjectConfig.Android.COMPILE_SDK) {
+                minorApiLevel = ProjectConfig.Android.COMPILE_SDK_MINOR
+            }
+        }
         minSdk = ProjectConfig.Android.MIN_SDK
         namespace = "${ProjectConfig.PACKAGE_NAME}.shared"
     }
@@ -65,9 +69,10 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
             implementation(libs.ktor.client.core)
-            implementation(libs.miuix)
+            implementation(libs.miuix.ui)
             implementation(libs.miuix.icons)
-            implementation(libs.haze)
+            implementation(libs.miuix.blur)
+            implementation(libs.miuix.preference)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)

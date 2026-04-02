@@ -1,18 +1,17 @@
 [versions]
 android-gradle-plugin = "9.1.0"
-androidx-activity-compose = "1.12.4"
+androidx-activity-compose = "1.13.0"
 androidx-lifecycle-compose = "2.10.0"
 compose-hotReload = "1.0.0"
 compose-plugin = "1.10.3"
 cryptography = "0.5.0"
-haze = "1.7.2"
 image-loader = "1.10.0"
 jna = "5.18.1"
 kotlin = "2.3.20"
 kotlinx-serialization-json = "1.10.0"
 kotlinx-datetime = "0.7.1"
 ktor-client = "3.4.2"
-miuix = "0.8.8"
+miuix = "0.9.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
@@ -24,7 +23,6 @@ cryptography-core = { module = "dev.whyoleg.cryptography:cryptography-core", ver
 cryptography-provider-apple = { module = "dev.whyoleg.cryptography:cryptography-provider-apple", version.ref = "cryptography" }
 cryptography-provider-jdk = { module = "dev.whyoleg.cryptography:cryptography-provider-jdk", version.ref = "cryptography" }
 cryptography-provider-webcrypto = { module = "dev.whyoleg.cryptography:cryptography-provider-webcrypto", version.ref = "cryptography" }
-haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 image-loader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "image-loader" }
 jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
@@ -34,8 +32,10 @@ ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor-cl
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor-client" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor-client" }
 ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor-client" }
-miuix = { module = "top.yukonga.miuix.kmp:miuix", version.ref = "miuix" }
+miuix-ui = { module = "top.yukonga.miuix.kmp:miuix-ui", version.ref = "miuix" }
+miuix-preference = { module = "top.yukonga.miuix.kmp:miuix-preference", version.ref = "miuix" }
 miuix-icons = { module = "top.yukonga.miuix.kmp:miuix-icons", version.ref = "miuix" }
+miuix-blur = { module = "top.yukonga.miuix.kmp:miuix-blur", version.ref = "miuix" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }

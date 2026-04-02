@@ -29,8 +29,8 @@ import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.SpinnerEntry
 import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.basic.TextField
-import top.yukonga.miuix.kmp.extra.SuperDropdown
-import top.yukonga.miuix.kmp.extra.SuperSpinner
+import top.yukonga.miuix.kmp.preference.OverlayDropdownPreference
+import top.yukonga.miuix.kmp.preference.OverlaySpinnerPreference
 import ui.components.AutoCompleteTextField
 import updater.shared.generated.resources.Res
 import updater.shared.generated.resources.android_version
@@ -69,7 +69,7 @@ private fun SearchHistoryView(
                 .padding(horizontal = 12.dp)
                 .padding(top = 12.dp)
         ) {
-            SuperSpinner(
+            OverlaySpinnerPreference(
                 title = stringResource(Res.string.search_history),
                 items = spinnerOptions,
                 selectedIndex = searchKeywordsSelected,
@@ -186,7 +186,7 @@ fun BasicViews(
             modifier = Modifier
                 .padding(horizontal = 12.dp)
         ) {
-            SuperDropdown(
+            OverlayDropdownPreference(
                 title = stringResource(Res.string.android_version),
                 items = DeviceInfoHelper.androidVersions,
                 selectedIndex = androidVersionSelected.value,
@@ -199,7 +199,7 @@ fun BasicViews(
                     focusManager.clearFocus()
                 }
             )
-            SuperDropdown(
+            OverlayDropdownPreference(
                 title = stringResource(Res.string.region_code),
                 items = DeviceInfoHelper.regionNames,
                 selectedIndex = regionSelected.value,
@@ -212,7 +212,7 @@ fun BasicViews(
                     focusManager.clearFocus()
                 }
             )
-            SuperDropdown(
+            OverlayDropdownPreference(
                 title = stringResource(Res.string.carrier_code),
                 items = DeviceInfoHelper.carrierNames,
                 selectedIndex = carrierSelected.value,

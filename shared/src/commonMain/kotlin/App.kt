@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -40,11 +41,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.HazeStyle
-import dev.chrisbanes.haze.HazeTint
-import dev.chrisbanes.haze.hazeEffect
-import dev.chrisbanes.haze.hazeSource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.DropdownImpl
@@ -61,9 +57,16 @@ import top.yukonga.miuix.kmp.basic.SmallTopAppBar
 import top.yukonga.miuix.kmp.basic.TopAppBar
 import top.yukonga.miuix.kmp.basic.VerticalDivider
 import top.yukonga.miuix.kmp.basic.rememberTopAppBarState
-import top.yukonga.miuix.kmp.extra.SuperListPopup
+import top.yukonga.miuix.kmp.blur.BlendColorEntry
+import top.yukonga.miuix.kmp.blur.BlurColors
+import top.yukonga.miuix.kmp.blur.LayerBackdrop
+import top.yukonga.miuix.kmp.blur.isRenderEffectSupported
+import top.yukonga.miuix.kmp.blur.layerBackdrop
+import top.yukonga.miuix.kmp.blur.rememberLayerBackdrop
+import top.yukonga.miuix.kmp.blur.textureBlur
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.extended.Settings
+import top.yukonga.miuix.kmp.overlay.OverlayListPopup
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.utils.Platform
 import top.yukonga.miuix.kmp.utils.overScrollVertical
@@ -96,14 +99,8 @@ fun App(
         val scrollBehavior = MiuixScrollBehavior(rememberTopAppBarState())
         val focusManager = LocalFocusManager.current
 
-        val hazeState = remember { HazeState() }
+        val backdrop = rememberLayerBackdrop()
         val surfaceColor = MiuixTheme.colorScheme.surface
-        val hazeStyle = remember(surfaceColor) {
-            HazeStyle(
-                backgroundColor = surfaceColor,
-                tint = HazeTint(surfaceColor.copy(0.8f))
-            )
-        }
 
         val density = LocalDensity.current
         val isMobile = platform() == Platform.Android || platform() == Platform.IOS
@@ -118,8 +115,8 @@ fun App(
         ) {
             if (containerWidth < 768.dp) {
                 PortraitAppView(
-                    hazeState = hazeState,
-                    hazeStyle = hazeStyle,
+                    backdrop = backdrop,
+                    surfaceColor = surfaceColor,
                     scrollBehavior = scrollBehavior,
                     focusManager = focusManager,
                     isDarkTheme = isDarkTheme,
@@ -149,7 +146,7 @@ private fun MenuActions(
     onShowDeviceSettings: () -> Unit,
     onShowMenuPopupChange: (Boolean) -> Unit
 ) {
-    SuperListPopup(
+    OverlayListPopup(
         show = showMenuPopup,
         popupPositionProvider = ListPopupDefaults.ContextMenuPositionProvider,
         alignment = PopupPositionProvider.Align.TopEnd,
@@ -186,9 +183,7 @@ private fun MenuActions(
     )
 
     IconButton(
-        modifier = Modifier
-            .padding(end = if (platform() != Platform.IOS && platform() != Platform.Android) 10.dp else 20.dp)
-            .size(40.dp),
+        modifier = Modifier.size(40.dp),
         onClick = {
             onShowMenuPopupChange(true)
             focusManager.clearFocus()
@@ -205,19 +200,21 @@ private fun MenuActions(
 
 @Composable
 private fun PortraitAppView(
-    hazeState: HazeState,
-    hazeStyle: HazeStyle,
+    backdrop: LayerBackdrop,
+    surfaceColor: Color,
     scrollBehavior: ScrollBehavior,
     focusManager: FocusManager,
     isDarkTheme: Boolean,
     uiState: AppUiState,
     viewModel: AppViewModel
 ) {
+    val blurSupported = isRenderEffectSupported()
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                color = Color.Transparent,
+                color = if (blurSupported) Color.Transparent else MiuixTheme.colorScheme.surface,
                 title = stringResource(Res.string.app_name),
                 scrollBehavior = scrollBehavior,
                 navigationIcon = {
@@ -241,10 +238,18 @@ private fun PortraitAppView(
                         onDismissRequest = { viewModel.updateShowDeviceSettingsDialog(false) }
                     )
                 },
-                modifier = Modifier.hazeEffect(hazeState) {
-                    style = hazeStyle
-                    blurRadius = 25.dp
-                    noiseFactor = 0f
+                modifier = if (blurSupported) {
+                    Modifier.textureBlur(
+                        backdrop = backdrop,
+                        shape = RectangleShape,
+                        blurRadius = 25f * LocalDensity.current.density,
+                        colors = BlurColors(
+                            blendColors = listOf(BlendColorEntry(color = surfaceColor.copy(0.8f)))
+                        ),
+                        noiseCoefficient = 0f
+                    )
+                } else {
+                    Modifier
                 }
             )
         }
@@ -252,7 +257,7 @@ private fun PortraitAppView(
         LazyColumn(
             modifier = Modifier
                 .fillMaxHeight()
-                .hazeSource(state = hazeState)
+                .then(if (blurSupported) Modifier.layerBackdrop(backdrop) else Modifier)
                 .overScrollVertical()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .imePadding(),
