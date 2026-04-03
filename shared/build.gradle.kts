@@ -64,7 +64,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel.compose)
             implementation(libs.androidx.lifecycle.runtime.compose)
             // Added
-            implementation(libs.cryptography.core)
+            implementation(libs.cryptography.provider.optimal)
             implementation(libs.image.loader)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
@@ -77,25 +77,21 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
             // Added
-            implementation(libs.cryptography.provider.jdk)
             implementation(libs.ktor.client.cio)
         }
         appleMain.dependencies {
             // Added
-            implementation(libs.cryptography.provider.apple)
             implementation(libs.ktor.client.darwin)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             // Added
-            implementation(libs.cryptography.provider.jdk)
             implementation(libs.ktor.client.cio)
             implementation(libs.jna)
             implementation(libs.jna.platform)
         }
         webMain.dependencies {
             // Added
-            implementation(libs.cryptography.provider.webcrypto)
             implementation(libs.ktor.client.js)
         }
     }

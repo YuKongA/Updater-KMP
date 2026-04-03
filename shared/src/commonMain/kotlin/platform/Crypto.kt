@@ -3,21 +3,19 @@ package platform
 import dev.whyoleg.cryptography.CryptographyProvider
 import dev.whyoleg.cryptography.DelicateCryptographyApi
 import dev.whyoleg.cryptography.algorithms.AES
+import dev.whyoleg.cryptography.operations.IvCipher
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 private val iv = "0102030405060708".encodeToByteArray()
-
-expect suspend fun provider(): CryptographyProvider
 
 expect fun generateKey()
 
 /**
  * Generate a Cipher to be used by the xiaomi server.
  */
-suspend fun miuiCipher(securityKey: ByteArray): AES.IvCipher {
-    val provider = provider()
-    val aesCBC = provider.get(AES.CBC) // AES CBC
+suspend fun miuiCipher(securityKey: ByteArray): IvCipher {
+    val aesCBC = CryptographyProvider.Default.get(AES.CBC) // AES CBC
     val key = aesCBC.keyDecoder().decodeFromByteArray(AES.Key.Format.RAW, securityKey)
     return key.cipher(true) // PKCS5Padding
 }

@@ -23,7 +23,7 @@ import platform.httpClientPlatform
 import platform.prefGet
 import platform.prefRemove
 import platform.prefSet
-import platform.provider
+import dev.whyoleg.cryptography.CryptographyProvider
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -251,7 +251,7 @@ class Login {
      */
     @OptIn(DelicateCryptographyApi::class)
     suspend fun md5Hash(input: String): String {
-        val md = provider().get(MD5)
+        val md = CryptographyProvider.Default.get(MD5)
         return md.hasher().hash(input.encodeToByteArray()).joinToString("") {
             val hex = (it.toInt() and 0xFF).toString(16).uppercase()
             if (hex.length == 1) "0$hex" else hex

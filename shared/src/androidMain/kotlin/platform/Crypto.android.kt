@@ -1,12 +1,8 @@
 package platform
 
-import dev.whyoleg.cryptography.CryptographyProvider
-import dev.whyoleg.cryptography.providers.jdk.JDK
 import misc.KeyStoreUtils
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
-
-actual suspend fun provider() = CryptographyProvider.JDK
 
 @OptIn(ExperimentalEncodingApi::class)
 actual fun ownEncrypt(string: String): Pair<String, String> {
