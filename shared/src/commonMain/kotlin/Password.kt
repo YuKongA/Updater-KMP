@@ -5,7 +5,7 @@ import platform.prefGet
 import platform.prefRemove
 import platform.prefSet
 
-class Password {
+object Password {
     /**
      * Save Xiaomi's account & password.
      *

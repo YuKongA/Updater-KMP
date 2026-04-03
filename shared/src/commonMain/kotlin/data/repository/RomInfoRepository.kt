@@ -5,14 +5,12 @@ import io.ktor.client.call.body
 import io.ktor.client.request.cookie
 import io.ktor.client.request.forms.submitForm
 import io.ktor.http.Parameters
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
 import platform.httpClientPlatform
 import platform.miuiDecrypt
 import platform.miuiEncrypt
-import platform.prefGet
 import utils.isWeb
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -21,22 +19,8 @@ class RomInfoRepository {
     private val CN_RECOVERY_URL = "https://update.miui.com/updates/miotaV3.php"
     private val INTL_RECOVERY_URL = "https://update.intl.miui.com/updates/miotaV3.php"
 
-    private var accountType = "CN"
-    private var port = "1"
-    private var ssecurity = ""
-    private var securityKey = "miuiotavalided11".encodeToByteArray()
-    private var serviceToken = ""
-    private var userId = ""
-    private var cUserId = ""
-
-    fun setDefaultRequestInfo() {
-        accountType = "CN"
-        port = "1"
-        ssecurity = ""
-        securityKey = "miuiotavalided11".encodeToByteArray()
-        serviceToken = ""
-        userId = ""
-    }
+    private val client = httpClientPlatform()
+    private val defaultSecurityKey = "miuiotavalided11".encodeToByteArray()
 
     fun generateJson(
         branch: String,
@@ -79,25 +63,36 @@ class RomInfoRepository {
         regionCode: String,
         romVersion: String,
         androidVersion: String,
-        isLogin: Boolean
+        loginData: DataHelper.LoginData?
     ): String {
-        if (prefGet("loginInfo") != null && isLogin) {
-            val loginInfo = prefGet("loginInfo")?.let { Json.decodeFromString<DataHelper.LoginData>(it) }
-            val authResult = loginInfo?.authResult
-            if (authResult != "3") {
-                accountType = loginInfo?.accountType.toString().ifEmpty { "CN" }
-                port = "2"
-                ssecurity = loginInfo?.ssecurity.toString()
-                securityKey = Base64.Mime.decode(ssecurity)
-                serviceToken = loginInfo?.serviceToken.toString()
-                userId = loginInfo?.userId.toString()
-                cUserId = loginInfo?.cUserId.toString()
-            } else setDefaultRequestInfo()
-        } else setDefaultRequestInfo()
+        val accountType: String
+        val port: String
+        val ssecurity: String
+        val securityKey: ByteArray
+        val serviceToken: String
+        val userId: String
+        val cUserId: String
+
+        if (loginData != null && loginData.authResult != "3") {
+            accountType = loginData.accountType?.ifEmpty { "CN" } ?: "CN"
+            port = "2"
+            ssecurity = loginData.ssecurity.orEmpty()
+            securityKey = Base64.Mime.decode(ssecurity)
+            serviceToken = loginData.serviceToken.orEmpty()
+            userId = loginData.userId.orEmpty()
+            cUserId = loginData.cUserId.orEmpty()
+        } else {
+            accountType = "CN"
+            port = "1"
+            ssecurity = ""
+            securityKey = defaultSecurityKey
+            serviceToken = ""
+            userId = ""
+            cUserId = ""
+        }
 
         val jsonData = generateJson(branch, codeNameExt, regionCode, romVersion, androidVersion, userId, ssecurity, serviceToken)
         val encryptedText = miuiEncrypt(jsonData, securityKey)
-        val client = httpClientPlatform()
         val parameters = Parameters.build {
             append("q", encryptedText)
             append("t", serviceToken)

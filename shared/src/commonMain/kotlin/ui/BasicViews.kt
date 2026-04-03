@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import data.DataHelper
 import data.DeviceInfoHelper
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
@@ -46,22 +47,21 @@ import utils.MessageUtils.Companion.showMessage
 
 @Composable
 private fun SearchHistoryView(
-    searchKeywords: List<String>,
-    searchKeywordsSelected: Int,
-    onHistorySelect: (Int, String) -> Unit
+    searchHistory: List<DataHelper.SearchHistoryEntry>,
+    searchHistorySelected: Int,
+    onHistorySelect: (Int, DataHelper.SearchHistoryEntry) -> Unit
 ) {
     AnimatedVisibility(
-        visible = searchKeywords.isNotEmpty(),
+        visible = searchHistory.isNotEmpty(),
         enter = fadeIn() + expandVertically(),
         exit = fadeOut() + shrinkVertically()
     ) {
         val focusManager = LocalFocusManager.current
-        val spinnerOptions = searchKeywords.map { keyword ->
-            val parts = keyword.split("-")
+        val spinnerOptions = searchHistory.map { entry ->
             SpinnerEntry(
                 icon = null,
-                title = "${parts.getOrElse(0) { "" }.ifEmpty { "Unknown" }} (${parts.getOrElse(1) { "" }})",
-                summary = "${parts.getOrElse(2) { "" }}-${parts.getOrElse(3) { "" }}-${parts.getOrElse(4) { "" }}-${parts.getOrElse(5) { "" }}",
+                title = "${entry.deviceName.ifEmpty { "Unknown" }} (${entry.codeName})",
+                summary = "${entry.deviceRegion}-${entry.deviceCarrier}-${entry.androidVersion}-${entry.systemVersion}",
             )
         }
         Card(
@@ -72,10 +72,10 @@ private fun SearchHistoryView(
             OverlaySpinnerPreference(
                 title = stringResource(Res.string.search_history),
                 items = spinnerOptions,
-                selectedIndex = searchKeywordsSelected,
+                selectedIndex = searchHistorySelected,
                 showValue = false,
                 onSelectedIndexChange = { index ->
-                    onHistorySelect(index, searchKeywords[index])
+                    onHistorySelect(index, searchHistory[index])
                 },
                 maxHeight = 280.dp,
                 modifier = Modifier.clickable {
@@ -94,16 +94,16 @@ fun BasicViews(
     deviceRegion: String,
     deviceCarrier: String,
     systemVersion: String,
-    searchKeywords: List<String>,
-    searchKeywordsSelected: Int,
+    searchHistory: List<DataHelper.SearchHistoryEntry>,
+    searchHistorySelected: Int,
     onDeviceNameChange: (String) -> Unit,
     onCodeNameChange: (String) -> Unit,
     onAndroidVersionChange: (String) -> Unit,
     onDeviceRegionChange: (String) -> Unit,
     onDeviceCarrierChange: (String) -> Unit,
     onSystemVersionChange: (String) -> Unit,
-    onSearchKeywordsSelectedChange: (Int) -> Unit,
-    onHistorySelect: (String) -> Unit,
+    onSearchHistorySelectedChange: (Int) -> Unit,
+    onHistorySelect: (DataHelper.SearchHistoryEntry) -> Unit,
     onSubmit: () -> Unit
 ) {
     val androidVersionSelected = remember(androidVersion) {
@@ -227,11 +227,11 @@ fun BasicViews(
             )
         }
         SearchHistoryView(
-            searchKeywords = searchKeywords,
-            searchKeywordsSelected = searchKeywordsSelected,
-            onHistorySelect = { index, keyword ->
-                onHistorySelect(keyword)
-                onSearchKeywordsSelectedChange(index)
+            searchHistory = searchHistory,
+            searchHistorySelected = searchHistorySelected,
+            onHistorySelect = { index, entry ->
+                onHistorySelect(entry)
+                onSearchHistorySelectedChange(index)
             }
         )
         TextButton(

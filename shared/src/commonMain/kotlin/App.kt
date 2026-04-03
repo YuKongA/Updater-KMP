@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +45,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import data.DataHelper
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.DropdownImpl
@@ -88,9 +90,11 @@ import updater.shared.generated.resources.app_name
 import updater.shared.generated.resources.clear_search_history
 import updater.shared.generated.resources.device_list_settings
 import updater.shared.generated.resources.icon
+import utils.MessageUtils
 import utils.MessageUtils.Companion.Snackbar
 import viewmodel.AppUiState
 import viewmodel.AppViewModel
+import viewmodel.UiEvent
 
 @Composable
 fun App(
@@ -101,6 +105,14 @@ fun App(
         isDarkTheme = isDarkTheme
     ) {
         val uiState by appViewModel.uiState.collectAsState()
+
+        LaunchedEffect(Unit) {
+            appViewModel.uiEvent.collect { event ->
+                when (event) {
+                    is UiEvent.ShowMessage -> MessageUtils.showMessage(event.message, event.duration)
+                }
+            }
+        }
 
         val scrollBehavior = MiuixScrollBehavior(rememberTopAppBarState())
         val focusManager = LocalFocusManager.current
@@ -145,7 +157,7 @@ fun App(
 
 @Composable
 private fun MenuActions(
-    searchKeywords: List<String>,
+    searchHistory: List<DataHelper.SearchHistoryEntry>,
     showMenuPopup: Boolean,
     focusManager: FocusManager,
     onClearSearchHistory: () -> Unit,
@@ -163,7 +175,7 @@ private fun MenuActions(
             ListPopupColumn {
                 DropdownImpl(
                     text = stringResource(Res.string.device_list_settings),
-                    optionSize = if (searchKeywords.isNotEmpty()) 2 else 1,
+                    optionSize = if (searchHistory.isNotEmpty()) 2 else 1,
                     isSelected = false,
                     onSelectedIndexChange = {
                         onShowMenuPopupChange(false)
@@ -172,7 +184,7 @@ private fun MenuActions(
                     index = 0
                 )
 
-                if (searchKeywords.isNotEmpty()) {
+                if (searchHistory.isNotEmpty()) {
                     DropdownImpl(
                         text = stringResource(Res.string.clear_search_history),
                         optionSize = 2,
@@ -232,7 +244,7 @@ private fun PortraitAppView(
                 },
                 actions = {
                     MenuActions(
-                        searchKeywords = uiState.searchKeywords,
+                        searchHistory = uiState.searchHistory,
                         showMenuPopup = uiState.showMenuPopup,
                         focusManager = focusManager,
                         onClearSearchHistory = { viewModel.clearSearchHistory() },
@@ -276,7 +288,12 @@ private fun PortraitAppView(
                         .navigationBarsPadding()
                 ) {
                     Column {
-                        LoginCardView(uiState.isLogin, isDarkTheme, onLoginChange = { viewModel.updateLoginState(it) })
+                        LoginCardView(
+                            uiState = uiState,
+                            isDarkTheme = isDarkTheme,
+                            onShowLoginDialog = { viewModel.showLoginDialog() },
+                            onLoginEvent = { viewModel.onLoginEvent(it) }
+                        )
                         BasicViews(
                             deviceName = uiState.deviceName,
                             codeName = uiState.codeName,
@@ -284,15 +301,15 @@ private fun PortraitAppView(
                             deviceRegion = uiState.deviceRegion,
                             deviceCarrier = uiState.deviceCarrier,
                             systemVersion = uiState.systemVersion,
-                            searchKeywords = uiState.searchKeywords,
-                            searchKeywordsSelected = uiState.searchKeywordsSelected,
+                            searchHistory = uiState.searchHistory,
+                            searchHistorySelected = uiState.searchHistorySelected,
                             onDeviceNameChange = { viewModel.updateDeviceName(it) },
                             onCodeNameChange = { viewModel.updateCodeName(it) },
                             onAndroidVersionChange = { viewModel.updateAndroidVersion(it) },
                             onDeviceRegionChange = { viewModel.updateDeviceRegion(it) },
                             onDeviceCarrierChange = { viewModel.updateDeviceCarrier(it) },
                             onSystemVersionChange = { viewModel.updateSystemVersion(it) },
-                            onSearchKeywordsSelectedChange = { viewModel.updateSearchKeywordsSelected(it) },
+                            onSearchHistorySelectedChange = { viewModel.updateSearchHistorySelected(it) },
                             onHistorySelect = { viewModel.loadSearchHistory(it) },
                             onSubmit = { viewModel.fetchRomInfo() }
                         )
@@ -344,7 +361,7 @@ private fun LandscapeAppView(
                     },
                     actions = {
                         MenuActions(
-                            searchKeywords = uiState.searchKeywords,
+                            searchHistory = uiState.searchHistory,
                             showMenuPopup = uiState.showMenuPopup,
                             focusManager = focusManager,
                             onClearSearchHistory = { viewModel.clearSearchHistory() },
@@ -369,7 +386,12 @@ private fun LandscapeAppView(
                     overscrollEffect = null
                 ) {
                     item {
-                        LoginCardView(uiState.isLogin, isDarkTheme, onLoginChange = { viewModel.updateLoginState(it) })
+                        LoginCardView(
+                            uiState = uiState,
+                            isDarkTheme = isDarkTheme,
+                            onShowLoginDialog = { viewModel.showLoginDialog() },
+                            onLoginEvent = { viewModel.onLoginEvent(it) }
+                        )
                         BasicViews(
                             deviceName = uiState.deviceName,
                             codeName = uiState.codeName,
@@ -377,15 +399,15 @@ private fun LandscapeAppView(
                             deviceRegion = uiState.deviceRegion,
                             deviceCarrier = uiState.deviceCarrier,
                             systemVersion = uiState.systemVersion,
-                            searchKeywords = uiState.searchKeywords,
-                            searchKeywordsSelected = uiState.searchKeywordsSelected,
+                            searchHistory = uiState.searchHistory,
+                            searchHistorySelected = uiState.searchHistorySelected,
                             onDeviceNameChange = { viewModel.updateDeviceName(it) },
                             onCodeNameChange = { viewModel.updateCodeName(it) },
                             onAndroidVersionChange = { viewModel.updateAndroidVersion(it) },
                             onDeviceRegionChange = { viewModel.updateDeviceRegion(it) },
                             onDeviceCarrierChange = { viewModel.updateDeviceCarrier(it) },
                             onSystemVersionChange = { viewModel.updateSystemVersion(it) },
-                            onSearchKeywordsSelectedChange = { viewModel.updateSearchKeywordsSelected(it) },
+                            onSearchHistorySelectedChange = { viewModel.updateSearchHistorySelected(it) },
                             onHistorySelect = { viewModel.loadSearchHistory(it) },
                             onSubmit = { viewModel.fetchRomInfo() }
                         )

@@ -2,8 +2,8 @@
 -dontwarn okhttp3.internal.platform.**
 -dontwarn io.ktor.network.sockets.SocketBase**
 -dontwarn kotlinx.datetime.**
+-dontwarn dev.whyoleg.cryptography.providers.jdk.internal.BouncyCastleBridge
 
 -keep class com.sun.jna.** { *; }
 -keep class * implements com.sun.jna.** { *; }
 -keep class dev.whyoleg.cryptography.providers.jdk.JdkCryptographyProviderContainer
-

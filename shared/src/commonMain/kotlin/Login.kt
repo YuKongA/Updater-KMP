@@ -27,7 +27,7 @@ import dev.whyoleg.cryptography.CryptographyProvider
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-class Login {
+object Login {
     private val client = httpClientPlatform().config {
         install(HttpCookies) {
             storage = AcceptAllCookiesStorage()
@@ -65,9 +65,9 @@ class Login {
     ): Int {
         if (account.isEmpty() || password.isEmpty()) return 1 // 1: 输入为空
         if (savePassword == "1") {
-            Password().savePassword(account, password)
+            Password.savePassword(account, password)
         } else {
-            Password().deletePassword()
+            Password.deletePassword()
         }
         try {
             if (flag != null && ticket.isEmpty()) {

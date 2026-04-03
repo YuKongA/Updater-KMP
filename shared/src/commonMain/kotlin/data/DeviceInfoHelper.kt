@@ -43,10 +43,10 @@ object DeviceInfoHelper {
      *
      */
     private val embeddedDeviceList = listOf(
-        Device("Xiaomi 15S Pro", "dijun", "OD"),
-        Device("Xiaomi 15", "dada", "OC"),
-        Device("Xiaomi 15 Pro", "haotian", "OB"),
-        Device("Xiaomi 15 Ultra", "xuanyuan", "OA"),
+        Device("Xiaomi 17", "pudding", "PC"),
+        Device("Xiaomi 17 Pro", "pandora", "BL"),
+        Device("Xiaomi 17 Pro Max", "popsicle", "PB"),
+        Device("Xiaomi 17 Ultra", "nezha", "PA"),
     )
 
     /**

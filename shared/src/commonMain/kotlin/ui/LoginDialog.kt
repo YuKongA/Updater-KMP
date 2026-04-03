@@ -1,7 +1,5 @@
 package ui
 
-import Login
-import Password
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,108 +26,73 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.stringResource
 import platform.prefGet
-import platform.prefRemove
-import platform.prefSet
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.basic.TextField
-import top.yukonga.miuix.kmp.preference.CheckboxPreference
-import top.yukonga.miuix.kmp.overlay.OverlayDialog
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.extended.Blocklist
 import top.yukonga.miuix.kmp.icon.extended.RemoveContact
 import top.yukonga.miuix.kmp.icon.extended.Rename
+import top.yukonga.miuix.kmp.overlay.OverlayDialog
+import top.yukonga.miuix.kmp.preference.CheckboxPreference
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import updater.shared.generated.resources.Res
 import updater.shared.generated.resources.account
-import updater.shared.generated.resources.account_or_password_empty
 import updater.shared.generated.resources.cancel
 import updater.shared.generated.resources.do_not_enter_in_browser
 import updater.shared.generated.resources.get_verification_code
 import updater.shared.generated.resources.global
-import updater.shared.generated.resources.logging_in
 import updater.shared.generated.resources.login
-import updater.shared.generated.resources.login_error
-import updater.shared.generated.resources.login_successful
-import updater.shared.generated.resources.login_tips
 import updater.shared.generated.resources.logout
 import updater.shared.generated.resources.logout_confirm
-import updater.shared.generated.resources.logout_successful
 import updater.shared.generated.resources.password
 import updater.shared.generated.resources.save_password
-import updater.shared.generated.resources.security_error
 import updater.shared.generated.resources.submit
-import updater.shared.generated.resources.toast_crash_info
 import updater.shared.generated.resources.verification_code
 import updater.shared.generated.resources.verifying
-import utils.MessageUtils.Companion.showMessage
+import viewmodel.LoginEvent
+import viewmodel.LoginState
 
 @Composable
 fun LoginDialog(
     show: Boolean,
-    onShow: () -> Unit,
-    onDismissRequest: () -> Unit,
-    isLogin: Int,
-    onLoginChange: (Int) -> Unit
+    loginState: LoginState,
+    account: String,
+    password: String,
+    global: Boolean,
+    savePassword: String,
+    showTicketUrl: Boolean,
+    showTicketInput: Boolean,
+    isVerifying: Boolean,
+    ticket: String,
+    isVerificationRequested: Boolean,
+    isLoggingIn: Boolean,
+    onShowDialog: () -> Unit,
+    onEvent: (LoginEvent) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     val uriHandler = LocalUriHandler.current
-    val coroutineScope = rememberCoroutineScope()
 
-    var account by remember { mutableStateOf(Password().getPassword().first) }
-    var password by remember { mutableStateOf(Password().getPassword().second) }
+    var localAccount by remember(show) { mutableStateOf(account) }
+    var localPassword by remember(show) { mutableStateOf(password) }
+    var localTicket by remember(show) { mutableStateOf(ticket) }
 
-    var global by remember { mutableStateOf(false) }
-    var savePassword by remember { mutableStateOf(prefGet("savePassword") ?: "0") }
+    val isLoggedIn = loginState is LoginState.LoggedIn
 
-    var showTicketUrl by remember { mutableStateOf(false) }
-    var showTicketInput by remember { mutableStateOf(false) }
-    var isVerificationRequested by remember { mutableStateOf(false) }
-
-    var ticket by remember { mutableStateOf("") }
-    var isVerifying by remember { mutableStateOf(false) }
-
-    if (!showTicketInput) {
-        isVerificationRequested = false
-    }
-
-    val icon = when (isLogin) {
-        1 -> MiuixIcons.Blocklist
+    val icon = when (loginState) {
+        is LoginState.LoggedIn -> MiuixIcons.Blocklist
         else -> MiuixIcons.RemoveContact
     }
 
-    val messageLoginIn = stringResource(Res.string.logging_in)
-    val messageLoginSuccess = stringResource(Res.string.login_successful)
-    val messageEmpty = stringResource(Res.string.account_or_password_empty)
-    val messageError = stringResource(Res.string.login_error)
-    val messageSecurityError = stringResource(Res.string.security_error)
-    val messageLogoutSuccessful = stringResource(Res.string.logout_successful)
-    val messageCrashInfo = stringResource(Res.string.toast_crash_info)
-    val messageLoginTips = stringResource(Res.string.login_tips)
-
-    // 主页登录按钮
     IconButton(
         onClick = {
-            prefRemove("captchaUrl")
-            prefRemove("notificationUrl")
-            prefRemove("identity_session")
-            prefRemove("2FAContext")
-            prefRemove("2FAOptions")
-            prefRemove("2FAFlag")
-
-            showTicketInput = false
-            showTicketUrl = false
-
             focusManager.clearFocus()
-
-            onShow()
+            onShowDialog()
         },
         holdDownState = show
     ) {
@@ -141,20 +103,17 @@ fun LoginDialog(
         )
     }
 
-    // 登录对话框
-    if (isLogin != 1) {
+    if (!isLoggedIn) {
         OverlayDialog(
             show = show,
             title = stringResource(Res.string.login),
-            onDismissRequest = {
-                onDismissRequest()
-            },
+            onDismissRequest = { onEvent(LoginEvent.DismissDialog) },
             content = {
                 Column {
                     // 账号输入框
                     TextField(
-                        value = account,
-                        onValueChange = { account = it },
+                        value = localAccount,
+                        onValueChange = { localAccount = it },
                         label = stringResource(Res.string.account),
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
@@ -165,8 +124,8 @@ fun LoginDialog(
                     // 密码输入框
                     var passwordVisibility by remember { mutableStateOf(false) }
                     TextField(
-                        value = password,
-                        onValueChange = { password = it },
+                        value = localPassword,
+                        onValueChange = { localPassword = it },
                         label = stringResource(Res.string.password),
                         modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                         singleLine = true,
@@ -174,12 +133,9 @@ fun LoginDialog(
                         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                         visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
                         trailingIcon = {
-                            // 显示 & 隐藏密码
                             IconButton(
                                 modifier = Modifier.padding(end = 6.dp),
-                                onClick = {
-                                    passwordVisibility = !passwordVisibility
-                                },
+                                onClick = { passwordVisibility = !passwordVisibility },
                                 content = {
                                     Icon(
                                         imageVector = MiuixIcons.Rename,
@@ -191,19 +147,7 @@ fun LoginDialog(
                         }
                     )
 
-                    // 二次认证验证码（浏览器请求）
-                    AnimatedVisibility(
-                        visible = showTicketUrl
-                    ) {
-                        val optionsStr = prefGet("2FAOptions") ?: "[]"
-                        var options by remember { mutableStateOf(Json.decodeFromString<MutableList<Int>>(optionsStr)) }
-                        if (options.isEmpty()) {
-                            onDismissRequest()
-                            showMessage(message = messageError)
-                        }
-                    }
-
-                    // 二次认证验证码输入框
+                    // 二次认证输入框
                     AnimatedVisibility(
                         visible = showTicketInput
                     ) {
@@ -231,7 +175,7 @@ fun LoginDialog(
                                             colors = ButtonDefaults.textButtonColorsPrimary(),
                                             onClick = {
                                                 uriHandler.openUri(verificationUrl)
-                                                isVerificationRequested = true
+                                                onEvent(LoginEvent.VerificationRequested(true))
                                             }
                                         )
                                         Row(
@@ -247,13 +191,14 @@ fun LoginDialog(
                                     }
                                 }
                             }
+
                             AnimatedVisibility(
                                 visible = verificationUrl == null || isVerificationRequested
                             ) {
                                 Column {
                                     TextField(
-                                        value = ticket,
-                                        onValueChange = { ticket = it },
+                                        value = localTicket,
+                                        onValueChange = { localTicket = it },
                                         label = stringResource(Res.string.verification_code),
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
@@ -266,32 +211,13 @@ fun LoginDialog(
                                         TextButton(
                                             modifier = Modifier.weight(1f),
                                             text = if (isVerifying) stringResource(Res.string.verifying) else stringResource(Res.string.submit),
-                                            enabled = !isVerifying && ticket.isNotBlank(),
+                                            enabled = !isVerifying && localTicket.isNotBlank(),
                                             colors = ButtonDefaults.textButtonColorsPrimary(),
                                             onClick = {
-                                                if (showTicketInput) {
-                                                    // 提交二次认证验证码
-                                                    coroutineScope.launch {
-                                                        isVerifying = true
-                                                        val int = Login().login(
-                                                            account = account,
-                                                            password = password,
-                                                            global = global,
-                                                            savePassword = savePassword,
-                                                            flag = prefGet("2FAFlag")?.toInt(),
-                                                            ticket = ticket
-                                                        )
-                                                        if (int == 0) {
-                                                            showMessage(message = messageLoginSuccess)
-                                                            ticket = ""
-                                                            onDismissRequest()
-                                                            onLoginChange(1)
-                                                        } else {
-                                                            showMessage(message = messageError)
-                                                        }
-                                                        isVerifying = false
-                                                    }
-                                                }
+                                                onEvent(LoginEvent.AccountChanged(localAccount))
+                                                onEvent(LoginEvent.PasswordChanged(localPassword))
+                                                onEvent(LoginEvent.TicketChanged(localTicket))
+                                                onEvent(LoginEvent.Submit2FA)
                                             }
                                         )
                                         Spacer(Modifier.width(16.dp))
@@ -299,11 +225,7 @@ fun LoginDialog(
                                             modifier = Modifier.weight(1f),
                                             text = stringResource(Res.string.cancel),
                                             colors = ButtonDefaults.textButtonColors(),
-                                            onClick = {
-                                                showTicketUrl = false
-                                                showTicketInput = false
-                                                ticket = ""
-                                            }
+                                            onClick = { onEvent(LoginEvent.CancelTicket) }
                                         )
                                     }
                                 }
@@ -316,11 +238,7 @@ fun LoginDialog(
                                         modifier = Modifier.weight(1f),
                                         text = stringResource(Res.string.cancel),
                                         colors = ButtonDefaults.textButtonColors(),
-                                        onClick = {
-                                            showTicketUrl = false
-                                            showTicketInput = false
-                                            ticket = ""
-                                        }
+                                        onClick = { onEvent(LoginEvent.CancelTicket) }
                                     )
                                 }
                             }
@@ -342,9 +260,7 @@ fun LoginDialog(
                                 CheckboxPreference(
                                     title = stringResource(Res.string.global),
                                     checked = global,
-                                    onCheckedChange = {
-                                        global = it
-                                    }
+                                    onCheckedChange = { onEvent(LoginEvent.GlobalChanged(it)) }
                                 )
                             }
                             Row(
@@ -354,9 +270,7 @@ fun LoginDialog(
                                 CheckboxPreference(
                                     title = stringResource(Res.string.save_password),
                                     checked = savePassword == "1",
-                                    onCheckedChange = {
-                                        savePassword = if (it) "1" else "0"
-                                    }
+                                    onCheckedChange = { onEvent(LoginEvent.SavePasswordChanged(if (it) "1" else "0")) }
                                 )
                             }
                         }
@@ -370,44 +284,12 @@ fun LoginDialog(
                             TextButton(
                                 modifier = Modifier.weight(1f),
                                 text = stringResource(Res.string.login),
+                                enabled = !isLoggingIn,
                                 colors = ButtonDefaults.textButtonColorsPrimary(),
                                 onClick = {
-                                    showMessage(message = messageLoginIn)
-                                    coroutineScope.launch {
-                                        val int = Login().login(
-                                            account = account,
-                                            password = password,
-                                            global = global,
-                                            savePassword = savePassword
-                                        )
-                                        when (int) {
-                                            0 -> {
-                                                showMessage(message = messageLoginSuccess)
-                                                onDismissRequest()
-                                                onLoginChange(1)
-                                            }
-
-                                            1 -> showMessage(message = messageEmpty)
-                                            2 -> showMessage(message = messageCrashInfo)
-                                            3 -> {
-                                                showMessage(message = messageError)
-                                                prefRemove("password")
-                                                prefRemove("passwordIv")
-                                            }
-
-                                            4 -> showMessage(message = messageSecurityError)
-
-                                            5 -> {
-                                                showTicketUrl = true
-                                                showTicketInput = true
-                                                showMessage(message = messageLoginTips)
-                                                val optionsStr = prefGet("2FAOptions") ?: "[]"
-                                                val options = Json.decodeFromString<List<Int>>(optionsStr)
-                                                val flag = if (options.contains(4)) 4 else 8
-                                                prefSet("2FAFlag", flag.toString())
-                                            }
-                                        }
-                                    }
+                                    onEvent(LoginEvent.AccountChanged(localAccount))
+                                    onEvent(LoginEvent.PasswordChanged(localPassword))
+                                    onEvent(LoginEvent.LoginClicked)
                                 }
                             )
                             Spacer(Modifier.width(16.dp))
@@ -415,9 +297,7 @@ fun LoginDialog(
                                 modifier = Modifier.weight(1f),
                                 text = stringResource(Res.string.cancel),
                                 colors = ButtonDefaults.textButtonColors(),
-                                onClick = {
-                                    onDismissRequest()
-                                }
+                                onClick = { onEvent(LoginEvent.DismissDialog) }
                             )
                         }
                     }
@@ -426,39 +306,26 @@ fun LoginDialog(
     }
 
     // 退出登录
-    if (isLogin == 1) {
+    if (isLoggedIn) {
         OverlayDialog(
             show = show,
             title = stringResource(Res.string.logout),
             summary = stringResource(Res.string.logout_confirm),
-            onDismissRequest = {
-                onDismissRequest()
-            },
+            onDismissRequest = { onEvent(LoginEvent.DismissDialog) },
             content = {
                 Row {
                     TextButton(
                         modifier = Modifier.weight(1f),
                         text = stringResource(Res.string.logout),
                         colors = ButtonDefaults.textButtonColorsPrimary(),
-                        onClick = {
-                            coroutineScope.launch {
-                                val boolean = Login().logout()
-                                if (boolean) {
-                                    showMessage(message = messageLogoutSuccessful)
-                                    onLoginChange(0)
-                                }
-                            }
-                            onDismissRequest()
-                        }
+                        onClick = { onEvent(LoginEvent.LogoutClicked) }
                     )
                     Spacer(Modifier.width(16.dp))
                     TextButton(
                         modifier = Modifier.weight(1f),
                         text = stringResource(Res.string.cancel),
                         colors = ButtonDefaults.textButtonColors(),
-                        onClick = {
-                            onDismissRequest()
-                        }
+                        onClick = { onEvent(LoginEvent.DismissDialog) }
                     )
                 }
             })
