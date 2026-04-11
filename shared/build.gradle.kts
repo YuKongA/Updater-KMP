@@ -11,7 +11,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-val generatedSrcDir = layout.buildDirectory.dir("generated").get().asFile.resolve("updater")
+val generatedSrcDir = layout.buildDirectory.dir("generated/updater")
 
 kotlin {
     jvmToolchain(ProjectConfig.JVM_VERSION)
@@ -56,7 +56,7 @@ kotlin {
     sourceSets {
         val desktopMain by getting
         val commonMain by getting {
-            kotlin.srcDir(generatedSrcDir.resolve("kotlin").absolutePath)
+            kotlin.srcDir(generatedSrcDir.map { it.dir("kotlin") })
         }
         commonMain.dependencies {
             api(libs.compose.ui)
@@ -105,36 +105,9 @@ tasks.named("generateComposeResClass").configure {
     dependsOn(generateVersionInfo)
 }
 
-val generateVersionInfo by tasks.registering {
-    doLast {
-        val file = generatedSrcDir.resolve("kotlin/misc/VersionInfo.kt")
-        if (!file.exists()) {
-            file.parentFile.mkdirs()
-            file.createNewFile()
-        }
-        file.writeText(
-            """
-            package misc
-
-            object VersionInfo {
-                const val VERSION_NAME = "${ProjectConfig.VERSION_NAME}"
-                const val VERSION_CODE = ${ProjectConfig.VERSION_CODE}
-            }
-            """.trimIndent()
-        )
-        val iosPlist = project.rootDir.resolve("ios/iosApp/Info.plist")
-        if (iosPlist.exists()) {
-            val content = iosPlist.readText()
-            val updatedContent = content
-                .replace(
-                    Regex("<key>CFBundleShortVersionString</key>\\s*<string>[^<]*</string>"),
-                    "<key>CFBundleShortVersionString</key>\n\t<string>${ProjectConfig.VERSION_NAME}</string>"
-                )
-                .replace(
-                    Regex("<key>CFBundleVersion</key>\\s*<string>[^<]*</string>"),
-                    "<key>CFBundleVersion</key>\n\t<string>${ProjectConfig.VERSION_CODE}</string>"
-                )
-            iosPlist.writeText(updatedContent)
-        }
-    }
+val generateVersionInfo by tasks.registering(GenerateVersionInfoTask::class) {
+    versionName.set(ProjectConfig.VERSION_NAME)
+    versionCode.set(getGitVersionCode())
+    outputFile.set(generatedSrcDir.map { it.file("kotlin/misc/VersionInfo.kt") })
+    iosPlistFile.set(layout.projectDirectory.file("../ios/iosApp/Info.plist"))
 }

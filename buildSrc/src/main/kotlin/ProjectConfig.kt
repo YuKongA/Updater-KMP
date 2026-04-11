@@ -3,7 +3,6 @@ object ProjectConfig {
     const val APP_NAME = "Updater"
     const val PACKAGE_NAME = "top.yukonga.updater.kmp"
     const val VERSION_NAME = "1.6.2"
-    val VERSION_CODE = getGitVersionCode()
 
     object Android {
         const val TARGET_SDK = 37
@@ -12,9 +11,10 @@ object ProjectConfig {
         const val COMPILE_SDK_MINOR = 0
         const val BUILD_TOOLS_VERSION = "37.0.0"
     }
+}
 
-    private fun getGitVersionCode(): Int {
-        val process = ProcessBuilder("git", "rev-list", "--count", "HEAD").start()
-        return process.inputStream.bufferedReader().use { it.readText().trim().toInt() }
-    }
+fun org.gradle.api.Project.getGitVersionCode(): Int {
+    return providers.exec {
+        commandLine("git", "rev-list", "--count", "HEAD")
+    }.standardOutput.asText.get().trim().toInt()
 }

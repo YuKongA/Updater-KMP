@@ -22,7 +22,7 @@ android {
     buildToolsVersion = ProjectConfig.Android.BUILD_TOOLS_VERSION
     defaultConfig {
         applicationId = ProjectConfig.PACKAGE_NAME
-        versionCode = ProjectConfig.VERSION_CODE
+        versionCode = getGitVersionCode()
         versionName = ProjectConfig.VERSION_NAME
         targetSdk = ProjectConfig.Android.TARGET_SDK
         minSdk = ProjectConfig.Android.MIN_SDK
@@ -62,6 +62,6 @@ android {
 
 base {
     archivesName.set(
-        ProjectConfig.APP_NAME + "-v" + ProjectConfig.VERSION_NAME + "(" + ProjectConfig.VERSION_CODE + ")"
+        ProjectConfig.APP_NAME + "-v" + ProjectConfig.VERSION_NAME + "(" + getGitVersionCode() + ")"
     )
 }
