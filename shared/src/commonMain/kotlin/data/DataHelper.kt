@@ -38,6 +38,7 @@ object DataHelper {
         val serviceToken: String? = null,
         val userId: String? = null,
         val cUserId: String? = null,
+        val passToken: String? = null,
     )
 
     @Serializable

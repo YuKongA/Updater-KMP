@@ -1,4 +1,5 @@
 import data.DataHelper
+import dev.whyoleg.cryptography.CryptographyProvider
 import dev.whyoleg.cryptography.DelicateCryptographyApi
 import dev.whyoleg.cryptography.algorithms.MD5
 import io.ktor.client.plugins.cookies.AcceptAllCookiesStorage
@@ -15,6 +16,7 @@ import io.ktor.http.setCookie
 import io.ktor.http.userAgent
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonArray
@@ -23,7 +25,6 @@ import platform.httpClientPlatform
 import platform.prefGet
 import platform.prefRemove
 import platform.prefSet
-import dev.whyoleg.cryptography.CryptographyProvider
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -37,8 +38,8 @@ object Login {
         }
     }
 
-    private val accountUrl = "https://account.xiaomi.com"
-    private val serviceLoginAuth2Url = "$accountUrl/pass/serviceLoginAuth2"
+    private const val ACCOUNT_URL = "https://account.xiaomi.com"
+    private const val SERVICE_LOGIN_AUTH2_URL = "$ACCOUNT_URL/pass/serviceLoginAuth2"
 
     /**
      * Login Xiaomi account.
@@ -125,11 +126,12 @@ object Login {
             append("_locale", if (global) "en_US" else "zh_CN")
             if (captcha.isNotEmpty()) append("captCode", captcha)
         }
-        val response = client.submitForm(serviceLoginAuth2Url, parameters)
+        val response = client.submitForm(SERVICE_LOGIN_AUTH2_URL, parameters)
         if (!response.status.isSuccess()) return 2 // 2: 网络错误
 
         val content = Json.decodeFromString<JsonObject>(removeResponsePrefix(response.bodyAsText()))
         val ssecurity = content["ssecurity"]?.jsonPrimitive?.content
+        val passToken = content["passToken"]?.jsonPrimitive?.content
         val notificationUrl = content["notificationUrl"]?.jsonPrimitive?.content
         val result = content["result"]?.jsonPrimitive?.content
 
@@ -141,6 +143,11 @@ object Login {
             val identitySession = requireNotNull(response.setCookie().find { it.name == "identity_session" }?.value)
             prefSet("identity_session", identitySession)
             val listJson = Json.decodeFromString<JsonObject>(removeResponsePrefix(response.bodyAsText()))
+
+            // 检测是否开启了双重认证（设备验证码）
+            val twoFactorAuth = listJson["twoFactorAuth"]?.jsonPrimitive?.booleanOrNull ?: false
+            if (twoFactorAuth) return 7 // 7: 不支持双重认证
+
             val options = listJson["options"]?.jsonArray?.mapNotNull { it.jsonPrimitive.intOrNull } ?: emptyList()
             if (options.isEmpty()) return 3 // 3: 登录失败
             prefSet("notificationUrl", notificationUrl)
@@ -169,7 +176,8 @@ object Login {
             ssecurity = ssecurity,
             serviceToken = serviceToken,
             userId = userId,
-            cUserId = cUserId
+            cUserId = cUserId,
+            passToken = passToken,
         )
         prefSet("loginInfo", Json.encodeToString(loginInfo))
         return 0 // 0: 登录成功
@@ -186,7 +194,7 @@ object Login {
     @OptIn(ExperimentalTime::class)
     suspend fun verify2FATicket(flag: Int, ticket: String): Boolean {
         val apiPath = if (flag == 4) "/identity/auth/verifyPhone" else "/identity/auth/verifyEmail"
-        val apiUrl = "$accountUrl$apiPath"
+        val apiUrl = "$ACCOUNT_URL$apiPath"
 
         val parameters = parameters {
             append("_flag", flag.toString())
@@ -205,6 +213,56 @@ object Login {
             return true
         }
         return false
+    }
+
+    /**
+     * Refresh serviceToken using passToken.
+     *
+     * @param loginData: Current login data with passToken
+     *
+     * @return Updated LoginData or null if refresh failed
+     */
+    suspend fun refreshServiceToken(loginData: DataHelper.LoginData): DataHelper.LoginData? {
+        val passToken = loginData.passToken ?: return null
+        val userId = loginData.userId ?: return null
+        val sid = if (loginData.accountType == "GL") "miuiota_intl" else "miuiromota"
+
+        val refreshClient = httpClientPlatform().config {
+            install(HttpCookies) {
+                storage = AcceptAllCookiesStorage()
+            }
+            defaultRequest {
+                userAgent(generateUserAgent())
+            }
+        }
+
+        try {
+            val response = refreshClient.get("$ACCOUNT_URL/pass/serviceLogin") {
+                parameter("sid", sid)
+                parameter("_json", "true")
+                header("Cookie", "passToken=$passToken;userId=$userId")
+            }
+            val content = Json.decodeFromString<JsonObject>(removeResponsePrefix(response.bodyAsText()))
+            val ssecurity = content["ssecurity"]?.jsonPrimitive?.content
+            val location = content["location"]?.jsonPrimitive?.content
+            if (ssecurity.isNullOrBlank() || location.isNullOrBlank()) return null
+            val newPassToken = content["passToken"]?.jsonPrimitive?.content
+
+            val response2 = refreshClient.get("$location&_userIdNeedEncrypt=true")
+            val serviceToken = response2.setCookie()
+                .find { it.name == "serviceToken" && it.value.isNotBlank() }?.value ?: return null
+            val cUserId = content["cUserId"]?.jsonPrimitive?.content ?: loginData.cUserId
+
+            return loginData.copy(
+                authResult = "1",
+                ssecurity = ssecurity,
+                serviceToken = serviceToken,
+                cUserId = cUserId,
+                passToken = newPassToken ?: passToken,
+            )
+        } catch (_: Exception) {
+            return null
+        }
     }
 
     /** Generate User-Agent(Xiaomi 17 Pro).

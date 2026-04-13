@@ -33,6 +33,7 @@ import updater.shared.generated.resources.login_successful
 import updater.shared.generated.resources.login_tips
 import updater.shared.generated.resources.logout_successful
 import updater.shared.generated.resources.security_error
+import updater.shared.generated.resources.two_factor_unsupported
 import updater.shared.generated.resources.toast_crash_info
 import updater.shared.generated.resources.toast_ing
 import updater.shared.generated.resources.toast_no_info
@@ -305,6 +306,7 @@ class AppViewModel : ViewModel() {
                     prefSet("2FAFlag", flag.toString())
                     _uiState.update { it.copy(showTicketUrl = true, showTicketInput = true) }
                 }
+                7 -> showMessage(getString(Res.string.two_factor_unsupported))
             }
             _uiState.update { it.copy(isLoggingIn = false) }
         }
@@ -329,8 +331,8 @@ class AppViewModel : ViewModel() {
                 password = state.loginPassword,
                 global = state.loginGlobal,
                 savePassword = state.loginSavePassword,
-                flag = prefGet("2FAFlag")?.toInt(),
-                ticket = state.loginTicket
+                flag = prefGet("2FAFlag")?.toIntOrNull(),
+                ticket = state.loginTicket,
             )
             if (result == 0) {
                 showMessage(getString(Res.string.login_successful))
@@ -400,13 +402,21 @@ class AppViewModel : ViewModel() {
         return RequestParams(regionCode, carrierCode, codeNameExt, systemVersionExt, branchExt)
     }
 
-    private fun updateAuthState(recoveryRomInfo: RomInfoHelper.RomInfo, loginState: LoginState) {
-        val currentLoginData = (loginState as? LoginState.LoggedIn)?.loginData
-        if (currentLoginData != null && recoveryRomInfo.authResult != 1) {
-            val expiredLoginData = currentLoginData.copy(authResult = "3")
-            _uiState.update { it.copy(loginState = LoginState.Expired(expiredLoginData)) }
-            prefSet("loginInfo", Json.encodeToString(expiredLoginData))
+    private suspend fun updateAuthState(recoveryRomInfo: RomInfoHelper.RomInfo, loginState: LoginState): Boolean {
+        val currentLoginData = (loginState as? LoginState.LoggedIn)?.loginData ?: return false
+        if (recoveryRomInfo.authResult == 1) return false
+
+        val refreshed = Login.refreshServiceToken(currentLoginData)
+        if (refreshed != null) {
+            _uiState.update { it.copy(loginState = LoginState.LoggedIn(refreshed)) }
+            prefSet("loginInfo", Json.encodeToString(refreshed))
+            return true
         }
+
+        val expiredLoginData = currentLoginData.copy(authResult = "3")
+        _uiState.update { it.copy(loginState = LoginState.Expired(expiredLoginData)) }
+        prefSet("loginInfo", Json.encodeToString(expiredLoginData))
+        return false
     }
 
     private suspend fun fetchCurrentRomDownloadUrl(
@@ -542,12 +552,26 @@ class AppViewModel : ViewModel() {
             if (romInfoStr.isEmpty()) {
                 showMessage(getString(Res.string.toast_crash_info), 5000L)
             } else {
-                val recoveryRomInfo = Json.decodeFromString<RomInfoHelper.RomInfo>(romInfoStr)
-                updateAuthState(recoveryRomInfo, state.loginState)
+                var currentRomInfoStr = romInfoStr
+                var recoveryRomInfo = Json.decodeFromString<RomInfoHelper.RomInfo>(currentRomInfoStr)
+                var currentLoginData = loginData
+
+                val refreshed = updateAuthState(recoveryRomInfo, state.loginState)
+                if (refreshed) {
+                    currentLoginData = (_uiState.value.loginState as? LoginState.LoggedIn)?.loginData
+                    val retryStr = repository.getRecoveryRomInfo(
+                        params.branchExt, params.codeNameExt, params.regionCode,
+                        params.systemVersionExt, state.androidVersion, currentLoginData
+                    )
+                    if (retryStr.isNotEmpty()) {
+                        currentRomInfoStr = retryStr
+                        recoveryRomInfo = Json.decodeFromString<RomInfoHelper.RomInfo>(currentRomInfoStr)
+                    }
+                }
 
                 when {
                     recoveryRomInfo.currentRom?.bigversion != null ->
-                        handleCurrentRom(recoveryRomInfo, romInfoStr, params, state, loginData)
+                        handleCurrentRom(recoveryRomInfo, currentRomInfoStr, params, state, currentLoginData)
                     recoveryRomInfo.incrementRom?.bigversion != null ->
                         handleFallbackRom(recoveryRomInfo, recoveryRomInfo.incrementRom)
                     recoveryRomInfo.crossRom?.bigversion != null ->

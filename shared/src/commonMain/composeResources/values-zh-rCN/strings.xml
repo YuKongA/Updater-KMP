@@ -46,6 +46,7 @@
     <string name="copy_successful">复制成功</string>
     <string name="download_start">开始下载</string>
     <string name="security_error">获取密钥失败</string>
+    <string name="two_factor_unsupported">不支持登录开启了双重认证的账户</string>
     <string name="logout">退出</string>
     <string name="logout_confirm">确定要退出登录么？</string>
     <string name="confirm">确定</string>
