@@ -17,7 +17,6 @@ import io.ktor.http.userAgent
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.booleanOrNull
-import kotlinx.serialization.json.int
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
@@ -38,7 +37,20 @@ object Login {
         }
     }
 
+    private val refreshClient by lazy {
+        httpClientPlatform().config {
+            install(HttpCookies) {
+                storage = AcceptAllCookiesStorage()
+            }
+            defaultRequest {
+                userAgent(generateUserAgent())
+            }
+        }
+    }
+
     private const val ACCOUNT_URL = "https://account.xiaomi.com"
+
+    private fun identitySessionCookie() = "identity_session=${prefGet("identity_session") ?: ""}"
     private const val SERVICE_LOGIN_AUTH2_URL = "$ACCOUNT_URL/pass/serviceLoginAuth2"
 
     /**
@@ -75,8 +87,9 @@ object Login {
                 return 5
             }
             if (flag != null && ticket.isNotEmpty()) {
-                val verify2FATicket = verify2FATicket(flag = flag, ticket = ticket)
-                if (!verify2FATicket) return 3 // 3: 登录失败
+                val verifyResult = verify2FATicket(flag = flag, ticket = ticket)
+                if (verifyResult == 70014) return 8 // 8: 验证码错误
+                if (verifyResult != 0) return 3 // 3: 登录失败
             }
             return serviceLoginAuth2(
                 account = account,
@@ -184,15 +197,41 @@ object Login {
     }
 
     /**
+     * Send 2FA ticket(phone or email).
+     *
+     * @param flag: 4 for phone, 8 for email
+     *
+     * @return Send ticket status
+     */
+    @OptIn(ExperimentalTime::class)
+    suspend fun sendTicket(flag: Int): Boolean {
+        val apiPath = if (flag == 4) "/identity/auth/sendPhoneTicket" else "/identity/auth/sendEmailTicket"
+        val params = parameters {
+            append("_json", "true")
+            append("retry", "0")
+            append("icode", "")
+        }
+        return try {
+            client.submitForm("$ACCOUNT_URL$apiPath", params) {
+                parameter("_dc", Clock.System.now().toEpochMilliseconds())
+                header("cookie", identitySessionCookie())
+            }
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    /**
      * Verify 2FA ticket(phone or email).
      *
      * @param flag: 4 for phone, 8 for email
      * @param ticket: 2FA ticket
      *
-     * @return Handle 2FA ticket status
+     * @return 0 = success, 70014 = wrong code, -1 = other error
      */
     @OptIn(ExperimentalTime::class)
-    suspend fun verify2FATicket(flag: Int, ticket: String): Boolean {
+    suspend fun verify2FATicket(flag: Int, ticket: String): Int {
         val apiPath = if (flag == 4) "/identity/auth/verifyPhone" else "/identity/auth/verifyEmail"
         val apiUrl = "$ACCOUNT_URL$apiPath"
 
@@ -207,12 +246,13 @@ object Login {
             header("cookie", "identity_session=${prefGet("identity_session") ?: ""}")
         }
         val verifyBody = Json.decodeFromString<JsonObject>(removeResponsePrefix(verifyResponse.bodyAsText()))
-        if (verifyBody["code"]?.jsonPrimitive?.int == 0) {
+        val code = verifyBody["code"]?.jsonPrimitive?.intOrNull
+        if (code == 0) {
             val location = requireNotNull(verifyBody["location"]?.jsonPrimitive?.content)
             client.get(location)
-            return true
+            return 0
         }
-        return false
+        return code ?: -1
     }
 
     /**
@@ -226,15 +266,6 @@ object Login {
         val passToken = loginData.passToken ?: return null
         val userId = loginData.userId ?: return null
         val sid = if (loginData.accountType == "GL") "miuiota_intl" else "miuiromota"
-
-        val refreshClient = httpClientPlatform().config {
-            install(HttpCookies) {
-                storage = AcceptAllCookiesStorage()
-            }
-            defaultRequest {
-                userAgent(generateUserAgent())
-            }
-        }
 
         try {
             val response = refreshClient.get("$ACCOUNT_URL/pass/serviceLogin") {

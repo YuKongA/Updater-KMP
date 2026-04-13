@@ -33,7 +33,9 @@ import updater.shared.generated.resources.login_successful
 import updater.shared.generated.resources.login_tips
 import updater.shared.generated.resources.logout_successful
 import updater.shared.generated.resources.security_error
+import updater.shared.generated.resources.send_code_error
 import updater.shared.generated.resources.two_factor_unsupported
+import updater.shared.generated.resources.verification_code_error
 import updater.shared.generated.resources.toast_crash_info
 import updater.shared.generated.resources.toast_ing
 import updater.shared.generated.resources.toast_no_info
@@ -60,6 +62,7 @@ sealed interface LoginEvent {
     data class SavePasswordChanged(val value: String) : LoginEvent
     data class TicketChanged(val value: String) : LoginEvent
     data class VerificationRequested(val value: Boolean) : LoginEvent
+    data class Select2FAMethod(val flag: Int) : LoginEvent
     data object LoginClicked : LoginEvent
     data object LogoutClicked : LoginEvent
     data object Submit2FA : LoginEvent
@@ -80,8 +83,8 @@ data class AppUiState(
     val loginPassword: String = "",
     val loginGlobal: Boolean = false,
     val loginSavePassword: String = "0",
-    val showTicketUrl: Boolean = false,
     val showTicketInput: Boolean = false,
+    val available2FAOptions: List<Int> = emptyList(),
     val isVerifying: Boolean = false,
     val loginTicket: String = "",
     val isVerificationRequested: Boolean = false,
@@ -227,6 +230,18 @@ class AppViewModel : ViewModel() {
         _uiState.update { it.copy(showAboutDialog = show) }
     }
 
+    private fun select2FAMethod(flag: Int) {
+        viewModelScope.launch {
+            prefSet("2FAFlag", flag.toString())
+            val sent = Login.sendTicket(flag)
+            if (sent) {
+                _uiState.update { it.copy(available2FAOptions = emptyList(), isVerificationRequested = true) }
+            } else {
+                showMessage(getString(Res.string.send_code_error))
+            }
+        }
+    }
+
     fun showLoginDialog() {
         prefRemove("captchaUrl")
         prefRemove("notificationUrl")
@@ -239,7 +254,7 @@ class AppViewModel : ViewModel() {
             it.copy(
                 showLoginDialog = true,
                 showTicketInput = false,
-                showTicketUrl = false,
+                available2FAOptions = emptyList(),
                 loginTicket = "",
                 isVerifying = false,
                 isLoggingIn = false,
@@ -260,11 +275,12 @@ class AppViewModel : ViewModel() {
             is LoginEvent.SavePasswordChanged -> _uiState.update { it.copy(loginSavePassword = event.value) }
             is LoginEvent.TicketChanged -> _uiState.update { it.copy(loginTicket = event.value) }
             is LoginEvent.VerificationRequested -> _uiState.update { it.copy(isVerificationRequested = event.value) }
+            is LoginEvent.Select2FAMethod -> select2FAMethod(event.flag)
             is LoginEvent.LoginClicked -> performLogin()
             is LoginEvent.LogoutClicked -> performLogout()
             is LoginEvent.Submit2FA -> submit2FATicket()
             is LoginEvent.CancelTicket -> _uiState.update {
-                it.copy(showTicketUrl = false, showTicketInput = false, loginTicket = "")
+                it.copy(showTicketInput = false, loginTicket = "", available2FAOptions = emptyList())
             }
             is LoginEvent.DismissDialog -> dismissLoginDialog()
         }
@@ -302,9 +318,7 @@ class AppViewModel : ViewModel() {
                     showMessage(getString(Res.string.login_tips))
                     val optionsStr = prefGet("2FAOptions") ?: "[]"
                     val options = Json.decodeFromString<List<Int>>(optionsStr)
-                    val flag = if (options.contains(4)) 4 else 8
-                    prefSet("2FAFlag", flag.toString())
-                    _uiState.update { it.copy(showTicketUrl = true, showTicketInput = true) }
+                    _uiState.update { it.copy(showTicketInput = true, available2FAOptions = options) }
                 }
                 7 -> showMessage(getString(Res.string.two_factor_unsupported))
             }
@@ -334,22 +348,24 @@ class AppViewModel : ViewModel() {
                 flag = prefGet("2FAFlag")?.toIntOrNull(),
                 ticket = state.loginTicket,
             )
-            if (result == 0) {
-                showMessage(getString(Res.string.login_successful))
-                val loginData = prefGet("loginInfo")?.let { Json.decodeFromString<DataHelper.LoginData>(it) }
-                if (loginData != null) {
-                    _uiState.update {
-                        it.copy(
-                            loginState = LoginState.LoggedIn(loginData),
-                            showLoginDialog = false,
-                            loginTicket = ""
-                        )
+            when (result) {
+                0 -> {
+                    showMessage(getString(Res.string.login_successful))
+                    val loginData = prefGet("loginInfo")?.let { Json.decodeFromString<DataHelper.LoginData>(it) }
+                    if (loginData != null) {
+                        _uiState.update {
+                            it.copy(
+                                loginState = LoginState.LoggedIn(loginData),
+                                showLoginDialog = false,
+                                loginTicket = ""
+                            )
+                        }
                     }
                 }
-            } else {
-                showMessage(getString(Res.string.login_error))
+                8 -> showMessage(getString(Res.string.verification_code_error))
+                else -> showMessage(getString(Res.string.login_error))
             }
-            _uiState.update { it.copy(isVerifying = false) }
+            _uiState.update { it.copy(isVerifying = false, loginTicket = "") }
         }
     }
 

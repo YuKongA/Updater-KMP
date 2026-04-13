@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
@@ -19,19 +20,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
-import platform.prefGet
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.icon.MiuixIcons
@@ -44,14 +41,14 @@ import top.yukonga.miuix.kmp.theme.MiuixTheme
 import updater.shared.generated.resources.Res
 import updater.shared.generated.resources.account
 import updater.shared.generated.resources.cancel
-import updater.shared.generated.resources.do_not_enter_in_browser
-import updater.shared.generated.resources.get_verification_code
 import updater.shared.generated.resources.global
 import updater.shared.generated.resources.login
 import updater.shared.generated.resources.logout
 import updater.shared.generated.resources.logout_confirm
 import updater.shared.generated.resources.password
 import updater.shared.generated.resources.save_password
+import updater.shared.generated.resources.send_email_code
+import updater.shared.generated.resources.send_phone_code
 import updater.shared.generated.resources.submit
 import updater.shared.generated.resources.verification_code
 import updater.shared.generated.resources.verifying
@@ -66,8 +63,8 @@ fun LoginDialog(
     password: String,
     global: Boolean,
     savePassword: String,
-    showTicketUrl: Boolean,
     showTicketInput: Boolean,
+    available2FAOptions: List<Int>,
     isVerifying: Boolean,
     ticket: String,
     isVerificationRequested: Boolean,
@@ -76,7 +73,6 @@ fun LoginDialog(
     onEvent: (LoginEvent) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
-    val uriHandler = LocalUriHandler.current
 
     var localAccount by remember(show) { mutableStateOf(account) }
     var localPassword by remember(show) { mutableStateOf(password) }
@@ -147,53 +143,53 @@ fun LoginDialog(
                         }
                     )
 
-                    // 二次认证输入框
+                    // 二次认证
                     AnimatedVisibility(
                         visible = showTicketInput
                     ) {
                         Column(
                             modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
                         ) {
-                            val captchaUrl = prefGet("captchaUrl")
-                            val notificationUrl = prefGet("notificationUrl")
-                            val verificationUrl = if (!captchaUrl.isNullOrBlank()) {
-                                "https://account.xiaomi.com$captchaUrl"
-                            } else if (!notificationUrl.isNullOrBlank()) {
-                                notificationUrl
-                            } else {
-                                null
-                            }
-
-                            if (verificationUrl != null) {
-                                AnimatedVisibility(
-                                    visible = !isVerificationRequested
-                                ) {
-                                    Column {
+                            // 验证方式选择
+                            AnimatedVisibility(
+                                visible = available2FAOptions.isNotEmpty() && !isVerificationRequested
+                            ) {
+                                Column {
+                                    if (available2FAOptions.contains(4)) {
                                         TextButton(
-                                            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                                            text = stringResource(Res.string.get_verification_code),
-                                            colors = ButtonDefaults.textButtonColorsPrimary(),
-                                            onClick = {
-                                                uriHandler.openUri(verificationUrl)
-                                                onEvent(LoginEvent.VerificationRequested(true))
-                                            }
-                                        )
-                                        Row(
                                             modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.Center
-                                        ) {
-                                            Text(
-                                                text = stringResource(Res.string.do_not_enter_in_browser),
-                                                color = MiuixTheme.colorScheme.onPrimaryVariant,
-                                                fontSize = 12.sp,
-                                            )
-                                        }
+                                            text = stringResource(Res.string.send_phone_code),
+                                            colors = ButtonDefaults.textButtonColorsPrimary(),
+                                            onClick = { onEvent(LoginEvent.Select2FAMethod(4)) }
+                                        )
+                                    }
+                                    if (available2FAOptions.contains(4) && available2FAOptions.contains(8)) {
+                                        Spacer(Modifier.height(16.dp))
+                                    }
+                                    if (available2FAOptions.contains(8)) {
+                                        TextButton(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            text = stringResource(Res.string.send_email_code),
+                                            colors = ButtonDefaults.textButtonColorsPrimary(),
+                                            onClick = { onEvent(LoginEvent.Select2FAMethod(8)) }
+                                        )
+                                    }
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+                                    ) {
+                                        TextButton(
+                                            modifier = Modifier.weight(1f),
+                                            text = stringResource(Res.string.cancel),
+                                            colors = ButtonDefaults.textButtonColors(),
+                                            onClick = { onEvent(LoginEvent.CancelTicket) }
+                                        )
                                     }
                                 }
                             }
 
+                            // 验证码输入
                             AnimatedVisibility(
-                                visible = verificationUrl == null || isVerificationRequested
+                                visible = isVerificationRequested
                             ) {
                                 Column {
                                     TextField(
@@ -230,24 +226,12 @@ fun LoginDialog(
                                     }
                                 }
                             }
-                            if (verificationUrl != null && !isVerificationRequested) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
-                                ) {
-                                    TextButton(
-                                        modifier = Modifier.weight(1f),
-                                        text = stringResource(Res.string.cancel),
-                                        colors = ButtonDefaults.textButtonColors(),
-                                        onClick = { onEvent(LoginEvent.CancelTicket) }
-                                    )
-                                }
-                            }
                         }
                     }
 
                     // 国际账号 & 保存密码
                     AnimatedVisibility(
-                        visible = !showTicketUrl && !showTicketInput
+                        visible = !showTicketInput
                     ) {
                         Row(
                             modifier = Modifier.padding(vertical = 16.dp),

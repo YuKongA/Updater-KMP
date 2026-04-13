@@ -47,6 +47,7 @@
     <string name="download_start">Iniciar download</string>
     <string name="security_error">Falha ao obter chave de segurança</string>
     <string name="two_factor_unsupported">Contas com autenticação de dois fatores ativada não são suportadas</string>
+    <string name="verification_code_error">Código de verificação incorreto</string>
     <string name="logout">Sair</string>
     <string name="logout_confirm">Tem certeza de que deseja sair?</string>
     <string name="confirm">Confirmar</string>

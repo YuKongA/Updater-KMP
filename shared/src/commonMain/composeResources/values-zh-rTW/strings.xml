@@ -47,6 +47,7 @@
     <string name="download_start">開始下載</string>
     <string name="security_error">取得金鑰失敗</string>
     <string name="two_factor_unsupported">不支援登入已啟用雙重認證的帳戶</string>
+    <string name="verification_code_error">驗證碼錯誤</string>
     <string name="logout">退出</string>
     <string name="logout_confirm">確定要退出登入嗎？</string>
     <string name="confirm">確定</string>

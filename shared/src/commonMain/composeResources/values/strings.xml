@@ -48,6 +48,7 @@
     <string name="download_start">Start download</string>
     <string name="security_error">Failed to get security key</string>
     <string name="two_factor_unsupported">Accounts with two-factor authentication enabled are not supported</string>
+    <string name="verification_code_error">Incorrect verification code</string>
     <string name="logout">Logout</string>
     <string name="logout_confirm">Are you sure you want to logout?</string>
     <string name="confirm">Confirm</string>
