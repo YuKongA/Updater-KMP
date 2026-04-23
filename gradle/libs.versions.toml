@@ -10,7 +10,7 @@ jna = "5.18.1"
 kotlin = "2.3.20"
 kotlinx-serialization-json = "1.11.0"
 kotlinx-datetime = "0.7.1"
-ktor-client = "3.4.2"
+ktor-client = "3.4.3"
 miuix = "0.9.0"
 
 [libraries]
