@@ -58,6 +58,11 @@ android {
         }
     }
     dependenciesInfo.includeInApk = false
+    packaging {
+        jniLibs {
+            excludes += "lib/*/libandroidx.graphics.path.so"
+        }
+    }
 }
 
 base {
