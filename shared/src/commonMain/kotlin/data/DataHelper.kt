@@ -63,5 +63,6 @@ object DataHelper {
         val fingerprint: String = "",
         val securityPatchLevel: String = "",
         val timestamp: String = "",
+        val sdkLevel: String = "",
     )
 }

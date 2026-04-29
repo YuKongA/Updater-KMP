@@ -67,6 +67,7 @@ kotlin {
             implementation(libs.cryptography.provider.optimal)
             implementation(libs.image.loader)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.serialization.protobuf)
             implementation(libs.kotlinx.datetime)
             implementation(libs.ktor.client.core)
             implementation(libs.miuix.ui)

@@ -1,9 +1,9 @@
 package viewmodel
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import Login
 import Password
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import data.DataHelper
 import data.DeviceInfoHelper
 import data.RomInfoHelper
@@ -34,14 +34,14 @@ import updater.shared.generated.resources.login_tips
 import updater.shared.generated.resources.logout_successful
 import updater.shared.generated.resources.security_error
 import updater.shared.generated.resources.send_code_error
-import updater.shared.generated.resources.two_factor_unsupported
-import updater.shared.generated.resources.verification_code_error
 import updater.shared.generated.resources.toast_crash_info
 import updater.shared.generated.resources.toast_ing
 import updater.shared.generated.resources.toast_no_info
 import updater.shared.generated.resources.toast_no_ultimate_link
 import updater.shared.generated.resources.toast_success_info
 import updater.shared.generated.resources.toast_wrong_info
+import updater.shared.generated.resources.two_factor_unsupported
+import updater.shared.generated.resources.verification_code_error
 import utils.MetadataUtils
 import kotlin.time.ExperimentalTime
 
@@ -481,17 +481,22 @@ class AppViewModel : ViewModel() {
         val url = if (noUltimateLink) curRomData.cdn1Download else curRomData.official1Download
         if (url.isEmpty()) return
 
-        val metadata = MetadataUtils.getMetadata(url)
-        val fingerprint = MetadataUtils.getMetadataValue(metadata, "post-build=")
-        val securityPatchLevel = MetadataUtils.getMetadataValue(metadata, "post-security-patch-level=")
-        val timestamp = convertTimestampToDateTime(MetadataUtils.getMetadataValue(metadata, "post-timestamp="))
+        val ota = MetadataUtils.getOtaMetadata(url) ?: return
+        val post = ota.postcondition
+        val postPartitions = post?.partitionState.orEmpty()
+
+        val postFingerprint = postPartitions.firstOrNull { it.partitionName == "odm" }
+            ?.build?.firstOrNull().orEmpty()
+            .ifEmpty { post?.build?.firstOrNull().orEmpty() }
 
         _uiState.update {
             it.copy(
                 curRomInfo = it.curRomInfo.copy(
-                    fingerprint = fingerprint,
-                    securityPatchLevel = securityPatchLevel,
-                    timestamp = timestamp,
+                    fingerprint = postFingerprint,
+                    securityPatchLevel = post?.securityPatchLevel.orEmpty(),
+                    timestamp = post?.timestamp?.takeIf { ts -> ts > 0 }
+                        ?.let { ts -> convertTimestampToDateTime(ts.toString()) }.orEmpty(),
+                    sdkLevel = post?.sdkLevel.orEmpty(),
                 )
             )
         }

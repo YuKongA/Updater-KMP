@@ -22,6 +22,7 @@
     <string name="fingerprint">Impressão digital</string>
     <string name="security_patch_level">Nível do patch de segurança</string>
     <string name="build_time">Hora da construção</string>
+    <string name="sdk_level">Nível do SDK</string>
     <string name="attention">ATENÇÃO</string>
     <string name="toast_ing">Pesquisando…</string>
     <string name="toast_no_info">Sem informações!</string>

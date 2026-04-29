@@ -72,6 +72,7 @@ import updater.shared.generated.resources.filemd5
 import updater.shared.generated.resources.filename
 import updater.shared.generated.resources.filesize
 import updater.shared.generated.resources.fingerprint
+import updater.shared.generated.resources.sdk_level
 import updater.shared.generated.resources.security_patch_level
 import updater.shared.generated.resources.system_version
 import updater.shared.generated.resources.tags
@@ -114,34 +115,30 @@ fun InfoCardViews(
 
             BaseMessageView(
                 romInfo.device,
+                romInfo.branch,
                 romInfo.version,
                 romInfo.bigVersion,
                 romInfo.codebase,
-                romInfo.branch
             )
 
             if (romInfo.isBeta) {
                 MessageTextView(
                     stringResource(Res.string.tags),
-                    "Beta"
+                    "Beta",
                 )
             }
 
             if (romInfo.isGov) {
                 MessageTextView(
                     stringResource(Res.string.tags),
-                    "Government"
+                    "Government",
                 )
             }
 
             AnimatedVisibility(
                 visible = hasTimestamp
             ) {
-                MetadataView(
-                    romInfo.fingerprint,
-                    romInfo.securityPatchLevel,
-                    romInfo.timestamp
-                )
+                MetadataView(romInfo)
             }
 
             RomFileInfoSection(
@@ -234,31 +231,36 @@ fun InfoCardViews(
 }
 
 @Composable
-fun MetadataView(
-    fingerprint: String,
-    securityPatchLevel: String,
-    buildTime: String,
-) {
+fun MetadataView(romInfo: DataHelper.RomInfoData) {
     Column {
-        MessageTextView(stringResource(Res.string.fingerprint), fingerprint)
-        MessageTextView(stringResource(Res.string.security_patch_level), securityPatchLevel)
-        MessageTextView(stringResource(Res.string.build_time), buildTime)
+        if (romInfo.sdkLevel.isNotEmpty()) {
+            MessageTextView(stringResource(Res.string.sdk_level), romInfo.sdkLevel)
+        }
+        if (romInfo.securityPatchLevel.isNotEmpty()) {
+            MessageTextView(stringResource(Res.string.security_patch_level), romInfo.securityPatchLevel)
+        }
+        if (romInfo.fingerprint.isNotEmpty()) {
+            MessageTextView(stringResource(Res.string.fingerprint), romInfo.fingerprint)
+        }
+        if (romInfo.timestamp.isNotEmpty()) {
+            MessageTextView(stringResource(Res.string.build_time), romInfo.timestamp)
+        }
     }
 }
 
 @Composable
 fun BaseMessageView(
     device: String,
+    branch: String,
     version: String,
     bigVersion: String,
     codebase: String,
-    branch: String
 ) {
     MessageTextView(stringResource(Res.string.code_name), device)
+    MessageTextView(stringResource(Res.string.branch), branch)
     MessageTextView(stringResource(Res.string.system_version), version)
     MessageTextView(stringResource(Res.string.big_version), bigVersion)
     MessageTextView(stringResource(Res.string.android_version), codebase)
-    MessageTextView(stringResource(Res.string.branch), branch)
 }
 
 @Composable

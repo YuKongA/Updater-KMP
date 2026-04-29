@@ -52,32 +52,46 @@ object ZipFileUtils {
         return FileInfoHelper.FileInfo(cenOffset, cenSize)
     }
 
-    fun locateLocalFileHeader(bytes: ByteArray, fileName: String): Long {
+    data class CdEntry(
+        val fileName: String,
+        val localHeaderOffset: Long,
+        val compressedSize: Long,
+        val uncompressedSize: Long,
+        val method: Int,
+    )
+
+    fun locateEntries(bytes: ByteArray, fileNames: Set<String>): Map<String, CdEntry> {
         val byteString = bytes.toByteString()
+        val results = HashMap<String, CdEntry>(fileNames.size)
         var pos = 0
-        var localHeaderOffset = -1L
-
         while (pos + 46 <= bytes.size) {
-            if ((byteString.getIntLe(pos).toLong() and 0xFFFFFFFFL) == CENSIG) {
-                val fileNameLength = byteString.getShortLe(pos + 28).toInt() and 0xFFFF
-                val extraFieldLength = byteString.getShortLe(pos + 30).toInt() and 0xFFFF
-                val fileCommentLength = byteString.getShortLe(pos + 32).toInt() and 0xFFFF
-                val relativeOffsetOfLocalHeader = byteString.getIntLe(pos + 42).toLong() and 0xFFFFFFFFL
+            if ((byteString.getIntLe(pos).toLong() and 0xFFFFFFFFL) != CENSIG) break
 
-                val fileNameStartPos = pos + 46
-                if (fileNameStartPos + fileNameLength > bytes.size) break
+            val method = byteString.getShortLe(pos + 10).toInt() and 0xFFFF
+            val compressedSize = byteString.getIntLe(pos + 20).toLong() and 0xFFFFFFFFL
+            val uncompressedSize = byteString.getIntLe(pos + 24).toLong() and 0xFFFFFFFFL
+            val fileNameLength = byteString.getShortLe(pos + 28).toInt() and 0xFFFF
+            val extraFieldLength = byteString.getShortLe(pos + 30).toInt() and 0xFFFF
+            val fileCommentLength = byteString.getShortLe(pos + 32).toInt() and 0xFFFF
+            val localHeaderOffset = byteString.getIntLe(pos + 42).toLong() and 0xFFFFFFFFL
 
-                val currentFileName = byteString.substring(fileNameStartPos, fileNameStartPos + fileNameLength).utf8()
-                if (fileName == currentFileName) {
-                    localHeaderOffset = relativeOffsetOfLocalHeader
-                    break
-                }
-                pos = fileNameStartPos + fileNameLength + extraFieldLength + fileCommentLength
-            } else {
-                break
+            val fileNameStartPos = pos + 46
+            if (fileNameStartPos + fileNameLength > bytes.size) break
+
+            val currentFileName = byteString.substring(fileNameStartPos, fileNameStartPos + fileNameLength).utf8()
+            if (currentFileName in fileNames) {
+                results[currentFileName] = CdEntry(
+                    fileName = currentFileName,
+                    localHeaderOffset = localHeaderOffset,
+                    compressedSize = compressedSize,
+                    uncompressedSize = uncompressedSize,
+                    method = method,
+                )
+                if (results.size == fileNames.size) break
             }
+            pos = fileNameStartPos + fileNameLength + extraFieldLength + fileCommentLength
         }
-        return localHeaderOffset
+        return results
     }
 
     fun locateLocalFileOffset(bytes: ByteArray): Long {

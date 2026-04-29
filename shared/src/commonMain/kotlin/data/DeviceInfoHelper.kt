@@ -74,6 +74,7 @@ object DeviceInfoHelper {
         _codeNamesFlow.value = _codeNames
     }
 
+    private val androidX = Android("17.0", "X")
     private val androidW = Android("16.0", "W")
     private val androidV = Android("15.0", "V")
     private val androidU = Android("14.0", "U")
@@ -92,6 +93,7 @@ object DeviceInfoHelper {
     private val androidK = Android("4.4", "K")
 
     private val androidList = listOf(
+        androidX,
         androidW,
         androidV,
         androidU,
