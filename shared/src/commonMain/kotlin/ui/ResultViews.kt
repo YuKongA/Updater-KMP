@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -354,20 +355,25 @@ private fun XmsAppRow(app: DataHelper.XmsAppInfo) {
                 .padding(horizontal = 16.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 4.dp)
+            ) {
                 if (displayTitle.isNotEmpty()) {
                     Text(
                         text = displayTitle,
-                        fontSize = 15.sp,
+                        fontSize = MiuixTheme.textStyles.headline1.fontSize,
                         fontWeight = FontWeight.Medium,
                         maxLines = 1,
+                        modifier = Modifier.basicMarquee()
                     )
                 }
                 if (app.versionCode.isNotEmpty()) {
                     Text(
                         text = "v${app.versionCode}",
-                        color = MiuixTheme.colorScheme.onSecondaryVariant,
-                        fontSize = 12.sp,
+                        fontSize = MiuixTheme.textStyles.body2.fontSize,
+                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
                     )
                 }
             }
@@ -402,8 +408,10 @@ private fun XmsAppRow(app: DataHelper.XmsAppInfo) {
             Icon(
                 imageVector = MiuixIcons.Basic.ArrowRight,
                 contentDescription = null,
-                tint = MiuixTheme.colorScheme.onSecondaryVariant,
-                modifier = Modifier.rotate(rotation).padding(start = 8.dp),
+                tint = MiuixTheme.colorScheme.onSurfaceVariantActions,
+                modifier = Modifier
+                    .padding(start = 4.dp)
+                    .rotate(rotation),
             )
         }
         AnimatedVisibility(
