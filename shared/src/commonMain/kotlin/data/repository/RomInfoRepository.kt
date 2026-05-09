@@ -30,7 +30,8 @@ class RomInfoRepository {
         androidVersion: String,
         userId: String,
         security: String,
-        token: String
+        token: String,
+        xmsVersion: String,
     ): String {
         return buildJsonObject {
             if (branch.isNotEmpty()) put("b", branch)
@@ -47,6 +48,7 @@ class RomInfoRepository {
             put("token", token)
             put("unlock", "0")
             put("v", "MIUI-$romVersion")
+            if (xmsVersion.isNotEmpty()) put("xv", xmsVersion)
 
             if ((androidVersion.toFloatOrNull() ?: 0f) >= 15.0f) {
                 putJsonObject("options") {
@@ -63,7 +65,8 @@ class RomInfoRepository {
         regionCode: String,
         romVersion: String,
         androidVersion: String,
-        loginData: DataHelper.LoginData?
+        loginData: DataHelper.LoginData?,
+        xmsVersion: String = "",
     ): String {
         val accountType: String
         val port: String
@@ -91,7 +94,7 @@ class RomInfoRepository {
             cUserId = ""
         }
 
-        val jsonData = generateJson(branch, codeNameExt, regionCode, romVersion, androidVersion, userId, ssecurity, serviceToken)
+        val jsonData = generateJson(branch, codeNameExt, regionCode, romVersion, androidVersion, userId, ssecurity, serviceToken, xmsVersion)
         val encryptedText = miuiEncrypt(jsonData, securityKey)
         val parameters = Parameters.build {
             append("q", encryptedText)
@@ -114,7 +117,8 @@ class RomInfoRepository {
                 }
             }
             val requestedEncryptedText = response.body<String>()
-            return miuiDecrypt(requestedEncryptedText, securityKey)
+            val decrypted = miuiDecrypt(requestedEncryptedText, securityKey)
+            return decrypted
         } catch (e: Exception) {
             e.printStackTrace()
             return ""

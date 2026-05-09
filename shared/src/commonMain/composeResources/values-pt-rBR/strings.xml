@@ -24,6 +24,10 @@
     <string name="build_time">Hora da construção</string>
     <string name="sdk_level">Nível do SDK</string>
     <string name="attention">ATENÇÃO</string>
+    <string name="xms_update">Atualização XMS</string>
+    <string name="xms_current_version">Versão Atual</string>
+    <string name="xms_target_version">Versão Alvo</string>
+    <string name="xms_package_count">Quantidade de Pacotes</string>
     <string name="toast_ing">Pesquisando…</string>
     <string name="toast_no_info">Sem informações!</string>
     <string name="toast_wrong_info">A versão solicitada não existe!</string>

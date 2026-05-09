@@ -42,6 +42,19 @@ object DataHelper {
     )
 
     @Serializable
+    data class XmsInfoData(
+        val hasUpdate: Boolean = false,
+        val curVer: String = "",
+        val lstVer: String = "",
+        val pkgCnt: Int = 0,
+        val prio: Int = 0,
+        val pkgs: List<String> = emptyList(),
+        val gentleNotice: String = "",
+        val changelogItems: List<ImageInfoData> = emptyList(),
+        val changelogText: String = "",
+    )
+
+    @Serializable
     data class RomInfoData(
         val type: String = "",
         val device: String = "",

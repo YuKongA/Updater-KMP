@@ -95,12 +95,13 @@ data class AppUiState(
     val incIconInfo: List<DataHelper.IconInfoData> = emptyList(),
     val curImageInfo: List<DataHelper.ImageInfoData> = emptyList(),
     val incImageInfo: List<DataHelper.ImageInfoData> = emptyList(),
+    val xmsInfo: DataHelper.XmsInfoData = DataHelper.XmsInfoData(),
     val isLoading: Boolean = false,
     val searchHistory: List<DataHelper.SearchHistoryEntry> = emptyList(),
     val searchHistorySelected: Int = 0,
     val showMenuPopup: Boolean = false,
     val showDeviceSettingsDialog: Boolean = false,
-    val showAboutDialog: Boolean = false
+    val showAboutDialog: Boolean = false,
 )
 
 class AppViewModel : ViewModel() {
@@ -181,7 +182,7 @@ class AppViewModel : ViewModel() {
                 loginAccount = savedPassword.first,
                 loginPassword = savedPassword.second,
                 loginSavePassword = savedSavePassword,
-                searchHistory = searchHistory
+                searchHistory = searchHistory,
             )
         }
 
@@ -555,7 +556,8 @@ class AppViewModel : ViewModel() {
                     curIconInfo = emptyList(),
                     incIconInfo = emptyList(),
                     curImageInfo = emptyList(),
-                    incImageInfo = emptyList()
+                    incImageInfo = emptyList(),
+                    xmsInfo = DataHelper.XmsInfoData(),
                 )
             }
 
@@ -588,6 +590,27 @@ class AppViewModel : ViewModel() {
                         currentRomInfoStr = retryStr
                         recoveryRomInfo = Json.decodeFromString<RomInfoHelper.RomInfo>(currentRomInfoStr)
                     }
+                }
+
+                val xmsRaw = recoveryRomInfo.xmsUpdateInfo
+                val xmsForBuild = if (xmsRaw?.hasXmsUpdate == 1 && !xmsRaw.lstVer.isNullOrEmpty()) {
+                    val followUpStr = repository.getRecoveryRomInfo(
+                        params.branchExt, params.codeNameExt, params.regionCode,
+                        params.systemVersionExt, state.androidVersion, currentLoginData, xmsRaw.lstVer
+                    )
+                    val followUpChangeLog = if (followUpStr.isNotEmpty()) {
+                        try {
+                            Json.decodeFromString<RomInfoHelper.RomInfo>(followUpStr).xmsUpdateInfo?.changeLog
+                        } catch (_: Exception) {
+                            null
+                        }
+                    } else null
+                    if (followUpChangeLog != null) xmsRaw.copy(changeLog = followUpChangeLog) else xmsRaw
+                } else {
+                    xmsRaw
+                }
+                _uiState.update {
+                    it.copy(xmsInfo = buildXmsInfo(xmsForBuild, recoveryRomInfo.fileMirror?.image ?: ""))
                 }
 
                 when {
@@ -630,6 +653,47 @@ class AppViewModel : ViewModel() {
 
         _uiState.update { it.copy(searchHistory = currentHistory, searchHistorySelected = 0) }
         prefSet("searchHistory", Json.encodeToString(currentHistory))
+    }
+
+    private fun buildXmsInfo(info: RomInfoHelper.XmsUpdateInfo?, imageMirror: String): DataHelper.XmsInfoData {
+        if (info == null) return DataHelper.XmsInfoData()
+        val cleanedGentle = info.gentleNotice?.text?.replace("<li>", "\n· ")
+            ?.replace("</li>", "")?.replace("<p>", "\n")?.replace("</p>", "")?.replace("&nbsp;", " ")
+            ?.replace("&#160;", "")?.replace(Regex("<[^>]*>"), "")?.trim()
+            ?.split("\n")?.drop(1)?.joinToString("\n").orEmpty()
+
+        val changelogItems = mutableListOf<DataHelper.ImageInfoData>()
+        val flatLog = StringBuilder()
+        info.changeLog?.forEach { (category, items) ->
+            val joined = items.joinToString("\n") { it.txt.trimEnd() }.trim()
+            if (category.isNotEmpty()) flatLog.append(category).append("\n")
+            if (joined.isNotEmpty()) flatLog.append(joined).append("\n")
+            flatLog.append("\n")
+            items.forEach { item ->
+                val image = item.image?.firstOrNull()
+                changelogItems.add(
+                    DataHelper.ImageInfoData(
+                        title = category,
+                        changelog = item.txt,
+                        imageUrl = imageLink(imageMirror, image?.path),
+                        imageWidth = image?.w?.toIntOrNull(),
+                        imageHeight = image?.h?.toIntOrNull(),
+                    )
+                )
+            }
+        }
+
+        return DataHelper.XmsInfoData(
+            hasUpdate = info.hasXmsUpdate == 1,
+            curVer = info.curVer.orEmpty(),
+            lstVer = info.lstVer.orEmpty(),
+            pkgCnt = info.pkgCnt,
+            prio = info.prio ?: 0,
+            pkgs = info.pkgs.orEmpty(),
+            gentleNotice = cleanedGentle,
+            changelogItems = changelogItems,
+            changelogText = flatLog.toString().trimEnd(),
+        )
     }
 
     private fun processRomInfo(

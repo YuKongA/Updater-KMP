@@ -85,6 +85,7 @@ import ui.BasicViews
 import ui.DeviceListDialog
 import ui.InfoCardViews
 import ui.LoginCardView
+import ui.XmsInfoCardView
 import updater.shared.generated.resources.Res
 import updater.shared.generated.resources.app_name
 import updater.shared.generated.resources.clear_search_history
@@ -316,6 +317,7 @@ private fun PortraitAppView(
                         Column(modifier = Modifier.padding(horizontal = 12.dp)) {
                             InfoCardViews(uiState.curRomInfo, uiState.curIconInfo, uiState.curImageInfo, 0)
                             InfoCardViews(uiState.incRomInfo, uiState.incIconInfo, uiState.incImageInfo, 0)
+                            XmsInfoCardView(uiState.xmsInfo)
                         }
                     }
                 }
@@ -461,6 +463,7 @@ private fun LandscapeAppView(
                         ) {
                             InfoCardViews(uiState.curRomInfo, uiState.curIconInfo, uiState.curImageInfo, 0)
                             InfoCardViews(uiState.incRomInfo, uiState.incIconInfo, uiState.incImageInfo, 0)
+                            XmsInfoCardView(uiState.xmsInfo)
                         }
                         Spacer(
                             Modifier.height(

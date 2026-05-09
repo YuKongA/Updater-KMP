@@ -76,6 +76,10 @@ import updater.shared.generated.resources.sdk_level
 import updater.shared.generated.resources.security_patch_level
 import updater.shared.generated.resources.system_version
 import updater.shared.generated.resources.tags
+import updater.shared.generated.resources.xms_current_version
+import updater.shared.generated.resources.xms_package_count
+import updater.shared.generated.resources.xms_target_version
+import updater.shared.generated.resources.xms_update
 import utils.LinkUtils
 import utils.MessageUtils.Companion.showMessage
 
@@ -208,6 +212,79 @@ fun InfoCardViews(
                 )
                 SelectionContainer {
                     val gentleLines = remember(romInfo.gentleNotice) { romInfo.gentleNotice.lines() }
+                    val textColor = MiuixTheme.colorScheme.onSecondaryVariant
+
+                    Column {
+                        gentleLines.forEachIndexed { idx, line ->
+                            if (line.isNotBlank()) {
+                                Text(
+                                    text = line,
+                                    color = textColor,
+                                    fontSize = 14.5.sp,
+                                    modifier = Modifier.padding(vertical = if (idx == 0) 6.dp else 4.dp)
+                                )
+                            } else {
+                                Spacer(modifier = Modifier.height(4.dp))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun XmsInfoCardView(
+    xmsInfo: DataHelper.XmsInfoData
+) {
+    val hasContent = xmsInfo.hasUpdate ||
+            xmsInfo.curVer.isNotEmpty() ||
+            xmsInfo.changelogItems.isNotEmpty() ||
+            xmsInfo.gentleNotice.isNotEmpty()
+    AnimatedVisibility(
+        visible = hasContent,
+        enter = fadeIn() + expandVertically(),
+        exit = fadeOut() + shrinkVertically()
+    ) {
+        Card(
+            modifier = Modifier.padding(bottom = 12.dp),
+            insideMargin = PaddingValues(16.dp)
+        ) {
+            Text(
+                text = stringResource(Res.string.xms_update),
+                fontSize = 24.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            if (xmsInfo.curVer.isNotEmpty()) {
+                MessageTextView(stringResource(Res.string.xms_current_version), xmsInfo.curVer)
+            }
+            if (xmsInfo.lstVer.isNotEmpty()) {
+                MessageTextView(stringResource(Res.string.xms_target_version), xmsInfo.lstVer)
+            }
+            if (xmsInfo.pkgCnt > 0) {
+                MessageTextView(stringResource(Res.string.xms_package_count), xmsInfo.pkgCnt.toString())
+            }
+
+            if (xmsInfo.changelogItems.isNotEmpty()) {
+                ChangelogView(
+                    iconInfo = emptyList(),
+                    imageInfo = xmsInfo.changelogItems,
+                    changelog = xmsInfo.changelogText,
+                )
+            }
+
+            if (xmsInfo.gentleNotice.isNotEmpty()) {
+                Text(
+                    modifier = Modifier.padding(top = 16.dp, bottom = 10.dp),
+                    text = stringResource(Res.string.attention),
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                SelectionContainer {
+                    val gentleLines = remember(xmsInfo.gentleNotice) { xmsInfo.gentleNotice.lines() }
                     val textColor = MiuixTheme.colorScheme.onSecondaryVariant
 
                     Column {
