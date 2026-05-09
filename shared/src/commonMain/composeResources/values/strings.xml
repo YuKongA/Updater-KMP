@@ -29,6 +29,9 @@
     <string name="xms_current_version">Current Version</string>
     <string name="xms_target_version">Target Version</string>
     <string name="xms_package_count">Package Count</string>
+    <string name="xms_packages">Download Packages</string>
+    <string name="xms_package_name">Package Name</string>
+    <string name="xms_version_code">Version Code</string>
     <string name="toast_ing">Searching…</string>
     <string name="toast_no_info">No information!</string>
     <string name="toast_wrong_info">Requested version does not exist!</string>

@@ -28,6 +28,9 @@
     <string name="xms_current_version">当前版本</string>
     <string name="xms_target_version">目标版本</string>
     <string name="xms_package_count">安装包数量</string>
+    <string name="xms_packages">下载安装包</string>
+    <string name="xms_package_name">包名</string>
+    <string name="xms_version_code">版本号</string>
     <string name="toast_ing">正在查询…</string>
     <string name="toast_no_info">未查询到信息！</string>
     <string name="toast_wrong_info">请求版本不存在！</string>

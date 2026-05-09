@@ -2,11 +2,13 @@ package ui
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,11 +24,14 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboard
@@ -54,6 +59,7 @@ import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.icon.MiuixIcons
+import top.yukonga.miuix.kmp.icon.basic.ArrowRight
 import top.yukonga.miuix.kmp.icon.extended.Copy
 import top.yukonga.miuix.kmp.icon.extended.Download
 import top.yukonga.miuix.kmp.theme.MiuixTheme
@@ -78,6 +84,8 @@ import updater.shared.generated.resources.system_version
 import updater.shared.generated.resources.tags
 import updater.shared.generated.resources.xms_current_version
 import updater.shared.generated.resources.xms_package_count
+import updater.shared.generated.resources.xms_package_name
+import updater.shared.generated.resources.xms_packages
 import updater.shared.generated.resources.xms_target_version
 import updater.shared.generated.resources.xms_update
 import utils.LinkUtils
@@ -249,58 +257,172 @@ fun XmsInfoCardView(
     ) {
         Card(
             modifier = Modifier.padding(bottom = 12.dp),
-            insideMargin = PaddingValues(16.dp)
+            insideMargin = PaddingValues(0.dp)
         ) {
             Text(
                 text = stringResource(Res.string.xms_update),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(bottom = 12.dp)
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 12.dp),
             )
 
-            if (xmsInfo.curVer.isNotEmpty()) {
-                MessageTextView(stringResource(Res.string.xms_current_version), xmsInfo.curVer)
+            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                if (xmsInfo.curVer.isNotEmpty()) {
+                    MessageTextView(stringResource(Res.string.xms_current_version), xmsInfo.curVer)
+                }
+                if (xmsInfo.lstVer.isNotEmpty()) {
+                    MessageTextView(stringResource(Res.string.xms_target_version), xmsInfo.lstVer)
+                }
+                if (xmsInfo.pkgCnt > 0) {
+                    MessageTextView(stringResource(Res.string.xms_package_count), xmsInfo.pkgCnt.toString())
+                }
             }
-            if (xmsInfo.lstVer.isNotEmpty()) {
-                MessageTextView(stringResource(Res.string.xms_target_version), xmsInfo.lstVer)
-            }
-            if (xmsInfo.pkgCnt > 0) {
-                MessageTextView(stringResource(Res.string.xms_package_count), xmsInfo.pkgCnt.toString())
+
+            if (xmsInfo.apps.isNotEmpty()) {
+                Text(
+                    text = stringResource(Res.string.xms_packages),
+                    color = MiuixTheme.colorScheme.onSecondaryVariant,
+                    fontSize = 13.sp,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+                xmsInfo.apps.forEach { app ->
+                    XmsAppRow(app)
+                }
             }
 
             if (xmsInfo.changelogItems.isNotEmpty()) {
-                ChangelogView(
-                    iconInfo = emptyList(),
-                    imageInfo = xmsInfo.changelogItems,
-                    changelog = xmsInfo.changelogText,
-                )
+                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    ChangelogView(
+                        iconInfo = emptyList(),
+                        imageInfo = xmsInfo.changelogItems,
+                        changelog = xmsInfo.changelogText,
+                    )
+                }
             }
 
             if (xmsInfo.gentleNotice.isNotEmpty()) {
-                Text(
-                    modifier = Modifier.padding(top = 16.dp, bottom = 10.dp),
-                    text = stringResource(Res.string.attention),
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                SelectionContainer {
-                    val gentleLines = remember(xmsInfo.gentleNotice) { xmsInfo.gentleNotice.lines() }
-                    val textColor = MiuixTheme.colorScheme.onSecondaryVariant
+                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Text(
+                        modifier = Modifier.padding(top = 16.dp, bottom = 10.dp),
+                        text = stringResource(Res.string.attention),
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    SelectionContainer {
+                        val gentleLines = remember(xmsInfo.gentleNotice) { xmsInfo.gentleNotice.lines() }
+                        val textColor = MiuixTheme.colorScheme.onSecondaryVariant
 
-                    Column {
-                        gentleLines.forEachIndexed { idx, line ->
-                            if (line.isNotBlank()) {
-                                Text(
-                                    text = line,
-                                    color = textColor,
-                                    fontSize = 14.5.sp,
-                                    modifier = Modifier.padding(vertical = if (idx == 0) 6.dp else 4.dp)
-                                )
-                            } else {
-                                Spacer(modifier = Modifier.height(4.dp))
+                        Column {
+                            gentleLines.forEachIndexed { idx, line ->
+                                if (line.isNotBlank()) {
+                                    Text(
+                                        text = line,
+                                        color = textColor,
+                                        fontSize = 14.5.sp,
+                                        modifier = Modifier.padding(vertical = if (idx == 0) 6.dp else 4.dp)
+                                    )
+                                } else {
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                }
                             }
                         }
                     }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+}
+
+@Composable
+private fun XmsAppRow(app: DataHelper.XmsAppInfo) {
+    var expanded by remember { mutableStateOf(false) }
+    val rotation by animateFloatAsState(targetValue = if (expanded) 90f else 0f, label = "xmsRowChevron")
+    val hapticFeedback = LocalHapticFeedback.current
+    val clipboard = LocalClipboard.current
+    val coroutineScope = rememberCoroutineScope()
+    val messageCopySuccessful = stringResource(Res.string.copy_successful)
+    val messageDownloadStart = stringResource(Res.string.download_start)
+    val displayTitle = app.name.ifEmpty { app.packName }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded }
+                .padding(horizontal = 16.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+                if (displayTitle.isNotEmpty()) {
+                    Text(
+                        text = displayTitle,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                    )
+                }
+                if (app.versionCode.isNotEmpty()) {
+                    Text(
+                        text = "v${app.versionCode}",
+                        color = MiuixTheme.colorScheme.onSecondaryVariant,
+                        fontSize = 12.sp,
+                    )
+                }
+            }
+            app.downloadUrls.firstOrNull()?.let { url ->
+                IconButton(
+                    onClick = {
+                        coroutineScope.launch { clipboard.copyToClipboard(url) }
+                        showMessage(messageCopySuccessful)
+                        hapticFeedback.performHapticFeedback(HapticFeedbackType.Confirm)
+                    }
+                ) {
+                    Icon(
+                        imageVector = MiuixIcons.Copy,
+                        contentDescription = "Copy",
+                        tint = MiuixTheme.colorScheme.onSurface,
+                    )
+                }
+                IconButton(
+                    onClick = {
+                        downloadToLocal(url, app.fileName)
+                        showMessage(messageDownloadStart)
+                        hapticFeedback.performHapticFeedback(HapticFeedbackType.Confirm)
+                    }
+                ) {
+                    Icon(
+                        imageVector = MiuixIcons.Download,
+                        contentDescription = "Download",
+                        tint = MiuixTheme.colorScheme.onSurface,
+                    )
+                }
+            }
+            Icon(
+                imageVector = MiuixIcons.Basic.ArrowRight,
+                contentDescription = null,
+                tint = MiuixTheme.colorScheme.onSecondaryVariant,
+                modifier = Modifier.rotate(rotation).padding(start = 8.dp),
+            )
+        }
+        AnimatedVisibility(
+            visible = expanded,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically(),
+        ) {
+            Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)) {
+                if (app.packName.isNotEmpty()) {
+                    MessageTextView(stringResource(Res.string.xms_package_name), app.packName)
+                }
+                if (app.fileName.isNotEmpty()) {
+                    MessageTextView(stringResource(Res.string.filename), app.fileName)
+                }
+                if (app.fileSize.isNotEmpty()) {
+                    MessageTextView(stringResource(Res.string.filesize), app.fileSize)
+                }
+                if (app.md5.isNotEmpty()) {
+                    MessageTextView(stringResource(Res.string.filemd5), app.md5)
                 }
             }
         }

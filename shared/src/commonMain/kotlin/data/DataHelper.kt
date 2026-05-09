@@ -42,13 +42,24 @@ object DataHelper {
     )
 
     @Serializable
+    data class XmsAppInfo(
+        val name: String = "",
+        val packName: String = "",
+        val versionCode: String = "",
+        val fileName: String = "",
+        val fileSize: String = "",
+        val md5: String = "",
+        val downloadUrls: List<String> = emptyList(),
+    )
+
+    @Serializable
     data class XmsInfoData(
         val hasUpdate: Boolean = false,
         val curVer: String = "",
         val lstVer: String = "",
         val pkgCnt: Int = 0,
         val prio: Int = 0,
-        val pkgs: List<String> = emptyList(),
+        val apps: List<XmsAppInfo> = emptyList(),
         val gentleNotice: String = "",
         val changelogItems: List<ImageInfoData> = emptyList(),
         val changelogText: String = "",

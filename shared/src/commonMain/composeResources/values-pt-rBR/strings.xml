@@ -28,6 +28,9 @@
     <string name="xms_current_version">Versão Atual</string>
     <string name="xms_target_version">Versão Alvo</string>
     <string name="xms_package_count">Quantidade de Pacotes</string>
+    <string name="xms_packages">Baixar Pacotes</string>
+    <string name="xms_package_name">Nome do Pacote</string>
+    <string name="xms_version_code">Código da Versão</string>
     <string name="toast_ing">Pesquisando…</string>
     <string name="toast_no_info">Sem informações!</string>
     <string name="toast_wrong_info">A versão solicitada não existe!</string>

@@ -8,7 +8,9 @@ import data.DataHelper
 import data.DeviceInfoHelper
 import data.RomInfoHelper
 import data.repository.RomInfoRepository
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -593,24 +595,51 @@ class AppViewModel : ViewModel() {
                 }
 
                 val xmsRaw = recoveryRomInfo.xmsUpdateInfo
-                val xmsForBuild = if (xmsRaw?.hasXmsUpdate == 1 && !xmsRaw.lstVer.isNullOrEmpty()) {
-                    val followUpStr = repository.getRecoveryRomInfo(
-                        params.branchExt, params.codeNameExt, params.regionCode,
-                        params.systemVersionExt, state.androidVersion, currentLoginData, xmsRaw.lstVer
-                    )
-                    val followUpChangeLog = if (followUpStr.isNotEmpty()) {
-                        try {
-                            Json.decodeFromString<RomInfoHelper.RomInfo>(followUpStr).xmsUpdateInfo?.changeLog
-                        } catch (_: Exception) {
-                            null
+                val (xmsForBuild, xmsApps) = if (xmsRaw?.hasXmsUpdate == 1 && !xmsRaw.lstVer.isNullOrEmpty()) {
+                    val pkgList = xmsRaw.pkgs.orEmpty()
+                    coroutineScope {
+                        val followUpDeferred = async {
+                            val followUpStr = repository.getRecoveryRomInfo(
+                                params.branchExt, params.codeNameExt, params.regionCode,
+                                params.systemVersionExt, state.androidVersion, currentLoginData, xmsRaw.lstVer
+                            )
+                            if (followUpStr.isNotEmpty()) {
+                                try {
+                                    Json.decodeFromString<RomInfoHelper.RomInfo>(followUpStr).xmsUpdateInfo?.changeLog
+                                } catch (_: Exception) {
+                                    null
+                                }
+                            } else null
                         }
-                    } else null
-                    if (followUpChangeLog != null) xmsRaw.copy(changeLog = followUpChangeLog) else xmsRaw
+                        val xmsVerDeferred = async {
+                            if (pkgList.isEmpty()) emptyList()
+                            else {
+                                val xmsVerStr = repository.getXmsVerInfo(
+                                    params.codeNameExt, params.regionCode, params.systemVersionExt,
+                                    state.androidVersion, pkgList,
+                                    xmsRaw.curVer.orEmpty(), xmsRaw.lstVer, currentLoginData
+                                )
+                                if (xmsVerStr.isNotEmpty()) {
+                                    try {
+                                        val dto = Json.decodeFromString<RomInfoHelper.XmsDto>(xmsVerStr)
+                                        buildXmsApps(dto)
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                        emptyList()
+                                    }
+                                } else emptyList()
+                            }
+                        }
+                        val followUpChangeLog = followUpDeferred.await()
+                        val apps = xmsVerDeferred.await()
+                        val updated = if (followUpChangeLog != null) xmsRaw.copy(changeLog = followUpChangeLog) else xmsRaw
+                        updated to apps
+                    }
                 } else {
-                    xmsRaw
+                    xmsRaw to emptyList()
                 }
                 _uiState.update {
-                    it.copy(xmsInfo = buildXmsInfo(xmsForBuild, recoveryRomInfo.fileMirror?.image ?: ""))
+                    it.copy(xmsInfo = buildXmsInfo(xmsForBuild, recoveryRomInfo.fileMirror?.image ?: "", xmsApps))
                 }
 
                 when {
@@ -655,8 +684,37 @@ class AppViewModel : ViewModel() {
         prefSet("searchHistory", Json.encodeToString(currentHistory))
     }
 
-    private fun buildXmsInfo(info: RomInfoHelper.XmsUpdateInfo?, imageMirror: String): DataHelper.XmsInfoData {
-        if (info == null) return DataHelper.XmsInfoData()
+    private fun buildXmsApps(dto: RomInfoHelper.XmsDto): List<DataHelper.XmsAppInfo> {
+        val mirrors = dto.mirrorList.orEmpty()
+        return dto.apkLists.orEmpty().map { apk ->
+            val resolvedUrls = apk.downloadUrls.orEmpty().mapNotNull { url ->
+                resolveXmsDownloadUrl(url, mirrors)
+            }
+            DataHelper.XmsAppInfo(
+                name = apk.name.orEmpty(),
+                packName = apk.packName.orEmpty(),
+                versionCode = apk.lastVerCode.orEmpty(),
+                fileName = apk.fileName.orEmpty(),
+                fileSize = apk.size?.toString().orEmpty(),
+                md5 = apk.md5.orEmpty(),
+                downloadUrls = resolvedUrls,
+            )
+        }
+    }
+
+    private fun resolveXmsDownloadUrl(raw: String, mirrors: List<String>): String? {
+        if (raw.isEmpty()) return null
+        if (raw.startsWith("http://") || raw.startsWith("https://")) return raw
+        val mirror = mirrors.firstOrNull()?.trimEnd('/') ?: return null
+        return mirror + (if (raw.startsWith("/")) raw else "/$raw")
+    }
+
+    private fun buildXmsInfo(
+        info: RomInfoHelper.XmsUpdateInfo?,
+        imageMirror: String,
+        apps: List<DataHelper.XmsAppInfo> = emptyList(),
+    ): DataHelper.XmsInfoData {
+        if (info == null) return DataHelper.XmsInfoData(apps = apps)
         val cleanedGentle = info.gentleNotice?.text?.replace("<li>", "\n· ")
             ?.replace("</li>", "")?.replace("<p>", "\n")?.replace("</p>", "")?.replace("&nbsp;", " ")
             ?.replace("&#160;", "")?.replace(Regex("<[^>]*>"), "")?.trim()
@@ -689,7 +747,7 @@ class AppViewModel : ViewModel() {
             lstVer = info.lstVer.orEmpty(),
             pkgCnt = info.pkgCnt,
             prio = info.prio ?: 0,
-            pkgs = info.pkgs.orEmpty(),
+            apps = apps,
             gentleNotice = cleanedGentle,
             changelogItems = changelogItems,
             changelogText = flatLog.toString().trimEnd(),

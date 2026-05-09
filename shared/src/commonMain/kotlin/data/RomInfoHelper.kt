@@ -98,6 +98,47 @@ object RomInfoHelper {
         val changeLog: LinkedHashMap<String, List<ChangelogItem>>? = null,
     )
 
+    @Serializable
+    @JsonIgnoreUnknownKeys
+    @OptIn(ExperimentalSerializationApi::class)
+    data class XmsDto(
+        val userLevel: Int? = null,
+        val traceId: String? = null,
+        val xmsVersion: XmsVersion? = null,
+        val apkLists: List<XmsApkInfo>? = null,
+        val mirrorList: List<String>? = null,
+        val gentleNotice: GentleNotice? = null,
+        val fileMirror: XmsFileMirror? = null,
+    )
+
+    @Serializable
+    data class XmsVersion(
+        val curVer: String? = null,
+        val lastVer: String? = null,
+        val size: Long? = null,
+    )
+
+    @Serializable
+    data class XmsFileMirror(
+        val image: String? = null,
+        val video: String? = null,
+    )
+
+    @Serializable
+    @JsonIgnoreUnknownKeys
+    @OptIn(ExperimentalSerializationApi::class)
+    data class XmsApkInfo(
+        val name: String? = null,
+        val packName: String? = null,
+        val curVerCode: String? = null,
+        val lastVerCode: String? = null,
+        val updateStatus: Int? = null,
+        val fileName: String? = null,
+        val md5: String? = null,
+        val size: Long? = null,
+        val downloadUrls: List<String>? = null,
+    )
+
     object ChangelogSerializer : KSerializer<LinkedHashMap<String, List<ChangelogItem>>> {
         override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Changelog")
 
