@@ -110,5 +110,5 @@ val generateVersionInfo by tasks.registering(GenerateVersionInfoTask::class) {
     versionName.set(ProjectConfig.VERSION_NAME)
     versionCode.set(getGitVersionCode())
     outputFile.set(generatedSrcDir.map { it.file("kotlin/misc/VersionInfo.kt") })
-    iosPlistFile.set(layout.projectDirectory.file("../ios/iosApp/Info.plist"))
+    xcconfigFile.set(layout.projectDirectory.file("../ios/iosApp/Generated.xcconfig"))
 }
