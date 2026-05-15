@@ -48,14 +48,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import data.DataHelper
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import top.yukonga.miuix.kmp.basic.DropdownImpl
+import top.yukonga.miuix.kmp.basic.DropdownEntry
+import top.yukonga.miuix.kmp.basic.DropdownItem
 import top.yukonga.miuix.kmp.basic.HorizontalDivider
 import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.ListPopupColumn
-import top.yukonga.miuix.kmp.basic.ListPopupDefaults
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.PopupPositionProvider
 import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.ScrollBehavior
 import top.yukonga.miuix.kmp.basic.SmallTopAppBar
@@ -72,9 +69,9 @@ import top.yukonga.miuix.kmp.blur.layerBackdrop
 import top.yukonga.miuix.kmp.blur.rememberLayerBackdrop
 import top.yukonga.miuix.kmp.blur.textureBlur
 import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.interfaces.ExperimentalScrollBarApi
 import top.yukonga.miuix.kmp.icon.extended.Settings
-import top.yukonga.miuix.kmp.overlay.OverlayListPopup
+import top.yukonga.miuix.kmp.interfaces.ExperimentalScrollBarApi
+import top.yukonga.miuix.kmp.menu.OverlayIconDropdownMenu
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.utils.Platform
 import top.yukonga.miuix.kmp.utils.overScrollVertical
@@ -159,55 +156,28 @@ fun App(
 @Composable
 private fun MenuActions(
     searchHistory: List<DataHelper.SearchHistoryEntry>,
-    showMenuPopup: Boolean,
     focusManager: FocusManager,
     onClearSearchHistory: () -> Unit,
-    onShowDeviceSettings: () -> Unit,
-    onShowMenuPopupChange: (Boolean) -> Unit
+    onShowDeviceSettings: () -> Unit
 ) {
-    OverlayListPopup(
-        show = showMenuPopup,
-        popupPositionProvider = ListPopupDefaults.ContextMenuPositionProvider,
-        alignment = PopupPositionProvider.Align.TopEnd,
-        onDismissRequest = {
-            onShowMenuPopupChange(false)
-        },
-        content = {
-            ListPopupColumn {
-                DropdownImpl(
-                    text = stringResource(Res.string.device_list_settings),
-                    optionSize = if (searchHistory.isNotEmpty()) 2 else 1,
-                    isSelected = false,
-                    onSelectedIndexChange = {
-                        onShowMenuPopupChange(false)
-                        onShowDeviceSettings()
-                    },
-                    index = 0
+    val entry = DropdownEntry(
+        items = listOfNotNull(
+            DropdownItem(
+                text = stringResource(Res.string.device_list_settings),
+                onClick = onShowDeviceSettings
+            ),
+            if (searchHistory.isNotEmpty()) {
+                DropdownItem(
+                    text = stringResource(Res.string.clear_search_history),
+                    onClick = onClearSearchHistory
                 )
-
-                if (searchHistory.isNotEmpty()) {
-                    DropdownImpl(
-                        text = stringResource(Res.string.clear_search_history),
-                        optionSize = 2,
-                        isSelected = false,
-                        onSelectedIndexChange = {
-                            onShowMenuPopupChange(false)
-                            onClearSearchHistory()
-                        },
-                        index = 1
-                    )
-                }
-            }
-        }
+            } else null
+        )
     )
-
-    IconButton(
+    OverlayIconDropdownMenu(
+        entry = entry,
         modifier = Modifier.size(40.dp),
-        onClick = {
-            onShowMenuPopupChange(true)
-            focusManager.clearFocus()
-        },
-        holdDownState = showMenuPopup
+        onExpandedChange = { expanded -> if (expanded) focusManager.clearFocus() }
     ) {
         Icon(
             imageVector = MiuixIcons.Settings,
@@ -246,11 +216,9 @@ private fun PortraitAppView(
                 actions = {
                     MenuActions(
                         searchHistory = uiState.searchHistory,
-                        showMenuPopup = uiState.showMenuPopup,
                         focusManager = focusManager,
                         onClearSearchHistory = { viewModel.clearSearchHistory() },
-                        onShowDeviceSettings = { viewModel.updateShowDeviceSettingsDialog(true) },
-                        onShowMenuPopupChange = { viewModel.updateShowMenuPopup(it) }
+                        onShowDeviceSettings = { viewModel.updateShowDeviceSettingsDialog(true) }
                     )
                     DeviceListDialog(
                         show = uiState.showDeviceSettingsDialog,
@@ -364,11 +332,9 @@ private fun LandscapeAppView(
                     actions = {
                         MenuActions(
                             searchHistory = uiState.searchHistory,
-                            showMenuPopup = uiState.showMenuPopup,
                             focusManager = focusManager,
                             onClearSearchHistory = { viewModel.clearSearchHistory() },
-                            onShowDeviceSettings = { viewModel.updateShowDeviceSettingsDialog(true) },
-                            onShowMenuPopupChange = { viewModel.updateShowMenuPopup(it) }
+                            onShowDeviceSettings = { viewModel.updateShowDeviceSettingsDialog(true) }
                         )
                     },
                     defaultWindowInsetsPadding = false,

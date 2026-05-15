@@ -101,7 +101,6 @@ data class AppUiState(
     val isLoading: Boolean = false,
     val searchHistory: List<DataHelper.SearchHistoryEntry> = emptyList(),
     val searchHistorySelected: Int = 0,
-    val showMenuPopup: Boolean = false,
     val showDeviceSettingsDialog: Boolean = false,
     val showAboutDialog: Boolean = false,
 )
@@ -219,10 +218,6 @@ class AppViewModel : ViewModel() {
 
     fun updateSearchHistorySelected(index: Int) {
         _uiState.update { it.copy(searchHistorySelected = index) }
-    }
-
-    fun updateShowMenuPopup(show: Boolean) {
-        _uiState.update { it.copy(showMenuPopup = show) }
     }
 
     fun updateShowDeviceSettingsDialog(show: Boolean) {

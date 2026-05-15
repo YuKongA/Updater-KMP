@@ -16,7 +16,6 @@ fun AppTheme(
     if (platform() != Platform.MacOS) ComposeFoundationFlags.isNewContextMenuEnabled = true
     MiuixTheme(
         colors = if (isDarkTheme) darkColorScheme() else lightColorScheme(),
-        smoothRounding = false,
     ) {
         content()
     }
