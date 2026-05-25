@@ -1,12 +1,14 @@
-package utils
+package data.repository
 
 import data.DeviceState
 import data.OtaMetadataPb
+import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.head
 import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.protobuf.ProtoBuf
@@ -16,24 +18,23 @@ import utils.ZipFileUtils.locateCentralDirectory
 import utils.ZipFileUtils.locateEntries
 import utils.ZipFileUtils.locateLocalFileOffset
 import kotlin.math.min
+import kotlin.time.Duration.Companion.milliseconds
 
-
-class MetadataUtils private constructor() {
-    companion object {
-        private const val METADATA_PATH = "META-INF/com/android/metadata"
-        private const val METADATA_PB_PATH = "META-INF/com/android/metadata.pb"
-        private const val END_BYTES_SIZE = 4096
-        private const val LOCAL_HEADER_SIZE = 256
-        private const val TIMEOUT_MS = 20000L
-        private val instance by lazy { MetadataUtils() }
-
-        suspend fun getOtaMetadata(url: String): OtaMetadataPb? = instance.fetchOtaMetadata(url)
+class OtaMetadataFetcher(
+    private val client: HttpClient = httpClientPlatform(),
+) {
+    private companion object {
+        const val METADATA_PATH = "META-INF/com/android/metadata"
+        const val METADATA_PB_PATH = "META-INF/com/android/metadata.pb"
+        const val END_BYTES_SIZE = 4096
+        const val LOCAL_HEADER_SIZE = 256
+        const val TIMEOUT_MS = 20000L
     }
 
-    private val client = httpClientPlatform()
+    suspend fun getOtaMetadata(url: String): OtaMetadataPb? = fetchOtaMetadata(url)
 
     private suspend fun fetchOtaMetadata(url: String): OtaMetadataPb? {
-        return withTimeout(TIMEOUT_MS) {
+        return withTimeout(TIMEOUT_MS.milliseconds) {
             try {
                 extractOtaMetadata(url)
             } catch (_: Exception) {
@@ -146,6 +147,8 @@ class MetadataUtils private constructor() {
             response.headers[HttpHeaders.ContentLength]?.toLongOrNull()?.let { if (it > 0) return it }
 
             null
+        } catch (e: CancellationException) {
+            throw e
         } catch (_: Exception) {
             null
         }
@@ -165,6 +168,8 @@ class MetadataUtils private constructor() {
                 bytes.size == size -> bytes
                 else -> bytes.copyOf(size)
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (_: Exception) {
             null
         }

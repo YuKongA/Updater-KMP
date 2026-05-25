@@ -25,9 +25,11 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -72,9 +74,7 @@ import updater.shared.generated.resources.branch
 import updater.shared.generated.resources.build_time
 import updater.shared.generated.resources.changelog
 import updater.shared.generated.resources.code_name
-import updater.shared.generated.resources.copy_successful
 import updater.shared.generated.resources.download
-import updater.shared.generated.resources.download_start
 import updater.shared.generated.resources.filemd5
 import updater.shared.generated.resources.filename
 import updater.shared.generated.resources.filesize
@@ -90,16 +90,16 @@ import updater.shared.generated.resources.xms_packages
 import updater.shared.generated.resources.xms_target_version
 import updater.shared.generated.resources.xms_update
 import utils.LinkUtils
-import utils.MessageUtils.Companion.showMessage
 
 @Composable
 fun InfoCardViews(
     romInfo: DataHelper.RomInfoData,
     iconInfo: List<DataHelper.IconInfoData>,
     imageInfo: List<DataHelper.ImageInfoData>,
-    updateRomInfoState: Int
+    onCopySuccess: () -> Unit,
+    onDownloadStart: () -> Unit,
 ) {
-    val isVisible by remember(updateRomInfoState, romInfo) {
+    val isVisible by remember(romInfo) {
         derivedStateOf {
             romInfo.fileName.isNotEmpty()
         }
@@ -173,15 +173,19 @@ fun InfoCardViews(
                 ) {
                     DownloadInfoView(
                         modifier = Modifier.weight(1f),
-                        "ultimateota",
-                        romInfo.official1Download,
-                        romInfo.fileName
+                        title = "ultimateota",
+                        url = romInfo.official1Download,
+                        fileName = romInfo.fileName,
+                        onCopySuccess = onCopySuccess,
+                        onDownloadStart = onDownloadStart,
                     )
                     DownloadInfoView(
                         modifier = Modifier.weight(1f),
-                        "superota",
-                        romInfo.official2Download,
-                        romInfo.fileName
+                        title = "superota",
+                        url = romInfo.official2Download,
+                        fileName = romInfo.fileName,
+                        onCopySuccess = onCopySuccess,
+                        onDownloadStart = onDownloadStart,
                     )
                 }
             }
@@ -192,23 +196,28 @@ fun InfoCardViews(
             ) {
                 DownloadInfoView(
                     modifier = Modifier.weight(1f),
-                    "aliyuncs",
-                    romInfo.cdn1Download,
-                    romInfo.fileName
+                    title = "aliyuncs",
+                    url = romInfo.cdn1Download,
+                    fileName = romInfo.fileName,
+                    onCopySuccess = onCopySuccess,
+                    onDownloadStart = onDownloadStart,
                 )
                 DownloadInfoView(
                     modifier = Modifier.weight(1f),
-                    "cdnorg",
-                    romInfo.cdn2Download,
-                    romInfo.fileName
+                    title = "cdnorg",
+                    url = romInfo.cdn2Download,
+                    fileName = romInfo.fileName,
+                    onCopySuccess = onCopySuccess,
+                    onDownloadStart = onDownloadStart,
                 )
             }
 
             if (romInfo.changelog.isNotEmpty()) {
                 ChangelogView(
-                    iconInfo,
-                    imageInfo,
-                    romInfo.changelog
+                    iconInfo = iconInfo,
+                    imageInfo = imageInfo,
+                    changelog = romInfo.changelog,
+                    onCopySuccess = onCopySuccess,
                 )
             }
 
@@ -245,7 +254,9 @@ fun InfoCardViews(
 
 @Composable
 fun XmsInfoCardView(
-    xmsInfo: DataHelper.XmsInfoData
+    xmsInfo: DataHelper.XmsInfoData,
+    onCopySuccess: () -> Unit,
+    onDownloadStart: () -> Unit,
 ) {
     val hasContent = xmsInfo.hasUpdate ||
             xmsInfo.curVer.isNotEmpty() ||
@@ -287,7 +298,13 @@ fun XmsInfoCardView(
                     modifier = Modifier.padding(horizontal = 16.dp),
                 )
                 xmsInfo.apps.forEach { app ->
-                    XmsAppRow(app)
+                    key(app.packName.ifEmpty { app.fileName }) {
+                        XmsAppRow(
+                            app = app,
+                            onCopySuccess = onCopySuccess,
+                            onDownloadStart = onDownloadStart,
+                        )
+                    }
                 }
             }
 
@@ -297,6 +314,7 @@ fun XmsInfoCardView(
                         iconInfo = emptyList(),
                         imageInfo = xmsInfo.changelogItems,
                         changelog = xmsInfo.changelogText,
+                        onCopySuccess = onCopySuccess,
                     )
                 }
             }
@@ -337,14 +355,16 @@ fun XmsInfoCardView(
 }
 
 @Composable
-private fun XmsAppRow(app: DataHelper.XmsAppInfo) {
-    var expanded by remember { mutableStateOf(false) }
+private fun XmsAppRow(
+    app: DataHelper.XmsAppInfo,
+    onCopySuccess: () -> Unit,
+    onDownloadStart: () -> Unit,
+) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
     val rotation by animateFloatAsState(targetValue = if (expanded) 90f else 0f, label = "xmsRowChevron")
     val hapticFeedback = LocalHapticFeedback.current
     val clipboard = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
-    val messageCopySuccessful = stringResource(Res.string.copy_successful)
-    val messageDownloadStart = stringResource(Res.string.download_start)
     val displayTitle = app.name.ifEmpty { app.packName }
 
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -381,7 +401,7 @@ private fun XmsAppRow(app: DataHelper.XmsAppInfo) {
                 IconButton(
                     onClick = {
                         coroutineScope.launch { clipboard.copyToClipboard(url) }
-                        showMessage(messageCopySuccessful)
+                        onCopySuccess()
                         hapticFeedback.performHapticFeedback(HapticFeedbackType.Confirm)
                     }
                 ) {
@@ -394,7 +414,7 @@ private fun XmsAppRow(app: DataHelper.XmsAppInfo) {
                 IconButton(
                     onClick = {
                         downloadToLocal(url, app.fileName)
-                        showMessage(messageDownloadStart)
+                        onDownloadStart()
                         hapticFeedback.performHapticFeedback(HapticFeedbackType.Confirm)
                     }
                 ) {
@@ -500,15 +520,14 @@ fun DownloadInfoView(
     modifier: Modifier = Modifier,
     title: String,
     url: String,
-    fileName: String
+    fileName: String,
+    onCopySuccess: () -> Unit,
+    onDownloadStart: () -> Unit,
 ) {
     val hapticFeedback = LocalHapticFeedback.current
     val clipboard = LocalClipboard.current
 
     val coroutineScope = rememberCoroutineScope()
-
-    val messageCopySuccessful = stringResource(Res.string.copy_successful)
-    val messageDownloadStart = stringResource(Res.string.download_start)
 
     Column(
         modifier = modifier
@@ -526,7 +545,7 @@ fun DownloadInfoView(
                         coroutineScope.launch {
                             clipboard.copyToClipboard(url)
                         }
-                        showMessage(messageCopySuccessful)
+                        onCopySuccess()
                         hapticFeedback.performHapticFeedback(HapticFeedbackType.Confirm)
                     }
                 ) {
@@ -539,7 +558,7 @@ fun DownloadInfoView(
                 IconButton(
                     onClick = {
                         downloadToLocal(url, fileName)
-                        showMessage(messageDownloadStart)
+                        onDownloadStart()
                         hapticFeedback.performHapticFeedback(HapticFeedbackType.Confirm)
                     }
                 ) {
@@ -558,12 +577,12 @@ fun DownloadInfoView(
 fun ChangelogView(
     iconInfo: List<DataHelper.IconInfoData>,
     imageInfo: List<DataHelper.ImageInfoData>,
-    changelog: String
+    changelog: String,
+    onCopySuccess: () -> Unit,
 ) {
     val hapticFeedback = LocalHapticFeedback.current
     val clipboard = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
-    val messageCopySuccessful = stringResource(Res.string.copy_successful)
 
     Column {
         Row(
@@ -582,7 +601,7 @@ fun ChangelogView(
                     coroutineScope.launch {
                         clipboard.copyToClipboard(changelog)
                     }
-                    showMessage(messageCopySuccessful)
+                    onCopySuccess()
                     hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                 }
             ) {

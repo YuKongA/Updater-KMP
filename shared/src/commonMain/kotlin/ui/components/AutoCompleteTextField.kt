@@ -59,11 +59,9 @@ fun AutoCompleteTextField(
         }.sortedBy { !it.startsWith(text, ignoreCase = true) }
     }
     var isFocused by remember { mutableStateOf(false) }
-    val showPopup = remember { mutableStateOf(false) }
+    val showPopup = isFocused && text.isNotEmpty()
     val hapticFeedback = LocalHapticFeedback.current
     val focusManager = LocalFocusManager.current
-
-    showPopup.value = isFocused && text.isNotEmpty()
 
     Box(
         modifier = Modifier
@@ -80,24 +78,18 @@ fun AutoCompleteTextField(
             singleLine = true,
             label = label,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = {
-                focusManager.clearFocus()
-                showPopup.value = false
-            }),
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             modifier = Modifier.onFocusChanged { focusState ->
                 isFocused = focusState.isFocused
             }
         )
         OverlayListPopup(
-            show = showPopup.value,
+            show = showPopup,
             popupModifier = Modifier,
             popupPositionProvider = AutoCompletePositionProvider,
             alignment = PopupPositionProvider.Align.TopStart,
             enableWindowDim = false,
-            onDismissRequest = {
-                focusManager.clearFocus()
-                showPopup.value = false
-            },
+            onDismissRequest = { focusManager.clearFocus() },
             maxHeight = 280.dp,
             minWidth = 200.dp,
             renderInRootScaffold = true,
@@ -112,7 +104,6 @@ fun AutoCompleteTextField(
                                     hapticFeedback.performHapticFeedback(LongPress)
                                     onValueChange(item)
                                     focusManager.clearFocus()
-                                    showPopup.value = false
                                 },
                                 isSelected = false,
                                 index = index,
@@ -240,6 +231,6 @@ fun AutoCompleteDropdownImpl(
         Box(
             modifier = Modifier
                 .padding(horizontal = 20.dp)
-        ) {}
+        )
     }
 }

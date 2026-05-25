@@ -32,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +47,8 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import data.DataHelper
+import kotlinx.coroutines.flow.merge
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.DropdownEntry
@@ -90,24 +93,32 @@ import updater.shared.generated.resources.device_list_settings
 import updater.shared.generated.resources.icon
 import utils.MessageUtils
 import utils.MessageUtils.Companion.Snackbar
-import viewmodel.AppUiState
-import viewmodel.AppViewModel
+import viewmodel.DeviceListUiState
+import viewmodel.DeviceListViewModel
+import viewmodel.LoginUiState
+import viewmodel.LoginViewModel
+import viewmodel.RomQueryUiState
+import viewmodel.RomQueryViewModel
 import viewmodel.UiEvent
 
 @Composable
 fun App(
     isDarkTheme: Boolean = isSystemInDarkTheme(),
-    appViewModel: AppViewModel = viewModel { AppViewModel() }
+    loginViewModel: LoginViewModel = viewModel { LoginViewModel() },
+    romQueryViewModel: RomQueryViewModel = viewModel { RomQueryViewModel() },
+    deviceListViewModel: DeviceListViewModel = viewModel { DeviceListViewModel() },
 ) {
     AppTheme(
         isDarkTheme = isDarkTheme
     ) {
-        val uiState by appViewModel.uiState.collectAsState()
+        val loginUi by loginViewModel.uiState.collectAsState()
+        val queryUi by romQueryViewModel.uiState.collectAsState()
+        val deviceListUi by deviceListViewModel.uiState.collectAsState()
 
-        LaunchedEffect(Unit) {
-            appViewModel.uiEvent.collect { event ->
+        LaunchedEffect(loginViewModel, romQueryViewModel) {
+            merge(loginViewModel.uiEvent, romQueryViewModel.uiEvent).collect { event ->
                 when (event) {
-                    is UiEvent.ShowMessage -> MessageUtils.showMessage(event.message, event.duration)
+                    is UiEvent.ShowMessage -> MessageUtils.showMessage(getString(event.resource), event.duration)
                 }
             }
         }
@@ -136,16 +147,24 @@ fun App(
                     scrollBehavior = scrollBehavior,
                     focusManager = focusManager,
                     isDarkTheme = isDarkTheme,
-                    uiState = uiState,
-                    viewModel = appViewModel
+                    loginUi = loginUi,
+                    queryUi = queryUi,
+                    deviceListUi = deviceListUi,
+                    loginViewModel = loginViewModel,
+                    romQueryViewModel = romQueryViewModel,
+                    deviceListViewModel = deviceListViewModel,
                 )
             } else {
                 LandscapeAppView(
                     scrollBehavior = scrollBehavior,
                     focusManager = focusManager,
                     isDarkTheme = isDarkTheme,
-                    uiState = uiState,
-                    viewModel = appViewModel
+                    loginUi = loginUi,
+                    queryUi = queryUi,
+                    deviceListUi = deviceListUi,
+                    loginViewModel = loginViewModel,
+                    romQueryViewModel = romQueryViewModel,
+                    deviceListViewModel = deviceListViewModel,
                 )
             }
         }
@@ -194,10 +213,16 @@ private fun PortraitAppView(
     scrollBehavior: ScrollBehavior,
     focusManager: FocusManager,
     isDarkTheme: Boolean,
-    uiState: AppUiState,
-    viewModel: AppViewModel
+    loginUi: LoginUiState,
+    queryUi: RomQueryUiState,
+    deviceListUi: DeviceListUiState,
+    loginViewModel: LoginViewModel,
+    romQueryViewModel: RomQueryViewModel,
+    deviceListViewModel: DeviceListViewModel,
 ) {
     val blurSupported = isRenderEffectSupported()
+    var showAboutDialog by rememberSaveable { mutableStateOf(false) }
+    var showDeviceSettingsDialog by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -208,28 +233,35 @@ private fun PortraitAppView(
                 scrollBehavior = scrollBehavior,
                 navigationIcon = {
                     AboutDialog(
-                        show = uiState.showAboutDialog,
-                        onShow = { viewModel.updateShowAboutDialog(true) },
-                        onDismissRequest = { viewModel.updateShowAboutDialog(false) }
+                        show = showAboutDialog,
+                        onShow = { showAboutDialog = true },
+                        onDismissRequest = { showAboutDialog = false }
                     )
                 },
                 actions = {
                     MenuActions(
-                        searchHistory = uiState.searchHistory,
+                        searchHistory = queryUi.searchHistory,
                         focusManager = focusManager,
-                        onClearSearchHistory = { viewModel.clearSearchHistory() },
-                        onShowDeviceSettings = { viewModel.updateShowDeviceSettingsDialog(true) }
+                        onClearSearchHistory = { romQueryViewModel.clearSearchHistory() },
+                        onShowDeviceSettings = {
+                            deviceListViewModel.resetUpdateState()
+                            showDeviceSettingsDialog = true
+                        }
                     )
                     DeviceListDialog(
-                        show = uiState.showDeviceSettingsDialog,
-                        onDismissRequest = { viewModel.updateShowDeviceSettingsDialog(false) }
+                        show = showDeviceSettingsDialog,
+                        source = deviceListUi.source,
+                        version = deviceListUi.version,
+                        updateState = deviceListUi.updateState,
+                        onSourceChange = { deviceListViewModel.setSource(it) },
+                        onRefresh = { deviceListViewModel.refresh() },
+                        onDismissRequest = { showDeviceSettingsDialog = false }
                     )
                 },
                 modifier = if (blurSupported) {
                     Modifier.textureBlur(
                         backdrop = backdrop,
                         shape = RectangleShape,
-                        blurRadius = 25f * LocalDensity.current.density,
                         colors = BlurColors(
                             blendColors = listOf(BlendColorEntry(color = surfaceColor.copy(0.8f)))
                         ),
@@ -258,34 +290,52 @@ private fun PortraitAppView(
                 ) {
                     Column {
                         LoginCardView(
-                            uiState = uiState,
+                            loginUi = loginUi,
                             isDarkTheme = isDarkTheme,
-                            onShowLoginDialog = { viewModel.showLoginDialog() },
-                            onLoginEvent = { viewModel.onLoginEvent(it) }
+                            onShowLoginDialog = { loginViewModel.showLoginDialog() },
+                            onLoginEvent = { loginViewModel.onLoginEvent(it) }
                         )
                         BasicViews(
-                            deviceName = uiState.deviceName,
-                            codeName = uiState.codeName,
-                            androidVersion = uiState.androidVersion,
-                            deviceRegion = uiState.deviceRegion,
-                            deviceCarrier = uiState.deviceCarrier,
-                            systemVersion = uiState.systemVersion,
-                            searchHistory = uiState.searchHistory,
-                            searchHistorySelected = uiState.searchHistorySelected,
-                            onDeviceNameChange = { viewModel.updateDeviceName(it) },
-                            onCodeNameChange = { viewModel.updateCodeName(it) },
-                            onAndroidVersionChange = { viewModel.updateAndroidVersion(it) },
-                            onDeviceRegionChange = { viewModel.updateDeviceRegion(it) },
-                            onDeviceCarrierChange = { viewModel.updateDeviceCarrier(it) },
-                            onSystemVersionChange = { viewModel.updateSystemVersion(it) },
-                            onSearchHistorySelectedChange = { viewModel.updateSearchHistorySelected(it) },
-                            onHistorySelect = { viewModel.loadSearchHistory(it) },
-                            onSubmit = { viewModel.fetchRomInfo() }
+                            deviceName = queryUi.deviceName,
+                            codeName = queryUi.codeName,
+                            androidVersion = queryUi.androidVersion,
+                            deviceRegion = queryUi.deviceRegion,
+                            deviceCarrier = queryUi.deviceCarrier,
+                            systemVersion = queryUi.systemVersion,
+                            deviceNames = queryUi.deviceNames,
+                            codeNames = queryUi.codeNames,
+                            searchHistory = queryUi.searchHistory,
+                            searchHistorySelected = queryUi.searchHistorySelected,
+                            onDeviceNameChange = { romQueryViewModel.updateDeviceName(it) },
+                            onCodeNameChange = { romQueryViewModel.updateCodeName(it) },
+                            onAndroidVersionChange = { romQueryViewModel.updateAndroidVersion(it) },
+                            onDeviceRegionChange = { romQueryViewModel.updateDeviceRegion(it) },
+                            onDeviceCarrierChange = { romQueryViewModel.updateDeviceCarrier(it) },
+                            onSystemVersionChange = { romQueryViewModel.updateSystemVersion(it) },
+                            onSearchHistorySelectedChange = { romQueryViewModel.updateSearchHistorySelected(it) },
+                            onHistorySelect = { romQueryViewModel.loadSearchHistory(it) },
+                            onSubmit = { romQueryViewModel.fetchRomInfo() }
                         )
                         Column(modifier = Modifier.padding(horizontal = 12.dp)) {
-                            InfoCardViews(uiState.curRomInfo, uiState.curIconInfo, uiState.curImageInfo, 0)
-                            InfoCardViews(uiState.incRomInfo, uiState.incIconInfo, uiState.incImageInfo, 0)
-                            XmsInfoCardView(uiState.xmsInfo)
+                            InfoCardViews(
+                                romInfo = queryUi.curRomInfo,
+                                iconInfo = queryUi.curIconInfo,
+                                imageInfo = queryUi.curImageInfo,
+                                onCopySuccess = romQueryViewModel::notifyCopySuccess,
+                                onDownloadStart = romQueryViewModel::notifyDownloadStart,
+                            )
+                            InfoCardViews(
+                                romInfo = queryUi.incRomInfo,
+                                iconInfo = queryUi.incIconInfo,
+                                imageInfo = queryUi.incImageInfo,
+                                onCopySuccess = romQueryViewModel::notifyCopySuccess,
+                                onDownloadStart = romQueryViewModel::notifyDownloadStart,
+                            )
+                            XmsInfoCardView(
+                                xmsInfo = queryUi.xmsInfo,
+                                onCopySuccess = romQueryViewModel::notifyCopySuccess,
+                                onDownloadStart = romQueryViewModel::notifyDownloadStart,
+                            )
                         }
                     }
                 }
@@ -299,15 +349,27 @@ private fun LandscapeAppView(
     scrollBehavior: ScrollBehavior,
     focusManager: FocusManager,
     isDarkTheme: Boolean,
-    uiState: AppUiState,
-    viewModel: AppViewModel
+    loginUi: LoginUiState,
+    queryUi: RomQueryUiState,
+    deviceListUi: DeviceListUiState,
+    loginViewModel: LoginViewModel,
+    romQueryViewModel: RomQueryViewModel,
+    deviceListViewModel: DeviceListViewModel,
 ) {
+    var showAboutDialog by rememberSaveable { mutableStateOf(false) }
+    var showDeviceSettingsDialog by rememberSaveable { mutableStateOf(false) }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
     ) { scaffoldPaddingValues ->
         DeviceListDialog(
-            show = uiState.showDeviceSettingsDialog,
-            onDismissRequest = { viewModel.updateShowDeviceSettingsDialog(false) }
+            show = showDeviceSettingsDialog,
+            source = deviceListUi.source,
+            version = deviceListUi.version,
+            updateState = deviceListUi.updateState,
+            onSourceChange = { deviceListViewModel.setSource(it) },
+            onRefresh = { deviceListViewModel.refresh() },
+            onDismissRequest = { showDeviceSettingsDialog = false }
         )
         Row(
             modifier = Modifier
@@ -324,17 +386,20 @@ private fun LandscapeAppView(
                     scrollBehavior = scrollBehavior,
                     navigationIcon = {
                         AboutDialog(
-                            show = uiState.showAboutDialog,
-                            onShow = { viewModel.updateShowAboutDialog(true) },
-                            onDismissRequest = { viewModel.updateShowAboutDialog(false) }
+                            show = showAboutDialog,
+                            onShow = { showAboutDialog = true },
+                            onDismissRequest = { showAboutDialog = false }
                         )
                     },
                     actions = {
                         MenuActions(
-                            searchHistory = uiState.searchHistory,
+                            searchHistory = queryUi.searchHistory,
                             focusManager = focusManager,
-                            onClearSearchHistory = { viewModel.clearSearchHistory() },
-                            onShowDeviceSettings = { viewModel.updateShowDeviceSettingsDialog(true) }
+                            onClearSearchHistory = { romQueryViewModel.clearSearchHistory() },
+                            onShowDeviceSettings = {
+                                deviceListViewModel.resetUpdateState()
+                                showDeviceSettingsDialog = true
+                            }
                         )
                     },
                     defaultWindowInsetsPadding = false,
@@ -355,29 +420,31 @@ private fun LandscapeAppView(
                 ) {
                     item {
                         LoginCardView(
-                            uiState = uiState,
+                            loginUi = loginUi,
                             isDarkTheme = isDarkTheme,
-                            onShowLoginDialog = { viewModel.showLoginDialog() },
-                            onLoginEvent = { viewModel.onLoginEvent(it) }
+                            onShowLoginDialog = { loginViewModel.showLoginDialog() },
+                            onLoginEvent = { loginViewModel.onLoginEvent(it) }
                         )
                         BasicViews(
-                            deviceName = uiState.deviceName,
-                            codeName = uiState.codeName,
-                            androidVersion = uiState.androidVersion,
-                            deviceRegion = uiState.deviceRegion,
-                            deviceCarrier = uiState.deviceCarrier,
-                            systemVersion = uiState.systemVersion,
-                            searchHistory = uiState.searchHistory,
-                            searchHistorySelected = uiState.searchHistorySelected,
-                            onDeviceNameChange = { viewModel.updateDeviceName(it) },
-                            onCodeNameChange = { viewModel.updateCodeName(it) },
-                            onAndroidVersionChange = { viewModel.updateAndroidVersion(it) },
-                            onDeviceRegionChange = { viewModel.updateDeviceRegion(it) },
-                            onDeviceCarrierChange = { viewModel.updateDeviceCarrier(it) },
-                            onSystemVersionChange = { viewModel.updateSystemVersion(it) },
-                            onSearchHistorySelectedChange = { viewModel.updateSearchHistorySelected(it) },
-                            onHistorySelect = { viewModel.loadSearchHistory(it) },
-                            onSubmit = { viewModel.fetchRomInfo() }
+                            deviceName = queryUi.deviceName,
+                            codeName = queryUi.codeName,
+                            androidVersion = queryUi.androidVersion,
+                            deviceRegion = queryUi.deviceRegion,
+                            deviceCarrier = queryUi.deviceCarrier,
+                            systemVersion = queryUi.systemVersion,
+                            deviceNames = queryUi.deviceNames,
+                            codeNames = queryUi.codeNames,
+                            searchHistory = queryUi.searchHistory,
+                            searchHistorySelected = queryUi.searchHistorySelected,
+                            onDeviceNameChange = { romQueryViewModel.updateDeviceName(it) },
+                            onCodeNameChange = { romQueryViewModel.updateCodeName(it) },
+                            onAndroidVersionChange = { romQueryViewModel.updateAndroidVersion(it) },
+                            onDeviceRegionChange = { romQueryViewModel.updateDeviceRegion(it) },
+                            onDeviceCarrierChange = { romQueryViewModel.updateDeviceCarrier(it) },
+                            onSystemVersionChange = { romQueryViewModel.updateSystemVersion(it) },
+                            onSearchHistorySelectedChange = { romQueryViewModel.updateSearchHistorySelected(it) },
+                            onHistorySelect = { romQueryViewModel.loadSearchHistory(it) },
+                            onSubmit = { romQueryViewModel.fetchRomInfo() }
                         )
                         Spacer(
                             Modifier.height(
@@ -400,7 +467,7 @@ private fun LandscapeAppView(
                     .fillMaxHeight()
                     .weight(1f - 0.42f)
             ) {
-                if (uiState.curRomInfo.version.isEmpty() && uiState.incRomInfo.version.isEmpty()) {
+                if (queryUi.curRomInfo.version.isEmpty() && queryUi.incRomInfo.version.isEmpty()) {
                     Image(
                         painter = painterResource(Res.drawable.icon),
                         contentDescription = "Logo",
@@ -427,9 +494,25 @@ private fun LandscapeAppView(
                         Column(
                             modifier = Modifier.padding(top = 12.dp)
                         ) {
-                            InfoCardViews(uiState.curRomInfo, uiState.curIconInfo, uiState.curImageInfo, 0)
-                            InfoCardViews(uiState.incRomInfo, uiState.incIconInfo, uiState.incImageInfo, 0)
-                            XmsInfoCardView(uiState.xmsInfo)
+                            InfoCardViews(
+                                romInfo = queryUi.curRomInfo,
+                                iconInfo = queryUi.curIconInfo,
+                                imageInfo = queryUi.curImageInfo,
+                                onCopySuccess = romQueryViewModel::notifyCopySuccess,
+                                onDownloadStart = romQueryViewModel::notifyDownloadStart,
+                            )
+                            InfoCardViews(
+                                romInfo = queryUi.incRomInfo,
+                                iconInfo = queryUi.incIconInfo,
+                                imageInfo = queryUi.incImageInfo,
+                                onCopySuccess = romQueryViewModel::notifyCopySuccess,
+                                onDownloadStart = romQueryViewModel::notifyDownloadStart,
+                            )
+                            XmsInfoCardView(
+                                xmsInfo = queryUi.xmsInfo,
+                                onCopySuccess = romQueryViewModel::notifyCopySuccess,
+                                onDownloadStart = romQueryViewModel::notifyDownloadStart,
+                            )
                         }
                         Spacer(
                             Modifier.height(

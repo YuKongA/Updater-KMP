@@ -10,16 +10,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import data.DeviceInfoHelper
-import kotlinx.coroutines.launch
+import data.DeviceListSource
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.BasicComponent
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
@@ -40,35 +35,30 @@ import updater.shared.generated.resources.device_list_update_now
 import updater.shared.generated.resources.device_list_updated
 import updater.shared.generated.resources.device_list_updating
 import updater.shared.generated.resources.device_list_version
-import utils.DeviceListUtils
+import viewmodel.DeviceListUpdateState
 
 @Composable
 fun DeviceListDialog(
     show: Boolean,
+    source: DeviceListSource,
+    version: String,
+    updateState: DeviceListUpdateState,
+    onSourceChange: (DeviceListSource) -> Unit,
+    onRefresh: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    val coroutinesScope = rememberCoroutineScope()
-    val version = remember { mutableStateOf(DeviceListUtils.getCachedVersion() ?: "-") }
-    val source = remember { mutableStateOf(DeviceListUtils.getDeviceListSource()) }
-    val updateResultMsg = remember { mutableStateOf("") }
-
-    LaunchedEffect(show) {
-        if (show) {
-            updateResultMsg.value = ""
-        }
-    }
-
-    fun refreshDeviceListInfo() {
-        version.value = DeviceListUtils.getCachedVersion() ?: "-"
-        source.value = DeviceListUtils.getDeviceListSource()
+    val updateButtonText = when (updateState) {
+        DeviceListUpdateState.Idle -> stringResource(Res.string.device_list_update_now)
+        DeviceListUpdateState.Updating -> stringResource(Res.string.device_list_updating)
+        DeviceListUpdateState.Updated -> stringResource(Res.string.device_list_updated)
+        DeviceListUpdateState.NoUpdates -> stringResource(Res.string.device_list_no_updates)
+        DeviceListUpdateState.Failed -> stringResource(Res.string.device_list_update_failed)
     }
 
     OverlayDialog(
         show = show,
         title = stringResource(Res.string.device_list_settings),
-        onDismissRequest = {
-            onDismissRequest()
-        },
+        onDismissRequest = onDismissRequest,
         insideMargin = DpSize(0.dp, 24.dp),
         content = {
             OverlayDropdownPreference(
@@ -77,23 +67,15 @@ fun DeviceListDialog(
                     stringResource(Res.string.device_list_remote),
                     stringResource(Res.string.device_list_embedded)
                 ),
-                selectedIndex = if (source.value == DeviceListUtils.DeviceListSource.REMOTE) 0 else 1,
-                onSelectedIndexChange = {
-                    source.value = if (it == 0) {
-                        DeviceListUtils.DeviceListSource.REMOTE
-                    } else {
-                        DeviceListUtils.DeviceListSource.EMBEDDED
-                    }
-                    DeviceListUtils.setDeviceListSource(source.value)
-                    coroutinesScope.launch {
-                        DeviceInfoHelper.updateDeviceList()
-                        refreshDeviceListInfo()
-                    }
+                selectedIndex = if (source == DeviceListSource.REMOTE) 0 else 1,
+                onSelectedIndexChange = { index ->
+                    val next = if (index == 0) DeviceListSource.REMOTE else DeviceListSource.EMBEDDED
+                    onSourceChange(next)
                 },
                 insideMargin = PaddingValues(horizontal = 24.dp, vertical = 16.dp)
             )
             AnimatedVisibility(
-                visible = source.value == DeviceListUtils.DeviceListSource.REMOTE,
+                visible = source == DeviceListSource.REMOTE,
                 enter = fadeIn() + expandVertically(),
                 exit = fadeOut() + shrinkVertically()
             ) {
@@ -102,7 +84,7 @@ fun DeviceListDialog(
                         title = stringResource(Res.string.device_list_version),
                         endActions = {
                             Text(
-                                text = version.value,
+                                text = version,
                                 fontSize = MiuixTheme.textStyles.body2.fontSize,
                                 color = MiuixTheme.colorScheme.onSurfaceVariantActions,
                                 textAlign = TextAlign.End,
@@ -110,40 +92,19 @@ fun DeviceListDialog(
                         },
                         insideMargin = PaddingValues(horizontal = 24.dp, vertical = 16.dp)
                     )
-                    val updatingText = stringResource(Res.string.device_list_updating)
-                    val updatedText = stringResource(Res.string.device_list_updated)
-                    val updateFailedText = stringResource(Res.string.device_list_update_failed)
-                    val updateNowText = stringResource(Res.string.device_list_update_now)
-                    val updateNoUpdates = stringResource(Res.string.device_list_no_updates)
                     TextButton(
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 16.dp),
-                        text = updateResultMsg.value.ifEmpty { updateNowText },
+                        text = updateButtonText,
                         colors = ButtonDefaults.textButtonColorsPrimary(),
-                        onClick = {
-                            updateResultMsg.value = updatingText
-                            coroutinesScope.launch {
-                                val result = DeviceListUtils.updateDeviceList()
-                                if (result == 0) {
-                                    DeviceInfoHelper.updateDeviceList()
-                                    refreshDeviceListInfo()
-                                }
-                                updateResultMsg.value = when (result) {
-                                    0 -> updatedText
-                                    1 -> updateNoUpdates
-                                    else -> updateFailedText
-                                }
-                            }
-                        },
-                        enabled = updateResultMsg.value.isEmpty()
+                        onClick = onRefresh,
+                        enabled = updateState == DeviceListUpdateState.Idle,
                     )
                 }
             }
             TextButton(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
                 text = stringResource(Res.string.cancel),
-                onClick = {
-                    onDismissRequest()
-                }
+                onClick = onDismissRequest,
             )
         })
 }

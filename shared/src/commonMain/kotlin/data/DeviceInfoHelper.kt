@@ -1,9 +1,6 @@
 package data
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.Serializable
-import utils.DeviceListUtils
 
 object DeviceInfoHelper {
     @Serializable
@@ -37,42 +34,15 @@ object DeviceInfoHelper {
     )
 
     /**
-     * List of Xiaomi devices.
-     *
-     * For auto-completion of device designators and system version suffixes.
-     *
+     * Built-in device list used as the fallback when remote is unavailable.
      */
-    private val embeddedDeviceList = listOf(
+    val embeddedDeviceList = listOf(
         Device("Xiaomi 17", "pudding", "PC"),
         Device("Xiaomi 17 Pro", "pandora", "BL"),
         Device("Xiaomi 17 Pro Max", "popsicle", "PB"),
         Device("Xiaomi 17 Ultra", "nezha", "PA"),
+        Device("Xiaomi 17 Max", "byron", "AF")
     )
-
-    /**
-     * Current device list
-     */
-    private var currentDeviceList: List<Device> = embeddedDeviceList
-
-    /**
-     * Update the current device list with remote or embedded data based
-     */
-    fun updateDeviceList() {
-        currentDeviceList = DeviceListUtils.getDeviceList(embeddedDeviceList)
-        rebuildMappings()
-    }
-
-    /**
-     * Rebuild all mappings when device list is updated
-     */
-    private fun rebuildMappings() {
-        _deviceNameToDeviceCodeName = currentDeviceList.associateBy({ it.deviceName }, { it.deviceCodeName })
-        _deviceCodeNameToDeviceName = currentDeviceList.associateBy({ it.deviceCodeName }, { it.deviceName })
-        _deviceNames = currentDeviceList.map { it.deviceName }
-        _codeNames = currentDeviceList.map { it.deviceCodeName }
-        _deviceNamesFlow.value = _deviceNames
-        _codeNamesFlow.value = _codeNames
-    }
 
     private val androidX = Android("17.0", "X")
     private val androidW = Android("16.0", "W")
@@ -153,37 +123,20 @@ object DeviceInfoHelper {
 
     private val carrierList = listOf(XM, DM, DC, AT, BY, CR, EN, HG, KD, MS, MT, OR, SB, SF, TF, TG, TM, VC, VF)
 
-    private var _deviceNameToDeviceCodeName = currentDeviceList.associateBy({ it.deviceName }, { it.deviceCodeName })
-    private var _deviceCodeNameToDeviceName = currentDeviceList.associateBy({ it.deviceCodeName }, { it.deviceName })
-    private var _deviceNames = currentDeviceList.map { it.deviceName }
-    private var _codeNames = currentDeviceList.map { it.deviceCodeName }
-
     private val regionNameToRegionCode = regionList.associateBy({ it.regionName }, { it.regionCode })
     private val regionNameToRegionCodeName = regionList.associateBy({ it.regionName }, { it.regionCodeName })
     private val carrierNameToCarrierCode = carrierList.associateBy({ it.carrierName }, { it.carrierCode })
     private val carrierNameToCarrierCodeName = carrierList.associateBy({ it.carrierName }, { it.regionAppend })
     private val androidVersionCodeToAndroidLetterCode = androidList.associateBy { it.androidVersionCode }
 
-    private val _deviceNamesFlow = MutableStateFlow(_deviceNames)
-    val deviceNamesFlow = _deviceNamesFlow.asStateFlow()
-
-    private val _codeNamesFlow = MutableStateFlow(_codeNames)
-    val codeNamesFlow = _codeNamesFlow.asStateFlow()
-
     val regionNames = regionList.map { it.regionName }
     val carrierNames = carrierList.map { it.carrierName }
     val androidVersions = androidList.map { it.androidVersionCode }
 
-    fun codeName(deviceName: String): String = _deviceNameToDeviceCodeName[deviceName] ?: ""
-    fun deviceName(deviceCodeName: String): String = _deviceCodeNameToDeviceName[deviceCodeName] ?: ""
     fun regionCode(regionName: String): String = regionNameToRegionCode[regionName] ?: ""
     fun carrierCode(carrierName: String): String = carrierNameToCarrierCode[carrierName] ?: ""
     fun regionCodeName(regionName: String): String = regionNameToRegionCodeName[regionName] ?: ""
     fun carrierCodeName(carrierName: String): String = carrierNameToCarrierCodeName[carrierName] ?: ""
-
-    fun deviceCode(androidVersionCode: String, codeName: String, regionCode: String, carrierCode: String): String {
-        val android = androidVersionCodeToAndroidLetterCode[androidVersionCode] ?: return ""
-        val device = currentDeviceList.find { it.deviceCodeName == codeName } ?: return ""
-        return "${android.androidLetterCode}${device.deviceCode}${regionCode}${carrierCode}"
-    }
+    fun androidLetterOf(androidVersionCode: String): String? =
+        androidVersionCodeToAndroidLetterCode[androidVersionCode]?.androidLetterCode
 }

@@ -1,10 +1,16 @@
 package data.repository
 
 import data.DataHelper
+import data.RomInfoHelper
+import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.cookie
 import io.ktor.client.request.forms.submitForm
 import io.ktor.http.Parameters
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.addJsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -19,13 +25,14 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-class RomInfoRepository {
+class RomInfoRepository(
+    private val client: HttpClient = httpClientPlatform(),
+) {
     private val CN_RECOVERY_URL = "https://update.miui.com/updates/miotaV3.php"
     private val INTL_RECOVERY_URL = "https://update.intl.miui.com/updates/miotaV3.php"
     private val CN_GETXMSVER_URL = "https://update.miui.com/api/v3/xms/getXmsVer"
     private val INTL_GETXMSVER_URL = "https://update.intl.miui.com/api/v3/xms/getXmsVer"
 
-    private val client = httpClientPlatform()
     private val defaultSecurityKey = "miuiotavalided11".encodeToByteArray()
 
     fun generateJson(
@@ -73,7 +80,7 @@ class RomInfoRepository {
         androidVersion: String,
         loginData: DataHelper.LoginData?,
         xmsVersion: String = "",
-    ): String {
+    ): RomInfoHelper.RomInfo? = withContext(Dispatchers.Default) {
         val accountType: String
         val port: String
         val ssecurity: String
@@ -100,7 +107,8 @@ class RomInfoRepository {
             cUserId = ""
         }
 
-        val jsonData = generateJson(branch, codeNameExt, regionCode, romVersion, androidVersion, userId, ssecurity, serviceToken, xmsVersion)
+        val jsonData =
+            generateJson(branch, codeNameExt, regionCode, romVersion, androidVersion, userId, ssecurity, serviceToken, xmsVersion)
         val encryptedText = miuiEncrypt(jsonData, securityKey)
         val parameters = Parameters.build {
             append("q", encryptedText)
@@ -124,10 +132,13 @@ class RomInfoRepository {
             }
             val requestedEncryptedText = response.body<String>()
             val decrypted = miuiDecrypt(requestedEncryptedText, securityKey)
-            return decrypted
+            if (decrypted.isEmpty()) return@withContext null
+            Json.decodeFromString<RomInfoHelper.RomInfo>(decrypted)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             e.printStackTrace()
-            return ""
+            null
         }
     }
 
@@ -141,9 +152,9 @@ class RomInfoRepository {
         curVer: String,
         lstVer: String,
         loginData: DataHelper.LoginData?,
-    ): String {
-        if (isWeb()) return ""
-        if (pkgs.isEmpty()) return ""
+    ): RomInfoHelper.XmsDto? = withContext(Dispatchers.Default) {
+        if (isWeb()) return@withContext null
+        if (pkgs.isEmpty()) return@withContext null
 
         val accountType: String
         val port: String
@@ -209,10 +220,14 @@ class RomInfoRepository {
                 }
             }
             val requestedEncryptedText = response.body<String>()
-            return miuiDecrypt(requestedEncryptedText, securityKey)
+            val decrypted = miuiDecrypt(requestedEncryptedText, securityKey)
+            if (decrypted.isEmpty()) return@withContext null
+            Json.decodeFromString<RomInfoHelper.XmsDto>(decrypted)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             e.printStackTrace()
-            return ""
+            null
         }
     }
 }

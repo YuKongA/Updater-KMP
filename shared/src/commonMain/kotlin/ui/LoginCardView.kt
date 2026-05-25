@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import data.repository.LoginState
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.CardDefaults
@@ -22,7 +23,6 @@ import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.extended.Info
 import top.yukonga.miuix.kmp.icon.extended.Ok
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.utils.PressFeedbackType
 import updater.shared.generated.resources.Res
 import updater.shared.generated.resources.logged_in
 import updater.shared.generated.resources.login_desc
@@ -31,18 +31,17 @@ import updater.shared.generated.resources.login_expired_desc
 import updater.shared.generated.resources.no_account
 import updater.shared.generated.resources.using_v2
 import utils.isWeb
-import viewmodel.AppUiState
 import viewmodel.LoginEvent
-import viewmodel.LoginState
+import viewmodel.LoginUiState
 
 @Composable
 fun LoginCardView(
-    uiState: AppUiState,
+    loginUi: LoginUiState,
     isDarkTheme: Boolean,
     onShowLoginDialog: () -> Unit,
     onLoginEvent: (LoginEvent) -> Unit,
 ) {
-    val loginState = uiState.loginState
+    val loginState = loginUi.loginState
     val isLoggedIn = loginState is LoginState.LoggedIn
     val account = when (loginState) {
         is LoginState.LoggedIn -> stringResource(Res.string.logged_in)
@@ -66,8 +65,6 @@ fun LoginCardView(
             .fillMaxWidth()
             .padding(all = 12.dp),
         insideMargin = PaddingValues(16.dp),
-        pressFeedbackType = PressFeedbackType.Sink,
-        onLongPress = { onShowLoginDialog() },
         colors = CardDefaults.defaultColors(color = color),
     ) {
         Row(
@@ -75,7 +72,7 @@ fun LoginCardView(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Icon(
-                modifier = Modifier.padding(start = 6.dp),
+                modifier = Modifier.padding(start = 8.dp),
                 imageVector = icon,
                 tint = MiuixTheme.colorScheme.onSurface,
                 contentDescription = null
@@ -94,18 +91,18 @@ fun LoginCardView(
             Spacer(modifier = Modifier.weight(1f))
             if (!isWeb()) {
                 LoginDialog(
-                    show = uiState.showLoginDialog,
+                    show = loginUi.showLoginDialog,
                     loginState = loginState,
-                    account = uiState.loginAccount,
-                    password = uiState.loginPassword,
-                    global = uiState.loginGlobal,
-                    savePassword = uiState.loginSavePassword,
-                    showTicketInput = uiState.showTicketInput,
-                    available2FAOptions = uiState.available2FAOptions,
-                    isVerifying = uiState.isVerifying,
-                    ticket = uiState.loginTicket,
-                    isVerificationRequested = uiState.isVerificationRequested,
-                    isLoggingIn = uiState.isLoggingIn,
+                    account = loginUi.loginAccount,
+                    password = loginUi.loginPassword,
+                    global = loginUi.isGlobal,
+                    savePassword = loginUi.savePasswordEnabled,
+                    showTicketInput = loginUi.showTicketInput,
+                    availableTwoFactorOptions = loginUi.availableTwoFactorOptions,
+                    isVerifying = loginUi.isVerifying,
+                    ticket = loginUi.loginTicket,
+                    isVerificationRequested = loginUi.isVerificationRequested,
+                    isLoggingIn = loginUi.isLoggingIn,
                     onShowDialog = onShowLoginDialog,
                     onEvent = onLoginEvent,
                 )

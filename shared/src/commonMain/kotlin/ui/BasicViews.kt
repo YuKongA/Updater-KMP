@@ -12,9 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,7 +24,7 @@ import data.DeviceInfoHelper
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Card
-import top.yukonga.miuix.kmp.basic.SpinnerEntry
+import top.yukonga.miuix.kmp.basic.DropdownItem
 import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.preference.OverlayDropdownPreference
@@ -42,8 +39,6 @@ import updater.shared.generated.resources.region_code
 import updater.shared.generated.resources.search_history
 import updater.shared.generated.resources.submit
 import updater.shared.generated.resources.system_version
-import updater.shared.generated.resources.toast_no_info
-import utils.MessageUtils.Companion.showMessage
 
 @Composable
 private fun SearchHistoryView(
@@ -58,7 +53,7 @@ private fun SearchHistoryView(
     ) {
         val focusManager = LocalFocusManager.current
         val spinnerOptions = searchHistory.map { entry ->
-            SpinnerEntry(
+            DropdownItem(
                 icon = null,
                 title = "${entry.deviceName.ifEmpty { "Unknown" }} (${entry.codeName})",
                 summary = "${entry.deviceRegion}-${entry.deviceCarrier}-${entry.androidVersion}-${entry.systemVersion}",
@@ -94,6 +89,8 @@ fun BasicViews(
     deviceRegion: String,
     deviceCarrier: String,
     systemVersion: String,
+    deviceNames: List<String>,
+    codeNames: List<String>,
     searchHistory: List<DataHelper.SearchHistoryEntry>,
     searchHistorySelected: Int,
     onDeviceNameChange: (String) -> Unit,
@@ -107,44 +104,16 @@ fun BasicViews(
     onSubmit: () -> Unit
 ) {
     val androidVersionSelected = remember(androidVersion) {
-        mutableStateOf(DeviceInfoHelper.androidVersions.indexOf(androidVersion).takeIf { it >= 0 } ?: 0)
+        DeviceInfoHelper.androidVersions.indexOf(androidVersion).takeIf { it >= 0 } ?: 0
     }
     val regionSelected = remember(deviceRegion) {
-        mutableStateOf(DeviceInfoHelper.regionNames.indexOf(deviceRegion).takeIf { it >= 0 } ?: 0)
+        DeviceInfoHelper.regionNames.indexOf(deviceRegion).takeIf { it >= 0 } ?: 0
     }
-
     val carrierSelected = remember(deviceCarrier) {
-        mutableStateOf(DeviceInfoHelper.carrierNames.indexOf(deviceCarrier).takeIf { it >= 0 } ?: 0)
+        DeviceInfoHelper.carrierNames.indexOf(deviceCarrier).takeIf { it >= 0 } ?: 0
     }
-
-    val deviceNames by DeviceInfoHelper.deviceNamesFlow.collectAsState()
-    val codeNames by DeviceInfoHelper.codeNamesFlow.collectAsState()
-
-    val toastNoInfo = stringResource(Res.string.toast_no_info)
 
     val focusManager = LocalFocusManager.current
-    val onDeviceNameInputChange = remember(deviceName, codeName) {
-        { newValue: String ->
-            if (deviceName != newValue) {
-                onDeviceNameChange(newValue)
-                val mappedCodeName = DeviceInfoHelper.codeName(newValue)
-                if (mappedCodeName.isNotEmpty() && mappedCodeName != codeName) {
-                    onCodeNameChange(mappedCodeName)
-                }
-            }
-        }
-    }
-    val onCodeNameInputChange = remember(deviceName, codeName) {
-        { newValue: String ->
-            if (codeName != newValue) {
-                onCodeNameChange(newValue)
-                val mappedDeviceName = DeviceInfoHelper.deviceName(newValue)
-                if (mappedDeviceName.isNotEmpty() && mappedDeviceName != deviceName) {
-                    onDeviceNameChange(mappedDeviceName)
-                }
-            }
-        }
-    }
 
     Column(
         modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
@@ -153,13 +122,13 @@ fun BasicViews(
         AutoCompleteTextField(
             text = deviceName,
             items = deviceNames,
-            onValueChange = onDeviceNameInputChange,
+            onValueChange = onDeviceNameChange,
             label = stringResource(Res.string.device_name)
         )
         AutoCompleteTextField(
             text = codeName,
             items = codeNames,
-            onValueChange = onCodeNameInputChange,
+            onValueChange = onCodeNameChange,
             label = stringResource(Res.string.code_name)
         )
         TextField(
@@ -175,11 +144,7 @@ fun BasicViews(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(onSearch = {
                 focusManager.clearFocus()
-                if (codeName != "" && androidVersion != "" && systemVersion != "") {
-                    onSubmit()
-                } else {
-                    showMessage(toastNoInfo)
-                }
+                onSubmit()
             })
         )
         Card(
@@ -189,9 +154,8 @@ fun BasicViews(
             OverlayDropdownPreference(
                 title = stringResource(Res.string.android_version),
                 items = DeviceInfoHelper.androidVersions,
-                selectedIndex = androidVersionSelected.value,
+                selectedIndex = androidVersionSelected,
                 onSelectedIndexChange = { index ->
-                    androidVersionSelected.value = index
                     onAndroidVersionChange(DeviceInfoHelper.androidVersions[index])
                 },
                 maxHeight = 280.dp,
@@ -202,9 +166,8 @@ fun BasicViews(
             OverlayDropdownPreference(
                 title = stringResource(Res.string.region_code),
                 items = DeviceInfoHelper.regionNames,
-                selectedIndex = regionSelected.value,
+                selectedIndex = regionSelected,
                 onSelectedIndexChange = { index ->
-                    regionSelected.value = index
                     onDeviceRegionChange(DeviceInfoHelper.regionNames[index])
                 },
                 maxHeight = 280.dp,
@@ -215,9 +178,8 @@ fun BasicViews(
             OverlayDropdownPreference(
                 title = stringResource(Res.string.carrier_code),
                 items = DeviceInfoHelper.carrierNames,
-                selectedIndex = carrierSelected.value,
+                selectedIndex = carrierSelected,
                 onSelectedIndexChange = { index ->
-                    carrierSelected.value = index
                     onDeviceCarrierChange(DeviceInfoHelper.carrierNames[index])
                 },
                 maxHeight = 280.dp,
@@ -242,11 +204,7 @@ fun BasicViews(
             colors = ButtonDefaults.textButtonColorsPrimary(),
             onClick = {
                 focusManager.clearFocus()
-                if (codeName != "" && androidVersion != "" && systemVersion != "") {
-                    onSubmit()
-                } else {
-                    showMessage(toastNoInfo)
-                }
+                onSubmit()
             },
             text = stringResource(Res.string.submit)
         )

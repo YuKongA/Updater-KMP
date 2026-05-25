@@ -14,7 +14,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +25,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import data.repository.LoginState
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Icon
@@ -53,7 +54,6 @@ import updater.shared.generated.resources.submit
 import updater.shared.generated.resources.verification_code
 import updater.shared.generated.resources.verifying
 import viewmodel.LoginEvent
-import viewmodel.LoginState
 
 @Composable
 fun LoginDialog(
@@ -62,9 +62,9 @@ fun LoginDialog(
     account: String,
     password: String,
     global: Boolean,
-    savePassword: String,
+    savePassword: Boolean,
     showTicketInput: Boolean,
-    available2FAOptions: List<Int>,
+    availableTwoFactorOptions: List<Int>,
     isVerifying: Boolean,
     ticket: String,
     isVerificationRequested: Boolean,
@@ -73,10 +73,6 @@ fun LoginDialog(
     onEvent: (LoginEvent) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
-
-    var localAccount by remember(show) { mutableStateOf(account) }
-    var localPassword by remember(show) { mutableStateOf(password) }
-    var localTicket by remember(show) { mutableStateOf(ticket) }
 
     val isLoggedIn = loginState is LoginState.LoggedIn
 
@@ -90,7 +86,7 @@ fun LoginDialog(
             focusManager.clearFocus()
             onShowDialog()
         },
-        holdDownState = show
+        holdDownState = show,
     ) {
         Icon(
             imageVector = icon,
@@ -108,8 +104,8 @@ fun LoginDialog(
                 Column {
                     // 账号输入框
                     TextField(
-                        value = localAccount,
-                        onValueChange = { localAccount = it },
+                        value = account,
+                        onValueChange = { onEvent(LoginEvent.AccountChanged(it)) },
                         label = stringResource(Res.string.account),
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
@@ -118,10 +114,10 @@ fun LoginDialog(
                     )
 
                     // 密码输入框
-                    var passwordVisibility by remember { mutableStateOf(false) }
+                    var passwordVisibility by rememberSaveable { mutableStateOf(false) }
                     TextField(
-                        value = localPassword,
-                        onValueChange = { localPassword = it },
+                        value = password,
+                        onValueChange = { onEvent(LoginEvent.PasswordChanged(it)) },
                         label = stringResource(Res.string.password),
                         modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                         singleLine = true,
@@ -152,26 +148,26 @@ fun LoginDialog(
                         ) {
                             // 验证方式选择
                             AnimatedVisibility(
-                                visible = available2FAOptions.isNotEmpty() && !isVerificationRequested
+                                visible = availableTwoFactorOptions.isNotEmpty() && !isVerificationRequested
                             ) {
                                 Column {
-                                    if (available2FAOptions.contains(4)) {
+                                    if (availableTwoFactorOptions.contains(4)) {
                                         TextButton(
                                             modifier = Modifier.fillMaxWidth(),
                                             text = stringResource(Res.string.send_phone_code),
                                             colors = ButtonDefaults.textButtonColorsPrimary(),
-                                            onClick = { onEvent(LoginEvent.Select2FAMethod(4)) }
+                                            onClick = { onEvent(LoginEvent.SelectTwoFactorMethod(4)) }
                                         )
                                     }
-                                    if (available2FAOptions.contains(4) && available2FAOptions.contains(8)) {
+                                    if (availableTwoFactorOptions.contains(4) && availableTwoFactorOptions.contains(8)) {
                                         Spacer(Modifier.height(16.dp))
                                     }
-                                    if (available2FAOptions.contains(8)) {
+                                    if (availableTwoFactorOptions.contains(8)) {
                                         TextButton(
                                             modifier = Modifier.fillMaxWidth(),
                                             text = stringResource(Res.string.send_email_code),
                                             colors = ButtonDefaults.textButtonColorsPrimary(),
-                                            onClick = { onEvent(LoginEvent.Select2FAMethod(8)) }
+                                            onClick = { onEvent(LoginEvent.SelectTwoFactorMethod(8)) }
                                         )
                                     }
                                     Row(
@@ -193,8 +189,8 @@ fun LoginDialog(
                             ) {
                                 Column {
                                     TextField(
-                                        value = localTicket,
-                                        onValueChange = { localTicket = it },
+                                        value = ticket,
+                                        onValueChange = { onEvent(LoginEvent.TicketChanged(it)) },
                                         label = stringResource(Res.string.verification_code),
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
@@ -207,14 +203,9 @@ fun LoginDialog(
                                         TextButton(
                                             modifier = Modifier.weight(1f),
                                             text = if (isVerifying) stringResource(Res.string.verifying) else stringResource(Res.string.submit),
-                                            enabled = !isVerifying && localTicket.isNotBlank(),
+                                            enabled = !isVerifying && ticket.isNotBlank(),
                                             colors = ButtonDefaults.textButtonColorsPrimary(),
-                                            onClick = {
-                                                onEvent(LoginEvent.AccountChanged(localAccount))
-                                                onEvent(LoginEvent.PasswordChanged(localPassword))
-                                                onEvent(LoginEvent.TicketChanged(localTicket))
-                                                onEvent(LoginEvent.Submit2FA)
-                                            }
+                                            onClick = { onEvent(LoginEvent.SubmitTwoFactor) }
                                         )
                                         Spacer(Modifier.width(16.dp))
                                         TextButton(
@@ -253,8 +244,8 @@ fun LoginDialog(
                             ) {
                                 CheckboxPreference(
                                     title = stringResource(Res.string.save_password),
-                                    checked = savePassword == "1",
-                                    onCheckedChange = { onEvent(LoginEvent.SavePasswordChanged(if (it) "1" else "0")) }
+                                    checked = savePassword,
+                                    onCheckedChange = { onEvent(LoginEvent.SavePasswordChanged(it)) }
                                 )
                             }
                         }
@@ -270,11 +261,7 @@ fun LoginDialog(
                                 text = stringResource(Res.string.login),
                                 enabled = !isLoggingIn,
                                 colors = ButtonDefaults.textButtonColorsPrimary(),
-                                onClick = {
-                                    onEvent(LoginEvent.AccountChanged(localAccount))
-                                    onEvent(LoginEvent.PasswordChanged(localPassword))
-                                    onEvent(LoginEvent.LoginClicked)
-                                }
+                                onClick = { onEvent(LoginEvent.LoginClicked) }
                             )
                             Spacer(Modifier.width(16.dp))
                             TextButton(
@@ -286,7 +273,8 @@ fun LoginDialog(
                         }
                     }
                 }
-            })
+            }
+        )
     }
 
     // 退出登录
@@ -312,6 +300,7 @@ fun LoginDialog(
                         onClick = { onEvent(LoginEvent.DismissDialog) }
                     )
                 }
-            })
+            }
+        )
     }
 }
