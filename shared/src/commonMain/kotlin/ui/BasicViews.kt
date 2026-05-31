@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import data.DataHelper
 import data.DeviceInfoHelper
 import org.jetbrains.compose.resources.stringResource
+import platform.DeviceInfo
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.DropdownItem
@@ -39,6 +40,7 @@ import updater.shared.generated.resources.region_code
 import updater.shared.generated.resources.search_history
 import updater.shared.generated.resources.submit
 import updater.shared.generated.resources.system_version
+import updater.shared.generated.resources.use_current_device
 
 @Composable
 private fun SearchHistoryView(
@@ -93,6 +95,8 @@ fun BasicViews(
     codeNames: List<String>,
     searchHistory: List<DataHelper.SearchHistoryEntry>,
     searchHistorySelected: Int,
+    currentDeviceInfo: DeviceInfo?,
+    onFillWithCurrent: () -> Unit,
     onDeviceNameChange: (String) -> Unit,
     onCodeNameChange: (String) -> Unit,
     onAndroidVersionChange: (String) -> Unit,
@@ -119,6 +123,20 @@ fun BasicViews(
         modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        if (currentDeviceInfo != null) {
+            TextButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp)
+                    .padding(horizontal = 12.dp),
+                colors = ButtonDefaults.textButtonColors(),
+                onClick = {
+                    focusManager.clearFocus()
+                    onFillWithCurrent()
+                },
+                text = stringResource(Res.string.use_current_device)
+            )
+        }
         AutoCompleteTextField(
             text = deviceName,
             items = deviceNames,

@@ -22,8 +22,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.StringResource
+import platform.DeviceInfo
+import platform.getDeviceInfo
 import updater.shared.generated.resources.Res
 import updater.shared.generated.resources.copy_successful
+import updater.shared.generated.resources.current_device_info_filled
 import updater.shared.generated.resources.download_start
 import updater.shared.generated.resources.toast_crash_info
 import updater.shared.generated.resources.toast_ing
@@ -51,6 +54,7 @@ data class RomQueryUiState(
     val isLoading: Boolean = false,
     val searchHistory: List<DataHelper.SearchHistoryEntry> = emptyList(),
     val searchHistorySelected: Int = 0,
+    val currentDeviceInfo: DeviceInfo? = null,
 )
 
 class RomQueryViewModel(
@@ -81,6 +85,9 @@ class RomQueryViewModel(
     }
 
     init {
+        _uiState.update {
+            it.copy(currentDeviceInfo = getDeviceInfo())
+        }
         viewModelScope.launch { loadQueryPreferences() }
         viewModelScope.launch {
             deviceListRepository.devices.collect { devices ->
@@ -192,6 +199,21 @@ class RomQueryViewModel(
     fun clearSearchHistory() {
         _uiState.update { it.copy(searchHistory = emptyList()) }
         viewModelScope.launch { preferences.remove(Keys.SEARCH_HISTORY) }
+    }
+
+    fun fillWithCurrent() {
+        _uiState.update { state ->
+            val currentInfo = _uiState.value.currentDeviceInfo ?: return
+            val codeName = currentInfo.codeName
+            val mappedName = deviceListRepository.deviceNameOf(codeName)
+
+            state.copy(
+                codeName = codeName,
+                deviceName = mappedName.ifEmpty { currentInfo.model },
+                systemVersion = currentInfo.version,
+            )
+        }
+        showMessage(Res.string.current_device_info_filled)
     }
 
     fun loadSearchHistory(entry: DataHelper.SearchHistoryEntry) {
