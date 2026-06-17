@@ -16,8 +16,6 @@ kotlin {
         desktopMain.dependencies {
             implementation(projects.shared)
             implementation(compose.desktop.currentOs)
-            implementation(libs.jna)
-            implementation(libs.jna.platform)
         }
     }
 }
@@ -26,8 +24,20 @@ compose.desktop {
     application {
         mainClass = "Main_desktopKt"
 
+        // Windows-only: FFM native access + reflective HWND (sun.awt). Gated on build host
+        // so non-Windows packages don't warn about the missing sun.awt.windows package.
+        if (System.getProperty("os.name").lowercase().contains("win")) {
+            jvmArgs += listOf(
+                "--enable-native-access=ALL-UNNAMED",
+                "--add-opens", "java.desktop/sun.awt=ALL-UNNAMED",
+                "--add-opens", "java.desktop/sun.awt.windows=ALL-UNNAMED",
+            )
+        }
+
         buildTypes.release.proguard {
             optimize = false
+            // Bundled ProGuard maxes at Java 24; pin a newer one for JDK 25 (class major 69).
+            version.set("7.9.1")
             configurationFiles.from("proguard-rules-jvm.pro")
         }
 

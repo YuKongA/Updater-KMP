@@ -88,8 +88,6 @@ kotlin {
             implementation(compose.desktop.currentOs)
             // Added
             implementation(libs.ktor.client.cio)
-            implementation(libs.jna)
-            implementation(libs.jna.platform)
         }
         webMain.dependencies {
             // Added
