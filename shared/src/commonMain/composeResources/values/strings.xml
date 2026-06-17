@@ -9,6 +9,7 @@
     <string name="device_name">Device Name</string>
     <string name="system_version">System Version</string>
     <string name="android_version">Android Version</string>
+    <string name="current_device_info_filled">Current device info filled</string>
     <string name="submit">Submit</string>
     <string name="search_history">Search History</string>
     <string name="clear_search_history">Clear Search History</string>

@@ -55,6 +55,7 @@ import top.yukonga.miuix.kmp.basic.DropdownEntry
 import top.yukonga.miuix.kmp.basic.DropdownItem
 import top.yukonga.miuix.kmp.basic.HorizontalDivider
 import top.yukonga.miuix.kmp.basic.Icon
+import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
 import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.ScrollBehavior
@@ -72,6 +73,7 @@ import top.yukonga.miuix.kmp.blur.layerBackdrop
 import top.yukonga.miuix.kmp.blur.rememberLayerBackdrop
 import top.yukonga.miuix.kmp.blur.textureBlur
 import top.yukonga.miuix.kmp.icon.MiuixIcons
+import top.yukonga.miuix.kmp.icon.extended.SearchDevice
 import top.yukonga.miuix.kmp.icon.extended.Settings
 import top.yukonga.miuix.kmp.interfaces.ExperimentalScrollBarApi
 import top.yukonga.miuix.kmp.menu.OverlayIconDropdownMenu
@@ -207,6 +209,26 @@ private fun MenuActions(
 }
 
 @Composable
+private fun FillFormCurrentDeviceAction(
+    focusManager: FocusManager,
+    onReadCurrentDevice: () -> Unit,
+) {
+    IconButton(
+        modifier = Modifier.size(40.dp),
+        onClick = {
+            focusManager.clearFocus()
+            onReadCurrentDevice()
+        }
+    ) {
+        Icon(
+            imageVector = MiuixIcons.SearchDevice,
+            tint = MiuixTheme.colorScheme.onBackground,
+            contentDescription = "Fill from current device"
+        )
+    }
+}
+
+@Composable
 private fun PortraitAppView(
     backdrop: LayerBackdrop,
     surfaceColor: Color,
@@ -239,6 +261,12 @@ private fun PortraitAppView(
                     )
                 },
                 actions = {
+                    if (queryUi.currentDeviceInfo != null) {
+                        FillFormCurrentDeviceAction(
+                            focusManager = focusManager,
+                            onReadCurrentDevice = { romQueryViewModel.fillWithCurrent() }
+                        )
+                    }
                     MenuActions(
                         searchHistory = queryUi.searchHistory,
                         focusManager = focusManager,
@@ -392,6 +420,12 @@ private fun LandscapeAppView(
                         )
                     },
                     actions = {
+                        if (queryUi.currentDeviceInfo != null) {
+                            FillFormCurrentDeviceAction(
+                                focusManager = focusManager,
+                                onReadCurrentDevice = { romQueryViewModel.fillWithCurrent() }
+                            )
+                        }
                         MenuActions(
                             searchHistory = queryUi.searchHistory,
                             focusManager = focusManager,

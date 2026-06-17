@@ -3,6 +3,7 @@ package viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import data.DataHelper
+import data.DeviceInfoHelper
 import data.repository.DeviceListRepository
 import data.repository.LoginState
 import data.repository.SessionRepository
@@ -22,8 +23,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.StringResource
+import platform.DeviceInfo
+import platform.getDeviceInfo
 import updater.shared.generated.resources.Res
 import updater.shared.generated.resources.copy_successful
+import updater.shared.generated.resources.current_device_info_filled
 import updater.shared.generated.resources.download_start
 import updater.shared.generated.resources.toast_crash_info
 import updater.shared.generated.resources.toast_ing
@@ -51,6 +55,7 @@ data class RomQueryUiState(
     val isLoading: Boolean = false,
     val searchHistory: List<DataHelper.SearchHistoryEntry> = emptyList(),
     val searchHistorySelected: Int = 0,
+    val currentDeviceInfo: DeviceInfo? = null,
 )
 
 class RomQueryViewModel(
@@ -81,7 +86,16 @@ class RomQueryViewModel(
     }
 
     init {
-        viewModelScope.launch { loadQueryPreferences() }
+        val deviceInfo = getDeviceInfo()
+        _uiState.update { it.copy(currentDeviceInfo = deviceInfo) }
+        viewModelScope.launch {
+            loadQueryPreferences()
+            // History (the last saved query) takes priority. Only when there is no prior
+            // query at all do we pre-fill the form from the current device.
+            if (deviceInfo != null && _uiState.value.codeName.isEmpty()) {
+                applyCurrentDevice(deviceInfo, notify = false)
+            }
+        }
         viewModelScope.launch {
             deviceListRepository.devices.collect { devices ->
                 _uiState.update {
@@ -192,6 +206,36 @@ class RomQueryViewModel(
     fun clearSearchHistory() {
         _uiState.update { it.copy(searchHistory = emptyList()) }
         viewModelScope.launch { preferences.remove(Keys.SEARCH_HISTORY) }
+    }
+
+    /** Triggered by the "read from current device" button. */
+    fun fillWithCurrent() {
+        val info = _uiState.value.currentDeviceInfo ?: return
+        applyCurrentDevice(info, notify = true)
+    }
+
+    private fun applyCurrentDevice(info: DeviceInfo, notify: Boolean) {
+        val decoded = deviceListRepository.decodeVersionInfo(info.codeName, info.incremental)
+        val mappedName = deviceListRepository.deviceNameOf(info.codeName)
+        _uiState.update { state ->
+            state.copy(
+                codeName = info.codeName,
+                deviceName = mappedName.ifEmpty { info.marketName.ifEmpty { info.model } },
+                systemVersion = info.incremental,
+                androidVersion = decoded?.androidVersion
+                    ?: normalizeAndroidVersion(info.androidVersion)
+                    ?: state.androidVersion,
+                deviceRegion = decoded?.regionName ?: state.deviceRegion,
+                deviceCarrier = decoded?.carrierName ?: state.deviceCarrier,
+            )
+        }
+        if (notify) showMessage(Res.string.current_device_info_filled)
+    }
+
+    /** "16" -> "16.0", and only return it when it matches a known dropdown option. */
+    private fun normalizeAndroidVersion(release: String): String? {
+        val candidate = if (release.contains('.')) release else "$release.0"
+        return DeviceInfoHelper.androidVersions.firstOrNull { it == candidate }
     }
 
     fun loadSearchHistory(entry: DataHelper.SearchHistoryEntry) {

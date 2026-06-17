@@ -8,6 +8,7 @@
     <string name="device_name">设备名称</string>
     <string name="system_version">系统版本</string>
     <string name="android_version">安卓版本</string>
+    <string name="current_device_info_filled">已填充当前设备信息</string>
     <string name="submit">提交</string>
     <string name="search_history">查询历史</string>
     <string name="clear_search_history">清空查询历史</string>

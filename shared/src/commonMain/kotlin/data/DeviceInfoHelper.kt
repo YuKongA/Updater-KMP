@@ -129,6 +129,10 @@ object DeviceInfoHelper {
     private val carrierNameToCarrierCodeName = carrierList.associateBy({ it.carrierName }, { it.regionAppend })
     private val androidVersionCodeToAndroidLetterCode = androidList.associateBy { it.androidVersionCode }
 
+    private val androidLetterCodeToVersion = androidList.associateBy({ it.androidLetterCode }, { it.androidVersionCode })
+    private val regionCodeToRegionName = regionList.associateBy({ it.regionCode }, { it.regionName })
+    private val carrierCodeToCarrierName = carrierList.associateBy({ it.carrierCode }, { it.carrierName })
+
     val regionNames = regionList.map { it.regionName }
     val carrierNames = carrierList.map { it.carrierName }
     val androidVersions = androidList.map { it.androidVersionCode }
@@ -137,6 +141,9 @@ object DeviceInfoHelper {
     fun carrierCode(carrierName: String): String = carrierNameToCarrierCode[carrierName] ?: ""
     fun regionCodeName(regionName: String): String = regionNameToRegionCodeName[regionName] ?: ""
     fun carrierCodeName(carrierName: String): String = carrierNameToCarrierCodeName[carrierName] ?: ""
-    fun androidLetterOf(androidVersionCode: String): String? =
-        androidVersionCodeToAndroidLetterCode[androidVersionCode]?.androidLetterCode
+    fun androidLetterOf(androidVersionCode: String): String? = androidVersionCodeToAndroidLetterCode[androidVersionCode]?.androidLetterCode
+
+    fun androidVersionOfLetter(letterCode: String): String? = androidLetterCodeToVersion[letterCode]
+    fun regionNameOfCode(regionCode: String): String? = regionCodeToRegionName[regionCode]
+    fun carrierNameOfCode(carrierCode: String): String? = carrierCodeToCarrierName[carrierCode]
 }

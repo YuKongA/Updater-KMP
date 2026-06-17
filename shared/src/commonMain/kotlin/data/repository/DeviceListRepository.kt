@@ -16,6 +16,12 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import platform.httpClientPlatform
 
+data class DecodedDeviceVersion(
+    val androidVersion: String?,
+    val regionName: String?,
+    val carrierName: String?,
+)
+
 class DeviceListRepository(
     private val prefs: PreferencesStorage,
     private val embedded: List<DeviceInfoHelper.Device> = DeviceInfoHelper.embeddedDeviceList,
@@ -96,6 +102,30 @@ class DeviceListRepository(
         val letter = DeviceInfoHelper.androidLetterOf(androidVersionCode) ?: return ""
         val device = _devices.value.firstOrNull { it.deviceCodeName == codeName } ?: return ""
         return "$letter${device.deviceCode}$regionCode$carrierCode"
+    }
+
+    fun decodeVersionInfo(codeName: String, systemVersion: String): DecodedDeviceVersion? {
+        val device = _devices.value.firstOrNull { it.deviceCodeName == codeName } ?: return null
+        // Strip a trailing ".DEV" (dev builds) so it does not become the parsed token.
+        val core = systemVersion.uppercase().removeSuffix(".DEV")
+        val token = core.substringAfterLast('.')
+        val deviceCode = device.deviceCode.uppercase()
+        if (token.length <= deviceCode.length) return null
+
+        val letter = token.take(1)
+        val afterLetter = token.drop(1)
+        if (!afterLetter.startsWith(deviceCode)) return null
+        val tail = afterLetter.removePrefix(deviceCode) // region(2) + carrier(2)
+
+        val androidVersion = DeviceInfoHelper.androidVersionOfLetter(letter)
+        val regionName = tail.takeIf { it.length >= 2 }
+            ?.let { DeviceInfoHelper.regionNameOfCode(it.take(2)) }
+        val carrierName = when {
+            tail.length >= 4 -> DeviceInfoHelper.carrierNameOfCode(tail.substring(2, 4))
+            tail.length == 2 -> DeviceInfoHelper.carrierNameOfCode("XM") // default Xiaomi when absent
+            else -> null
+        }
+        return DecodedDeviceVersion(androidVersion, regionName, carrierName)
     }
 
     private suspend fun resolveDeviceList(): List<DeviceInfoHelper.Device> = when (source()) {
