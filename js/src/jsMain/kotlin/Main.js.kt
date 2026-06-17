@@ -1,58 +1,45 @@
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.platform.LocalFontFamilyResolver
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.platform.Font
 import androidx.compose.ui.window.ComposeViewport
-import kotlinx.browser.window
-import kotlinx.coroutines.await
-import org.khronos.webgl.ArrayBuffer
-import org.khronos.webgl.Int8Array
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
+import webfont.preloadWebFonts
+import webfont.queryParam
+import kotlin.time.Duration.Companion.milliseconds
 
-private const val MiSanVF = "./MiSans VF.woff2"
+private const val DEFAULT_CSS_URL =
+    "https://cdn-font.hyperos.mi.com/font/css?family=MiSans_VF:VF:Chinese_Simplify&display=swap"
+
+// Safety cap on how long the loading overlay waits for fonts; afterwards it hides and any remaining
+// subsets keep downloading in the background.
+private const val LOADING_FONT_TIMEOUT_MS = 10_000L
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
+    val cssUrl = queryParam("cssUrl").ifBlank { DEFAULT_CSS_URL }
     ComposeViewport(
         viewportContainerId = "composeApplication"
     ) {
+        // Register each CJK subset with the shared resolver so the whole app picks the glyphs up
+        // through the global font fallback (no bundled font, no per-text wrappers), while feeding
+        // download progress into the overlay's font bar. Launched in an outer scope so it survives
+        // the overlay's timeout.
         val fontFamilyResolver = LocalFontFamilyResolver.current
-        val fontsLoaded = remember { mutableStateOf(false) }
-
-        if (fontsLoaded.value) {
-            hideLoading()
-            App()
+        val scope = rememberCoroutineScope()
+        LaunchedEffect(cssUrl, fontFamilyResolver) {
+            withFrameNanos {} // let the first frame paint behind the overlay
+            val preload = scope.launch {
+                preloadWebFonts(cssUrl, fontFamilyResolver) { done, total ->
+                    platformSetFontProgress(done, total)
+                }
+            }
+            withTimeoutOrNull(LOADING_FONT_TIMEOUT_MS.milliseconds) { preload.join() }
+            platformHideLoading()
         }
 
-        LaunchedEffect(Unit) {
-            val miSanVFBytes = loadRes(MiSanVF).toByteArray()
-            val fontFamily = FontFamily(Font("MiSans VF", miSanVFBytes))
-            fontFamilyResolver.preload(fontFamily)
-            fontsLoaded.value = true
-        }
+        App()
     }
 }
-
-suspend fun loadRes(url: String): ArrayBuffer {
-    return window.fetch(url).await().arrayBuffer().await()
-}
-
-fun ArrayBuffer.toByteArray(): ByteArray {
-    val source = Int8Array(this, 0, byteLength)
-    return jsInt8ArrayToKotlinByteArray(source)
-}
-
-@OptIn(ExperimentalWasmJsInterop::class)
-@JsFun(
-    """
-        function hideLoading() {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('composeApplication').style.display = 'block';
-        }
-    """
-)
-external fun hideLoading()
-
-external fun jsInt8ArrayToKotlinByteArray(x: Int8Array): ByteArray
