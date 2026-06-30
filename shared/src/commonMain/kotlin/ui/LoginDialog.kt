@@ -9,11 +9,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.KeyboardActionHandler
+import androidx.compose.foundation.text.input.OutputTransformation
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -22,8 +26,6 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import data.repository.LoginState
 import org.jetbrains.compose.resources.stringResource
@@ -59,14 +61,14 @@ import viewmodel.LoginEvent
 fun LoginDialog(
     show: Boolean,
     loginState: LoginState,
-    account: String,
-    password: String,
+    accountState: TextFieldState,
+    passwordState: TextFieldState,
     global: Boolean,
     savePassword: Boolean,
     showTicketInput: Boolean,
     availableTwoFactorOptions: List<Int>,
     isVerifying: Boolean,
-    ticket: String,
+    ticketState: TextFieldState,
     isVerificationRequested: Boolean,
     isLoggingIn: Boolean,
     onShowDialog: () -> Unit,
@@ -104,26 +106,34 @@ fun LoginDialog(
                 Column {
                     // 账号输入框
                     TextField(
-                        value = account,
-                        onValueChange = { onEvent(LoginEvent.AccountChanged(it)) },
+                        state = accountState,
                         label = stringResource(Res.string.account),
                         modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
+                        lineLimits = TextFieldLineLimits.SingleLine,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                        keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
+                        onKeyboardAction = KeyboardActionHandler { focusManager.moveFocus(FocusDirection.Down) }
                     )
 
                     // 密码输入框
                     var passwordVisibility by rememberSaveable { mutableStateOf(false) }
+                    val passwordMask = remember {
+                        OutputTransformation {
+                            val count = length
+                            var index = 0
+                            while (index < count) {
+                                replace(index, index + 1, "•")
+                                index++
+                            }
+                        }
+                    }
                     TextField(
-                        value = password,
-                        onValueChange = { onEvent(LoginEvent.PasswordChanged(it)) },
+                        state = passwordState,
                         label = stringResource(Res.string.password),
                         modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                        singleLine = true,
+                        lineLimits = TextFieldLineLimits.SingleLine,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-                        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                        visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+                        onKeyboardAction = KeyboardActionHandler { focusManager.clearFocus() },
+                        outputTransformation = if (passwordVisibility) null else passwordMask,
                         trailingIcon = {
                             IconButton(
                                 modifier = Modifier.padding(end = 6.dp),
@@ -189,13 +199,12 @@ fun LoginDialog(
                             ) {
                                 Column {
                                     TextField(
-                                        value = ticket,
-                                        onValueChange = { onEvent(LoginEvent.TicketChanged(it)) },
+                                        state = ticketState,
                                         label = stringResource(Res.string.verification_code),
                                         modifier = Modifier.fillMaxWidth(),
-                                        singleLine = true,
+                                        lineLimits = TextFieldLineLimits.SingleLine,
                                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                                        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
+                                        onKeyboardAction = KeyboardActionHandler { focusManager.clearFocus() }
                                     )
                                     Row(
                                         modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
@@ -203,7 +212,7 @@ fun LoginDialog(
                                         TextButton(
                                             modifier = Modifier.weight(1f),
                                             text = if (isVerifying) stringResource(Res.string.verifying) else stringResource(Res.string.submit),
-                                            enabled = !isVerifying && ticket.isNotBlank(),
+                                            enabled = !isVerifying && ticketState.text.isNotBlank(),
                                             colors = ButtonDefaults.textButtonColorsPrimary(),
                                             onClick = { onEvent(LoginEvent.SubmitTwoFactor) }
                                         )

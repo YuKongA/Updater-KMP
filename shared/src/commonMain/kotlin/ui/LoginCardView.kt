@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +39,9 @@ import viewmodel.LoginUiState
 fun LoginCardView(
     loginUi: LoginUiState,
     isDarkTheme: Boolean,
+    accountState: TextFieldState,
+    passwordState: TextFieldState,
+    ticketState: TextFieldState,
     onShowLoginDialog: () -> Unit,
     onLoginEvent: (LoginEvent) -> Unit,
 ) {
@@ -93,14 +97,14 @@ fun LoginCardView(
                 LoginDialog(
                     show = loginUi.showLoginDialog,
                     loginState = loginState,
-                    account = loginUi.loginAccount,
-                    password = loginUi.loginPassword,
+                    accountState = accountState,
+                    passwordState = passwordState,
                     global = loginUi.isGlobal,
                     savePassword = loginUi.savePasswordEnabled,
                     showTicketInput = loginUi.showTicketInput,
                     availableTwoFactorOptions = loginUi.availableTwoFactorOptions,
                     isVerifying = loginUi.isVerifying,
-                    ticket = loginUi.loginTicket,
+                    ticketState = ticketState,
                     isVerificationRequested = loginUi.isVerificationRequested,
                     isLoggingIn = loginUi.isLoggingIn,
                     onShowDialog = onShowLoginDialog,

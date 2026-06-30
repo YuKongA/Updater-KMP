@@ -320,6 +320,9 @@ private fun PortraitAppView(
                         LoginCardView(
                             loginUi = loginUi,
                             isDarkTheme = isDarkTheme,
+                            accountState = loginViewModel.accountState,
+                            passwordState = loginViewModel.passwordState,
+                            ticketState = loginViewModel.ticketState,
                             onShowLoginDialog = { loginViewModel.showLoginDialog() },
                             onLoginEvent = { loginViewModel.onLoginEvent(it) }
                         )
@@ -456,6 +459,9 @@ private fun LandscapeAppView(
                         LoginCardView(
                             loginUi = loginUi,
                             isDarkTheme = isDarkTheme,
+                            accountState = loginViewModel.accountState,
+                            passwordState = loginViewModel.passwordState,
+                            ticketState = loginViewModel.ticketState,
                             onShowLoginDialog = { loginViewModel.showLoginDialog() },
                             onLoginEvent = { loginViewModel.onLoginEvent(it) }
                         )

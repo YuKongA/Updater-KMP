@@ -1,5 +1,8 @@
 package viewmodel
 
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import data.LoginResult
@@ -31,11 +34,8 @@ import updater.shared.generated.resources.two_factor_unsupported
 import updater.shared.generated.resources.verification_code_error
 
 sealed interface LoginEvent {
-    data class AccountChanged(val value: String) : LoginEvent
-    data class PasswordChanged(val value: String) : LoginEvent
     data class GlobalChanged(val value: Boolean) : LoginEvent
     data class SavePasswordChanged(val value: Boolean) : LoginEvent
-    data class TicketChanged(val value: String) : LoginEvent
     data class VerificationRequested(val value: Boolean) : LoginEvent
     data class SelectTwoFactorMethod(val flag: Int) : LoginEvent
     data object LoginClicked : LoginEvent
@@ -48,15 +48,12 @@ sealed interface LoginEvent {
 data class LoginUiState(
     val loginState: LoginState = LoginState.NotLoggedIn,
     val showLoginDialog: Boolean = false,
-    val loginAccount: String = "",
-    val loginPassword: String = "",
     val isGlobal: Boolean = false,
     val savePasswordEnabled: Boolean = false,
     val showTicketInput: Boolean = false,
     val availableTwoFactorOptions: List<Int> = emptyList(),
     val selectedTwoFactorFlag: Int? = null,
     val isVerifying: Boolean = false,
-    val loginTicket: String = "",
     val isVerificationRequested: Boolean = false,
     val isLoggingIn: Boolean = false,
 )
@@ -69,6 +66,10 @@ class LoginViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
+
+    val accountState = TextFieldState()
+    val passwordState = TextFieldState()
+    val ticketState = TextFieldState()
 
     private val _uiEvent = Channel<UiEvent>(Channel.BUFFERED)
     val uiEvent = _uiEvent.receiveAsFlow()
@@ -90,24 +91,22 @@ class LoginViewModel(
     private suspend fun loadCredentials() {
         val savedCredentials = credentials.load()
         val savedSavePassword = credentials.isSaveEnabled()
+        accountState.setTextAndPlaceCursorAtEnd(savedCredentials.account)
+        passwordState.setTextAndPlaceCursorAtEnd(savedCredentials.password)
         _uiState.update {
-            it.copy(
-                loginAccount = savedCredentials.account,
-                loginPassword = savedCredentials.password,
-                savePasswordEnabled = savedSavePassword,
-            )
+            it.copy(savePasswordEnabled = savedSavePassword)
         }
     }
 
     fun showLoginDialog() {
         viewModelScope.launch { loginFlow.clearTransient() }
+        ticketState.clearText()
         _uiState.update {
             it.copy(
                 showLoginDialog = true,
                 showTicketInput = false,
                 availableTwoFactorOptions = emptyList(),
                 selectedTwoFactorFlag = null,
-                loginTicket = "",
                 isVerifying = false,
                 isLoggingIn = false,
                 isVerificationRequested = false,
@@ -121,18 +120,18 @@ class LoginViewModel(
 
     fun onLoginEvent(event: LoginEvent) {
         when (event) {
-            is LoginEvent.AccountChanged -> _uiState.update { it.copy(loginAccount = event.value) }
-            is LoginEvent.PasswordChanged -> _uiState.update { it.copy(loginPassword = event.value) }
             is LoginEvent.GlobalChanged -> _uiState.update { it.copy(isGlobal = event.value) }
             is LoginEvent.SavePasswordChanged -> _uiState.update { it.copy(savePasswordEnabled = event.value) }
-            is LoginEvent.TicketChanged -> _uiState.update { it.copy(loginTicket = event.value) }
             is LoginEvent.VerificationRequested -> _uiState.update { it.copy(isVerificationRequested = event.value) }
             is LoginEvent.SelectTwoFactorMethod -> selectTwoFactorMethod(event.flag)
             is LoginEvent.LoginClicked -> performLogin()
             is LoginEvent.LogoutClicked -> performLogout()
             is LoginEvent.SubmitTwoFactor -> submitTwoFactorTicket()
-            is LoginEvent.CancelTicket -> _uiState.update {
-                it.copy(showTicketInput = false, loginTicket = "", availableTwoFactorOptions = emptyList())
+            is LoginEvent.CancelTicket -> {
+                ticketState.clearText()
+                _uiState.update {
+                    it.copy(showTicketInput = false, availableTwoFactorOptions = emptyList())
+                }
             }
 
             is LoginEvent.DismissDialog -> dismissLoginDialog()
@@ -158,8 +157,8 @@ class LoginViewModel(
             showMessage(Res.string.logging_in)
 
             val result = loginService.login(
-                account = state.loginAccount,
-                password = state.loginPassword,
+                account = accountState.text.toString(),
+                password = passwordState.text.toString(),
                 global = state.isGlobal,
                 savePassword = state.savePasswordEnabled
             )
@@ -181,28 +180,26 @@ class LoginViewModel(
             val state = _uiState.value
             _uiState.update { it.copy(isVerifying = true) }
             val result = loginService.login(
-                account = state.loginAccount,
-                password = state.loginPassword,
+                account = accountState.text.toString(),
+                password = passwordState.text.toString(),
                 global = state.isGlobal,
                 savePassword = state.savePasswordEnabled,
                 flag = state.selectedTwoFactorFlag,
-                ticket = state.loginTicket,
+                ticket = ticketState.text.toString(),
             )
-            handleLoginResult(result, clearTicketOnSuccess = true)
-            _uiState.update { it.copy(isVerifying = false, loginTicket = "") }
+            handleLoginResult(result)
+            ticketState.clearText()
+            _uiState.update { it.copy(isVerifying = false) }
         }
     }
 
-    private suspend fun handleLoginResult(result: LoginResult, clearTicketOnSuccess: Boolean = false) {
+    private suspend fun handleLoginResult(result: LoginResult) {
         when (result) {
             is LoginResult.Success -> {
                 showMessage(Res.string.login_successful)
                 session.save(result.loginData)
                 _uiState.update {
-                    it.copy(
-                        showLoginDialog = false,
-                        loginTicket = if (clearTicketOnSuccess) "" else it.loginTicket,
-                    )
+                    it.copy(showLoginDialog = false)
                 }
             }
 
