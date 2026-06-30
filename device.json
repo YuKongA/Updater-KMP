@@ -201,6 +201,7 @@
         { "deviceName": "REDMI A7 Pro / POCO C81 / C81 Pro", "deviceCodeName": "arctic", "deviceCode": "BV" },
         { "deviceName": "REDMI 17 5G / 15A 5G / A7 Pro 5G / POCO C85x", "deviceCodeName": "somalia", "deviceCode": "BW" },
         { "deviceName": "REDMI K90 Max", "deviceCodeName": "prague", "deviceCode": "AA" },
+        { "deviceName": "REDMI K90 Ultra", "deviceCodeName": "warsaw", "deviceCode": "HP" },
         { "deviceName": "REDMI K Pad 2", "deviceCodeName": "yili", "deviceCode": "AK" },
         { "deviceName": "REDMI Pad 2 SE / REDMI Pad 2 9.7 / POCO Pad C1", "deviceCodeName": "guitar", "deviceCode": "DN" },
         { "deviceName": "REDMI Pad 2 SE 4G / REDMI Pad 2 9.7 4G", "deviceCodeName": "erhu", "deviceCode": "DO" },
@@ -210,5 +211,5 @@
         { "deviceName": "Xiaomi Pad 8", "deviceCodeName": "yupei", "deviceCode": "PZ" },
         { "deviceName": "Xiaomi Pad 8 Pro", "deviceCodeName": "piano", "deviceCode": "PY" }
     ],
-    "version": "1.1.3"
+    "version": "1.1.4"
 }
