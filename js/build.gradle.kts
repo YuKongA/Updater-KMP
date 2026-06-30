@@ -5,7 +5,7 @@ plugins {
 }
 
 kotlin {
-    js(IR) {
+    js {
         outputModuleName = ProjectConfig.APP_NAME
         browser {
             commonWebpackConfig {
