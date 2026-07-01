@@ -18,13 +18,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,6 +44,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import data.DataHelper
@@ -85,9 +86,9 @@ import top.yukonga.miuix.kmp.utils.scrollEndHaptic
 import ui.AboutDialog
 import ui.BasicViews
 import ui.DeviceListDialog
-import ui.InfoCardViews
 import ui.LoginCardView
-import ui.XmsInfoCardView
+import ui.infoCardItems
+import ui.xmsCardItems
 import updater.shared.generated.resources.Res
 import updater.shared.generated.resources.app_name
 import updater.shared.generated.resources.clear_search_history
@@ -228,6 +229,97 @@ private fun FillFormCurrentDeviceAction(
     }
 }
 
+private fun LazyListScope.loginCardItem(
+    loginUi: LoginUiState,
+    isDarkTheme: Boolean,
+    loginViewModel: LoginViewModel,
+) = item(key = "loginCard") {
+    LoginCardView(
+        loginUi = loginUi,
+        isDarkTheme = isDarkTheme,
+        accountState = loginViewModel.accountState,
+        passwordState = loginViewModel.passwordState,
+        ticketState = loginViewModel.ticketState,
+        onShowLoginDialog = { loginViewModel.showLoginDialog() },
+        onLoginEvent = { loginViewModel.onLoginEvent(it) }
+    )
+}
+
+private fun LazyListScope.basicViewsItem(
+    queryUi: RomQueryUiState,
+    romQueryViewModel: RomQueryViewModel,
+) = item(key = "basicViews") {
+    BasicViews(
+        deviceName = queryUi.deviceName,
+        codeName = queryUi.codeName,
+        androidVersion = queryUi.androidVersion,
+        deviceRegion = queryUi.deviceRegion,
+        deviceCarrier = queryUi.deviceCarrier,
+        systemVersion = queryUi.systemVersion,
+        deviceNames = queryUi.deviceNames,
+        codeNames = queryUi.codeNames,
+        searchHistory = queryUi.searchHistory,
+        searchHistorySelected = queryUi.searchHistorySelected,
+        onDeviceNameChange = { romQueryViewModel.updateDeviceName(it) },
+        onCodeNameChange = { romQueryViewModel.updateCodeName(it) },
+        onAndroidVersionChange = { romQueryViewModel.updateAndroidVersion(it) },
+        onDeviceRegionChange = { romQueryViewModel.updateDeviceRegion(it) },
+        onDeviceCarrierChange = { romQueryViewModel.updateDeviceCarrier(it) },
+        onSystemVersionChange = { romQueryViewModel.updateSystemVersion(it) },
+        onSearchHistorySelectedChange = { romQueryViewModel.updateSearchHistorySelected(it) },
+        onHistorySelect = { romQueryViewModel.loadSearchHistory(it) },
+        onSubmit = { romQueryViewModel.fetchRomInfo() }
+    )
+}
+
+private fun LazyListScope.resultCardItems(
+    queryUi: RomQueryUiState,
+    romQueryViewModel: RomQueryViewModel,
+    outerHorizontalPadding: Dp,
+    leadingSpacing: Dp = 0.dp,
+) {
+    if (leadingSpacing > 0.dp) {
+        item(key = "resultsTopSpacer") { Spacer(Modifier.height(leadingSpacing)) }
+    }
+    infoCardItems(
+        keyPrefix = "curRom",
+        romInfo = queryUi.curRomInfo,
+        iconInfo = queryUi.curIconInfo,
+        imageInfo = queryUi.curImageInfo,
+        outerHorizontalPadding = outerHorizontalPadding,
+        bottomSpacing = 12.dp,
+        onCopySuccess = romQueryViewModel::notifyCopySuccess,
+        onDownloadStart = romQueryViewModel::notifyDownloadStart,
+    )
+    infoCardItems(
+        keyPrefix = "incRom",
+        romInfo = queryUi.incRomInfo,
+        iconInfo = queryUi.incIconInfo,
+        imageInfo = queryUi.incImageInfo,
+        outerHorizontalPadding = outerHorizontalPadding,
+        bottomSpacing = 12.dp,
+        onCopySuccess = romQueryViewModel::notifyCopySuccess,
+        onDownloadStart = romQueryViewModel::notifyDownloadStart,
+    )
+    xmsCardItems(
+        keyPrefix = "xms",
+        xmsInfo = queryUi.xmsInfo,
+        outerHorizontalPadding = outerHorizontalPadding,
+        bottomSpacing = 12.dp,
+        onCopySuccess = romQueryViewModel::notifyCopySuccess,
+        onDownloadStart = romQueryViewModel::notifyDownloadStart,
+    )
+}
+
+private fun LazyListScope.bottomInsetSpacerItem() = item(key = "bottomSpacer") {
+    Spacer(
+        Modifier.height(
+            WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() +
+                    WindowInsets.captionBar.asPaddingValues().calculateBottomPadding()
+        )
+    )
+}
+
 @Composable
 private fun PortraitAppView(
     backdrop: LayerBackdrop,
@@ -307,70 +399,19 @@ private fun PortraitAppView(
                 .then(if (blurSupported) Modifier.layerBackdrop(backdrop) else Modifier)
                 .overScrollVertical()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal))
                 .imePadding(),
             contentPadding = paddingValues,
             overscrollEffect = null
         ) {
-            item {
-                Box(
-                    modifier = Modifier
-                        .navigationBarsPadding()
-                ) {
-                    Column {
-                        LoginCardView(
-                            loginUi = loginUi,
-                            isDarkTheme = isDarkTheme,
-                            accountState = loginViewModel.accountState,
-                            passwordState = loginViewModel.passwordState,
-                            ticketState = loginViewModel.ticketState,
-                            onShowLoginDialog = { loginViewModel.showLoginDialog() },
-                            onLoginEvent = { loginViewModel.onLoginEvent(it) }
-                        )
-                        BasicViews(
-                            deviceName = queryUi.deviceName,
-                            codeName = queryUi.codeName,
-                            androidVersion = queryUi.androidVersion,
-                            deviceRegion = queryUi.deviceRegion,
-                            deviceCarrier = queryUi.deviceCarrier,
-                            systemVersion = queryUi.systemVersion,
-                            deviceNames = queryUi.deviceNames,
-                            codeNames = queryUi.codeNames,
-                            searchHistory = queryUi.searchHistory,
-                            searchHistorySelected = queryUi.searchHistorySelected,
-                            onDeviceNameChange = { romQueryViewModel.updateDeviceName(it) },
-                            onCodeNameChange = { romQueryViewModel.updateCodeName(it) },
-                            onAndroidVersionChange = { romQueryViewModel.updateAndroidVersion(it) },
-                            onDeviceRegionChange = { romQueryViewModel.updateDeviceRegion(it) },
-                            onDeviceCarrierChange = { romQueryViewModel.updateDeviceCarrier(it) },
-                            onSystemVersionChange = { romQueryViewModel.updateSystemVersion(it) },
-                            onSearchHistorySelectedChange = { romQueryViewModel.updateSearchHistorySelected(it) },
-                            onHistorySelect = { romQueryViewModel.loadSearchHistory(it) },
-                            onSubmit = { romQueryViewModel.fetchRomInfo() }
-                        )
-                        Column(modifier = Modifier.padding(horizontal = 12.dp)) {
-                            InfoCardViews(
-                                romInfo = queryUi.curRomInfo,
-                                iconInfo = queryUi.curIconInfo,
-                                imageInfo = queryUi.curImageInfo,
-                                onCopySuccess = romQueryViewModel::notifyCopySuccess,
-                                onDownloadStart = romQueryViewModel::notifyDownloadStart,
-                            )
-                            InfoCardViews(
-                                romInfo = queryUi.incRomInfo,
-                                iconInfo = queryUi.incIconInfo,
-                                imageInfo = queryUi.incImageInfo,
-                                onCopySuccess = romQueryViewModel::notifyCopySuccess,
-                                onDownloadStart = romQueryViewModel::notifyDownloadStart,
-                            )
-                            XmsInfoCardView(
-                                xmsInfo = queryUi.xmsInfo,
-                                onCopySuccess = romQueryViewModel::notifyCopySuccess,
-                                onDownloadStart = romQueryViewModel::notifyDownloadStart,
-                            )
-                        }
-                    }
-                }
-            }
+            loginCardItem(loginUi, isDarkTheme, loginViewModel)
+            basicViewsItem(queryUi, romQueryViewModel)
+            resultCardItems(
+                queryUi = queryUi,
+                romQueryViewModel = romQueryViewModel,
+                outerHorizontalPadding = 12.dp,
+            )
+            bottomInsetSpacerItem()
         }
     }
 }
@@ -455,44 +496,9 @@ private fun LandscapeAppView(
                         .imePadding(),
                     overscrollEffect = null
                 ) {
-                    item {
-                        LoginCardView(
-                            loginUi = loginUi,
-                            isDarkTheme = isDarkTheme,
-                            accountState = loginViewModel.accountState,
-                            passwordState = loginViewModel.passwordState,
-                            ticketState = loginViewModel.ticketState,
-                            onShowLoginDialog = { loginViewModel.showLoginDialog() },
-                            onLoginEvent = { loginViewModel.onLoginEvent(it) }
-                        )
-                        BasicViews(
-                            deviceName = queryUi.deviceName,
-                            codeName = queryUi.codeName,
-                            androidVersion = queryUi.androidVersion,
-                            deviceRegion = queryUi.deviceRegion,
-                            deviceCarrier = queryUi.deviceCarrier,
-                            systemVersion = queryUi.systemVersion,
-                            deviceNames = queryUi.deviceNames,
-                            codeNames = queryUi.codeNames,
-                            searchHistory = queryUi.searchHistory,
-                            searchHistorySelected = queryUi.searchHistorySelected,
-                            onDeviceNameChange = { romQueryViewModel.updateDeviceName(it) },
-                            onCodeNameChange = { romQueryViewModel.updateCodeName(it) },
-                            onAndroidVersionChange = { romQueryViewModel.updateAndroidVersion(it) },
-                            onDeviceRegionChange = { romQueryViewModel.updateDeviceRegion(it) },
-                            onDeviceCarrierChange = { romQueryViewModel.updateDeviceCarrier(it) },
-                            onSystemVersionChange = { romQueryViewModel.updateSystemVersion(it) },
-                            onSearchHistorySelectedChange = { romQueryViewModel.updateSearchHistorySelected(it) },
-                            onHistorySelect = { romQueryViewModel.loadSearchHistory(it) },
-                            onSubmit = { romQueryViewModel.fetchRomInfo() }
-                        )
-                        Spacer(
-                            Modifier.height(
-                                WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() +
-                                        WindowInsets.captionBar.asPaddingValues().calculateBottomPadding()
-                            )
-                        )
-                    }
+                    loginCardItem(loginUi, isDarkTheme, loginViewModel)
+                    basicViewsItem(queryUi, romQueryViewModel)
+                    bottomInsetSpacerItem()
                 }
             }
             VerticalDivider(
@@ -530,37 +536,13 @@ private fun LandscapeAppView(
                     ),
                     overscrollEffect = null
                 ) {
-                    item {
-                        Column(
-                            modifier = Modifier.padding(top = 12.dp)
-                        ) {
-                            InfoCardViews(
-                                romInfo = queryUi.curRomInfo,
-                                iconInfo = queryUi.curIconInfo,
-                                imageInfo = queryUi.curImageInfo,
-                                onCopySuccess = romQueryViewModel::notifyCopySuccess,
-                                onDownloadStart = romQueryViewModel::notifyDownloadStart,
-                            )
-                            InfoCardViews(
-                                romInfo = queryUi.incRomInfo,
-                                iconInfo = queryUi.incIconInfo,
-                                imageInfo = queryUi.incImageInfo,
-                                onCopySuccess = romQueryViewModel::notifyCopySuccess,
-                                onDownloadStart = romQueryViewModel::notifyDownloadStart,
-                            )
-                            XmsInfoCardView(
-                                xmsInfo = queryUi.xmsInfo,
-                                onCopySuccess = romQueryViewModel::notifyCopySuccess,
-                                onDownloadStart = romQueryViewModel::notifyDownloadStart,
-                            )
-                        }
-                        Spacer(
-                            Modifier.height(
-                                WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() +
-                                        WindowInsets.captionBar.asPaddingValues().calculateBottomPadding()
-                            )
-                        )
-                    }
+                    resultCardItems(
+                        queryUi = queryUi,
+                        romQueryViewModel = romQueryViewModel,
+                        outerHorizontalPadding = 0.dp,
+                        leadingSpacing = 12.dp,
+                    )
+                    bottomInsetSpacerItem()
                 }
                 VerticalScrollBar(
                     adapter = rememberScrollBarAdapter(lazyListState),
