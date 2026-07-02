@@ -7,6 +7,7 @@ import data.storage.LoginFlowStorage
 import dev.whyoleg.cryptography.CryptographyProvider
 import dev.whyoleg.cryptography.DelicateCryptographyApi
 import dev.whyoleg.cryptography.algorithms.MD5
+import dev.whyoleg.cryptography.algorithms.SHA1
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.cookies.AcceptAllCookiesStorage
 import io.ktor.client.plugins.cookies.HttpCookies
@@ -16,6 +17,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.encodeURLParameter
 import io.ktor.http.isSuccess
 import io.ktor.http.parameters
 import io.ktor.http.setCookie
@@ -30,6 +32,8 @@ import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
 import platform.httpClientPlatform
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -112,6 +116,7 @@ class LoginService(
         val content = Json.decodeFromString<JsonObject>(removeResponsePrefix(response.bodyAsText()))
         val ssecurity = content["ssecurity"]?.jsonPrimitive?.content
         val passToken = content["passToken"]?.jsonPrimitive?.content
+        val nonce = content["nonce"]?.jsonPrimitive?.content
         val notificationUrl = content["notificationUrl"]?.jsonPrimitive?.content
         val result = content["result"]?.jsonPrimitive?.content
 
@@ -138,7 +143,8 @@ class LoginService(
         }
 
         val location = requireNotNull(content["location"]?.jsonPrimitive?.content)
-        val response2 = client.get("$location&_userIdNeedEncrypt=true")
+        val clientSign = nonce?.let { "&clientSign=${xiaomiClientSign(it, ssecurity).encodeURLParameter()}" } ?: ""
+        val response2 = client.get("$location$clientSign&_userIdNeedEncrypt=true")
         if (!response2.status.isSuccess()) return LoginResult.NetworkError
 
         val userId = requireNotNull(content["userId"]?.jsonPrimitive?.content)
@@ -222,10 +228,12 @@ class LoginService(
             val content = Json.decodeFromString<JsonObject>(removeResponsePrefix(response.bodyAsText()))
             val ssecurity = content["ssecurity"]?.jsonPrimitive?.content
             val location = content["location"]?.jsonPrimitive?.content
+            val nonce = content["nonce"]?.jsonPrimitive?.content
             if (ssecurity.isNullOrBlank() || location.isNullOrBlank()) return@withContext null
             val newPassToken = content["passToken"]?.jsonPrimitive?.content
 
-            val response2 = refreshClient.get("$location&_userIdNeedEncrypt=true")
+            val clientSign = nonce?.let { "&clientSign=${xiaomiClientSign(it, ssecurity).encodeURLParameter()}" } ?: ""
+            val response2 = refreshClient.get("$location$clientSign&_userIdNeedEncrypt=true")
             val serviceToken = response2.setCookie()
                 .find { it.name == "serviceToken" && it.value.isNotBlank() }?.value ?: return@withContext null
             val cUserId = content["cUserId"]?.jsonPrimitive?.content ?: loginData.cUserId
@@ -251,6 +259,12 @@ class LoginService(
             val hex = (it.toInt() and 0xFF).toString(16).uppercase()
             if (hex.length == 1) "0$hex" else hex
         }
+    }
+
+    @OptIn(DelicateCryptographyApi::class, ExperimentalEncodingApi::class)
+    private suspend fun xiaomiClientSign(nonce: String, ssecurity: String): String {
+        val digest = CryptographyProvider.Default.get(SHA1).hasher().hash("nonce=$nonce&$ssecurity".encodeToByteArray())
+        return Base64.Default.encode(digest)
     }
 
     private fun removeResponsePrefix(response: String): String = response.removePrefix("&&&START&&&")
