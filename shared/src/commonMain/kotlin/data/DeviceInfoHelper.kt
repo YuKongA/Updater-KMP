@@ -107,6 +107,7 @@ object DeviceInfoHelper {
     private val AT = Carrier("AT&T", "AT", "_at")
     private val BY = Carrier("Bouygues", "BY", "_by")
     private val CR = Carrier("Claro", "CR", "_cr")
+    private val DT = Carrier("Deutsche Telekom", "DT", "_dt")
     private val EN = Carrier("Entel", "EN", "_en")
     private val HG = Carrier("3HK", "HG", "_hg")
     private val KD = Carrier("KDDI", "KD", "_kd")
@@ -121,7 +122,7 @@ object DeviceInfoHelper {
     private val VC = Carrier("Vodacom", "VC", "_vc")
     private val VF = Carrier("Vodafone", "VF", "_vf")
 
-    private val carrierList = listOf(XM, DM, DC, AT, BY, CR, EN, HG, KD, MS, MT, OR, SB, SF, TF, TG, TM, VC, VF)
+    private val carrierList = listOf(XM, DM, DC, AT, BY, CR, DT, EN, HG, KD, MS, MT, OR, SB, SF, TF, TG, TM, VC, VF)
 
     private val regionNameToRegionCode = regionList.associateBy({ it.regionName }, { it.regionCode })
     private val regionNameToRegionCodeName = regionList.associateBy({ it.regionName }, { it.regionCodeName })
