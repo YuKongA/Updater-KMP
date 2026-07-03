@@ -38,10 +38,13 @@ class CredentialsStorage(private val prefs: PreferencesStorage) {
         val password = prefs.get(KEY_PASSWORD)
         val passwordIv = prefs.get(KEY_PASSWORD_IV)
         if (account != null && accountIv != null && password != null && passwordIv != null) {
-            Credentials(
-                account = ownDecrypt(account, accountIv),
-                password = ownDecrypt(password, passwordIv),
-            )
+            // Corrupted config can make ownDecrypt throw; fall back to no saved credentials.
+            runCatching {
+                Credentials(
+                    account = ownDecrypt(account, accountIv),
+                    password = ownDecrypt(password, passwordIv),
+                )
+            }.getOrDefault(Credentials.Empty)
         } else {
             Credentials.Empty
         }
