@@ -9,7 +9,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 private val iv = "0102030405060708".encodeToByteArray()
 
-expect fun generateKey()
+expect suspend fun generateKey()
 
 /**
  * Generate a Cipher to be used by the xiaomi server.
@@ -51,6 +51,6 @@ suspend fun miuiDecrypt(encryptedText: String, securityKey: ByteArray): String {
     return decryptedTextBytes.decodeToString()
 }
 
-expect fun ownEncrypt(string: String): Pair<String, String>
+expect suspend fun ownEncrypt(string: String): Pair<String, String>
 
-expect fun ownDecrypt(encryptedText: String, encodedIv: String): String
+expect suspend fun ownDecrypt(encryptedText: String, encodedIv: String): String

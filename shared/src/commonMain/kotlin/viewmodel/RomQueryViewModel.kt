@@ -11,7 +11,7 @@ import data.storage.PreferencesStorage
 import data.usecase.FetchRomInfoUseCase
 import data.usecase.RomInfoQuery
 import data.usecase.RomInfoResult
-import data.usecase.SessionUpdate
+import data.usecase.persistTo
 import di.AppContainer
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -357,11 +357,7 @@ class RomQueryViewModel(
                 )
 
                 val outcome = fetchRomInfoUseCase.fetch(request)
-                when (val update = outcome.sessionUpdate) {
-                    is SessionUpdate.Refreshed -> session.save(update.loginData)
-                    is SessionUpdate.Expired -> session.save(update.loginData.copy(authResult = "3"))
-                    null -> Unit
-                }
+                outcome.sessionUpdate.persistTo(session)
                 when (val result = outcome.result) {
                     RomInfoResult.NetworkError -> showMessage(Res.string.toast_crash_info, 5000L)
                     RomInfoResult.NoData -> showMessage(Res.string.toast_no_info)

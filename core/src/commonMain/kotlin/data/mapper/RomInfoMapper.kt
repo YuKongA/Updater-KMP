@@ -45,7 +45,7 @@ object RomInfoMapper {
         officialDownload: String? = null,
         noUltimateLink: Boolean = false,
     ): Triple<DataHelper.RomInfoData, List<DataHelper.IconInfoData>, List<DataHelper.ImageInfoData>> {
-        if (romInfo?.bigversion == null) return Triple(DataHelper.RomInfoData(), emptyList(), emptyList())
+        val bigversion = romInfo?.bigversion ?: return Triple(DataHelper.RomInfoData(), emptyList(), emptyList())
 
         val log = StringBuilder()
         romInfo.changelog?.forEach { (category, items) ->
@@ -69,7 +69,8 @@ object RomInfoMapper {
         var imageInfoData = emptyList<DataHelper.ImageInfoData>()
         var iconInfoData = emptyList<DataHelper.IconInfoData>()
 
-        if (!romInfo.osbigversion.isNullOrEmpty() && romInfo.osbigversion.toFloat() >= 3.0f) {
+        val osBigVersion = romInfo.osbigversion
+        if ((osBigVersion?.toFloatOrNull() ?: 0f) >= 3.0f) {
             val imageMainLink = recoveryRomInfo.fileMirror?.image ?: ""
             imageInfoData = romInfo.changelog?.flatMap { (categoryTitle, items) ->
                 items.map { item ->
@@ -98,9 +99,9 @@ object RomInfoMapper {
         }
 
         val bigVersion = when {
-            !romInfo.osbigversion.isNullOrEmpty() && romInfo.osbigversion != ".0" && romInfo.osbigversion != "0.0" -> "HyperOS " + romInfo.osbigversion
-            romInfo.bigversion.contains("816") -> romInfo.bigversion.replace("816", "HyperOS 1.0")
-            else -> "MIUI ${romInfo.bigversion}"
+            !osBigVersion.isNullOrEmpty() && osBigVersion != ".0" && osBigVersion != "0.0" -> "HyperOS $osBigVersion"
+            bigversion.contains("816") -> bigversion.replace("816", "HyperOS 1.0")
+            else -> "MIUI $bigversion"
         }
 
         val official1Download = if (noUltimateLink) "" else {

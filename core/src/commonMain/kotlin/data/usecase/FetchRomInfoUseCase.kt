@@ -8,6 +8,7 @@ import data.repository.DeviceListRepository
 import data.repository.LoginService
 import data.repository.OtaMetadataFetcher
 import data.repository.RomInfoRepository
+import data.repository.SessionRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import utils.isWeb
@@ -45,6 +46,15 @@ sealed interface SessionUpdate {
     data class Expired(val loginData: DataHelper.LoginData) : SessionUpdate
 }
 
+/** Single write-site for how a fetch outcome updates the persisted session. */
+suspend fun SessionUpdate?.persistTo(session: SessionRepository) {
+    when (this) {
+        is SessionUpdate.Refreshed -> session.save(loginData)
+        is SessionUpdate.Expired -> session.save(loginData.copy(authResult = "3"))
+        null -> Unit
+    }
+}
+
 data class FetchOutcome(
     val result: RomInfoResult,
     val sessionUpdate: SessionUpdate? = null,
@@ -71,15 +81,17 @@ class FetchRomInfoUseCase(
         val (xmsForBuild, xmsApps) = fetchXmsBlock(recoveryRomInfo, params, request.androidVersion, request.rustVersion, currentLoginData)
         val xmsInfo = RomInfoMapper.mapXmsInfo(xmsForBuild, recoveryRomInfo.fileMirror?.image ?: "", xmsApps)
 
+        val incrementRom = recoveryRomInfo.incrementRom
+        val crossRom = recoveryRomInfo.crossRom
         val result = when {
             recoveryRomInfo.currentRom?.bigversion != null ->
                 buildCurrentRomResult(recoveryRomInfo, params, request.androidVersion, currentLoginData, xmsInfo)
 
-            recoveryRomInfo.incrementRom?.bigversion != null ->
-                buildFallbackResult(recoveryRomInfo, recoveryRomInfo.incrementRom, xmsInfo)
+            incrementRom?.bigversion != null ->
+                buildFallbackResult(recoveryRomInfo, incrementRom, xmsInfo)
 
-            recoveryRomInfo.crossRom?.bigversion != null ->
-                buildFallbackResult(recoveryRomInfo, recoveryRomInfo.crossRom, xmsInfo)
+            crossRom?.bigversion != null ->
+                buildFallbackResult(recoveryRomInfo, crossRom, xmsInfo)
 
             else -> RomInfoResult.NoData
         }
@@ -119,21 +131,22 @@ class FetchRomInfoUseCase(
         loginData: DataHelper.LoginData?,
     ): Pair<RomInfoHelper.XmsUpdateInfo?, List<DataHelper.XmsAppInfo>> {
         val xmsRaw = recoveryRomInfo.xmsUpdateInfo
-        if (xmsRaw?.hasXmsUpdate != 1 || xmsRaw.lstVer.isNullOrEmpty()) return xmsRaw to emptyList()
+        val lstVer = xmsRaw?.lstVer
+        if (xmsRaw?.hasXmsUpdate != 1 || lstVer.isNullOrEmpty()) return xmsRaw to emptyList()
 
         val pkgList = xmsRaw.pkgs.orEmpty()
         return coroutineScope {
             val followUpDeferred = async {
                 repository.getRecoveryRomInfo(
                     params.branchExt, params.codeNameExt, params.regionCode,
-                    params.systemVersionExt, androidVersion, loginData, xmsRaw.lstVer
+                    params.systemVersionExt, androidVersion, loginData, lstVer
                 )?.xmsUpdateInfo?.changeLog
             }
             val xmsVerDeferred = async {
                 if (pkgList.isEmpty()) emptyList()
                 else repository.getXmsVerInfo(
                     params.codeNameExt, params.regionCode, params.systemVersionExt,
-                    androidVersion, pkgList, xmsRaw.lstVer, rustVersion, loginData
+                    androidVersion, pkgList, lstVer, rustVersion, loginData
                 )?.let { RomInfoMapper.mapXmsApps(it) } ?: emptyList()
             }
             val followUpChangeLog = followUpDeferred.await()
@@ -219,15 +232,18 @@ class FetchRomInfoUseCase(
             params.systemVersionExt, androidVersion, loginData
         ) ?: recoveryRomInfo
 
-        return if (recoveryRomInfoCurrent.latestRom?.filename != null) {
+        val latestFilename = recoveryRomInfoCurrent.latestRom?.filename
+        val currentVersion = recoveryRomInfoCurrent.currentRom?.version ?: recoveryRomInfo.currentRom?.version
+        return if (latestFilename != null && currentVersion != null) {
             RomInfoMapper.downloadUrl(
-                recoveryRomInfoCurrent.currentRom?.version!!,
-                recoveryRomInfoCurrent.latestRom.filename
+                currentVersion,
+                latestFilename
             ) to false
         } else {
+            val currentRom = recoveryRomInfo.currentRom!!
             RomInfoMapper.downloadUrl(
-                recoveryRomInfo.currentRom!!.version!!,
-                recoveryRomInfo.currentRom.filename!!
+                currentRom.version!!,
+                currentRom.filename!!
             ) to true
         }
     }

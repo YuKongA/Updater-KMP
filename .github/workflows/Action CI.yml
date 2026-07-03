@@ -19,6 +19,9 @@ jobs:
             artifact-path: macos/build/compose/binaries/main/native-macosArm64-release-dmg/*.dmg
             artifact-name: Updater-darwin-arm64-dmg.dmg
             archive: false
+            cli-command: ./gradlew :cli:linkReleaseExecutableMacosArm64 :core:macosArm64Test
+            cli-artifact-path: cli/build/bin/macosArm64/releaseExecutable/updater.kexe
+            cli-artifact-name: Updater-cli-macos-arm64
           - os: ubuntu-latest
             platform: linux x64
             platformEx: android universal
@@ -29,18 +32,27 @@ jobs:
             artifact-name: Updater-linux-x64-bin
             artifact-nameEx: Updater-android-universal-apk.apk
             archive: true
+            cli-command: ./gradlew :cli:linkReleaseExecutableLinuxX64 :core:linuxX64Test :core:desktopTest
+            cli-artifact-path: cli/build/bin/linuxX64/releaseExecutable/updater.kexe
+            cli-artifact-name: Updater-cli-linux-x64
           - os: ubuntu-24.04-arm
             platform: linux arm64
             build-command: ./gradlew createReleaseDistributable
             artifact-path: desktop/build/compose/binaries/main-release/app/Updater
             artifact-name: Updater-linux-arm64-bin
             archive: true
+            cli-command: ./gradlew :cli:linkReleaseExecutableLinuxArm64 :core:linuxArm64Test
+            cli-artifact-path: cli/build/bin/linuxArm64/releaseExecutable/updater.kexe
+            cli-artifact-name: Updater-cli-linux-arm64
           - os: windows-latest
             platform: windows x64
             build-command: ./gradlew createReleaseDistributable
             artifact-path: desktop/build/compose/binaries/main-release/app/Updater
             artifact-name: Updater-windows-x64-exe
             archive: true
+            cli-command: ./gradlew :cli:linkReleaseExecutableMingwX64 :core:mingwX64Test :cli:mingwX64Test
+            cli-artifact-path: cli/build/bin/mingwX64/releaseExecutable/updater.exe
+            cli-artifact-name: Updater-cli-windows-x64.exe
     steps:
       - name: Checkout Sources
         uses: actions/checkout@v7
@@ -53,6 +65,9 @@ jobs:
           java-version: "25"
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
+      - name: Install libcurl for Linux CLI
+        if: runner.os == 'Linux' && matrix.cli-command != ''
+        run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
       - name: Decode android signing key
         if: matrix.platformEx == 'android universal'
         run: echo ${{ secrets.SIGNING_KEY }} | base64 -d > keystore.jks
@@ -66,6 +81,20 @@ jobs:
           KEYSTORE_PASS: ${{ secrets.KEY_STORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      - name: Build CLI
+        if: matrix.cli-command != ''
+        run: ${{ matrix.cli-command }}
+      - name: Rename CLI artifact
+        if: matrix.cli-command != ''
+        run: mv ${{ matrix.cli-artifact-path }} ${{ matrix.cli-artifact-name }}
+        shell: bash
+      - name: Upload CLI artifact
+        if: matrix.cli-command != ''
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.cli-artifact-name }}
+          path: ${{ matrix.cli-artifact-name }}
+          archive: false
       - name: Rename ${{ matrix.platform }} artifact
         run: mv ${{ matrix.artifact-path }} ${{ matrix.artifact-name }}
         shell: bash

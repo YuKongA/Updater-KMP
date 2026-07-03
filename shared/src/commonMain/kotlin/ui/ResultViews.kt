@@ -760,8 +760,10 @@ fun TextWithImage(
                         )
                     }
 
-                    if (line.imageUrl != "" && line.imageWidth != null && line.imageHeight != null && line.imageHeight > 0) {
-                        val aspectRatio = line.imageWidth.toFloat() / line.imageHeight.toFloat()
+                    val imageWidth = line.imageWidth
+                    val imageHeight = line.imageHeight
+                    if (line.imageUrl != "" && imageWidth != null && imageHeight != null && imageHeight > 0) {
+                        val aspectRatio = imageWidth.toFloat() / imageHeight.toFloat()
                         Image(
                             painter = rememberImagePainter(line.imageUrl),
                             modifier = Modifier
