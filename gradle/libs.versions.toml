@@ -2,32 +2,42 @@
 android-gradle-plugin = "9.2.1"
 androidx-activity-compose = "1.13.0"
 androidx-lifecycle-compose = "2.10.0"
+clikt = "5.1.0"
 compose-hotReload = "1.1.1"
 compose-plugin = "1.11.1"
 cryptography = "0.6.0"
 image-loader = "1.10.0"
 kotlin = "2.4.0"
+kotlinx-browser = "0.5.0"
 kotlinx-serialization-json = "1.11.0"
 kotlinx-datetime = "0.8.0"
 ktor-client = "3.5.1"
 miuix = "0.9.2"
+mordant = "3.0.2"
+okio = "3.16.2"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
 androidx-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle-compose" }
 androidx-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle-compose" }
+clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt" }
 compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-plugin" }
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-plugin" }
 cryptography-provider-optimal = { module = "dev.whyoleg.cryptography:cryptography-provider-optimal", version.ref = "cryptography" }
 image-loader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "image-loader" }
+kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlinx-browser" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 kotlinx-serialization-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "kotlinx-serialization-json" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor-client" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor-client" }
+ktor-client-curl = { module = "io.ktor:ktor-client-curl", version.ref = "ktor-client" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor-client" }
 ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor-client" }
+ktor-client-winhttp = { module = "io.ktor:ktor-client-winhttp", version.ref = "ktor-client" }
 miuix-ui = { module = "top.yukonga.miuix.kmp:miuix-ui", version.ref = "miuix" }
+mordant = { module = "com.github.ajalt.mordant:mordant", version.ref = "mordant" }
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 miuix-preference = { module = "top.yukonga.miuix.kmp:miuix-preference", version.ref = "miuix" }
 miuix-icons = { module = "top.yukonga.miuix.kmp:miuix-icons", version.ref = "miuix" }
 miuix-blur = { module = "top.yukonga.miuix.kmp:miuix-blur", version.ref = "miuix" }

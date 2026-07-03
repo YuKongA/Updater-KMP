@@ -11,8 +11,6 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-val generatedSrcDir = layout.buildDirectory.dir("generated/updater")
-
 kotlin {
     jvmToolchain(ProjectConfig.JVM_VERSION)
 
@@ -55,21 +53,14 @@ kotlin {
 
     sourceSets {
         val desktopMain by getting
-        val commonMain by getting {
-            kotlin.srcDir(generatedSrcDir.map { it.dir("kotlin") })
-        }
         commonMain.dependencies {
+            api(projects.core)
             api(libs.compose.ui)
             api(libs.compose.components.resources)
             implementation(libs.androidx.lifecycle.viewmodel.compose)
             implementation(libs.androidx.lifecycle.runtime.compose)
             // Added
-            implementation(libs.cryptography.provider.optimal)
             implementation(libs.image.loader)
-            implementation(libs.kotlinx.serialization.json)
-            implementation(libs.kotlinx.serialization.protobuf)
-            implementation(libs.kotlinx.datetime)
-            implementation(libs.ktor.client.core)
             implementation(libs.miuix.ui)
             implementation(libs.miuix.icons)
             implementation(libs.miuix.blur)
@@ -77,36 +68,13 @@ kotlin {
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
-            // Added
-            implementation(libs.ktor.client.cio)
-        }
-        appleMain.dependencies {
-            // Added
-            implementation(libs.ktor.client.darwin)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
-            // Added
-            implementation(libs.ktor.client.cio)
-        }
-        webMain.dependencies {
-            // Added
-            implementation(libs.ktor.client.js)
         }
     }
 }
 
 compose.resources {
     publicResClass = true
-}
-
-tasks.named("generateComposeResClass").configure {
-    dependsOn(generateVersionInfo)
-}
-
-val generateVersionInfo by tasks.registering(GenerateVersionInfoTask::class) {
-    versionName.set(ProjectConfig.VERSION_NAME)
-    versionCode.set(getGitVersionCode())
-    outputFile.set(generatedSrcDir.map { it.file("kotlin/misc/VersionInfo.kt") })
-    xcconfigFile.set(layout.projectDirectory.file("../ios/iosApp/Generated.xcconfig"))
 }

@@ -10,13 +10,13 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Generate version xcconfig"
-               scriptText = "cd &quot;$SRCROOT/../..&quot; &amp;&amp; ./gradlew :example:shared:generateVersionInfo&#10;"
+               scriptText = "cd &quot;$SRCROOT/..&quot; &amp;&amp; ./gradlew :core:generateVersionInfo&#10;"
                shellToInvoke = "/bin/sh">
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
                      BlueprintIdentifier = "7555FF7A242A565900829871"
-                     BuildableName = "Miuix.app"
+                     BuildableName = "Updater.app"
                      BlueprintName = "iosApp"
                      ReferencedContainer = "container:iosApp.xcodeproj">
                   </BuildableReference>
