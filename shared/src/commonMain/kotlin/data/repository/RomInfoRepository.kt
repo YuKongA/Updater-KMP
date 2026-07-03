@@ -65,7 +65,7 @@ class RomInfoRepository(
 
             if ((androidVersion.toFloatOrNull() ?: 0f) >= 15.0f) {
                 putJsonObject("options") {
-                    put("av", "9.1.3")
+                    put("av", "9.3.7")
                 }
             }
         }.toString()
@@ -149,8 +149,8 @@ class RomInfoRepository(
         romVersion: String,
         androidVersion: String,
         pkgs: List<String>,
-        curVer: String,
         lstVer: String,
+        rustVersion: String,
         loginData: DataHelper.LoginData?,
     ): RomInfoHelper.XmsDto? = withContext(Dispatchers.Default) {
         if (isWeb()) return@withContext null
@@ -185,11 +185,15 @@ class RomInfoRepository(
             put("d", codeNameExt)
             if (romVersion.isNotEmpty()) put("rv", romVersion)
             put("f", "1")
-            put("csv", curVer)
             put("l", if (!codeNameExt.contains("_global")) "zh_CN" else "en_US")
             put("lsv", lstVer)
             put("r", regionCode)
             put("id", userId)
+            if (rustVersion.isNotEmpty()) {
+                putJsonObject("options") {
+                    put("rustRV", rustVersion)
+                }
+            }
             putJsonArray("pkgs") {
                 pkgs.forEach { pkg ->
                     addJsonObject {

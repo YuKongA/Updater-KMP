@@ -90,6 +90,7 @@ import ui.LoginCardView
 import ui.infoCardItems
 import ui.xmsCardItems
 import updater.shared.generated.resources.Res
+import updater.shared.generated.resources.advanced_options
 import updater.shared.generated.resources.app_name
 import updater.shared.generated.resources.clear_search_history
 import updater.shared.generated.resources.device_list_settings
@@ -178,12 +179,19 @@ fun App(
 @Composable
 private fun MenuActions(
     searchHistory: List<DataHelper.SearchHistoryEntry>,
+    advancedOptions: Boolean,
     focusManager: FocusManager,
+    onToggleAdvancedOptions: () -> Unit,
     onClearSearchHistory: () -> Unit,
     onShowDeviceSettings: () -> Unit
 ) {
     val entry = DropdownEntry(
         items = listOfNotNull(
+            DropdownItem(
+                text = stringResource(Res.string.advanced_options),
+                selected = advancedOptions,
+                onClick = onToggleAdvancedOptions
+            ),
             DropdownItem(
                 text = stringResource(Res.string.device_list_settings),
                 onClick = onShowDeviceSettings
@@ -256,6 +264,8 @@ private fun LazyListScope.basicViewsItem(
         deviceRegion = queryUi.deviceRegion,
         deviceCarrier = queryUi.deviceCarrier,
         systemVersion = queryUi.systemVersion,
+        rustVersion = queryUi.rustVersion,
+        advancedOptions = queryUi.advancedOptions,
         deviceNames = queryUi.deviceNames,
         codeNames = queryUi.codeNames,
         searchHistory = queryUi.searchHistory,
@@ -266,6 +276,7 @@ private fun LazyListScope.basicViewsItem(
         onDeviceRegionChange = { romQueryViewModel.updateDeviceRegion(it) },
         onDeviceCarrierChange = { romQueryViewModel.updateDeviceCarrier(it) },
         onSystemVersionChange = { romQueryViewModel.updateSystemVersion(it) },
+        onRustVersionChange = { romQueryViewModel.updateRustVersion(it) },
         onSearchHistorySelectedChange = { romQueryViewModel.updateSearchHistorySelected(it) },
         onHistorySelect = { romQueryViewModel.loadSearchHistory(it) },
         onSubmit = { romQueryViewModel.fetchRomInfo() }
@@ -361,7 +372,9 @@ private fun PortraitAppView(
                     }
                     MenuActions(
                         searchHistory = queryUi.searchHistory,
+                        advancedOptions = queryUi.advancedOptions,
                         focusManager = focusManager,
+                        onToggleAdvancedOptions = { romQueryViewModel.toggleAdvancedOptions() },
                         onClearSearchHistory = { romQueryViewModel.clearSearchHistory() },
                         onShowDeviceSettings = {
                             deviceListViewModel.resetUpdateState()
@@ -472,7 +485,9 @@ private fun LandscapeAppView(
                         }
                         MenuActions(
                             searchHistory = queryUi.searchHistory,
+                            advancedOptions = queryUi.advancedOptions,
                             focusManager = focusManager,
+                            onToggleAdvancedOptions = { romQueryViewModel.toggleAdvancedOptions() },
                             onClearSearchHistory = { romQueryViewModel.clearSearchHistory() },
                             onShowDeviceSettings = {
                                 deviceListViewModel.resetUpdateState()

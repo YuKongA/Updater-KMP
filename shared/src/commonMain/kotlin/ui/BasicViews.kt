@@ -36,6 +36,7 @@ import updater.shared.generated.resources.carrier_code
 import updater.shared.generated.resources.code_name
 import updater.shared.generated.resources.device_name
 import updater.shared.generated.resources.region_code
+import updater.shared.generated.resources.rust_runtime
 import updater.shared.generated.resources.search_history
 import updater.shared.generated.resources.submit
 import updater.shared.generated.resources.system_version
@@ -89,6 +90,8 @@ fun BasicViews(
     deviceRegion: String,
     deviceCarrier: String,
     systemVersion: String,
+    rustVersion: String,
+    advancedOptions: Boolean,
     deviceNames: List<String>,
     codeNames: List<String>,
     searchHistory: List<DataHelper.SearchHistoryEntry>,
@@ -99,6 +102,7 @@ fun BasicViews(
     onDeviceRegionChange: (String) -> Unit,
     onDeviceCarrierChange: (String) -> Unit,
     onSystemVersionChange: (String) -> Unit,
+    onRustVersionChange: (String) -> Unit,
     onSearchHistorySelectedChange: (Int) -> Unit,
     onHistorySelect: (DataHelper.SearchHistoryEntry) -> Unit,
     onSubmit: () -> Unit
@@ -125,12 +129,18 @@ fun BasicViews(
             onValueChange = onDeviceNameChange,
             label = stringResource(Res.string.device_name)
         )
-        AutoCompleteTextField(
-            text = codeName,
-            items = codeNames,
-            onValueChange = onCodeNameChange,
-            label = stringResource(Res.string.code_name)
-        )
+        AnimatedVisibility(
+            visible = advancedOptions,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
+        ) {
+            AutoCompleteTextField(
+                text = codeName,
+                items = codeNames,
+                onValueChange = onCodeNameChange,
+                label = stringResource(Res.string.code_name)
+            )
+        }
         TextField(
             insideMargin = DpSize(16.dp, 20.dp),
             modifier = Modifier
@@ -175,17 +185,44 @@ fun BasicViews(
                     focusManager.clearFocus()
                 }
             )
-            OverlayDropdownPreference(
-                title = stringResource(Res.string.carrier_code),
-                items = DeviceInfoHelper.carrierNames,
-                selectedIndex = carrierSelected,
-                onSelectedIndexChange = { index ->
-                    onDeviceCarrierChange(DeviceInfoHelper.carrierNames[index])
-                },
-                maxHeight = 280.dp,
-                modifier = Modifier.clickable {
+            AnimatedVisibility(
+                visible = advancedOptions,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ) {
+                OverlayDropdownPreference(
+                    title = stringResource(Res.string.carrier_code),
+                    items = DeviceInfoHelper.carrierNames,
+                    selectedIndex = carrierSelected,
+                    onSelectedIndexChange = { index ->
+                        onDeviceCarrierChange(DeviceInfoHelper.carrierNames[index])
+                    },
+                    maxHeight = 280.dp,
+                    modifier = Modifier.clickable {
+                        focusManager.clearFocus()
+                    }
+                )
+            }
+        }
+        AnimatedVisibility(
+            visible = advancedOptions,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
+        ) {
+            TextField(
+                insideMargin = DpSize(16.dp, 20.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp)
+                    .padding(top = 12.dp),
+                value = rustVersion,
+                onValueChange = onRustVersionChange,
+                label = stringResource(Res.string.rust_runtime),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = {
                     focusManager.clearFocus()
-                }
+                })
             )
         }
         SearchHistoryView(

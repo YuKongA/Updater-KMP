@@ -8,9 +8,11 @@
     <string name="device_name">Nome do Dispositivo</string>
     <string name="system_version">Versão do Sistema</string>
     <string name="android_version">Versão do Android</string>
+    <string name="rust_runtime">Runtime do Rust</string>
     <string name="submit">Enviar</string>
     <string name="search_history">Histórico de Pesquisa</string>
     <string name="clear_search_history">Limpar histórico de Pesquisa</string>
+    <string name="advanced_options">Opções avançadas</string>
     <string name="big_version">Versão Principal</string>
     <string name="filename">Nome do Arquivo</string>
     <string name="filesize">Tamanho do Arquivo</string>
@@ -24,7 +26,6 @@
     <string name="build_time">Hora da construção</string>
     <string name="sdk_level">Nível do SDK</string>
     <string name="attention">ATENÇÃO</string>
-    <string name="xms_update">Atualização XMS</string>
     <string name="xms_current_version">Versão Atual</string>
     <string name="xms_target_version">Versão Alvo</string>
     <string name="xms_package_count">Quantidade de Pacotes</string>

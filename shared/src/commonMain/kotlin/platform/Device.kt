@@ -12,4 +12,5 @@ data class DeviceInfo(
     val codeName: String,       // Build.DEVICE, the bare codename, e.g. popsicle
     val androidVersion: String, // Build.VERSION.RELEASE, e.g. "16"
     val incremental: String,    // Build.VERSION.INCREMENTAL, carries the decodable suffix
+    val rustVersion: String = "", // rust.runtime_version, empty when the device has no Rust runtime
 )

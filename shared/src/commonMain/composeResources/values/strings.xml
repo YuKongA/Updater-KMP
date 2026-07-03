@@ -9,10 +9,12 @@
     <string name="device_name">Device Name</string>
     <string name="system_version">System Version</string>
     <string name="android_version">Android Version</string>
+    <string name="rust_runtime">Rust Runtime</string>
     <string name="current_device_info_filled">Current device info filled</string>
     <string name="submit">Submit</string>
     <string name="search_history">Search History</string>
     <string name="clear_search_history">Clear Search History</string>
+    <string name="advanced_options">Advanced options</string>
     <string name="big_version">Major Version</string>
     <string name="filename">File Name</string>
     <string name="filesize">File Size</string>
@@ -26,7 +28,6 @@
     <string name="build_time">Build Time</string>
     <string name="sdk_level">SDK Level</string>
     <string name="attention">Attention</string>
-    <string name="xms_update">XMS Update</string>
     <string name="xms_current_version">Current Version</string>
     <string name="xms_target_version">Target Version</string>
     <string name="xms_package_count">Package Count</string>

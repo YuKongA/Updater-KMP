@@ -8,10 +8,12 @@
     <string name="device_name">裝置名稱</string>
     <string name="system_version">系統版本</string>
     <string name="android_version">安卓版本</string>
+    <string name="rust_runtime">Rust 運行時</string>
     <string name="current_device_info_filled">已填充目前裝置資訊</string>
     <string name="submit">提交</string>
     <string name="search_history">查詢歷史</string>
     <string name="clear_search_history">清空查詢歷史</string>
+    <string name="advanced_options">進階選項</string>
     <string name="big_version">主要版本</string>
     <string name="filename">檔案名稱</string>
     <string name="filesize">檔案大小</string>
@@ -25,7 +27,6 @@
     <string name="build_time">構建時間</string>
     <string name="sdk_level">SDK 版本</string>
     <string name="attention">注意事項</string>
-    <string name="xms_update">XMS 更新</string>
     <string name="xms_current_version">目前版本</string>
     <string name="xms_target_version">目標版本</string>
     <string name="xms_package_count">套件數量</string>

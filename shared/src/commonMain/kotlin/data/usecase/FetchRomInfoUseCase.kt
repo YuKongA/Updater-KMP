@@ -19,6 +19,7 @@ data class RomInfoQuery(
     val deviceCarrier: String,
     val androidVersion: String,
     val systemVersion: String,
+    val rustVersion: String,
     val loginData: DataHelper.LoginData?,
 )
 
@@ -67,7 +68,7 @@ class FetchRomInfoUseCase(
         val recoveryRomInfo = refreshOutcome.romInfo
         val currentLoginData = refreshOutcome.loginData
 
-        val (xmsForBuild, xmsApps) = fetchXmsBlock(recoveryRomInfo, params, request.androidVersion, currentLoginData)
+        val (xmsForBuild, xmsApps) = fetchXmsBlock(recoveryRomInfo, params, request.androidVersion, request.rustVersion, currentLoginData)
         val xmsInfo = RomInfoMapper.mapXmsInfo(xmsForBuild, recoveryRomInfo.fileMirror?.image ?: "", xmsApps)
 
         val result = when {
@@ -100,10 +101,8 @@ class FetchRomInfoUseCase(
         val loginData = request.loginData ?: return RefreshOutcome(initialInfo, null, null)
         if (initialInfo.authResult == 1) return RefreshOutcome(initialInfo, loginData, null)
 
-        val refreshed = loginService.refreshServiceToken(loginData)
-        if (refreshed == null) {
-            return RefreshOutcome(initialInfo, loginData, SessionUpdate.Expired(loginData))
-        }
+        val refreshed =
+            loginService.refreshServiceToken(loginData) ?: return RefreshOutcome(initialInfo, loginData, SessionUpdate.Expired(loginData))
 
         val retried = repository.getRecoveryRomInfo(
             params.branchExt, params.codeNameExt, params.regionCode,
@@ -116,6 +115,7 @@ class FetchRomInfoUseCase(
         recoveryRomInfo: RomInfoHelper.RomInfo,
         params: RequestParams,
         androidVersion: String,
+        rustVersion: String,
         loginData: DataHelper.LoginData?,
     ): Pair<RomInfoHelper.XmsUpdateInfo?, List<DataHelper.XmsAppInfo>> {
         val xmsRaw = recoveryRomInfo.xmsUpdateInfo
@@ -133,7 +133,7 @@ class FetchRomInfoUseCase(
                 if (pkgList.isEmpty()) emptyList()
                 else repository.getXmsVerInfo(
                     params.codeNameExt, params.regionCode, params.systemVersionExt,
-                    androidVersion, pkgList, xmsRaw.curVer.orEmpty(), xmsRaw.lstVer, loginData
+                    androidVersion, pkgList, xmsRaw.lstVer, rustVersion, loginData
                 )?.let { RomInfoMapper.mapXmsApps(it) } ?: emptyList()
             }
             val followUpChangeLog = followUpDeferred.await()

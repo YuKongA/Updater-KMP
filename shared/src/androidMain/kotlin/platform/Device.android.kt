@@ -11,6 +11,7 @@ actual fun getDeviceInfo(): DeviceInfo? {
         codeName = Build.DEVICE,
         androidVersion = Build.VERSION.RELEASE,
         incremental = Build.VERSION.INCREMENTAL,
+        rustVersion = systemProp("rust.runtime_version"),
     )
 }
 

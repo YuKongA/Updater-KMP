@@ -43,6 +43,7 @@ data class RomQueryUiState(
     val deviceCarrier: String = "Default (Xiaomi)",
     val androidVersion: String = "16.0",
     val systemVersion: String = "",
+    val rustVersion: String = "1.3.0",
     val deviceNames: List<String> = emptyList(),
     val codeNames: List<String> = emptyList(),
     val curRomInfo: DataHelper.RomInfoData = DataHelper.RomInfoData(),
@@ -56,6 +57,7 @@ data class RomQueryUiState(
     val searchHistory: List<DataHelper.SearchHistoryEntry> = emptyList(),
     val searchHistorySelected: Int = 0,
     val currentDeviceInfo: DeviceInfo? = null,
+    val advancedOptions: Boolean = false,
 )
 
 class RomQueryViewModel(
@@ -81,6 +83,8 @@ class RomQueryViewModel(
         const val DEVICE_CARRIER = "deviceCarrier"
         const val ANDROID_VERSION = "androidVersion"
         const val SYSTEM_VERSION = "systemVersion"
+        const val RUST_VERSION = "rustVersion"
+        const val ADVANCED_OPTIONS = "advancedOptions"
         const val SEARCH_HISTORY = "searchHistory"
         const val LEGACY_SEARCH_KEYWORDS = "searchKeywords"
     }
@@ -115,6 +119,8 @@ class RomQueryViewModel(
         val deviceCarrier = preferences.get(Keys.DEVICE_CARRIER) ?: "Default (Xiaomi)"
         val androidVersion = preferences.get(Keys.ANDROID_VERSION) ?: "16.0"
         val systemVersion = preferences.get(Keys.SYSTEM_VERSION) ?: ""
+        val rustVersion = preferences.get(Keys.RUST_VERSION) ?: "1.3.0"
+        val advancedOptions = preferences.get(Keys.ADVANCED_OPTIONS)?.toBooleanStrictOrNull() ?: false
         val searchHistory = loadSearchHistoryFromPrefs()
 
         _uiState.update {
@@ -125,6 +131,8 @@ class RomQueryViewModel(
                 deviceCarrier = deviceCarrier,
                 androidVersion = androidVersion,
                 systemVersion = systemVersion,
+                rustVersion = rustVersion,
+                advancedOptions = advancedOptions,
                 searchHistory = searchHistory,
             )
         }
@@ -199,6 +207,16 @@ class RomQueryViewModel(
         _uiState.update { it.copy(systemVersion = version) }
     }
 
+    fun updateRustVersion(version: String) {
+        _uiState.update { it.copy(rustVersion = version) }
+    }
+
+    fun toggleAdvancedOptions() {
+        val enabled = !_uiState.value.advancedOptions
+        _uiState.update { it.copy(advancedOptions = enabled) }
+        viewModelScope.launch { preferences.set(Keys.ADVANCED_OPTIONS, enabled.toString()) }
+    }
+
     fun updateSearchHistorySelected(index: Int) {
         _uiState.update { it.copy(searchHistorySelected = index) }
     }
@@ -227,6 +245,7 @@ class RomQueryViewModel(
                     ?: state.androidVersion,
                 deviceRegion = decoded?.regionName ?: state.deviceRegion,
                 deviceCarrier = decoded?.carrierName ?: state.deviceCarrier,
+                rustVersion = info.rustVersion.ifEmpty { state.rustVersion },
             )
         }
         if (notify) showMessage(Res.string.current_device_info_filled)
@@ -266,6 +285,7 @@ class RomQueryViewModel(
         val deviceCarrier: String,
         val androidVersion: String,
         val systemVersion: String,
+        val rustVersion: String,
         val loggedInUserId: String?,
     )
 
@@ -279,6 +299,7 @@ class RomQueryViewModel(
         preferences.set(Keys.DEVICE_CARRIER, state.deviceCarrier)
         preferences.set(Keys.SYSTEM_VERSION, state.systemVersion)
         preferences.set(Keys.ANDROID_VERSION, state.androidVersion)
+        preferences.set(Keys.RUST_VERSION, state.rustVersion)
     }
 
     fun fetchRomInfo() {
@@ -295,6 +316,7 @@ class RomQueryViewModel(
             deviceCarrier = current.deviceCarrier,
             androidVersion = current.androidVersion,
             systemVersion = current.systemVersion,
+            rustVersion = current.rustVersion,
             loggedInUserId = loginData?.userId,
         )
         val running = fetchJob
@@ -330,6 +352,7 @@ class RomQueryViewModel(
                     deviceCarrier = state.deviceCarrier,
                     androidVersion = state.androidVersion,
                     systemVersion = state.systemVersion,
+                    rustVersion = state.rustVersion,
                     loginData = loginData,
                 )
 

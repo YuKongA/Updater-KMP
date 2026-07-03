@@ -90,7 +90,6 @@ import updater.shared.generated.resources.xms_package_count
 import updater.shared.generated.resources.xms_package_name
 import updater.shared.generated.resources.xms_packages
 import updater.shared.generated.resources.xms_target_version
-import updater.shared.generated.resources.xms_update
 import utils.LinkUtils
 
 private val CardCornerRadius = 16.dp
@@ -330,7 +329,7 @@ fun LazyListScope.xmsCardItems(
 @Composable
 private fun XmsHeaderContent(xmsInfo: DataHelper.XmsInfoData) {
     Text(
-        text = stringResource(Res.string.xms_update),
+        text = "XMS",
         fontSize = 24.sp,
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier.padding(bottom = 12.dp),

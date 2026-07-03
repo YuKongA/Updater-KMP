@@ -8,9 +8,11 @@
     <string name="device_name">デバイス名</string>
     <string name="system_version">システムバージョン</string>
     <string name="android_version">Android バージョン</string>
+    <string name="rust_runtime">Rust ランタイム</string>
     <string name="submit">送信</string>
     <string name="search_history">検索履歴</string>
     <string name="clear_search_history">検索履歴を消去</string>
+    <string name="advanced_options">詳細オプション</string>
     <string name="big_version">メジャーバージョン</string>
     <string name="filename">ファイル名</string>
     <string name="filesize">ファイルサイズ</string>
@@ -24,7 +26,6 @@
     <string name="build_time">ビルド時間</string>
     <string name="sdk_level">SDK レベル</string>
     <string name="attention">注意</string>
-    <string name="xms_update">XMS 更新</string>
     <string name="xms_current_version">現在のバージョン</string>
     <string name="xms_target_version">ターゲットバージョン</string>
     <string name="xms_package_count">パッケージ数</string>
