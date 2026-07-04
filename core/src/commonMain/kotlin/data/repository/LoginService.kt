@@ -4,10 +4,6 @@ import data.DataHelper
 import data.LoginResult
 import data.storage.CredentialsStorage
 import data.storage.LoginFlowStorage
-import dev.whyoleg.cryptography.CryptographyProvider
-import dev.whyoleg.cryptography.DelicateCryptographyApi
-import dev.whyoleg.cryptography.algorithms.MD5
-import dev.whyoleg.cryptography.algorithms.SHA1
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.cookies.AcceptAllCookiesStorage
 import io.ktor.client.plugins.cookies.HttpCookies
@@ -31,6 +27,8 @@ import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
+import platform.crypto.md5
+import platform.crypto.sha1
 import platform.httpClientPlatform
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -252,18 +250,16 @@ class LoginService(
         }
     }
 
-    @OptIn(DelicateCryptographyApi::class)
-    private suspend fun md5Hash(input: String): String {
-        val md = CryptographyProvider.Default.get(MD5)
-        return md.hasher().hash(input.encodeToByteArray()).joinToString("") {
+    private fun md5Hash(input: String): String {
+        return md5(input.encodeToByteArray()).joinToString("") {
             val hex = (it.toInt() and 0xFF).toString(16).uppercase()
             if (hex.length == 1) "0$hex" else hex
         }
     }
 
-    @OptIn(DelicateCryptographyApi::class, ExperimentalEncodingApi::class)
-    private suspend fun xiaomiClientSign(nonce: String, ssecurity: String): String {
-        val digest = CryptographyProvider.Default.get(SHA1).hasher().hash("nonce=$nonce&$ssecurity".encodeToByteArray())
+    @OptIn(ExperimentalEncodingApi::class)
+    private fun xiaomiClientSign(nonce: String, ssecurity: String): String {
+        val digest = sha1("nonce=$nonce&$ssecurity".encodeToByteArray())
         return Base64.Default.encode(digest)
     }
 

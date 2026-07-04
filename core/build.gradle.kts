@@ -58,9 +58,9 @@ kotlin {
             api(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.serialization.protobuf)
             implementation(libs.kotlinx.datetime)
-            implementation(libs.cryptography.provider.optimal)
             implementation(libs.okio)
         }
+        commonTest.dependencies { implementation(kotlin("test")) }
         androidMain.dependencies { implementation(libs.ktor.client.cio) }
         appleMain.dependencies { implementation(libs.ktor.client.darwin) }
         desktopMain.dependencies { implementation(libs.ktor.client.cio) }

@@ -1,9 +1,6 @@
 package platform
 
-import dev.whyoleg.cryptography.CryptographyProvider
-import dev.whyoleg.cryptography.DelicateCryptographyApi
-import dev.whyoleg.cryptography.algorithms.AES
-import dev.whyoleg.cryptography.operations.IvCipher
+import platform.crypto.AesCbc
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -11,43 +8,18 @@ private val iv = "0102030405060708".encodeToByteArray()
 
 expect suspend fun generateKey()
 
-/**
- * Generate a Cipher to be used by the xiaomi server.
- */
-suspend fun miuiCipher(securityKey: ByteArray): IvCipher {
-    val aesCBC = CryptographyProvider.Default.get(AES.CBC) // AES CBC
-    val key = aesCBC.keyDecoder().decodeFromByteArray(AES.Key.Format.RAW, securityKey)
-    return key.cipher(true) // PKCS5Padding
-}
-
-/**
- * Encrypt the JSON used for the request using AES.
- *
- * @param jsonRequest: JSON used for the request
- * @param securityKey: Security key
- *
- * @return Encrypted JSON text
- */
-@OptIn(ExperimentalEncodingApi::class, DelicateCryptographyApi::class)
-suspend fun miuiEncrypt(jsonRequest: String, securityKey: ByteArray): String {
-    val cipher = miuiCipher(securityKey)
-    val encrypted = cipher.encryptWithIv(iv, jsonRequest.encodeToByteArray())
+/** AES-CBC encrypt the request JSON, returned as URL-safe Base64. */
+@OptIn(ExperimentalEncodingApi::class)
+fun miuiEncrypt(jsonRequest: String, securityKey: ByteArray): String {
+    val encrypted = AesCbc.encrypt(securityKey, iv, jsonRequest.encodeToByteArray())
     return Base64.UrlSafe.encode(encrypted)
 }
 
-/**
- * Decrypt the returned content using AES.
- *
- * @param encryptedText: Returned content
- * @param securityKey: Security key
- *
- * @return Decrypted return content text
- */
-@OptIn(DelicateCryptographyApi::class, ExperimentalEncodingApi::class)
-suspend fun miuiDecrypt(encryptedText: String, securityKey: ByteArray): String {
-    val cipher = miuiCipher(securityKey)
+/** AES-CBC decrypt a Base64 server response back to plaintext JSON. */
+@OptIn(ExperimentalEncodingApi::class)
+fun miuiDecrypt(encryptedText: String, securityKey: ByteArray): String {
     val encryptedTextBytes = Base64.Mime.decode(encryptedText)
-    val decryptedTextBytes = cipher.decryptWithIv(iv, encryptedTextBytes)
+    val decryptedTextBytes = AesCbc.decrypt(securityKey, iv, encryptedTextBytes)
     return decryptedTextBytes.decodeToString()
 }
 

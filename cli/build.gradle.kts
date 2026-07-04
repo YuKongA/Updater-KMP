@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -6,15 +7,16 @@ plugins {
 }
 
 kotlin {
-    fun KotlinNativeTarget.cliBinary() {
+    fun KotlinNativeTarget.cliBinary(vararg stripArgs: String) {
         binaries.executable {
             entryPoint = "main"
             baseName = "updater"
+            if (buildType == NativeBuildType.RELEASE) linkerOpts(*stripArgs)
         }
     }
-    mingwX64 { cliBinary() }
-    linuxX64 { cliBinary() }
-    macosArm64 { cliBinary() }
+    mingwX64 { cliBinary("-Wl,-s") }
+    linuxX64 { cliBinary("-Wl,-s") }
+    macosArm64 { cliBinary("-Wl,-x") }
 
     sourceSets {
         commonMain.dependencies {
