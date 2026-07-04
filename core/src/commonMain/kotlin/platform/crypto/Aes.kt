@@ -29,15 +29,16 @@ internal object AesCbc {
         require(ciphertext.size % BLOCK == 0 && ciphertext.isNotEmpty()) { "AES-CBC ciphertext must be a positive multiple of 16 bytes" }
         val rk = RoundKeys(key)
         val out = ByteArray(ciphertext.size)
-        var prev = iv.copyOf()
-        val block = ByteArray(BLOCK)
+        val prev = iv.copyOf()
+        val work = ByteArray(BLOCK)
         var offset = 0
         while (offset < ciphertext.size) {
-            ciphertext.copyInto(block, 0, offset, offset + BLOCK)
-            val decrypted = block.copyOf()
-            decryptBlock(decrypted, rk)
-            for (i in 0 until BLOCK) out[offset + i] = (decrypted[i].toInt() xor prev[i].toInt()).toByte()
-            prev = block.copyOf()
+            ciphertext.copyInto(work, 0, offset, offset + BLOCK)
+            decryptBlock(work, rk)
+            for (i in 0 until BLOCK) {
+                out[offset + i] = (work[i].toInt() xor prev[i].toInt()).toByte()
+                prev[i] = ciphertext[offset + i]
+            }
             offset += BLOCK
         }
         return pkcs7Unpad(out)

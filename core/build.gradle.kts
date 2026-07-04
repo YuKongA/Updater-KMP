@@ -60,6 +60,7 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.okio)
         }
+        commonTest.dependencies { implementation(kotlin("test")) }
         androidMain.dependencies { implementation(libs.ktor.client.cio) }
         appleMain.dependencies { implementation(libs.ktor.client.darwin) }
         desktopMain.dependencies { implementation(libs.ktor.client.cio) }

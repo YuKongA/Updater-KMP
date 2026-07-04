@@ -17,7 +17,7 @@ actual suspend fun ownDecrypt(encryptedText: String, encodedIv: String): String 
     val encrypted = Base64.decode(encryptedText)
     val iv = Base64.decode(encodedIv)
     val cipher = KeyStoreUtils.getDecryptionCipher(iv) ?: return ""
-    return String(cipher.doFinal(encrypted))
+    return cipher.doFinal(encrypted).decodeToString()
 }
 
 actual suspend fun generateKey() {
