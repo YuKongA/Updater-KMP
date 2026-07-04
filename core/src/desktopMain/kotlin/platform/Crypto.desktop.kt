@@ -9,13 +9,13 @@ actual suspend fun ownEncrypt(string: String): Pair<String, String> {
     val cipher = KeyStoreUtils.getEncryptionCipher()
     val encrypted = cipher.doFinal(string.toByteArray())
     val iv = cipher.iv
-    return Pair(Base64.Mime.encode(encrypted), Base64.Mime.encode(iv))
+    return Pair(Base64.encode(encrypted), Base64.encode(iv))
 }
 
 @OptIn(ExperimentalEncodingApi::class)
 actual suspend fun ownDecrypt(encryptedText: String, encodedIv: String): String {
-    val encrypted = Base64.Mime.decode(encryptedText)
-    val iv = Base64.Mime.decode(encodedIv)
+    val encrypted = Base64.decode(encryptedText)
+    val iv = Base64.decode(encodedIv)
     val cipher = KeyStoreUtils.getDecryptionCipher(iv) ?: return ""
     return String(cipher.doFinal(encrypted))
 }
