@@ -112,6 +112,34 @@ jobs:
           name: ${{ matrix.artifact-nameEx }}
           path: ${{ matrix.artifact-nameEx }}
           archive: false
+      - name: Build unsigned iOS IPA
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          ./gradlew :core:generateVersionInfo
+          xcodebuild archive \
+            -project ios/iosApp.xcodeproj \
+            -scheme ios \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/Updater.xcarchive" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGN_ENTITLEMENTS="" \
+            DEVELOPMENT_TEAM=""
+          APP="$RUNNER_TEMP/Updater.xcarchive/Products/Applications/Updater.app"
+          mkdir -p "$RUNNER_TEMP/Payload"
+          cp -R "$APP" "$RUNNER_TEMP/Payload/"
+          ( cd "$RUNNER_TEMP" && zip -r -y "$GITHUB_WORKSPACE/Updater-ios-arm64-unsigned.ipa" Payload )
+      - name: Upload unsigned iOS IPA artifact
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@v7
+        with:
+          name: Updater-ios-arm64-unsigned.ipa
+          path: Updater-ios-arm64-unsigned.ipa
+          archive: false
 
   post_telegram:
     needs: build
