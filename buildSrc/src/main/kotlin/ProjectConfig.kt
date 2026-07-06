@@ -2,7 +2,7 @@ object ProjectConfig {
     const val JVM_VERSION = 25
     const val APP_NAME = "Updater"
     const val PACKAGE_NAME = "top.yukonga.updater.kmp"
-    const val VERSION_NAME = "1.6.2"
+    const val VERSION_NAME = "1.7.0"
 
     object Android {
         const val TARGET_SDK = 37
