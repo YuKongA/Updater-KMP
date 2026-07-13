@@ -16,39 +16,39 @@ jobs:
           - os: macos-latest
             platform: macos arm64
             build-command: ./gradlew packageDmgNativeReleaseMacosArm64
-            artifact-path: macos/build/compose/binaries/main/native-macosArm64-release-dmg/*.dmg
+            artifact-path: app/macos/build/compose/binaries/main/native-macosArm64-release-dmg/*.dmg
             artifact-name: Updater-darwin-arm64-dmg.dmg
             archive: false
-            cli-command: ./gradlew :cli:linkReleaseExecutableMacosArm64 :core:macosArm64Test
-            cli-artifact-path: cli/build/bin/macosArm64/releaseExecutable/updater.kexe
+            cli-command: ./gradlew :app:cli:linkReleaseExecutableMacosArm64 :data:macosArm64Test
+            cli-artifact-path: app/cli/build/bin/macosArm64/releaseExecutable/updater.kexe
             cli-artifact-name: Updater-cli-macos-arm64
           - os: ubuntu-latest
             platform: linux x64
             platformEx: android universal
             build-command: ./gradlew createReleaseDistributable
             build-commandEx: ./gradlew assembleDebug && ./gradlew assembleRelease
-            artifact-path: desktop/build/compose/binaries/main-release/app/Updater
-            artifact-pathEx: android/build/outputs/apk/release/*.apk
+            artifact-path: app/desktop/build/compose/binaries/main-release/app/Updater
+            artifact-pathEx: app/android/build/outputs/apk/release/*.apk
             artifact-name: Updater-linux-x64-bin
             artifact-nameEx: Updater-android-universal-apk.apk
             archive: true
-            cli-command: ./gradlew :cli:linkReleaseExecutableLinuxX64 :core:linuxX64Test :core:desktopTest
-            cli-artifact-path: cli/build/bin/linuxX64/releaseExecutable/updater.kexe
+            cli-command: ./gradlew :app:cli:linkReleaseExecutableLinuxX64 :data:linuxX64Test :data:desktopTest
+            cli-artifact-path: app/cli/build/bin/linuxX64/releaseExecutable/updater.kexe
             cli-artifact-name: Updater-cli-linux-x64
           - os: ubuntu-24.04-arm
             platform: linux arm64
             build-command: ./gradlew createReleaseDistributable
-            artifact-path: desktop/build/compose/binaries/main-release/app/Updater
+            artifact-path: app/desktop/build/compose/binaries/main-release/app/Updater
             artifact-name: Updater-linux-arm64-bin
             archive: true
           - os: windows-latest
             platform: windows x64
             build-command: ./gradlew createReleaseDistributable
-            artifact-path: desktop/build/compose/binaries/main-release/app/Updater
+            artifact-path: app/desktop/build/compose/binaries/main-release/app/Updater
             artifact-name: Updater-windows-x64-exe
             archive: true
-            cli-command: ./gradlew :cli:linkReleaseExecutableMingwX64 :core:mingwX64Test :cli:mingwX64Test
-            cli-artifact-path: cli/build/bin/mingwX64/releaseExecutable/updater.exe
+            cli-command: ./gradlew :app:cli:linkReleaseExecutableMingwX64 :data:mingwX64Test :app:cli:mingwX64Test
+            cli-artifact-path: app/cli/build/bin/mingwX64/releaseExecutable/updater.exe
             cli-artifact-name: Updater-cli-windows-x64.exe
     steps:
       - name: Checkout Sources
@@ -74,7 +74,7 @@ jobs:
         if: matrix.platformEx == 'android universal'
         run: ${{ matrix.build-commandEx }}
         env:
-          KEYSTORE_PATH: "../keystore.jks"
+          KEYSTORE_PATH: "../../keystore.jks"
           KEYSTORE_PASS: ${{ secrets.KEY_STORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
@@ -116,9 +116,9 @@ jobs:
         if: runner.os == 'macOS'
         shell: bash
         run: |
-          ./gradlew :core:generateVersionInfo
+          ./gradlew :data:generateVersionInfo
           xcodebuild archive \
-            -project ios/iosApp.xcodeproj \
+            -project app/ios/iosApp.xcodeproj \
             -scheme ios \
             -configuration Release \
             -sdk iphoneos \

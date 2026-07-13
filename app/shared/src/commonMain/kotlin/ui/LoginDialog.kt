@@ -1,0 +1,315 @@
+package ui
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.KeyboardActionHandler
+import androidx.compose.foundation.text.input.OutputTransformation
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import data.repository.LoginState
+import org.jetbrains.compose.resources.stringResource
+import top.yukonga.miuix.kmp.basic.ButtonDefaults
+import top.yukonga.miuix.kmp.basic.Icon
+import top.yukonga.miuix.kmp.basic.IconButton
+import top.yukonga.miuix.kmp.basic.TextButton
+import top.yukonga.miuix.kmp.basic.TextField
+import top.yukonga.miuix.kmp.icon.MiuixIcons
+import top.yukonga.miuix.kmp.icon.extended.Blocklist
+import top.yukonga.miuix.kmp.icon.extended.RemoveContact
+import top.yukonga.miuix.kmp.icon.extended.Rename
+import top.yukonga.miuix.kmp.overlay.OverlayDialog
+import top.yukonga.miuix.kmp.preference.CheckboxPreference
+import top.yukonga.miuix.kmp.theme.MiuixTheme
+import updater.app.shared.generated.resources.Res
+import updater.app.shared.generated.resources.account
+import updater.app.shared.generated.resources.cancel
+import updater.app.shared.generated.resources.global
+import updater.app.shared.generated.resources.login
+import updater.app.shared.generated.resources.logout
+import updater.app.shared.generated.resources.logout_confirm
+import updater.app.shared.generated.resources.password
+import updater.app.shared.generated.resources.save_password
+import updater.app.shared.generated.resources.send_email_code
+import updater.app.shared.generated.resources.send_phone_code
+import updater.app.shared.generated.resources.submit
+import updater.app.shared.generated.resources.verification_code
+import updater.app.shared.generated.resources.verifying
+import viewmodel.LoginEvent
+
+@Composable
+fun LoginDialog(
+    show: Boolean,
+    loginState: LoginState,
+    accountState: TextFieldState,
+    passwordState: TextFieldState,
+    global: Boolean,
+    savePassword: Boolean,
+    showTicketInput: Boolean,
+    availableTwoFactorOptions: List<Int>,
+    isVerifying: Boolean,
+    ticketState: TextFieldState,
+    isVerificationRequested: Boolean,
+    isLoggingIn: Boolean,
+    onShowDialog: () -> Unit,
+    onEvent: (LoginEvent) -> Unit,
+) {
+    val focusManager = LocalFocusManager.current
+
+    val isLoggedIn = loginState is LoginState.LoggedIn
+
+    val icon = when (loginState) {
+        is LoginState.LoggedIn -> MiuixIcons.Blocklist
+        else -> MiuixIcons.RemoveContact
+    }
+
+    IconButton(
+        onClick = {
+            focusManager.clearFocus()
+            onShowDialog()
+        },
+        holdDownState = show,
+    ) {
+        Icon(
+            imageVector = icon,
+            tint = MiuixTheme.colorScheme.onSurface,
+            contentDescription = stringResource(Res.string.login)
+        )
+    }
+
+    if (!isLoggedIn) {
+        OverlayDialog(
+            show = show,
+            title = stringResource(Res.string.login),
+            onDismissRequest = { onEvent(LoginEvent.DismissDialog) },
+            content = {
+                Column {
+                    // 账号输入框
+                    TextField(
+                        state = accountState,
+                        label = stringResource(Res.string.account),
+                        modifier = Modifier.fillMaxWidth(),
+                        lineLimits = TextFieldLineLimits.SingleLine,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        onKeyboardAction = KeyboardActionHandler { focusManager.moveFocus(FocusDirection.Down) }
+                    )
+
+                    // 密码输入框
+                    var passwordVisibility by rememberSaveable { mutableStateOf(false) }
+                    val passwordMask = remember {
+                        OutputTransformation {
+                            val count = length
+                            var index = 0
+                            while (index < count) {
+                                replace(index, index + 1, "•")
+                                index++
+                            }
+                        }
+                    }
+                    TextField(
+                        state = passwordState,
+                        label = stringResource(Res.string.password),
+                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                        lineLimits = TextFieldLineLimits.SingleLine,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                        onKeyboardAction = KeyboardActionHandler { focusManager.clearFocus() },
+                        outputTransformation = if (passwordVisibility) null else passwordMask,
+                        trailingIcon = {
+                            IconButton(
+                                modifier = Modifier.padding(end = 6.dp),
+                                onClick = { passwordVisibility = !passwordVisibility },
+                                content = {
+                                    Icon(
+                                        imageVector = MiuixIcons.Rename,
+                                        tint = if (passwordVisibility) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.onSecondaryContainer,
+                                        contentDescription = null
+                                    )
+                                }
+                            )
+                        }
+                    )
+
+                    // 二次认证
+                    AnimatedVisibility(
+                        visible = showTicketInput
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+                        ) {
+                            // 验证方式选择
+                            AnimatedVisibility(
+                                visible = availableTwoFactorOptions.isNotEmpty() && !isVerificationRequested
+                            ) {
+                                Column {
+                                    if (availableTwoFactorOptions.contains(4)) {
+                                        TextButton(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            text = stringResource(Res.string.send_phone_code),
+                                            colors = ButtonDefaults.textButtonColorsPrimary(),
+                                            onClick = { onEvent(LoginEvent.SelectTwoFactorMethod(4)) }
+                                        )
+                                    }
+                                    if (availableTwoFactorOptions.contains(4) && availableTwoFactorOptions.contains(8)) {
+                                        Spacer(Modifier.height(16.dp))
+                                    }
+                                    if (availableTwoFactorOptions.contains(8)) {
+                                        TextButton(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            text = stringResource(Res.string.send_email_code),
+                                            colors = ButtonDefaults.textButtonColorsPrimary(),
+                                            onClick = { onEvent(LoginEvent.SelectTwoFactorMethod(8)) }
+                                        )
+                                    }
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+                                    ) {
+                                        TextButton(
+                                            modifier = Modifier.weight(1f),
+                                            text = stringResource(Res.string.cancel),
+                                            colors = ButtonDefaults.textButtonColors(),
+                                            onClick = { onEvent(LoginEvent.CancelTicket) }
+                                        )
+                                    }
+                                }
+                            }
+
+                            // 验证码输入
+                            AnimatedVisibility(
+                                visible = isVerificationRequested
+                            ) {
+                                Column {
+                                    TextField(
+                                        state = ticketState,
+                                        label = stringResource(Res.string.verification_code),
+                                        modifier = Modifier.fillMaxWidth(),
+                                        lineLimits = TextFieldLineLimits.SingleLine,
+                                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                                        onKeyboardAction = KeyboardActionHandler { focusManager.clearFocus() }
+                                    )
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+                                    ) {
+                                        TextButton(
+                                            modifier = Modifier.weight(1f),
+                                            text = if (isVerifying) stringResource(Res.string.verifying) else stringResource(Res.string.submit),
+                                            enabled = !isVerifying && ticketState.text.isNotBlank(),
+                                            colors = ButtonDefaults.textButtonColorsPrimary(),
+                                            onClick = { onEvent(LoginEvent.SubmitTwoFactor) }
+                                        )
+                                        Spacer(Modifier.width(16.dp))
+                                        TextButton(
+                                            modifier = Modifier.weight(1f),
+                                            text = stringResource(Res.string.cancel),
+                                            colors = ButtonDefaults.textButtonColors(),
+                                            onClick = { onEvent(LoginEvent.CancelTicket) }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // 国际账号 & 保存密码
+                    AnimatedVisibility(
+                        visible = !showTicketInput
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(vertical = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                modifier = Modifier.weight(1f),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                CheckboxPreference(
+                                    title = stringResource(Res.string.global),
+                                    checked = global,
+                                    onCheckedChange = { onEvent(LoginEvent.GlobalChanged(it)) }
+                                )
+                            }
+                            Row(
+                                modifier = Modifier.weight(1f),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                CheckboxPreference(
+                                    title = stringResource(Res.string.save_password),
+                                    checked = savePassword,
+                                    onCheckedChange = { onEvent(LoginEvent.SavePasswordChanged(it)) }
+                                )
+                            }
+                        }
+                    }
+
+                    // 登录 & 取消
+                    AnimatedVisibility(
+                        visible = !showTicketInput
+                    ) {
+                        Row {
+                            TextButton(
+                                modifier = Modifier.weight(1f),
+                                text = stringResource(Res.string.login),
+                                enabled = !isLoggingIn,
+                                colors = ButtonDefaults.textButtonColorsPrimary(),
+                                onClick = { onEvent(LoginEvent.LoginClicked) }
+                            )
+                            Spacer(Modifier.width(16.dp))
+                            TextButton(
+                                modifier = Modifier.weight(1f),
+                                text = stringResource(Res.string.cancel),
+                                colors = ButtonDefaults.textButtonColors(),
+                                onClick = { onEvent(LoginEvent.DismissDialog) }
+                            )
+                        }
+                    }
+                }
+            }
+        )
+    }
+
+    // 退出登录
+    if (isLoggedIn) {
+        OverlayDialog(
+            show = show,
+            title = stringResource(Res.string.logout),
+            summary = stringResource(Res.string.logout_confirm),
+            onDismissRequest = { onEvent(LoginEvent.DismissDialog) },
+            content = {
+                Row {
+                    TextButton(
+                        modifier = Modifier.weight(1f),
+                        text = stringResource(Res.string.logout),
+                        colors = ButtonDefaults.textButtonColorsPrimary(),
+                        onClick = { onEvent(LoginEvent.LogoutClicked) }
+                    )
+                    Spacer(Modifier.width(16.dp))
+                    TextButton(
+                        modifier = Modifier.weight(1f),
+                        text = stringResource(Res.string.cancel),
+                        colors = ButtonDefaults.textButtonColors(),
+                        onClick = { onEvent(LoginEvent.DismissDialog) }
+                    )
+                }
+            }
+        )
+    }
+}

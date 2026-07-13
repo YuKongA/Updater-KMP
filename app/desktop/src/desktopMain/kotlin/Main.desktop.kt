@@ -1,0 +1,87 @@
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPosition
+import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
+import di.initKoin
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import theme.LinuxThemeManager
+import theme.MacOSThemeManager
+import theme.WindowsThemeManager
+import updater.app.shared.generated.resources.Res
+import updater.app.shared.generated.resources.app_name
+import updater.app.shared.generated.resources.icon
+import javax.swing.SwingUtilities
+
+fun main() = application {
+    initKoin()
+    val state = rememberWindowState(
+        size = DpSize(1200.dp, 800.dp),
+        position = WindowPosition.Aligned(Alignment.Center)
+    )
+
+    Window(
+        state = state,
+        onCloseRequest = ::exitApplication,
+        title = stringResource(Res.string.app_name),
+        icon = painterResource(Res.drawable.icon),
+    ) {
+        val osName = System.getProperty("os.name").lowercase()
+        when {
+            osName.contains("win") -> {
+                var isDarkTheme by remember { mutableStateOf(WindowsThemeManager.isWindowsDarkTheme()) }
+                LaunchedEffect(Unit) {
+                    withContext(Dispatchers.IO) {
+                        WindowsThemeManager.listenWindowsThemeChanges { newSystemThemeIsDark ->
+                            if (isDarkTheme != newSystemThemeIsDark) isDarkTheme = newSystemThemeIsDark
+                        }
+                    }
+                }
+                LaunchedEffect(isDarkTheme, window) {
+                    SwingUtilities.invokeLater {
+                        WindowsThemeManager.setWindowsTitleBarTheme(window, isDarkTheme)
+                    }
+                }
+                App(isDarkTheme)
+            }
+
+            osName.contains("mac") -> {
+                var isDarkTheme by remember { mutableStateOf(MacOSThemeManager.isMacOSDarkTheme()) }
+                LaunchedEffect(Unit) {
+                    withContext(Dispatchers.IO) {
+                        MacOSThemeManager.listenMacOSThemeChanges { newSystemThemeIsDark ->
+                            if (isDarkTheme != newSystemThemeIsDark) isDarkTheme = newSystemThemeIsDark
+                        }
+                    }
+                }
+                App(isDarkTheme)
+            }
+
+            osName.contains("nux") || osName.contains("nix") -> {
+                var isDarkTheme by remember { mutableStateOf(LinuxThemeManager.isLinuxDarkTheme()) }
+                LaunchedEffect(Unit) {
+                    withContext(Dispatchers.IO) {
+                        LinuxThemeManager.listenLinuxThemeChanges { newSystemThemeIsDark ->
+                            if (isDarkTheme != newSystemThemeIsDark) isDarkTheme = newSystemThemeIsDark
+                        }
+                    }
+                }
+                App(isDarkTheme)
+            }
+
+            else -> {
+                App()
+            }
+        }
+    }
+}

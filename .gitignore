@@ -307,12 +307,12 @@ xcuserdata/
 ### Xcode Patch ###
 
 # Ignore cocoapods files
-ios/iosApp/Podfile.lock
-ios/iosApp/Pods/*
-ios/iosApp/iosApp.xcworkspace/*
-ios/iosApp/iosApp.xcodeproj/*
-ios/iosApp/Generated.xcconfig
-!ios/iosApp/iosApp.xcodeproj/project.pbxproj
+app/ios/iosApp/Podfile.lock
+app/ios/iosApp/Pods/*
+app/ios/iosApp.xcworkspace/*
+app/ios/iosApp.xcodeproj/*
+app/ios/iosApp/Generated.xcconfig
+!app/ios/iosApp.xcodeproj/project.pbxproj
 
 ### AndroidStudio ###
 # Covers files to be ignored for android development using Android Studio.

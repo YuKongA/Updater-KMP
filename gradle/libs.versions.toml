@@ -6,7 +6,9 @@ clikt = "5.1.0"
 compose-hotReload = "1.1.1"
 compose-plugin = "1.11.1"
 image-loader = "1.10.0"
+koin = "4.2.0"
 kotlin = "2.4.0"
+kotlinx-coroutines = "1.11.0"
 kotlinx-browser = "0.5.0"
 kotlinx-serialization-json = "1.11.0"
 kotlinx-datetime = "0.8.0"
@@ -23,6 +25,11 @@ clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt" }
 compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-plugin" }
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-plugin" }
 image-loader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "image-loader" }
+koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin" }
+koin-core = { module = "io.insert-koin:koin-core" }
+koin-compose = { module = "io.insert-koin:koin-compose" }
+koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlinx-browser" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }

@@ -1,0 +1,116 @@
+package ui
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import data.repository.LoginState
+import org.jetbrains.compose.resources.stringResource
+import top.yukonga.miuix.kmp.basic.Card
+import top.yukonga.miuix.kmp.basic.CardDefaults
+import top.yukonga.miuix.kmp.basic.Icon
+import top.yukonga.miuix.kmp.basic.Text
+import top.yukonga.miuix.kmp.icon.MiuixIcons
+import top.yukonga.miuix.kmp.icon.extended.Info
+import top.yukonga.miuix.kmp.icon.extended.Ok
+import top.yukonga.miuix.kmp.theme.MiuixTheme
+import updater.app.shared.generated.resources.Res
+import updater.app.shared.generated.resources.logged_in
+import updater.app.shared.generated.resources.login_desc
+import updater.app.shared.generated.resources.login_expired
+import updater.app.shared.generated.resources.login_expired_desc
+import updater.app.shared.generated.resources.no_account
+import updater.app.shared.generated.resources.using_v2
+import utils.isWeb
+import viewmodel.LoginEvent
+import viewmodel.LoginUiState
+
+@Composable
+fun LoginCardView(
+    loginUi: LoginUiState,
+    isDarkTheme: Boolean,
+    accountState: TextFieldState,
+    passwordState: TextFieldState,
+    ticketState: TextFieldState,
+    onShowLoginDialog: () -> Unit,
+    onLoginEvent: (LoginEvent) -> Unit,
+) {
+    val loginState = loginUi.loginState
+    val isLoggedIn = loginState is LoginState.LoggedIn
+    val account = when (loginState) {
+        is LoginState.LoggedIn -> stringResource(Res.string.logged_in)
+        is LoginState.NotLoggedIn -> stringResource(Res.string.no_account)
+        is LoginState.Expired -> stringResource(Res.string.login_expired)
+    }
+    val info = when (loginState) {
+        is LoginState.LoggedIn -> stringResource(Res.string.using_v2)
+        is LoginState.NotLoggedIn -> stringResource(Res.string.login_desc)
+        is LoginState.Expired -> stringResource(Res.string.login_expired_desc)
+    }
+    val icon = if (isLoggedIn) MiuixIcons.Ok else MiuixIcons.Info
+    val color = when {
+        isDarkTheme && isLoggedIn -> Color(0xFF1A3825)
+        isDarkTheme && !isLoggedIn -> Color(0xFF310808)
+        !isDarkTheme && isLoggedIn -> Color(0xFFDFFAE4)
+        else -> Color(0xFFF8E2E2)
+    }
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(all = 12.dp),
+        insideMargin = PaddingValues(16.dp),
+        colors = CardDefaults.defaultColors(color = color),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Icon(
+                modifier = Modifier.padding(start = 8.dp),
+                imageVector = icon,
+                tint = MiuixTheme.colorScheme.onSurface,
+                contentDescription = null
+            )
+            Column(
+                modifier = Modifier.padding(start = 20.dp)
+            ) {
+                Text(
+                    text = if (!isWeb()) account else "WebPage",
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = info
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            if (!isWeb()) {
+                LoginDialog(
+                    show = loginUi.showLoginDialog,
+                    loginState = loginState,
+                    accountState = accountState,
+                    passwordState = passwordState,
+                    global = loginUi.isGlobal,
+                    savePassword = loginUi.savePasswordEnabled,
+                    showTicketInput = loginUi.showTicketInput,
+                    availableTwoFactorOptions = loginUi.availableTwoFactorOptions,
+                    isVerifying = loginUi.isVerifying,
+                    ticketState = ticketState,
+                    isVerificationRequested = loginUi.isVerificationRequested,
+                    isLoggingIn = loginUi.isLoggingIn,
+                    onShowDialog = onShowLoginDialog,
+                    onEvent = onLoginEvent,
+                )
+            }
+        }
+    }
+}
