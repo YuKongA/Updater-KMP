@@ -15,7 +15,7 @@ kotlinx-datetime = "0.8.0"
 ktor-client = "3.5.1"
 miuix = "0.9.3"
 mordant = "3.0.2"
-okio = "3.17.0"
+okio = "3.18.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
