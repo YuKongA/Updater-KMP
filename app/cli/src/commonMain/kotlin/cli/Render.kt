@@ -29,6 +29,7 @@ fun Terminal.renderRom(title: String, rom: DataHelper.RomInfoData) {
     kv("MD5", rom.md5)
     kv("Fingerprint", rom.fingerprint)
     kv("Security patch", rom.securityPatchLevel)
+    kv("Kernel", rom.kernelVersion)
     kv("Build time", rom.timestamp)
     kv("Official", rom.official1Download)
     kv("Official 2", rom.official2Download)

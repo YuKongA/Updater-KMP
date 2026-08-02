@@ -5,6 +5,7 @@ import data.DeviceInfoHelper
 import data.RomInfoHelper
 import data.mapper.RomInfoMapper
 import data.repository.DeviceListRepository
+import data.repository.KernelVersionFetcher
 import data.repository.LoginService
 import data.repository.OtaMetadataFetcher
 import data.repository.RomInfoRepository
@@ -65,6 +66,7 @@ class FetchRomInfoUseCase(
     private val loginService: LoginService,
     private val deviceListRepository: DeviceListRepository,
     private val metadataFetcher: OtaMetadataFetcher,
+    private val kernelVersionFetcher: KernelVersionFetcher,
 ) {
     suspend fun fetch(request: RomInfoQuery): FetchOutcome {
         val params = buildRequestParams(request)
@@ -176,11 +178,15 @@ class FetchRomInfoUseCase(
             Triple(DataHelper.RomInfoData(), emptyList(), emptyList())
         }
 
-        val ota = if (!isWeb()) {
+        val (ota, kernelVersion) = if (!isWeb()) {
             val url = if (noUltimateLink) curRomData.cdn1Download else curRomData.official1Download
-            if (url.isNotEmpty()) metadataFetcher.getOtaMetadata(url) else null
-        } else null
-        val enrichedCurRom = RomInfoMapper.applyMetadata(curRomData, ota)
+            if (url.isNotEmpty()) coroutineScope {
+                val otaDeferred = async { metadataFetcher.getOtaMetadata(url) }
+                val kernelDeferred = async { kernelVersionFetcher.getKernelVersion(url) }
+                otaDeferred.await() to kernelDeferred.await()
+            } else null to null
+        } else null to null
+        val enrichedCurRom = RomInfoMapper.applyMetadata(curRomData, ota, kernelVersion)
 
         return RomInfoResult.Found(
             curRomInfo = enrichedCurRom,

@@ -11,14 +11,19 @@ import kotlin.time.ExperimentalTime
 
 object RomInfoMapper {
 
-    fun applyMetadata(curRomData: DataHelper.RomInfoData, ota: OtaMetadataPb?): DataHelper.RomInfoData {
-        if (ota == null) return curRomData
+    fun applyMetadata(
+        curRomData: DataHelper.RomInfoData,
+        ota: OtaMetadataPb?,
+        kernelVersion: String? = null,
+    ): DataHelper.RomInfoData {
+        val withKernel = if (kernelVersion.isNullOrEmpty()) curRomData else curRomData.copy(kernelVersion = kernelVersion)
+        if (ota == null) return withKernel
         val post = ota.postcondition
         val postPartitions = post?.partitionState.orEmpty()
         val postFingerprint = postPartitions.firstOrNull { it.partitionName == "odm" }
             ?.build?.firstOrNull().orEmpty()
             .ifEmpty { post?.build?.firstOrNull().orEmpty() }
-        return curRomData.copy(
+        return withKernel.copy(
             fingerprint = postFingerprint,
             securityPatchLevel = post?.securityPatchLevel.orEmpty(),
             timestamp = post?.timestamp?.takeIf { ts -> ts > 0 }

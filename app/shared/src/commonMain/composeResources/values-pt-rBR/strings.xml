@@ -24,6 +24,7 @@
     <string name="fingerprint">Impressão digital</string>
     <string name="security_patch_level">Nível do patch de segurança</string>
     <string name="build_time">Hora da construção</string>
+    <string name="kernel_version">Versão do kernel</string>
     <string name="sdk_level">Nível do SDK</string>
     <string name="attention">ATENÇÃO</string>
     <string name="xms_current_version">Versão Atual</string>

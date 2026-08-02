@@ -88,5 +88,6 @@ object DataHelper {
         val securityPatchLevel: String = "",
         val timestamp: String = "",
         val sdkLevel: String = "",
+        val kernelVersion: String = "",
     )
 }

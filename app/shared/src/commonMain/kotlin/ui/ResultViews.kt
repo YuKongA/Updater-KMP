@@ -81,6 +81,7 @@ import updater.app.shared.generated.resources.filemd5
 import updater.app.shared.generated.resources.filename
 import updater.app.shared.generated.resources.filesize
 import updater.app.shared.generated.resources.fingerprint
+import updater.app.shared.generated.resources.kernel_version
 import updater.app.shared.generated.resources.sdk_level
 import updater.app.shared.generated.resources.security_patch_level
 import updater.app.shared.generated.resources.system_version
@@ -195,7 +196,8 @@ private fun InfoHeaderContent(
 ) {
     val hasTimestamp = romInfo.timestamp.isNotEmpty() ||
             romInfo.fingerprint.isNotEmpty() ||
-            romInfo.securityPatchLevel.isNotEmpty()
+            romInfo.securityPatchLevel.isNotEmpty() ||
+            romInfo.kernelVersion.isNotEmpty()
 
     Text(
         text = romInfo.type.uppercase(),
@@ -570,6 +572,9 @@ fun MetadataView(romInfo: DataHelper.RomInfoData) {
         }
         if (romInfo.securityPatchLevel.isNotEmpty()) {
             MessageTextView(stringResource(Res.string.security_patch_level), romInfo.securityPatchLevel)
+        }
+        if (romInfo.kernelVersion.isNotEmpty()) {
+            MessageTextView(stringResource(Res.string.kernel_version), romInfo.kernelVersion)
         }
         if (romInfo.fingerprint.isNotEmpty()) {
             MessageTextView(stringResource(Res.string.fingerprint), romInfo.fingerprint)

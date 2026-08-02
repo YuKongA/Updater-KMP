@@ -2,6 +2,8 @@ package di
 
 import data.repository.DeviceListRepository
 import data.repository.DeviceListRepositoryImpl
+import data.repository.KernelVersionFetcher
+import data.repository.KernelVersionFetcherImpl
 import data.repository.LoginService
 import data.repository.LoginServiceImpl
 import data.repository.OtaMetadataFetcher
@@ -33,7 +35,8 @@ val dataModule = module {
     single<LoginService> { LoginServiceImpl(get(), get(), get()) }
     single<RomInfoRepository> { RomInfoRepositoryImpl(get()) }
     single<OtaMetadataFetcher> { OtaMetadataFetcherImpl(get()) }
+    single<KernelVersionFetcher> { KernelVersionFetcherImpl(get()) }
     single<DeviceListRepository> { DeviceListRepositoryImpl(get(), client = get()) }
 
-    single { FetchRomInfoUseCase(get(), get(), get(), get()) }
+    single { FetchRomInfoUseCase(get(), get(), get(), get(), get()) }
 }

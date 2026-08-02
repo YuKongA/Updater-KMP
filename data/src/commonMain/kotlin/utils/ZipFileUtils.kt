@@ -68,18 +68,44 @@ object ZipFileUtils {
             if ((byteString.getIntLe(pos).toLong() and 0xFFFFFFFFL) != CENSIG) break
 
             val method = byteString.getShortLe(pos + 10).toInt() and 0xFFFF
-            val compressedSize = byteString.getIntLe(pos + 20).toLong() and 0xFFFFFFFFL
-            val uncompressedSize = byteString.getIntLe(pos + 24).toLong() and 0xFFFFFFFFL
+            var compressedSize = byteString.getIntLe(pos + 20).toLong() and 0xFFFFFFFFL
+            var uncompressedSize = byteString.getIntLe(pos + 24).toLong() and 0xFFFFFFFFL
             val fileNameLength = byteString.getShortLe(pos + 28).toInt() and 0xFFFF
             val extraFieldLength = byteString.getShortLe(pos + 30).toInt() and 0xFFFF
             val fileCommentLength = byteString.getShortLe(pos + 32).toInt() and 0xFFFF
-            val localHeaderOffset = byteString.getIntLe(pos + 42).toLong() and 0xFFFFFFFFL
+            var localHeaderOffset = byteString.getIntLe(pos + 42).toLong() and 0xFFFFFFFFL
 
             val fileNameStartPos = pos + 46
             if (fileNameStartPos + fileNameLength > bytes.size) break
 
             val currentFileName = byteString.substring(fileNameStartPos, fileNameStartPos + fileNameLength).utf8()
             if (currentFileName in fileNames) {
+                // Saturated fields carry their real value in the ZIP64 extra block, in this fixed order.
+                val extraStart = fileNameStartPos + fileNameLength
+                val extraEnd = minOf(extraStart + extraFieldLength, bytes.size)
+                if (uncompressedSize == ZIP64_MAGICVAL || compressedSize == ZIP64_MAGICVAL || localHeaderOffset == ZIP64_MAGICVAL) {
+                    var extraPos = extraStart
+                    while (extraPos + 4 <= extraEnd) {
+                        val id = byteString.getShortLe(extraPos).toInt() and 0xFFFF
+                        val size = byteString.getShortLe(extraPos + 2).toInt() and 0xFFFF
+                        val dataStart = extraPos + 4
+                        if (dataStart + size > extraEnd) break
+                        if (id == 0x0001) {
+                            var fieldPos = dataStart
+                            if (uncompressedSize == ZIP64_MAGICVAL && fieldPos + 8 <= dataStart + size) {
+                                uncompressedSize = byteString.getLongLe(fieldPos); fieldPos += 8
+                            }
+                            if (compressedSize == ZIP64_MAGICVAL && fieldPos + 8 <= dataStart + size) {
+                                compressedSize = byteString.getLongLe(fieldPos); fieldPos += 8
+                            }
+                            if (localHeaderOffset == ZIP64_MAGICVAL && fieldPos + 8 <= dataStart + size) {
+                                localHeaderOffset = byteString.getLongLe(fieldPos)
+                            }
+                            break
+                        }
+                        extraPos = dataStart + size
+                    }
+                }
                 results[currentFileName] = CdEntry(
                     fileName = currentFileName,
                     localHeaderOffset = localHeaderOffset,

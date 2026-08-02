@@ -25,6 +25,7 @@
     <string name="fingerprint">指纹信息</string>
     <string name="security_patch_level">安全补丁</string>
     <string name="build_time">构建时间</string>
+    <string name="kernel_version">内核版本</string>
     <string name="sdk_level">SDK 版本</string>
     <string name="attention">注意事项</string>
     <string name="xms_current_version">当前版本</string>

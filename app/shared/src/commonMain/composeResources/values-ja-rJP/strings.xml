@@ -24,6 +24,7 @@
     <string name="fingerprint">フィンガープリント</string>
     <string name="security_patch_level">セキュリティ パッチ レベル</string>
     <string name="build_time">ビルド時間</string>
+    <string name="kernel_version">カーネル バージョン</string>
     <string name="sdk_level">SDK レベル</string>
     <string name="attention">注意</string>
     <string name="xms_current_version">現在のバージョン</string>

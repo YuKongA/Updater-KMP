@@ -3,16 +3,11 @@ package data.repository
 import data.DeviceState
 import data.OtaMetadataPb
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.get
-import io.ktor.client.request.head
-import io.ktor.client.request.header
-import io.ktor.http.HttpHeaders
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.protobuf.ProtoBuf
 import platform.httpClientPlatform
+import utils.HttpRangeReader
 import utils.ZipFileUtils.CdEntry
 import utils.ZipFileUtils.locateCentralDirectory
 import utils.ZipFileUtils.locateEntries
@@ -21,7 +16,7 @@ import kotlin.math.min
 import kotlin.time.Duration.Companion.milliseconds
 
 class OtaMetadataFetcherImpl(
-    private val client: HttpClient = httpClientPlatform(),
+    client: HttpClient = httpClientPlatform(),
 ) : OtaMetadataFetcher {
     private companion object {
         const val METADATA_PATH = "META-INF/com/android/metadata"
@@ -30,6 +25,8 @@ class OtaMetadataFetcherImpl(
         const val LOCAL_HEADER_SIZE = 256
         const val TIMEOUT_MS = 20000L
     }
+
+    private val reader = HttpRangeReader(client)
 
     override suspend fun getOtaMetadata(url: String): OtaMetadataPb? = fetchOtaMetadata(url)
 
@@ -132,46 +129,7 @@ class OtaMetadataFetcherImpl(
         return OtaMetadataPb(type = type, precondition = pre, postcondition = post)
     }
 
-    private suspend fun getFileLength(url: String): Long? {
-        return try {
-            val response = client.head(url) {
-                header(HttpHeaders.Range, "bytes=0-0")
-            }
+    private suspend fun getFileLength(url: String): Long? = reader.fileLength(url)
 
-            response.headers[HttpHeaders.ContentRange]?.let { contentRange ->
-                val parts = contentRange.split("/")
-                if (parts.size > 1) {
-                    parts[1].toLongOrNull()?.let { if (it > 0) return it }
-                }
-            }
-            response.headers[HttpHeaders.ContentLength]?.toLongOrNull()?.let { if (it > 0) return it }
-
-            null
-        } catch (e: CancellationException) {
-            throw e
-        } catch (_: Exception) {
-            null
-        }
-    }
-
-    private suspend fun readRange(url: String, start: Long, size: Int): ByteArray? {
-        if (size == 0) return ByteArray(0)
-        if (size < 0 || start < 0) return null
-
-        return try {
-            val response = client.get(url) {
-                header(HttpHeaders.Range, "bytes=$start-${start + size - 1}")
-            }
-            val bytes = response.body<ByteArray>()
-            when {
-                bytes.size < size -> null
-                bytes.size == size -> bytes
-                else -> bytes.copyOf(size)
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (_: Exception) {
-            null
-        }
-    }
+    private suspend fun readRange(url: String, start: Long, size: Int): ByteArray? = reader.read(url, start, size)
 }

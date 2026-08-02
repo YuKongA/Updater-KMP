@@ -26,6 +26,7 @@
     <string name="fingerprint">Fingerprint</string>
     <string name="security_patch_level">Security Patch Level</string>
     <string name="build_time">Build Time</string>
+    <string name="kernel_version">Kernel Version</string>
     <string name="sdk_level">SDK Level</string>
     <string name="attention">Attention</string>
     <string name="xms_current_version">Current Version</string>
