@@ -11,6 +11,7 @@ plugins {
 val generatedSrcDir = layout.buildDirectory.dir("generated/updater")
 
 val generateVersionInfo = tasks.register<GenerateVersionInfoTask>("generateVersionInfo") {
+    description = "generateVersionInfo"
     versionName.set(ProjectConfig.VERSION_NAME)
     versionCode.set(getGitVersionCode())
     outputFile.set(generatedSrcDir.map { it.file("kotlin/misc/VersionInfo.kt") })
