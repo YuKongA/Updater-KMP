@@ -10,6 +10,7 @@ import org.jetbrains.compose.resources.LanguageQualifier
 import org.jetbrains.compose.resources.LocalComposeEnvironment
 import org.jetbrains.compose.resources.RegionQualifier
 import org.jetbrains.compose.resources.ResourceEnvironment
+import org.jetbrains.compose.resources.ScriptQualifier
 import org.jetbrains.compose.resources.getResourceEnvironment
 import org.jetbrains.compose.resources.getSystemEnvironment
 import platform.Foundation.NSLocale
@@ -75,6 +76,7 @@ private fun mapEnvironment(environment: ResourceEnvironment): ResourceEnvironmen
             else -> environment.region
         },
         theme = environment.theme,
-        density = environment.density
+        density = environment.density,
+        script = script?.let { ScriptQualifier(it) } ?: ScriptQualifier("")
     )
 }
