@@ -44,7 +44,6 @@ kotlin {
             api(libs.kotlinx.serialization.json)
             api(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.protobuf)
-            implementation(libs.kotlinx.datetime)
         }
         commonTest.dependencies { implementation(kotlin("test")) }
     }

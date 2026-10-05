@@ -3,11 +3,8 @@ package data.mapper
 import data.DataHelper
 import data.OtaMetadataPb
 import data.RomInfoHelper
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.number
-import kotlinx.datetime.toLocalDateTime
+import utils.formatEpochSeconds
 import utils.isWeb
-import kotlin.time.ExperimentalTime
 
 object RomInfoMapper {
 
@@ -32,15 +29,9 @@ object RomInfoMapper {
         )
     }
 
-    @OptIn(ExperimentalTime::class)
     private fun convertTimestampToDateTime(timestamp: String): String {
         val epochSeconds = timestamp.toLongOrNull() ?: return ""
-        val instant = kotlin.time.Instant.fromEpochSeconds(epochSeconds)
-        val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-        return "${dateTime.year}/${dateTime.month.number}/${dateTime.day} " +
-                dateTime.hour.toString().padStart(2, '0') +
-                ":${dateTime.minute.toString().padStart(2, '0')}" +
-                ":${dateTime.second.toString().padStart(2, '0')}"
+        return formatEpochSeconds(epochSeconds)
     }
 
 

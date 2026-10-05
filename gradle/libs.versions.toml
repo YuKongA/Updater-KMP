@@ -11,7 +11,6 @@ kotlin = "2.4.20"
 kotlinx-coroutines = "1.11.0"
 kotlinx-browser = "0.5.0"
 kotlinx-serialization-json = "1.11.0"
-kotlinx-datetime = "0.8.0"
 ktor-client = "3.6.0"
 miuix = "0.9.4"
 mordant = "3.1.0"
@@ -31,7 +30,6 @@ koin-compose = { module = "io.insert-koin:koin-compose" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlinx-browser" }
-kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 kotlinx-serialization-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "kotlinx-serialization-json" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor-client" }
