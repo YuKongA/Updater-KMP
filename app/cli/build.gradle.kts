@@ -14,8 +14,8 @@ kotlin {
             if (buildType == NativeBuildType.RELEASE) linkerOpts(*stripArgs)
         }
     }
-    mingwX64 { cliBinary("-Wl,-s") }
-    linuxX64 { cliBinary("-Wl,-s") }
+    mingwX64 { cliBinary("-Wl,-s", "-Wl,--gc-sections", "-Wl,--icf=all") }
+    linuxX64 { cliBinary("-Wl,-s", "-Wl,--no-export-dynamic", "-Wl,--gc-sections", "-Wl,--icf=all") }
     macosArm64 { cliBinary("-Wl,-x") }
 
     sourceSets {
