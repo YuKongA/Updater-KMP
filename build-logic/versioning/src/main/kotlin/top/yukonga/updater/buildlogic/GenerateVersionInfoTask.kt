@@ -1,11 +1,17 @@
+package top.yukonga.updater.buildlogic
+
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
+@CacheableTask
 abstract class GenerateVersionInfoTask : DefaultTask() {
     @get:Input
     abstract val versionName: Property<String>
@@ -13,15 +19,16 @@ abstract class GenerateVersionInfoTask : DefaultTask() {
     @get:Input
     abstract val versionCode: Property<Int>
 
-    @get:OutputFile
-    abstract val outputFile: RegularFileProperty
+    @get:OutputDirectory
+    abstract val outputDirectory: DirectoryProperty
 
-    @get:Internal
+    @get:Optional
+    @get:OutputFile
     abstract val xcconfigFile: RegularFileProperty
 
     @TaskAction
     fun generate() {
-        val file = outputFile.get().asFile
+        val file = outputDirectory.file("misc/VersionInfo.kt").get().asFile
         file.parentFile.mkdirs()
         file.writeText(
             """
@@ -34,8 +41,7 @@ abstract class GenerateVersionInfoTask : DefaultTask() {
             """.trimIndent(),
         )
 
-        val xcconfig = xcconfigFile.orNull?.asFile
-        if (xcconfig != null) {
+        xcconfigFile.orNull?.asFile?.let { xcconfig ->
             xcconfig.parentFile.mkdirs()
             xcconfig.writeText(
                 """

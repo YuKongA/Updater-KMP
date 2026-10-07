@@ -1,3 +1,8 @@
+package top.yukonga.updater.buildlogic
+
+import org.gradle.api.Project
+import org.gradle.api.provider.Provider
+
 object ProjectConfig {
     const val JVM_VERSION = 25
     const val APP_NAME = "Updater"
@@ -13,8 +18,7 @@ object ProjectConfig {
     }
 }
 
-fun org.gradle.api.Project.getGitVersionCode(): Int {
-    return providers.exec {
-        commandLine("git", "rev-list", "--count", "HEAD")
-    }.standardOutput.asText.get().trim().toInt()
-}
+fun Project.getGitVersionCode(): Provider<Int> = providers.exec {
+    workingDir(layout.settingsDirectory)
+    commandLine("git", "rev-list", "--count", "HEAD")
+}.standardOutput.asText.map { it.trim().toInt() }

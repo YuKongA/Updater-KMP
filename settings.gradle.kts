@@ -19,6 +19,7 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
+    repositoriesMode = RepositoriesMode.PREFER_PROJECT
     repositories {
         google {
             mavenContent {
@@ -35,12 +36,12 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version ("1.0.0")
 }
 
+includeBuild("build-logic")
+
 include(":domain")
 include(":data")
-include(":app:shared")
-include(":app:android")
-include(":app:desktop")
-include(":app:js")
-include(":app:wasmJs")
-include(":app:macos")
-include(":app:cli")
+
+listOf("shared", "android", "desktop", "js", "wasmJs", "macos", "cli").forEach { name ->
+    include(":$name")
+    project(":$name").projectDir = file("app/$name")
+}

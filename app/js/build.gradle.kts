@@ -1,7 +1,8 @@
+import top.yukonga.updater.buildlogic.ProjectConfig
+
 plugins {
-    alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.jetbrains.compose)
-    alias(libs.plugins.kotlin.multiplatform)
+    id("updater.multiplatform")
+    id("updater.compose")
 }
 
 kotlin {
@@ -17,7 +18,10 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(projects.app.shared)
+            implementation(projects.shared)
+        }
+        jsMain.dependencies {
+            implementation(devNpm("terser-webpack-plugin", libs.versions.terser.webpack.plugin.get()))
         }
     }
 }

@@ -1,20 +1,18 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import top.yukonga.updater.buildlogic.ProjectConfig
 
 plugins {
-    alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.jetbrains.compose)
-    alias(libs.plugins.kotlin.multiplatform)
+    id("updater.multiplatform")
+    id("updater.compose")
 }
 
 kotlin {
-    jvmToolchain(ProjectConfig.JVM_VERSION)
-
     jvm("desktop")
 
     sourceSets {
-        val desktopMain by getting
+        val desktopMain = getByName("desktopMain")
         desktopMain.dependencies {
-            implementation(projects.app.shared)
+            implementation(projects.shared)
             implementation(compose.desktop.currentOs)
         }
     }

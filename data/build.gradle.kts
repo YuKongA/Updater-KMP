@@ -1,58 +1,24 @@
 @file:Suppress("UnstableApiUsage")
 
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import top.yukonga.updater.buildlogic.GenerateVersionInfoTask
 
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.kotlin.serialization)
+    id("updater.multiplatform-library")
+    id("updater.android-library")
+    id("updater.serialization")
+    id("updater.version-info")
 }
 
-val generatedSrcDir = layout.buildDirectory.dir("generated/updater")
-
-val generateVersionInfo = tasks.register<GenerateVersionInfoTask>("generateVersionInfo") {
-    description = "generateVersionInfo"
-    versionName.set(ProjectConfig.VERSION_NAME)
-    versionCode.set(getGitVersionCode())
-    outputFile.set(generatedSrcDir.map { it.file("kotlin/misc/VersionInfo.kt") })
-    xcconfigFile.set(layout.projectDirectory.file("../app/ios/iosApp/Generated.xcconfig"))
-}
+val generateVersionInfo = tasks.named<GenerateVersionInfoTask>("generateVersionInfo")
 
 kotlin {
-    jvmToolchain(ProjectConfig.JVM_VERSION)
-
-    android {
-        compileSdk {
-            version = release(ProjectConfig.Android.COMPILE_SDK) {
-                minorApiLevel = ProjectConfig.Android.COMPILE_SDK_MINOR
-            }
-        }
-        minSdk = ProjectConfig.Android.MIN_SDK
-        namespace = "${ProjectConfig.PACKAGE_NAME}.data"
-    }
-
-    jvm("desktop")
-
-    iosArm64()
-    iosSimulatorArm64()
-    macosArm64()
-
     mingwX64()
     linuxX64()
 
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        browser()
-    }
-
-    js {
-        browser()
-    }
-
     sourceSets {
-        val desktopMain by getting
-        val commonMain by getting {
-            kotlin.srcDir(generateVersionInfo.map { generatedSrcDir.get().dir("kotlin") })
+        val desktopMain = getByName("desktopMain")
+        named("commonMain") {
+            kotlin.srcDir(generateVersionInfo.flatMap { it.outputDirectory })
         }
         commonMain.dependencies {
             api(projects.domain)

@@ -1,31 +1,19 @@
 @file:Suppress("UnstableApiUsage")
 
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import top.yukonga.updater.buildlogic.ProjectConfig
 
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.jetbrains.compose)
-    alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.kotlin.serialization)
+    id("updater.multiplatform-library")
+    id("updater.android-library")
+    id("updater.compose")
+    id("updater.serialization")
 }
 
 kotlin {
-    jvmToolchain(ProjectConfig.JVM_VERSION)
-
     android {
         androidResources.enable = true
-        compileSdk {
-            version = release(ProjectConfig.Android.COMPILE_SDK) {
-                minorApiLevel = ProjectConfig.Android.COMPILE_SDK_MINOR
-            }
-        }
-        minSdk = ProjectConfig.Android.MIN_SDK
-        namespace = "${ProjectConfig.PACKAGE_NAME}.shared"
     }
-
-    jvm("desktop")
 
     fun iosTargets(config: KotlinNativeTarget.() -> Unit) {
         iosArm64(config)
@@ -40,23 +28,14 @@ kotlin {
         }
     }
 
-    macosArm64()
-
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        browser()
-    }
-
-    js {
-        browser()
-    }
-
     sourceSets {
-        val desktopMain by getting
+        val desktopMain = getByName("desktopMain")
         commonMain.dependencies {
             api(projects.data)
             api(libs.compose.ui)
             api(libs.compose.components.resources)
+            // NPM aggregation needs the BOM in the module declaring versionless Koin dependencies.
+            implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.androidx.lifecycle.viewmodel.compose)
@@ -78,5 +57,7 @@ kotlin {
 }
 
 compose.resources {
+    // Keep the resource API stable when logical Gradle project paths change.
+    packageOfResClass = "updater.app.shared.generated.resources"
     publicResClass = true
 }

@@ -5,7 +5,7 @@ fi
 BOT_API_URL="${BOT_API_LINK:-https://api.telegram.org}"
 
 # Get Version Info
-VERSION_NAME=$(grep 'const val VERSION_NAME' buildSrc/src/main/kotlin/ProjectConfig.kt | cut -d '"' -f 2)
+VERSION_NAME=$(sed -n 's/.*const val VERSION_NAME = "\([^"]*\)".*/\1/p' build-logic/common/src/main/kotlin/top/yukonga/updater/buildlogic/ProjectConfig.kt)
 SHORT_HASH=$(git rev-parse --short HEAD)
 COMMIT_MSG_BODY=$(git log -1 --pretty=%B)
 COMMIT_COUNT=$(git rev-list --count HEAD)

@@ -3,43 +3,36 @@
 import java.util.Properties
 
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.compose.compiler)
+    id("updater.android-application")
+    id("updater.compose-compiler")
 }
 
-kotlin {
-    jvmToolchain(ProjectConfig.JVM_VERSION)
-}
+val localProperties = providers.fileContents(layout.settingsDirectory.file("local.properties"))
+    .asText.orElse("").map { contents ->
+        Properties().apply { contents.reader().use { load(it) } }
+    }
+
+fun signingProperty(name: String) = localProperties.map { it.getProperty(name) }
+    .orElse(providers.environmentVariable(name))
+
+val keystorePath = signingProperty("KEYSTORE_PATH").orNull
+val keystorePwd = signingProperty("KEYSTORE_PASS").orNull
+val signingAlias = signingProperty("KEY_ALIAS").orNull
+val signingPassword = signingProperty("KEY_PASSWORD").orNull
 
 dependencies {
-    implementation(projects.app.shared)
+    implementation(projects.shared)
     implementation(libs.androidx.activity.compose)
 }
 
 android {
-    namespace = ProjectConfig.PACKAGE_NAME
-    compileSdk = ProjectConfig.Android.COMPILE_SDK
-    buildToolsVersion = ProjectConfig.Android.BUILD_TOOLS_VERSION
-    defaultConfig {
-        applicationId = ProjectConfig.PACKAGE_NAME
-        versionCode = getGitVersionCode()
-        versionName = ProjectConfig.VERSION_NAME
-        targetSdk = ProjectConfig.Android.TARGET_SDK
-        minSdk = ProjectConfig.Android.MIN_SDK
-    }
-    val properties = Properties()
-    runCatching { properties.load(project.rootProject.file("local.properties").inputStream()) }
-    val keystorePath = properties.getProperty("KEYSTORE_PATH") ?: System.getenv("KEYSTORE_PATH")
-    val keystorePwd = properties.getProperty("KEYSTORE_PASS") ?: System.getenv("KEYSTORE_PASS")
-    val alias = properties.getProperty("KEY_ALIAS") ?: System.getenv("KEY_ALIAS")
-    val pwd = properties.getProperty("KEY_PASSWORD") ?: System.getenv("KEY_PASSWORD")
     if (keystorePath != null) {
         signingConfigs {
             create("release") {
                 storeFile = file(keystorePath)
                 storePassword = keystorePwd
-                keyAlias = alias
-                keyPassword = pwd
+                keyAlias = signingAlias
+                keyPassword = signingPassword
                 enableV2Signing = true
                 enableV3Signing = true
             }
@@ -63,10 +56,4 @@ android {
             excludes += "lib/*/libandroidx.graphics.path.so"
         }
     }
-}
-
-base {
-    archivesName.set(
-        ProjectConfig.APP_NAME + "-v" + ProjectConfig.VERSION_NAME + "(" + getGitVersionCode() + ")"
-    )
 }

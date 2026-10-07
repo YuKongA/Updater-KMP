@@ -23,6 +23,10 @@ When you are not logged in with a Xiaomi account, you can use the miotaV3-v1 int
 
 After logging in to your Xiaomi account, you will use the miotaV3-v2 interface to obtain detailed information about the `Beta Release Version` or the `Public Development Version`, corresponding to the internal test permissions you have.
 
+## Building
+
+Gradle conventions are maintained in the [build-logic included build](build-logic/README.md), which documents the module paths, build commands, and cache validation.
+
 ## Credits
 
 - [compose-imageloader](https://github.com/qdsfdhvh/compose-imageloader) with MIT License

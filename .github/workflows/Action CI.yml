@@ -19,7 +19,7 @@ jobs:
             artifact-path: app/macos/build/compose/binaries/main/native-macosArm64-release-dmg/*.dmg
             artifact-name: Updater-darwin-arm64-dmg.dmg
             archive: false
-            cli-command: ./gradlew :app:cli:linkReleaseExecutableMacosArm64 :data:macosArm64Test
+            cli-command: ./gradlew :cli:linkReleaseExecutableMacosArm64 :data:macosArm64Test
             cli-artifact-path: app/cli/build/bin/macosArm64/releaseExecutable/updater.kexe
             cli-artifact-name: Updater-cli-macos-arm64
           - os: ubuntu-latest
@@ -32,7 +32,7 @@ jobs:
             artifact-name: Updater-linux-x64-bin
             artifact-nameEx: Updater-android-universal-apk.apk
             archive: true
-            cli-command: ./gradlew :app:cli:linkReleaseExecutableLinuxX64 :data:linuxX64Test :data:desktopTest
+            cli-command: ./gradlew :cli:linkReleaseExecutableLinuxX64 :data:linuxX64Test :data:desktopTest
             cli-artifact-path: app/cli/build/bin/linuxX64/releaseExecutable/updater.kexe
             cli-artifact-name: Updater-cli-linux-x64
           - os: ubuntu-24.04-arm
@@ -47,7 +47,7 @@ jobs:
             artifact-path: app/desktop/build/compose/binaries/main-release/app/Updater
             artifact-name: Updater-windows-x64-exe
             archive: true
-            cli-command: ./gradlew :app:cli:linkReleaseExecutableMingwX64 :data:mingwX64Test :app:cli:mingwX64Test
+            cli-command: ./gradlew :cli:linkReleaseExecutableMingwX64 :data:mingwX64Test :cli:mingwX64Test
             cli-artifact-path: app/cli/build/bin/mingwX64/releaseExecutable/updater.exe
             cli-artifact-name: Updater-cli-windows-x64.exe
     steps:
@@ -62,6 +62,9 @@ jobs:
           java-version: "25"
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
+      - name: Validate Gradle build logic
+        if: matrix.os == 'ubuntu-latest'
+        run: ./gradlew -p build-logic check --parallel --configuration-cache --configuration-cache-problems=fail
       - name: Install libcurl for Linux CLI
         if: runner.os == 'Linux' && matrix.cli-command != ''
         run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
