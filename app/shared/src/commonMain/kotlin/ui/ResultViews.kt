@@ -49,6 +49,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -761,8 +762,9 @@ fun TextWithImage(
                 lines.forEach { line ->
                     if (line.changelog.isNotEmpty()) {
                         ChangelogText(
-                            text = line.changelog,
+                            text = if (line.isListItem) "• ${line.changelog}" else line.changelog,
                             fontWeight = if (line.isBold) FontWeight.Bold else null,
+                            textIndent = if (line.isListItem) TextIndent(restLine = 12.sp) else null,
                         )
                     }
 
@@ -806,6 +808,7 @@ fun ChangelogText(
     text: String,
     modifier: Modifier = Modifier,
     fontWeight: FontWeight? = null,
+    textIndent: TextIndent? = null,
 ) {
     val links = remember(text) { LinkUtils.extractLinks(text) }
     val uriHandler = LocalUriHandler.current
@@ -850,6 +853,7 @@ fun ChangelogText(
             color = MiuixTheme.colorScheme.onSecondaryVariant,
             fontSize = 14.5.sp,
             fontWeight = fontWeight,
+            textIndent = textIndent,
         )
     )
 }

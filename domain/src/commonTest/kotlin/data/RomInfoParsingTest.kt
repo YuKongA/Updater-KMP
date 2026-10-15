@@ -45,8 +45,10 @@ class RomInfoParsingTest {
         assertEquals(1110, images.first().imageWidth)
         assertEquals(600, images.first().imageHeight)
         assertEquals(listOf(false, false, true, false, false, false), images.map { it.isBold })
+        assertEquals(listOf(false, false, false, true, true, true), images.map { it.isListItem })
         val roundTrip = Json.decodeFromString<RomInfoHelper.Rom>(Json.encodeToString(rom))
         assertEquals(1, assertNotNull(roundTrip.changelog).getValue("基础体验")[2].bold)
+        assertEquals(1, assertNotNull(roundTrip.changelog).getValue("基础体验")[3].list)
     }
 
     @Test
@@ -59,6 +61,7 @@ class RomInfoParsingTest {
         assertEquals(listOf("优化 系统稳定性", "修复 已知问题"), groups.getValue("系统").map { it.txt })
         assertEquals("更新 安全补丁", groups.getValue("安全").single().txt)
         assertTrue(groups.values.flatten().all { it.bold == 0 })
+        assertTrue(groups.values.flatten().all { it.list == 0 })
     }
 
     @Test
@@ -77,6 +80,7 @@ class RomInfoParsingTest {
         assertEquals("com.example.app", items.first().packageName)
         assertEquals("123", items.first().versionCode)
         assertTrue(items.all { it.bold == 0 })
+        assertTrue(items.all { it.list == 0 })
     }
 
     @Test
@@ -84,7 +88,7 @@ class RomInfoParsingTest {
         val response = Json.decodeFromString<RomInfoHelper.RomInfo>(
             """
             {"xmsUpdateInfo":{"hasXmsUpdate":1,"changeLog":{"应用":[
-              {"txt":"优化 应用体验","bold":1,"packageName":"com.example.app","versionName":"1.0","video":["intro.mp4"],"cover":["cover.png"]}
+              {"txt":"优化 应用体验","bold":1,"list":1,"packageName":"com.example.app","versionName":"1.0","video":["intro.mp4"],"cover":["cover.png"]}
             ]}}}
             """.trimIndent()
         )
@@ -92,5 +96,6 @@ class RomInfoParsingTest {
         assertEquals("优化 应用体验", assertNotNull(xms.changeLog).getValue("应用").single().txt)
         assertTrue(RomInfoMapper.mapXmsInfo(xms, "").changelogText.contains("优化 应用体验"))
         assertTrue(RomInfoMapper.mapXmsInfo(xms, "").changelogItems.single().isBold)
+        assertTrue(RomInfoMapper.mapXmsInfo(xms, "").changelogItems.single().isListItem)
     }
 }

@@ -18,6 +18,7 @@ object DataHelper {
         val imageWidth: Int? = null,
         val imageHeight: Int? = null,
         val isBold: Boolean = false,
+        val isListItem: Boolean = false,
     )
 
     @Serializable

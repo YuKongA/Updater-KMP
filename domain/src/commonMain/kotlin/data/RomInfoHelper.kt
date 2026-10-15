@@ -66,6 +66,7 @@ object RomInfoHelper {
         @SerialName("package") val packageName: String? = null,
         val versionCode: String? = null,
         val bold: Int = 0,
+        val list: Int = 0,
     )
 
     @Serializable
@@ -195,6 +196,7 @@ object RomInfoHelper {
                             addJsonObject {
                                 put("txt", item.txt)
                                 if (item.bold != 0) put("bold", item.bold)
+                                if (item.list != 0) put("list", item.list)
                                 item.image?.let { images ->
                                     putJsonArray("image") {
                                         images.forEach { img ->

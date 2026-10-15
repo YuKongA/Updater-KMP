@@ -78,6 +78,7 @@ object RomInfoMapper {
                         imageWidth = image?.w?.toIntOrNull(),
                         imageHeight = image?.h?.toIntOrNull(),
                         isBold = item.bold == 1,
+                        isListItem = item.list == 1,
                     )
                 }
             } ?: emptyList()
@@ -162,6 +163,7 @@ object RomInfoMapper {
                         imageWidth = image?.w?.toIntOrNull(),
                         imageHeight = image?.h?.toIntOrNull(),
                         isBold = item.bold == 1,
+                        isListItem = item.list == 1,
                     )
                 )
             }
