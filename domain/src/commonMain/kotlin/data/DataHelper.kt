@@ -16,7 +16,9 @@ object DataHelper {
         val changelog: String = "",
         val imageUrl: String = "",
         val imageWidth: Int? = null,
-        val imageHeight: Int? = null
+        val imageHeight: Int? = null,
+        val isBold: Boolean = false,
+        val isListItem: Boolean = false,
     )
 
     @Serializable

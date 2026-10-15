@@ -76,7 +76,9 @@ object RomInfoMapper {
                         changelog = item.txt,
                         imageUrl = imageLink(imageMainLink, image?.path),
                         imageWidth = image?.w?.toIntOrNull(),
-                        imageHeight = image?.h?.toIntOrNull()
+                        imageHeight = image?.h?.toIntOrNull(),
+                        isBold = item.bold == 1,
+                        isListItem = item.list == 1,
                     )
                 }
             } ?: emptyList()
@@ -160,6 +162,8 @@ object RomInfoMapper {
                         imageUrl = imageLink(imageMirror, image?.path),
                         imageWidth = image?.w?.toIntOrNull(),
                         imageHeight = image?.h?.toIntOrNull(),
+                        isBold = item.bold == 1,
+                        isListItem = item.list == 1,
                     )
                 )
             }

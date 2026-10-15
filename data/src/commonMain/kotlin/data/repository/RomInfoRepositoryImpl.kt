@@ -17,6 +17,7 @@ import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
 import platform.httpClientPlatform
+import platform.logDebugJson
 import platform.miuiDecrypt
 import platform.miuiEncrypt
 import utils.isWeb
@@ -132,6 +133,7 @@ class RomInfoRepositoryImpl(
             }
             val requestedEncryptedText = response.body<String>()
             val decrypted = miuiDecrypt(requestedEncryptedText, securityKey)
+            logDebugJson(decrypted)
             if (decrypted.isEmpty()) return@withContext null
             Json.decodeFromString<RomInfoHelper.RomInfo>(decrypted)
         } catch (e: CancellationException) {
@@ -225,6 +227,7 @@ class RomInfoRepositoryImpl(
             }
             val requestedEncryptedText = response.body<String>()
             val decrypted = miuiDecrypt(requestedEncryptedText, securityKey)
+            logDebugJson(decrypted)
             if (decrypted.isEmpty()) return@withContext null
             Json.decodeFromString<RomInfoHelper.XmsDto>(decrypted)
         } catch (e: CancellationException) {
