@@ -58,11 +58,14 @@ object RomInfoHelper {
     )
 
     @Serializable
+    @JsonIgnoreUnknownKeys
+    @OptIn(ExperimentalSerializationApi::class)
     data class ChangelogItem(
         val txt: String,
         val image: List<ChangelogImage>? = null,
         @SerialName("package") val packageName: String? = null,
         val versionCode: String? = null,
+        val bold: Int = 0,
     )
 
     @Serializable
@@ -191,6 +194,7 @@ object RomInfoHelper {
                         items.forEach { item ->
                             addJsonObject {
                                 put("txt", item.txt)
+                                if (item.bold != 0) put("bold", item.bold)
                                 item.image?.let { images ->
                                     putJsonArray("image") {
                                         images.forEach { img ->

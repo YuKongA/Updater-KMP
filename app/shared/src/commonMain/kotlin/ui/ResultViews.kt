@@ -762,6 +762,7 @@ fun TextWithImage(
                     if (line.changelog.isNotEmpty()) {
                         ChangelogText(
                             text = line.changelog,
+                            fontWeight = if (line.isBold) FontWeight.Bold else null,
                         )
                     }
 
@@ -802,7 +803,9 @@ fun RomFileInfoSection(
 
 @Composable
 fun ChangelogText(
-    text: String
+    text: String,
+    modifier: Modifier = Modifier,
+    fontWeight: FontWeight? = null,
 ) {
     val links = remember(text) { LinkUtils.extractLinks(text) }
     val uriHandler = LocalUriHandler.current
@@ -841,11 +844,12 @@ fun ChangelogText(
     }
 
     Text(
-        modifier = Modifier.padding(vertical = 6.dp),
+        modifier = modifier.padding(vertical = 6.dp),
         text = annotatedString,
         style = TextStyle(
             color = MiuixTheme.colorScheme.onSecondaryVariant,
-            fontSize = 14.5.sp
+            fontSize = 14.5.sp,
+            fontWeight = fontWeight,
         )
     )
 }
