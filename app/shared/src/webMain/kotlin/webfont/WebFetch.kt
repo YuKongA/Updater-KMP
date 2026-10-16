@@ -10,7 +10,8 @@ import kotlin.js.ExperimentalWasmJsInterop
 @JsFun(
     """
         function fetchTextJs(url, onOk, onErr) {
-            fetch(url, { credentials: 'omit' })
+            var sig = typeof AbortSignal !== 'undefined' && AbortSignal.timeout ? AbortSignal.timeout(10000) : undefined;
+            fetch(url, { credentials: 'omit', signal: sig })
                 .then(function (r) {
                     if (!r.ok) { onErr('http ' + r.status); return null; }
                     return r.text();
@@ -30,7 +31,8 @@ private external fun fetchTextJs(
 @JsFun(
     """
         function fetchBytesAsBase64Js(url, onOk, onErr) {
-            fetch(url, { credentials: 'omit' })
+            var sig = typeof AbortSignal !== 'undefined' && AbortSignal.timeout ? AbortSignal.timeout(15000) : undefined;
+            fetch(url, { credentials: 'omit', signal: sig })
                 .then(function (r) {
                     if (!r.ok) { onErr('http ' + r.status); return null; }
                     return r.arrayBuffer();

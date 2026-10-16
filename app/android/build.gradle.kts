@@ -21,7 +21,7 @@ val signingAlias = signingProperty("KEY_ALIAS").orNull
 val signingPassword = signingProperty("KEY_PASSWORD").orNull
 
 dependencies {
-    implementation(projects.shared)
+    implementation(project(":shared"))
     implementation(libs.androidx.activity.compose)
 }
 

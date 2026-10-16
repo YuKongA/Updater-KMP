@@ -20,7 +20,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(projects.shared)
+            implementation(project(":shared"))
         }
         wasmJsMain.dependencies {
             implementation(devNpm("terser-webpack-plugin", libs.versions.terser.webpack.plugin.get()))

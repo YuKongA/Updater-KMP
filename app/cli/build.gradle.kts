@@ -20,13 +20,10 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(projects.data)
+            implementation(project(":data"))
             implementation(libs.koin.core)
             implementation(libs.clikt)
             implementation(libs.mordant)
-        }
-        commonTest.dependencies {
-            implementation(kotlin("test"))
         }
     }
 }

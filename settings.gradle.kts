@@ -1,7 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-
 rootProject.name = "Updater"
 
 pluginManagement {
@@ -41,7 +39,7 @@ includeBuild("build-logic")
 include(":domain")
 include(":data")
 
-listOf("shared", "android", "desktop", "js", "wasmJs", "macos", "cli").forEach { name ->
+listOf("shared", "android", "desktop", "wasmJs", "macos", "cli").forEach { name ->
     include(":$name")
     project(":$name").projectDir = file("app/$name")
 }

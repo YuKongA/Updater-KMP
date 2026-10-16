@@ -23,7 +23,7 @@ Web launchers explicitly declare `terser-webpack-plugin` as an NPM development d
 
 Parallel execution, configuration caching, and build caching are enabled for both builds. Main-build incremental compilation and Native optimizations stay in the root `gradle.properties`. Generated sources use a task output provider so Gradle infers compilation dependencies. Kotlin version sources and Xcode's `Generated.xcconfig` are both declared outputs, allowing missing files to be restored from the build cache. Git's commit count is obtained through `providers.exec`, so configuration-cache reuse checks version changes.
 
-Application projects retain their physical `app/<name>` directories and use flat logical paths (`:android`, `:shared`, `:desktop`, `:js`, `:wasmJs`, `:macos`, `:cli`). This avoids creating an empty `:app` project. Use these paths in task commands and `projects.shared` in dependencies. CI, Xcode, and IDE run configurations use the same paths. The shared Compose resource package is explicitly pinned to `updater.app.shared.generated.resources` to preserve the existing resource API.
+Application projects retain their physical `app/<name>` directories and use flat logical paths (`:android`, `:shared`, `:desktop`, `:wasmJs`, `:macos`, `:cli`). This avoids creating an empty `:app` project. Use these paths in task commands and `projects.shared` in dependencies. CI, Xcode, and IDE run configurations use the same paths. The shared Compose resource package is explicitly pinned to `updater.app.shared.generated.resources` to preserve the existing resource API.
 
 If an existing checkout reports changed Yarn lock files during Web packaging, refresh the generated local locks with `./gradlew kotlinUpgradeYarnLock kotlinWasmUpgradeYarnLock`. Keep lock mismatch checks enabled.
 
@@ -35,7 +35,7 @@ Run from the repository root:
 
 # Check the project structure and build several targets in parallel.
 ./gradlew projects
-./gradlew :data:desktopTest :android:assembleDebug :desktop:desktopJar :js:compileKotlinJs :wasmJs:compileKotlinWasmJs --parallel --configuration-cache --configuration-cache-problems=fail
+./gradlew :data:desktopTest :android:assembleDebug :desktop:desktopJar :wasmJs:compileKotlinWasmJs --parallel --configuration-cache --configuration-cache-problems=fail
 
 # Repeating a command should reuse the configuration cache and up-to-date task outputs.
 ./gradlew :data:generateVersionInfo --parallel --configuration-cache --configuration-cache-problems=fail

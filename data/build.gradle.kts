@@ -21,7 +21,7 @@ kotlin {
             kotlin.srcDir(generateVersionInfo.flatMap { it.outputDirectory })
         }
         commonMain.dependencies {
-            api(projects.domain)
+            api(project(":domain"))
             api(project.dependencies.platform(libs.koin.bom))
             api(libs.koin.core)
             api(libs.ktor.client.core)
@@ -29,7 +29,6 @@ kotlin {
             implementation(libs.kotlinx.serialization.protobuf)
             implementation(libs.okio)
         }
-        commonTest.dependencies { implementation(kotlin("test")) }
         androidMain.dependencies { implementation(libs.ktor.client.cio) }
         appleMain.dependencies { implementation(libs.ktor.client.darwin) }
         desktopMain.dependencies { implementation(libs.ktor.client.cio) }

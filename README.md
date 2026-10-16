@@ -3,7 +3,7 @@
 This is an app to get Xiaomi official recovery rom information.
 Use [Kotlin Multiplatform](https://www.jetbrains.com/kotlin-multiplatform/) + [Compose Multiplatform](https://www.jetbrains.com/compose-multiplatform/).
 **Android** / **Desktop(JVM)** / **iOS** / **macOS** are fully supported.
-**Webpage([Js](https://yukonga.github.io/Updater-JsCanvas/)/[WasmJs](https://yukonga.github.io/Updater-WasmJs/))** is also basically supported.
+**Webpage([WasmJs](https://yukonga.github.io/Updater-WasmJs/))** is also basically supported.
 
 ## Usage
 

@@ -16,6 +16,5 @@ kotlin {
             api(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.protobuf)
         }
-        commonTest.dependencies { implementation(kotlin("test")) }
     }
 }

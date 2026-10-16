@@ -15,18 +15,5 @@ import kotlin.js.ExperimentalWasmJsInterop
 )
 private external fun hideLoading()
 
-@OptIn(ExperimentalWasmJsInterop::class)
-@JsFun(
-    """
-        function setFontProgress(done, total) {
-            if (window.__updaterLoading && window.__updaterLoading.fontProgress) {
-                window.__updaterLoading.fontProgress(done, total);
-            }
-        }
-    """,
-)
-private external fun setFontProgress(done: Int, total: Int)
-
 fun platformHideLoading() = hideLoading()
 
-fun platformSetFontProgress(done: Int, total: Int) = setFontProgress(done, total)

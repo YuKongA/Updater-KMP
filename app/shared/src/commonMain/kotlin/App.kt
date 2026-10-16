@@ -104,16 +104,19 @@ import viewmodel.LoginViewModel
 import viewmodel.RomQueryUiState
 import viewmodel.RomQueryViewModel
 import viewmodel.UiEvent
+import top.yukonga.miuix.kmp.theme.TextStyles
 
 @Composable
 fun App(
     isDarkTheme: Boolean = isSystemInDarkTheme(),
+    textStyles: TextStyles = MiuixTheme.textStyles,
     loginViewModel: LoginViewModel = koinViewModel(),
     romQueryViewModel: RomQueryViewModel = koinViewModel(),
     deviceListViewModel: DeviceListViewModel = koinViewModel(),
 ) {
     AppTheme(
-        isDarkTheme = isDarkTheme
+        isDarkTheme = isDarkTheme,
+        textStyles = textStyles,
     ) {
         val loginUi by loginViewModel.uiState.collectAsState()
         val queryUi by romQueryViewModel.uiState.collectAsState()

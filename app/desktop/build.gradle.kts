@@ -12,7 +12,7 @@ kotlin {
     sourceSets {
         val desktopMain = getByName("desktopMain")
         desktopMain.dependencies {
-            implementation(projects.shared)
+            implementation(project(":shared"))
             implementation(compose.desktop.currentOs)
         }
     }

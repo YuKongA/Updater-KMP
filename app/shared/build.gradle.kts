@@ -31,7 +31,7 @@ kotlin {
     sourceSets {
         val desktopMain = getByName("desktopMain")
         commonMain.dependencies {
-            api(projects.data)
+            api(project(":data"))
             api(libs.compose.ui)
             api(libs.compose.components.resources)
             // NPM aggregation needs the BOM in the module declaring versionless Koin dependencies.
@@ -41,8 +41,8 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel.compose)
             implementation(libs.androidx.lifecycle.runtime.compose)
             // Added
+            api(libs.miuix.ui)
             implementation(libs.image.loader)
-            implementation(libs.miuix.ui)
             implementation(libs.miuix.icons)
             implementation(libs.miuix.blur)
             implementation(libs.miuix.preference)

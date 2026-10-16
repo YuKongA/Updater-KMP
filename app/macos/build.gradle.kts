@@ -17,7 +17,7 @@ kotlin {
 
     sourceSets {
         macosMain.dependencies {
-            implementation(projects.shared)
+            implementation(project(":shared"))
         }
     }
 }
