@@ -4,8 +4,6 @@ plugins {
 
 dependencies {
     api(project(":common"))
-    testImplementation(gradleTestKit())
-    testImplementation(kotlin("test-junit"))
 }
 
 gradlePlugin {

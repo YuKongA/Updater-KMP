@@ -35,7 +35,7 @@ Run from the repository root:
 
 # Check the project structure and build several targets in parallel.
 ./gradlew projects
-./gradlew :data:desktopTest :android:assembleDebug :desktop:desktopJar :wasmJs:compileKotlinWasmJs --parallel --configuration-cache --configuration-cache-problems=fail
+./gradlew :android:assembleDebug :desktop:desktopJar :wasmJs:compileKotlinWasmJs --parallel --configuration-cache --configuration-cache-problems=fail
 
 # Repeating a command should reuse the configuration cache and up-to-date task outputs.
 ./gradlew :data:generateVersionInfo --parallel --configuration-cache --configuration-cache-problems=fail
