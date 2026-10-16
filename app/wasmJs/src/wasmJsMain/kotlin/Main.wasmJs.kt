@@ -12,7 +12,7 @@ import webfont.queryParam
 import kotlin.time.Duration.Companion.milliseconds
 
 private const val DEFAULT_CSS_URL =
-    "https://cdn-font.hyperos.mi.com/font/css?family=MiSans_VF:VF:Chinese_Simplify&display=swap"
+    "https://i02.appmifile.com/i18n/fonts/MiSans/vf/index.css"
 
 // Safety cap on how long the loading overlay waits for fonts; afterwards it hides and any remaining
 // subsets keep downloading in the background.
