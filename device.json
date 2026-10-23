@@ -225,5 +225,5 @@
         { "deviceName": "Xiaomi 18 Pro Max", "deviceCodeName": "madrid", "deviceCode": "EO" },
         { "deviceName": "POCO X8s", "deviceCodeName": "darwin", "deviceCode": "ET" }
     ],
-    "version": "1.2.0"
+    "version": "1.2.1"
 }
