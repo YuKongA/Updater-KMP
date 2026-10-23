@@ -159,8 +159,8 @@
         { "deviceName": "Xiaomi Pad 6S Pro", "deviceCodeName": "sheng", "deviceCode": "NX" },
         { "deviceName": "Redmi Pad Pro WiFi / POCO Pad", "deviceCodeName": "dizi", "deviceCode": "NS" },
         { "deviceName": "Redmi Pad Pro 5G / POCO Pad 5G", "deviceCodeName": "ruan", "deviceCode": "FS" },
-        { "deviceName": "REDMI Pad 2 4G", "deviceCodeName": "koto", "deviceCode": "OW" },
-        { "deviceName": "REDMI Pad 2", "deviceCodeName": "taiko", "deviceCode": "OV" },
+        { "deviceName": "REDMI Pad 2 4G / REDMI Pad 3 4G", "deviceCodeName": "koto", "deviceCode": "OW" },
+        { "deviceName": "REDMI Pad 2 / REDMI Pad 3", "deviceCodeName": "taiko", "deviceCode": "OV" },
         { "deviceName": "REDMI Pad 2 Pro / POCO Pad M1", "deviceCodeName": "flute", "deviceCode": "PW" },
         { "deviceName": "REDMI Pad 2 Pro 5G", "deviceCodeName": "organ", "deviceCode": "PX" },
         { "deviceName": "REDMI K Pad / Xiaomi Pad Mini", "deviceCodeName": "turner", "deviceCode": "AO" },
@@ -201,7 +201,7 @@
         { "deviceName": "REDMI A7 Pro / POCO C81 / C81 Pro", "deviceCodeName": "arctic", "deviceCode": "BV" },
         { "deviceName": "REDMI 17 5G / 15A 5G / A7 Pro 5G / POCO C85x", "deviceCodeName": "somalia", "deviceCode": "BW" },
         { "deviceName": "REDMI K90 Max", "deviceCodeName": "prague", "deviceCode": "AA" },
-        { "deviceName": "REDMI K90 Ultra", "deviceCodeName": "warsaw", "deviceCode": "HP" },
+        { "deviceName": "REDMI K90 Ultra / REDMI K100", "deviceCodeName": "warsaw", "deviceCode": "HP" },
         { "deviceName": "REDMI 17 / POCO C95 Pro", "deviceCodeName": "leedsa", "deviceCode": "DT" },
         { "deviceName": "REDMI M100 / REDMI 17 5G (Global) / POCO M8x", "deviceCodeName": "steppe", "deviceCode": "AV" },
         { "deviceName": "REDMI Note 17 4G", "deviceCodeName": "zephyr", "deviceCode": "BU" },
@@ -222,7 +222,8 @@
         { "deviceName": "Xiaomi Pad 9 Pro", "deviceCodeName": "shuntian", "deviceCode": "FP" },
         { "deviceName": "Xiaomi Pad 9 Pro Max", "deviceCodeName": "yingtian", "deviceCode": "BM" },
         { "deviceName": "Xiaomi 18 Pro", "deviceCodeName": "hongkong", "deviceCode": "FR" },
-        { "deviceName": "Xiaomi 18 Pro Max", "deviceCodeName": "madrid", "deviceCode": "EO" }
+        { "deviceName": "Xiaomi 18 Pro Max", "deviceCodeName": "madrid", "deviceCode": "EO" },
+        { "deviceName": "POCO X8s", "deviceCodeName": "darwin", "deviceCode": "ET" }
     ],
-    "version": "1.2.0"
+    "version": "1.2.1"
 }
