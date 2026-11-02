@@ -113,13 +113,15 @@ object DeviceInfoHelper {
     private val MS = Carrier("Movistar", "MS", "_ms")
     private val MT = Carrier("MTN", "MT", "_mt")
     private val OR = Carrier("Orange", "OR", "_or")
-    private val SB = Carrier("SoftBank", "SB", "_ti")
+    private val SB = Carrier("SoftBank", "SB", "_sb")
     private val SF = Carrier("Altice France", "SF", "_sf")
+    private val TC = Carrier("Telcel", "TC", "_tc")
     private val TF = Carrier("Telefónica", "TF", "_tf")
     private val TG = Carrier("Tigo", "TG", "_tg")
-    private val TM = Carrier("TIM", "TI", "_tm")
+    private val TM = Carrier("TIM", "TI", "_ti")
     private val VC = Carrier("Vodacom", "VC", "_vc")
     private val VF = Carrier("Vodafone", "VF", "_vf")
+    private val WT = Carrier("Watu", "WT", "_wt")
 
     private val carrierList = listOf(XM, DM, DC, AT, BY, CR, EN, HG, KD, MS, MT, OR, SB, SF, TF, TG, TM, VC, VF)
 
