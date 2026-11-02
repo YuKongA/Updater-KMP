@@ -123,7 +123,7 @@ object DeviceInfoHelper {
     private val VF = Carrier("Vodafone", "VF", "_vf")
     private val WT = Carrier("Watu", "WT", "_wt")
 
-    private val carrierList = listOf(XM, DM, DC, AT, BY, CR, EN, HG, KD, MS, MT, OR, SB, SF, TF, TG, TM, VC, VF)
+    private val carrierList = listOf(XM, DM, DC, AT, BY, CR, EN, HG, KD, MS, MT, OR, SB, SF, TC, TF, TG, TM, VC, VF, WT)
 
     private val regionNameToRegionCode = regionList.associateBy({ it.regionName }, { it.regionCode })
     private val regionNameToRegionCodeName = regionList.associateBy({ it.regionName }, { it.regionCodeName })
